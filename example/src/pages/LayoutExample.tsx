@@ -173,7 +173,6 @@ function LayoutExample(): React.JSX.Element {
   );
 }
 
-// 스타일 생성 함수 (최적화된 방식 유지)
 const createStyles = ({
   background,
 }: {

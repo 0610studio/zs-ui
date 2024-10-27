@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableOpacity, BackHandler } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableOpacity, BackHandler, Text } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useNotify } from '../../model/useNotify';
@@ -93,20 +93,15 @@ function AlertNotify({
                     style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                     onPress={handleButtonPress(primary?.onPress)}
                   >
-                    <ZSText typo='subTitle.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label}</ZSText>
+                    <ZSText typo='subTitle.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                   </TouchableOpacity>
                 </>
               ) : (
                 <TouchableOpacity
+                  style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                   onPress={handleButtonPress(primary?.onPress)}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <TouchableOpacity
-                    style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
-                    onPress={handleButtonPress(primary?.onPress)}
-                  >
-                    <ZSText typo='subTitle.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
-                  </TouchableOpacity>
+                  <ZSText typo='subTitle.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                 </TouchableOpacity>
               )}
             </ViewAtom>
