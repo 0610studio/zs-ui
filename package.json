@@ -1,0 +1,54 @@
+{
+  "name": "@0610studio/zs-ui",
+  "version": "0.0.1",
+  "private": false,
+  "description": "EXPO ZS-UI",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "start:android": "cd example && yarn install && npx expo run:android",
+    "build": "expo-module build",
+    "prepare": "expo-module prepare",
+    "---------------------------------------------------------------------------": "",
+    "clean": "expo-module clean",
+    "lint": "expo-module lint",
+    "test": "expo-module test",
+    "prepublishOnly": "expo-module prepublishOnly",
+    "expo-module": "expo-module",
+    "open:ios": "xed example/ios",
+    "open:android": "open -a \"Android Studio\" example/android"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "zs-ui",
+    "ZsUi"
+  ],
+  "repository": "https://github.com/0610studio/zs-ui",
+  "author": "righthot <0610studio@naver.com> ()",
+  "license": "MIT",
+  "homepage": "https://github.com/0610studio/zs-ui",
+  "dependencies": {},
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "^2.0.0",
+    "@types/react": "^18.0.25",
+    "expo-module-scripts": "^3.5.2",
+    "expo-modules-core": "^1.12.24",
+    "react": ">=16.8.0",
+    "react-native": ">=0.63.0",
+    "react-native-gesture-handler": "^2.20.0",
+    "react-native-reanimated": "^3.16.0",
+    "react-native-safe-area-context": "^4.11.1",
+    "react-native-svg": "^15.8.0"
+  },
+  "peerDependencies": {
+    "@react-native-async-storage/async-storage": "*",
+    "expo": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-svg": "*"
+  }
+}
