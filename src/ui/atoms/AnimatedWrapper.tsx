@@ -71,13 +71,13 @@ function AnimatedWrapper({
 
   // 애니메이션이 비활성화된 경우 기본 View로 렌더링
   if (!isAnimation) {
-    return <View style={[{ backgroundColor: palette.background.base }, style, staticStyle]} {...props}>{children}</View>;
+    return <View style={[style, staticStyle]} {...props}>{children}</View>;
   }
 
   // 애니메이션이 적용된 View로 렌더링
   return (
     <Animated.View
-      style={[{ backgroundColor: palette.background.base }, style, staticStyle, animatedStyle]}
+      style={[style, staticStyle, animatedStyle]}
       {...animationProps}
       {...props}
     >
