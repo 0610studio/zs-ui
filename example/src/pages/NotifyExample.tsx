@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Button, StyleSheet } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import { PopOverButton, useNotify, ZSContainer, ZSText, ZSView } from "zs-ui";
 import MyBottomSheet from "../ui/MyBottomSheet";
 import { useTheme } from "zs-ui/model/useThemeProvider";
@@ -95,8 +95,15 @@ const NotifyExample = () => {
       <Button
         onPress={() => {
           showBottomSheet({
-            isHandleVisible: true,
-            isBottomRadius: true,
+            isScrollView: true,
+            contentsGestureEnable: false,
+            maxHeight: 300,
+            showsVerticalScrollIndicator: true,
+            headerComponent: (
+              <View style={{ backgroundColor: 'lightblue', padding: 30 }}>
+                <ZSText>headerComponent</ZSText>
+              </View>
+            ),
             component: (
               <MyBottomSheet
                 onConfirm={() => {

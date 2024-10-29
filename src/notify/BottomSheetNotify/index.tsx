@@ -6,7 +6,7 @@ import useBottomSheetNotify from './model/useBottomSheetNotify';
 import { BottomSheetNotifyRef } from './types';
 import ContentsComponent from './ui/ContentsComponent';
 import { useTheme } from '../../model/useThemeProvider';
-import { ColorPalette, ThemeBackground, ThemeTextType } from '../../theme';
+import { ThemeBackground } from '../../theme';
 import ViewAtom from '../../ui/atoms/ViewAtom';
 import { ZSView } from '../../ui';
 
@@ -25,6 +25,8 @@ interface Props extends ViewProps {
   maxHeight?: number;
   isScrollView?: boolean;
   bottomSheetComponent: React.ReactNode;
+  showsVerticalScrollIndicator: boolean;
+  headerComponent?: React.ReactNode;
 }
 
 function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
@@ -39,7 +41,9 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
     isBottomRadius = true,
     isScrollView = true,
     maxHeight = BS_MAX_HEIGHT,
-    bottomSheetComponent
+    bottomSheetComponent,
+    showsVerticalScrollIndicator,
+    headerComponent
   } = props;
 
   const {
@@ -64,11 +68,11 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
     isHandleVisible,
   });
 
-  const { palette: { background, text, primary, modalBgColor } } = useTheme();
+  const { palette: { background } } = useTheme();
 
   const styles = useMemo(
-    () => createStyles({ background, text, primary, modalBgColor }),
-    [background, text, primary, modalBgColor]
+    () => createStyles({ background }),
+    [background]
   );
 
   useImperativeHandle(ref, () => ({
@@ -124,6 +128,8 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
                 bottomSheetPadding={bottomSheetPadding}
                 maxHeight={maxHeight}
                 isScrollView={isScrollView}
+                showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+                headerComponent={headerComponent}
               />
             </GestureDetector>
           </Animated.View>
@@ -136,14 +142,8 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
 
 const createStyles = ({
   background,
-  text,
-  primary,
-  modalBgColor,
 }: {
   background: ThemeBackground;
-  text: ThemeTextType;
-  primary: ColorPalette;
-  modalBgColor: string;
 }) =>
   StyleSheet.create({
     modalBg: {

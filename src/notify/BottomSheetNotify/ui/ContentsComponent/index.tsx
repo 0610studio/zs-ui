@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Dimensions, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { Dimensions, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Text, View } from 'react-native';
 import { GestureType, ScrollView } from 'react-native-gesture-handler';
 import { SharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +19,8 @@ interface Props {
     bottomSheetPadding: number;
     maxHeight: number;
     isScrollView: boolean;
+    showsVerticalScrollIndicator: boolean;
+    headerComponent?: React.ReactNode;
 }
 
 // 화살표 함수 대신 일반 함수 사용
@@ -32,7 +34,9 @@ function ContentsComponent({
     bottomSheetComponent,
     bottomSheetPadding,
     maxHeight,
-    isScrollView
+    isScrollView,
+    showsVerticalScrollIndicator,
+    headerComponent
 }: Props) {
     const { bottom } = useSafeAreaInsets();
 
@@ -59,15 +63,21 @@ function ContentsComponent({
             keyboardShouldPersistTaps="handled"
             bounces={false}
             bouncesZoom={false}
-            showsVerticalScrollIndicator={false}
+            overScrollMode="never" 
+            showsVerticalScrollIndicator={showsVerticalScrollIndicator}
             scrollEventThrottle={16}
+            stickyHeaderIndices={headerComponent ? [0] : undefined}
         >
+            {headerComponent && headerComponent}
+
             <ZSView style={{ width: '100%', minHeight: 1, paddingBottom: bottomSheetPadding }} onLayout={onLayout}>
                 {bottomSheetComponent}
             </ZSView>
         </ScrollView>
     ) : (
         <ZSView style={{ width: '100%', minHeight: 1, paddingBottom: bottomSheetPadding, maxHeight }} onLayout={onLayout}>
+            {headerComponent && headerComponent}
+
             {bottomSheetComponent}
         </ZSView>
     );

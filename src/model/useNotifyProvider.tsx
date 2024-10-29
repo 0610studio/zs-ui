@@ -44,6 +44,8 @@ export function NotifyProvider({
     const [isBottomRadius, setIsBottomRadius] = useState<boolean>(true);
     const [handleVisible, setHandleVisible] = useState<boolean>(true);
     const [marginBottomBS, setMarginBottomBs] = useState<number | undefined>(undefined);
+    const [showsVerticalScrollIndicator, setShowsVerticalScrollIndicator] = useState<boolean>(false);
+    const [headerComponent, setHeaderComponent] = useState<React.ReactNode | undefined>(undefined);
     const bottomSheetRef = useRef<BottomSheetRef | null>(null);
 
     // Loading
@@ -99,7 +101,9 @@ export function NotifyProvider({
         backgroundColor,
         isBottomRadius = true,
         maxHeight,
-        isScrollView = true
+        isScrollView = true,
+        showsVerticalScrollIndicator = false,
+        headerComponent = undefined
     }: ShowBottomSheetProps) => {
         Keyboard.dismiss();
         padding && setBottomSheetPadding(padding);
@@ -107,6 +111,8 @@ export function NotifyProvider({
         marginHorizontal && setBottomSheetMarginX(marginHorizontal);
         backgroundColor && setBottomSheetBackgroundColor(backgroundColor);
         maxHeight && setBottomSheetMaxHeight(maxHeight);
+        setShowsVerticalScrollIndicator(showsVerticalScrollIndicator);
+        setHeaderComponent(headerComponent);
         setContentsGestureEnable(contentsGestureEnable);
         setHandleVisible(isHandleVisible);
         setBottomSheetScrollView(isScrollView);
@@ -217,6 +223,8 @@ export function NotifyProvider({
                 bottomSheetBackgroundColor={bottomSheetBackgroundColor}
                 maxHeight={bottomSheetMaxHeight}
                 isScrollView={bottomSheetScrollView}
+                showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+                headerComponent={headerComponent}
             />
 
             <PopOverMenu
