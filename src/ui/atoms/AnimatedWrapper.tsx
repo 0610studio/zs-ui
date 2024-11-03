@@ -7,6 +7,7 @@ import { ShadowLevel, ShadowStyle } from '../types';
 const DEFAULT_DURATION = 200 as const;
 const SHADOW_DURATION = 50 as const;
 const IOS_SHADOW: readonly ShadowStyle[] = [
+  { shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0, shadowRadius: 0 },
   { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 1.00 },
   { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 1.41 },
   { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 2.22 },
