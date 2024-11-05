@@ -1,10 +1,30 @@
 import { TextProps } from "react-native";
 
 export type ColorPalette = {
-  [key: string]: string;
+  0: string;
+  5: string;
+  10: string; // p-lighter
+  20: string; // p-light
+  30: string;
+  40: string;
+  50: string; // p-main
+  60: string; // p-dark
+  70: string; // p-darker
+  80: string;
+  90: string;
+  100: string;
+  main: string;
+};
+
+export type ColorPaletteExtend = ColorPalette & {
+  lighter: string;
+  light: string;
+  dark: string;
+  darker: string;
 };
 
 export interface ThemeTextType {
+  main: string;
   primary: string;
   secondary: string;
   disabled: string;
@@ -49,7 +69,7 @@ export interface MainColors {
 
 export interface Theme {
   mode: 'light' | 'dark';
-  primary: ColorPalette;
+  primary: ColorPaletteExtend;
   secondary: ColorPalette;
   danger: ColorPalette;
   warning: ColorPalette;

@@ -122,6 +122,7 @@ const LIGHT_COLORS = {
     main: '#007FFF',
   },
   danger: {
+    0: '#FFF5F7',
     5: '#FEECF0',
     10: '#FCD4DE',
     20: '#F799B1',
@@ -132,9 +133,11 @@ const LIGHT_COLORS = {
     70: '#8D0023',
     80: '#5E0018',
     90: '#2F000C',
+    100: '#1A0008',
     main: '#EB003B',
   },
   warning: {
+    0: '#FFFBF2',
     5: '#FFF8E9',
     10: '#FFEAC1',
     20: '#FFE2A7',
@@ -145,9 +148,11 @@ const LIGHT_COLORS = {
     70: '#66490E',
     80: '#4D370B',
     90: '#332507',
+    100: '#1F1805',
     main: '#FFB724',
   },
   success: {
+    0: '#F5FBF6',
     5: '#EEF7F0',
     10: '#CEE9D4',
     20: '#B2DCBB',
@@ -158,9 +163,11 @@ const LIGHT_COLORS = {
     70: '#005312',
     80: '#00370C',
     90: '#002207',
+    100: '#001804',
     main: '#008A1E',
   },
   information: {
+    0: '#F3F8FF',
     5: '#E9F0FF',
     10: '#D4E1FF',
     20: '#A9C3FF',
@@ -171,6 +178,7 @@ const LIGHT_COLORS = {
     70: '#173E99',
     80: '#0C1F4D',
     90: '#040A1A',
+    100: '#020510',
     main: '#2768FF',
   },
   grey: {
@@ -255,6 +263,7 @@ const MAIN_COLORS = {
 
 const TEXT_COLORS = {
   light: {
+    main: LIGHT_COLORS.primary.main,
     primary: LIGHT_COLORS.grey[80],
     secondary: LIGHT_COLORS.grey[60],
     disabled: LIGHT_COLORS.grey[50],
@@ -266,6 +275,7 @@ const TEXT_COLORS = {
     black: '#000000',
   },
   dark: {
+    main: LIGHT_COLORS.primary.main,
     primary: DARK_COLORS.grey[90],
     secondary: DARK_COLORS.grey[70],
     disabled: DARK_COLORS.grey[50],
