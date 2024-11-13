@@ -1,5 +1,4 @@
-import { ThemeProvider } from 'zs-ui/model/useThemeProvider';
-import { NotifyProvider } from 'zs-ui/model/useNotifyProvider';
+import { ThemeProvider, NotifyProvider } from 'zs-ui';
 import NavigateComponent from './src/NavigateComponent';
 import SnackBar from './src/ui/Snackbar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';

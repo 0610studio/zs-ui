@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import { useNotify, ZSPressable, ZSText, ZSView } from 'zs-ui';
-import { useTheme } from 'zs-ui/model/useThemeProvider';
+import { useNotify, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
 interface MyBottomSheetProps {

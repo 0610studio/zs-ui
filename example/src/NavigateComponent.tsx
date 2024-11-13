@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Pressable, Scro
 import ThemeExample from './pages/ThemeExample';
 import LayoutExample from './pages/LayoutExample';
 import NotifyExample from './pages/NotifyExample';
-import { useTheme } from 'zs-ui/model/useThemeProvider';
+import { useTheme } from 'zs-ui';
 
 const BUTTONS = [
   { id: 'Theme', title: 'Theme Example', component: <ThemeExample /> },

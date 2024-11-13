@@ -1,6 +1,5 @@
 import { Image, StyleSheet, TouchableOpacity } from "react-native"
-import { ZSText } from "zs-ui";
-import { useTheme } from "zs-ui/model/useThemeProvider";
+import { ZSText, useTheme } from "zs-ui";
 import ViewAtom from "zs-ui/ui/atoms/ViewAtom";
 
 const SnackBar = ({ snackType, snackMessage }: any) => {
