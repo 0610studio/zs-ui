@@ -1,3 +1,9 @@
+import {
+  useTheme,
+  NotifyProvider,
+  ThemeProvider,
+} from './model'
+
 import { 
   ZSView,
   AnimatedWrapper,
@@ -26,6 +32,10 @@ import {
 } from './notify';
 
 export {
+  useTheme,
+  NotifyProvider,
+  ThemeProvider,
+  // ---
   ZSView,
   AnimatedWrapper,
   TextAtom,
