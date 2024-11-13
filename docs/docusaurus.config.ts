@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'ZS-ui',
-  tagline: 'Expo용 UI 라이브러리',
+  tagline: 'ReactNative Expo - UI Toolkit',
   favicon: 'img/favicon.ico',
 
   url: 'https://0610studio.github.io',

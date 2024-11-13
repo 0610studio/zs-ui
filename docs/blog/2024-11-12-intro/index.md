@@ -1,13 +1,13 @@
 ---
-slug: welcome
-title: Welcome
+slug: intro
+title: ZS-ui 소개
 authors: [rightHot]
 tags: [zsUi, barabom]
 ---
 
 `ZS-ui`는 `바라봄APP`에서 사용되는 UI 컴포넌트를 분리하기 위해 개발되었습니다.
 
-단순한 구조를 지향하여, Expo를 시작하는 분들에게 영감을 주는 라이브러리가 되었으면 합니다.
+초급자도 코드를 해석할 수 있도록 단순한 구조를 지향하며, Expo를 시작하는 분들에게 영감을 주는 라이브러리가 되었으면 합니다.
 
 <!-- truncate -->
 
