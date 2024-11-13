@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme } from 'zs-ui';
-import { RadioOption } from 'zs-ui/ui/types';
 import TitleCard from '../ui/TitleCard';
+import type { RadioOption } from 'zs-ui/types';
 
 function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
