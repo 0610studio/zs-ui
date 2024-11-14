@@ -147,6 +147,17 @@ const config: Config = {
       },
     ],
   } satisfies Preset.ThemeConfig,
+
+
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: {
+        name: 'google-site-verification',
+        content: 'H9nzKXqTA1-fjx7PbVQk7uvveM5wI5xbdblzHVHzOYQ',
+      },
+    },
+  ],
 };
 
 export default config;
