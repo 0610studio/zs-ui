@@ -131,7 +131,7 @@ const config: Config = {
       insights: false,
 
       // 옵션: history.push 대신 window.location을 통해 탐색해야 하는 도메인을 지정합니다. 여러 문서 사이트를 크롤링하고 window.location.href를 사용하여 해당 사이트로 이동하려는 경우에 유용한 알골리아 설정입니다.
-      // externalUrlRegex: 'external\\.com|domain\\.com',
+      externalUrlRegex: 'external\\.com|domain\\.com',
 
       // 옵션: 알골리아에서 URL 일부를 바꿉니다. 다른 baseUrl을 사용하는 여러 배포본에 대해 같은 검색 인덱스를 사용할 경우 유용합니다. `from` 파라미터에 정규식이나 문자열을 사용할 수 있습니다. For example: localhost:3000 vs myCompany.com/docs
       // replaceSearchResultPathname: {
