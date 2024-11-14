@@ -2,18 +2,25 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-
 const config: Config = {
+  
+  // GitHub Pages 주소
+  url: 'https://0610studio.github.io',
+
+  // 리포지토리 이름
+  baseUrl: '/zs-ui/',
+
+  // GitHub 사용자 이름
+  organizationName: '0610studio',
+  projectName: 'zs-ui',
+
+  // --------------------------------------------
+  
   title: 'ZS-ui',
   tagline: 'ReactNative Expo - UI Toolkit',
   favicon: 'img/favicon.ico',
 
-  url: 'https://0610studio.github.io',
-  baseUrl: '/zs-ui/',
-
-  organizationName: '0610studio', // Usually your GitHub org/user name.
-  projectName: 'zs-ui', // Usually your repo name.
+  // --------------------------------------------
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -29,9 +36,8 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/0610studio/zs-ui/tree/main/',
+          // editUrl: 'https://github.com/0610studio/zs-ui/tree/main/',
         },
         blog: {
           showReadingTime: true,
@@ -39,7 +45,8 @@ const config: Config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          editUrl: 'https://github.com/0610studio/zs-ui/tree/main/',
+          // Remove this to remove the "edit this page" links.
+          // editUrl: 'https://github.com/0610studio/zs-ui/tree/main/',
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
@@ -52,7 +59,6 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: 'Expo ZS-ui',
@@ -112,17 +118,17 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
     trailingSlash: true,
+
+    // * algolia 검색 위젯
     algolia: {
-      // 알골리아에서 제공한 appId를 사용하세요.
       appId: 'NXL3O5WL1V',
-
-      // 공개 API 키: 커밋해도 문제가 생기지 않습니다.
       apiKey: 'bf99a76d14d820e1bdb58e173f75c02a',
-
       indexName: '0610studioio',
 
-      // 옵션: 아래 문서를 참고
       contextualSearch: true,
+      searchParameters: {},
+      searchPagePath: 'search',
+      insights: false,
 
       // 옵션: history.push 대신 window.location을 통해 탐색해야 하는 도메인을 지정합니다. 여러 문서 사이트를 크롤링하고 window.location.href를 사용하여 해당 사이트로 이동하려는 경우에 유용한 알골리아 설정입니다.
       // externalUrlRegex: 'external\\.com|domain\\.com',
@@ -132,18 +138,14 @@ const config: Config = {
       //   from: '/docs/', // or as RegExp: /\/docs\//
       //   to: '/',
       // },
-
-      // Optional: Algolia search parameters
-      searchParameters: {},
-
-      // Optional: path for search page that enabled by default (`false` to disable it)
-      searchPagePath: 'search',
-
-      // Optional: whether the insights feature is enabled or not on Docsearch (`false` by default)
-      insights: false,
-
-      //... other Algolia params
     },
+    scripts: [
+      // * giscus 댓글 위젯
+      {
+        src: 'https://giscus.app/client.js',
+        async: true,
+      },
+    ],
   } satisfies Preset.ThemeConfig,
 };
 

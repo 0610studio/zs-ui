@@ -19,10 +19,14 @@ npx expo install @react-native-async-storage/async-storage react-native-gesture-
 npx expo install @0610studio/zs-ui
 ```
 
+<br />
+
 ### 사용법
 
 사용법은 [문서](https://0610studio.github.io/zs-ui/docs/intro)를 확인해주세요.
 
+
+<br />
 
 ### playground
 
