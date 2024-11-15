@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme } from 'zs-ui';
 import TitleCard from '../ui/TitleCard';
-import type { RadioOption } from 'zs-ui/types';
+import type { RadioOption } from 'zs-ui';
 
 function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
