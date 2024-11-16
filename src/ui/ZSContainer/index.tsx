@@ -18,6 +18,7 @@ type ZSContainerProps = ViewProps & {
   showsVerticalScrollIndicator?: boolean;
   loadingComponent?: React.ReactNode;
   keyboardVerticalOffset?: number;
+  behavior?: "padding" | "height" | "position" | undefined;
 };
 
 function ZSContainer({
@@ -33,6 +34,7 @@ function ZSContainer({
   showsVerticalScrollIndicator = true,
   loadingComponent = <ActivityIndicator />,
   keyboardVerticalOffset,
+  behavior = Platform.OS === 'ios' ? 'position' : undefined,
   ...props
 }: ZSContainerProps) {
   const { palette } = useTheme(); // 테마 사용
@@ -52,7 +54,7 @@ function ZSContainer({
       {!isDelayed && (
         <KeyboardAvoidingView
           style={styles.flex1}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={behavior}
           keyboardVerticalOffset={keyboardVerticalOffset}
           enabled
         >
