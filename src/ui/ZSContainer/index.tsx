@@ -19,6 +19,7 @@ type ZSContainerProps = ViewProps & {
   loadingComponent?: React.ReactNode;
   keyboardVerticalOffset?: number;
   behavior?: "padding" | "height" | "position" | undefined;
+  automaticallyAdjustKeyboardInsets?: boolean;
 };
 
 function ZSContainer({
@@ -34,7 +35,8 @@ function ZSContainer({
   showsVerticalScrollIndicator = true,
   loadingComponent = <ActivityIndicator />,
   keyboardVerticalOffset,
-  behavior = Platform.OS === 'ios' ? 'position' : undefined,
+  behavior,
+  automaticallyAdjustKeyboardInsets = true,
   ...props
 }: ZSContainerProps) {
   const { palette } = useTheme(); // 테마 사용
@@ -48,12 +50,12 @@ function ZSContainer({
   }, []);
 
   return (
-    <SafeAreaView style={[{ backgroundColor: backgroundColor || palette.background.base }, styles.flex1]} edges={edges}>
+    <SafeAreaView style={[{ backgroundColor: backgroundColor || palette.background.base }, styles.flex1, styles.fullWidth]} edges={edges}>
       <StatusBar barStyle={barStyle} backgroundColor={statusBarColor || palette.background.base} />
 
       {!isDelayed && (
         <KeyboardAvoidingView
-          style={styles.flex1}
+          style={[styles.flex1, styles.fullWidth]}
           behavior={behavior}
           keyboardVerticalOffset={keyboardVerticalOffset}
           enabled
@@ -64,19 +66,20 @@ function ZSContainer({
             loadingComponent
           ) : isScrollView ? (
             <ScrollViewAtom
-              ref={scrollViewRef} 
-              style={styles.flex1}
+              ref={scrollViewRef}
+              style={styles.fullWidth}
               bounces={false}
               contentContainerStyle={styles.scrollContainerStyle}
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}
               keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets={automaticallyAdjustKeyboardInsets}
             >
-              <ViewAtom style={[styles.flex1, props.style]}>
+              <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>
                 {props.children}
               </ViewAtom>
             </ScrollViewAtom>
           ) : (
-            <ViewAtom style={[styles.flex1, props.style]}>{props.children}</ViewAtom>
+            <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>{props.children}</ViewAtom>
           )}
 
           {!isLoader && bottomComponent && bottomComponent}
@@ -87,8 +90,9 @@ function ZSContainer({
 }
 
 const styles = StyleSheet.create({
-  flex1: { flex: 1, width: Dimensions.get('window').width },
-  scrollContainerStyle: { flexGrow: 1, alignItems: 'center' },
+  flex1: { flex: 1 },
+  fullWidth: { width: Dimensions.get('window').width },
+  scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: Dimensions.get('window').width },
 });
 
 export default ZSContainer;
