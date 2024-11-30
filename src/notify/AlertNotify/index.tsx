@@ -69,10 +69,10 @@ function AlertNotify({
       >
         <Pressable style={[styles.contentContainer, { width: modalWidth }]}>
           {title && (
-            <ZSText typo='title.2' style={[styles.title, titleStyle]}>{title}</ZSText>
+            <ZSText typo='title.1' style={[styles.title, titleStyle]}>{title}</ZSText>
           )}
           {informative && (
-            <ZSText typo='body.3' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
+            <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
           )}
           {actions && (
             <ViewAtom style={styles.buttonContainer}>
