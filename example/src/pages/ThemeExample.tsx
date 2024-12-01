@@ -15,6 +15,7 @@ export default function ThemeExample() {
       success,
       information,
     },
+    elevation
   } = useTheme();
 
   const styles = useMemo(
@@ -105,6 +106,18 @@ export default function ThemeExample() {
         <View style={[styles.colorBox, { backgroundColor: information.main }]}>
           <Text style={styles.textWhite}>Information Main</Text>
         </View>
+      </TitleCard>
+
+      <TitleCard title='elevation'>
+        <View style={[styles.elevationBox, { ...elevation(1) }]} />
+        <View style={[styles.elevationBox, { ...elevation(2) }]} />
+        <View style={[styles.elevationBox, { ...elevation(3) }]} />
+        <View style={[styles.elevationBox, { ...elevation(4) }]} />
+        <View style={[styles.elevationBox, { ...elevation(5) }]} />
+        <View style={[styles.elevationBox, { ...elevation(6) }]} />
+        <View style={[styles.elevationBox, { ...elevation(7) }]} />
+        <View style={[styles.elevationBox, { ...elevation(8) }]} />
+        <View style={[styles.elevationBox, { ...elevation(9) }]} />
       </TitleCard>
     </ZSContainer>
   );
@@ -220,5 +233,13 @@ const createStyles = ({
       alignItems: 'center',
       minHeight: 90,
       justifyContent: 'center',
+    },
+    elevationBox: {
+      width: '100%',
+      alignItems: 'center',
+      height: 30,
+      justifyContent: 'center',
+      backgroundColor: background.base,
+      marginVertical: 10
     },
   });

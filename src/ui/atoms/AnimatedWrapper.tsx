@@ -2,23 +2,11 @@ import React, { useMemo, useCallback } from 'react';
 import { View, ViewProps, Platform } from 'react-native';
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, runOnJS } from 'react-native-reanimated';
 import { useTheme } from '../../model/useThemeProvider';
-import { ShadowLevel, ShadowStyle } from '../types';
+import { ShadowLevel } from '../types';
+import { IOS_SHADOW } from '../../theme/elevation';
 
 const DEFAULT_DURATION = 200 as const;
 const SHADOW_DURATION = 50 as const;
-const IOS_SHADOW: readonly ShadowStyle[] = [
-  { shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0, shadowRadius: 0 },
-  { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 1.00 },
-  { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 1.41 },
-  { shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 2.22 },
-  { shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 2.62 },
-  { shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 3.84 },
-  { shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 4.65 },
-  { shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 4.65 },
-  { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 4.65 },
-  { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 5.46 },
-  { shadowOffset: { width: 0, height: 5 }, shadowOpacity: 1, shadowRadius: 6.27 },
-] as const;
 
 interface AnimatedWrapperProps extends ViewProps {
   isAnimation: boolean;
