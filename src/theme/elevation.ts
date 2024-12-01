@@ -1,6 +1,5 @@
 import { Platform } from "react-native";
 import { ShadowLevel, ShadowStyle } from "../ui/types";
-import { useTheme } from "../model";
 import { Theme } from "./types";
 
 export const IOS_SHADOW: readonly ShadowStyle[] = [
