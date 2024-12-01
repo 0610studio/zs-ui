@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import palette from '../theme/palette';
 import { Theme, ThemeFonts, TypographyVariantsProps } from '../theme/types';
 import typography from '../theme/typography';
+import elevation, { ElevationProps } from '../theme/elevation';
+import { ShadowLevel } from '../ui/types';
 
 export interface ThemeProviderProps {
     themeFonts?: ThemeFonts;
@@ -13,6 +15,7 @@ export interface ThemeProviderProps {
 export interface ThemeProps {
     palette: Palette;
     typography: TypographyVariantsProps;
+    elevation: (elevationLevel: ShadowLevel) => ElevationProps;
 }
 
 export interface Palette extends Theme {
@@ -89,6 +92,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
             ...palette({ mode }), // 선택된 모드에 따른 팔레트 적용
         },
         typography: typography({ themeFonts }),
+        elevation
     }), [mode, isUsingSystemColorScheme, typography, themeFonts]);
 
     return (
