@@ -109,15 +109,15 @@ export default function ThemeExample() {
       </TitleCard>
 
       <TitleCard title='elevation'>
-        <View style={[styles.elevationBox, { ...elevation(1) }]} />
-        <View style={[styles.elevationBox, { ...elevation(2) }]} />
-        <View style={[styles.elevationBox, { ...elevation(3) }]} />
-        <View style={[styles.elevationBox, { ...elevation(4) }]} />
-        <View style={[styles.elevationBox, { ...elevation(5) }]} />
-        <View style={[styles.elevationBox, { ...elevation(6) }]} />
-        <View style={[styles.elevationBox, { ...elevation(7) }]} />
-        <View style={[styles.elevationBox, { ...elevation(8) }]} />
-        <View style={[styles.elevationBox, { ...elevation(9) }]} />
+        <View style={[styles.elevationBox, { ...elevation[1] }]} />
+        <View style={[styles.elevationBox, { ...elevation[2] }]} />
+        <View style={[styles.elevationBox, { ...elevation[3] }]} />
+        <View style={[styles.elevationBox, { ...elevation[4] }]} />
+        <View style={[styles.elevationBox, { ...elevation[5] }]} />
+        <View style={[styles.elevationBox, { ...elevation[6] }]} />
+        <View style={[styles.elevationBox, { ...elevation[7] }]} />
+        <View style={[styles.elevationBox, { ...elevation[8] }]} />
+        <View style={[styles.elevationBox, { ...elevation[9] }]} />
       </TitleCard>
     </ZSContainer>
   );
