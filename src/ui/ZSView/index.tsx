@@ -2,12 +2,14 @@ import React, { memo, useMemo } from 'react';
 import { ViewProps, StyleSheet } from 'react-native';
 import { useTheme } from '../../model/useThemeProvider';
 import AnimatedWrapper from '../atoms/AnimatedWrapper';
+import { ShadowLevel } from '../types';
 
 type Props = ViewProps & {
   isAnimation?: boolean;
+  elevationLevel?: ShadowLevel;
 };
 
-const ZSView: React.FC<Props> = ({ isAnimation = false, style, children, ...rest }) => {
+const ZSView: React.FC<Props> = ({ isAnimation = false, elevationLevel = 0, style, children, ...rest }) => {
   const { palette } = useTheme();
 
   const styles = useMemo(
@@ -21,7 +23,7 @@ const ZSView: React.FC<Props> = ({ isAnimation = false, style, children, ...rest
   );
 
   return (
-    <AnimatedWrapper isAnimation={isAnimation} style={[styles.container, style]} {...rest}>
+    <AnimatedWrapper isAnimation={isAnimation} elevationLevel={elevationLevel} style={[styles.container, style]} {...rest}>
       {children}
     </AnimatedWrapper>
   );
