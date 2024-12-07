@@ -22,17 +22,13 @@ function AnimatedWrapper({
   children,
   ...props
 }: AnimatedWrapperProps) {
-  const { palette } = useTheme();
+  const { elevation } = useTheme();
   const opacity = useSharedValue(0);
 
   // 그림자 및 기타 스타일을 플랫폼에 맞게 미리 계산
   const staticStyle = useMemo(() => {
-    if (Platform.OS === 'ios') {
-      const { shadowOpacity, ...rest } = IOS_SHADOW[elevationLevel];
-      return { shadowColor: palette.elevationShadow[elevationLevel], ...rest };
-    }
-    return { shadowColor: palette.elevationShadow[elevationLevel] };
-  }, [elevationLevel, palette]);
+    return { ...elevation[elevationLevel] };
+  }, [elevation]);
 
   // 애니메이션 스타일 정의 (iOS 그림자 및 Android elevation 처리)
   const animatedStyle = useAnimatedStyle(() => {

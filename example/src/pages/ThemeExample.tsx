@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ZSContainer, useTheme } from 'zs-ui';
+import { ZSContainer, ZSView, useTheme } from 'zs-ui';
 import TitleCard from '../ui/TitleCard';
 
 export default function ThemeExample() {
