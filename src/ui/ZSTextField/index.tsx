@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import { LayoutChangeEvent, StyleProp, TextInput, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
 import ErrorComponent from './ui/ErrorComponent';
@@ -9,6 +9,8 @@ import { useTheme } from '../../model/useThemeProvider';
 import ViewAtom from '../atoms/ViewAtom';
 
 export type BoxStyle = 'outline' | 'underline' | 'inbox';
+
+const iosOffset = Platform.OS === 'ios' ? 8 : 4;
 
 interface TextFieldProps {
   typo?: TypoOptions;
@@ -83,7 +85,7 @@ function ZSTextField({
     const labelFontSize = interpolate(
       labelAnimationValue.value,
       [0, 1],
-      [fontSize + (boxStyle === 'inbox' ? 5 : 0), boxStyle === 'inbox' ? 10 : 12],
+      [fontSize + (boxStyle === 'inbox' ? 2 : 0), boxStyle === 'inbox' ? 11 : 12],
       'clamp'
     );
 
@@ -92,7 +94,7 @@ function ZSTextField({
       [0, 1],
       [
         isTextArea ? 12 : 0,
-        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + (boxStyle === 'inbox' ? 18 : 0),
+        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + (boxStyle === 'inbox' ? 17 : 0),
       ],
       'clamp'
     );
@@ -148,7 +150,7 @@ function ZSTextField({
     paddingVertical: 2,
     textAlignVertical: 'center',
     fontFamily,
-    borderRadius: boxStyle === 'outline' ? 20 : 0,
+    borderRadius: boxStyle === 'outline' ? 5 : 0,
     overflow: 'hidden',
   }), [fontSize, paddingHorizontal, labelBgColor, boxStyle, fontFamily]);
 
@@ -167,7 +169,7 @@ function ZSTextField({
         <TextInput
           {...textInputProps}
           style={[
-            { paddingTop: 7, paddingBottom: 5 },
+            { paddingTop: 7 + iosOffset, paddingBottom: 5 + iosOffset },
             textInputProps?.style,
             { fontSize, width: '100%', paddingRight: 25, fontFamily },
           ]}

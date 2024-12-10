@@ -106,7 +106,6 @@ function LayoutExample(): React.JSX.Element {
           onChangeText={serUserId}
           textInputProps={{
             multiline: false,
-            style: { color: text.primary, paddingTop: 8, paddingBottom: 10 },
           }}
         />
 
