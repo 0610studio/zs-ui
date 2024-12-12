@@ -8,8 +8,6 @@ import BottomSheetNotify from '../notify/BottomSheetNotify';
 import LoadingNotify from '../notify/LoadingNotify';
 import PopOverMenu from '../notify/PopOver/PopOverMenu';
 
-const BS_MAX_HEIGHT = Dimensions.get('window').height - 120;
-
 export function NotifyProvider({
     customSnackbar,
     loaderComponent,
@@ -39,7 +37,7 @@ export function NotifyProvider({
     const [bottomSheetComponent, setBottomSheetComponent] = useState<React.ReactNode>(false);
     const [bottomSheetPadding, setBottomSheetPadding] = useState<number | undefined>(undefined);
     const [bottomSheetMarginX, setBottomSheetMarginX] = useState<number | undefined>(undefined);
-    const [bottomSheetMaxHeight, setBottomSheetMaxHeight] = useState<number>(BS_MAX_HEIGHT);
+    const [bottomSheetMaxHeight, setBottomSheetMaxHeight] = useState<number>();
     const [bottomSheetScrollView, setBottomSheetScrollView] = useState<boolean>(true);
     const [isBottomRadius, setIsBottomRadius] = useState<boolean>(true);
     const [handleVisible, setHandleVisible] = useState<boolean>(true);

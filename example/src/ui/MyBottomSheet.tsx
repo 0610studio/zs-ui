@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useNotify, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
@@ -22,12 +22,14 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
 
   return (
     <ZSView style={styles.container}>
-      <ZSPressable fullWidth style={styles.confirm} onPress={handleConfirmPress}>
-        <ZSText>확인</ZSText>
-      </ZSPressable>
-      <ZSPressable fullWidth style={styles.button} onPress={handleClosePress}>
-        <ZSText>닫기</ZSText>
-      </ZSPressable>
+      <View style={{ flexDirection: 'row',gap:15}}>
+        <ZSPressable fullWidth style={styles.confirm} onPress={handleConfirmPress}>
+          <ZSText>확인</ZSText>
+        </ZSPressable>
+        <ZSPressable fullWidth style={styles.button} onPress={handleClosePress}>
+          <ZSText>닫기</ZSText>
+        </ZSPressable>
+      </View>
     </ZSView>
   );
 }
@@ -42,10 +44,8 @@ const createStyles = ({
   StyleSheet.create({
     container: {
       paddingTop: 150,
-      flexDirection: 'row',
-      gap: 15,
       width: '100%',
-      alignItems: 'flex-end'
+      height: 2000
     },
     confirm: {
       justifyContent: 'center',

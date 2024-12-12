@@ -9,9 +9,10 @@ import { useTheme } from '../../model/useThemeProvider';
 import { ThemeBackground } from '../../theme';
 import ViewAtom from '../../ui/atoms/ViewAtom';
 import { ZSView } from '../../ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const DEFAULT_BORDER_RADIUS = 24;
-const BS_MAX_HEIGHT = Dimensions.get('window').height - 120;
+const BS_MAX_HEIGHT = Dimensions.get('window').height - 80;
 
 interface Props extends ViewProps {
   marginBottomBS?: number;
@@ -69,6 +70,7 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
   });
 
   const { palette: { background } } = useTheme();
+  const { bottom, top } = useSafeAreaInsets();
 
   const styles = useMemo(
     () => createStyles({ background }),
@@ -98,7 +100,6 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
               {
                 width: screenWidth,
                 height: screenHeight,
-                paddingHorizontal: bottomSheetPadding,
                 left: bottomSheetMarginX,
                 right: bottomSheetMarginX,
                 borderTopLeftRadius: DEFAULT_BORDER_RADIUS,
@@ -126,10 +127,11 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
                 screenHeight={screenHeight}
                 bottomSheetComponent={bottomSheetComponent}
                 bottomSheetPadding={bottomSheetPadding}
-                maxHeight={maxHeight}
+                maxHeight={maxHeight - bottom - top - marginBottomBS - bottomSheetMarginX}
                 isScrollView={isScrollView}
                 showsVerticalScrollIndicator={showsVerticalScrollIndicator}
                 headerComponent={headerComponent}
+                paddingHorizontal={bottomSheetPadding}
               />
             </GestureDetector>
           </Animated.View>
