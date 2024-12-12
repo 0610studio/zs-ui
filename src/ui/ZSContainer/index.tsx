@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from 'react';
-import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, Platform, ScrollView } from 'react-native';
+import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ViewAtom from '../atoms/ViewAtom';
 import ScrollViewAtom from '../atoms/ScrollViewAtom';
@@ -51,14 +51,12 @@ function ZSContainer({
 
   return (
     <SafeAreaView style={[{ backgroundColor: backgroundColor || palette.background.base }, styles.flex1, styles.fullWidth]} edges={edges}>
-      <StatusBar barStyle={barStyle} backgroundColor={statusBarColor || palette.background.base} />
 
       {!isDelayed && (
         <KeyboardAvoidingView
           style={[styles.flex1, styles.fullWidth]}
           behavior={behavior}
           keyboardVerticalOffset={keyboardVerticalOffset}
-          enabled
         >
           {topComponent && topComponent}
 
@@ -85,6 +83,8 @@ function ZSContainer({
           {!isLoader && bottomComponent && bottomComponent}
         </KeyboardAvoidingView>
       )}
+
+      <StatusBar barStyle={barStyle} backgroundColor={statusBarColor || palette.background.base} />
     </SafeAreaView>
   );
 }

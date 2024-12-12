@@ -38,7 +38,7 @@ const NotifyExample = () => {
   );
 
   return (
-    <ZSContainer style={styles.container} edges={["top", "bottom"]}>
+    <ZSContainer style={styles.container} edges={["top"]}>
       <TitleCard title="PopOverButton">
         <ZSView style={{ flex: 1, alignItems: "flex-end" }}>
           <PopOverButton

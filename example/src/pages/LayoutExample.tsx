@@ -34,7 +34,8 @@ function LayoutExample(): React.JSX.Element {
   return (
     <ZSContainer
       style={styles.container}
-      edges={['top', 'bottom']}
+      edges={[]}
+      behavior={'padding'}
       bottomComponent={
         <ZSBottomButton
           disabled={buttonDisabled}
@@ -179,9 +180,10 @@ const createStyles = ({
   StyleSheet.create({
     container: {
       gap: 30,
-      paddingVertical: 20,
+      paddingTop: 20,
       backgroundColor: background.layer2,
       paddingHorizontal: 15,
+      paddingBottom: 90,
     },
     sleekStyle: {
       width: '100%',

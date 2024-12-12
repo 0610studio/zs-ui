@@ -76,9 +76,11 @@ function ZSTextField({
 
   // 포커스 및 값 변경 시 라벨 애니메이션 트리거
   useEffect(() => {
-    const shouldAnimate = value !== '' || isFocused;
-    labelAnimationValue.value = withTiming(shouldAnimate ? 1 : 0, { duration: 50 });
-  }, [value, isFocused, labelAnimationValue]);
+    labelAnimationValue.value = withTiming(
+      value !== '' || isFocused ? 1 : 0, 
+      { duration: 150 }
+    );
+  }, [value, isFocused]);
 
   // 라벨 애니메이션 스타일
   const animatedLabelStyle = useAnimatedStyle(() => {
@@ -199,4 +201,4 @@ function ZSTextField({
   );
 }
 
-export default ZSTextField;
+export default React.memo(ZSTextField);
