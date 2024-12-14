@@ -6,7 +6,7 @@ import TitleCard from "../ui/TitleCard";
 import RenderPopOverMenu from "../ui/RenderPopOverMenu";
 
 const NotifyExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet } = useNotify();
+  const { showAlert, showSnackBar, showBottomSheet, showModality, hideNotify } = useNotify();
   const {
     palette: {
       background,
@@ -108,6 +108,23 @@ const NotifyExample = () => {
           });
         }}
         title="show_BottomSheet"
+        color="#331599"
+      />
+
+      <Button
+        onPress={() => {
+          showModality({
+            component: (
+              <MyBottomSheet
+                onConfirm={() => {
+                  console.log("event");
+                  hideNotify('all');
+                }}
+              />
+            ),
+          });
+        }}
+        title="show_Modality"
         color="#331599"
       />
     </ZSContainer>

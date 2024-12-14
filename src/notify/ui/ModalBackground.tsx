@@ -29,7 +29,6 @@ function ModalBackground({ isCenter = true, children, onPress }: ModalBackground
   );
 }
 
-// 스타일을 생성하는 함수, 모달 배경 색상 인자로 받음
 const createStyles = (modalBgColor: string) =>
   StyleSheet.create({
     modalBg: {
@@ -37,7 +36,6 @@ const createStyles = (modalBgColor: string) =>
       backgroundColor: modalBgColor,
       ...StyleSheet.absoluteFillObject,
     },
-    // 화면 전체를 덮는 Pressable 스타일 추가
     fullScreen: {
       ...StyleSheet.absoluteFillObject,
     },

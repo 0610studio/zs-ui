@@ -1,12 +1,13 @@
 import { useCallback, useRef, useState } from 'react';
-import { Dimensions, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
+import { Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
 import NotifyContext from './useNotify';
-import { AlertActions, BottomSheetRef, HideOption, NotifyProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
+import { AlertActions, BottomSheetRef, HideOption, ModalityProps, NotifyProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
 import AlertNotify from '../notify/AlertNotify';
 import SnackbarNotify from '../notify/SnackbarNotify';
 import BottomSheetNotify from '../notify/BottomSheetNotify';
 import LoadingNotify from '../notify/LoadingNotify';
 import PopOverMenu from '../notify/PopOver/PopOverMenu';
+import Modality from '../notify/Modality';
 
 export function NotifyProvider({
     customSnackbar,
@@ -53,6 +54,10 @@ export function NotifyProvider({
     const [popOverVisible, setPopOverVisible] = useState<boolean>(false);
     const [popOverLocation, setPopOverLocation] = useState<{ px: PopOverMenuProps['px'], py: PopOverMenuProps['py'] }>({ px: 0, py: 0 });
     const [popOverComponent, setPopOverComponent] = useState<React.ReactNode>(false);
+
+    // Modality
+    const [modalityVisible, setModalityVisible] = useState<boolean>(false);
+    const [modalityComponent, setModalityComponent] = useState<React.ReactNode>(false);
 
     // ---
     const [fontFamily, setFontFamily] = useState<string | undefined | { title?: string; info?: string; label?: string; }>(undefined);
@@ -133,6 +138,13 @@ export function NotifyProvider({
         setPopOverVisible(true);
     }
 
+    const showModality = ({
+        component
+    }: ModalityProps) => {
+        setModalityComponent(component);
+        setModalityVisible(true);
+    }
+
     const showSnackBar = ({
         message,
         type = 'success',
@@ -158,6 +170,9 @@ export function NotifyProvider({
             case 'alert':
                 setAlertVisible(false);
                 break;
+            case 'modal':
+                setModalityVisible(false);
+                break;
             case 'snack':
                 setSnackItemStack([]);
                 break;
@@ -171,6 +186,7 @@ export function NotifyProvider({
                 setPopOverVisible(false);
                 break;
             case 'all':
+                setModalityVisible(false);
                 setAlertVisible(false);
                 setSnackItemStack([]);
                 setLoaderVisible(false);
@@ -199,11 +215,15 @@ export function NotifyProvider({
             popOverVisible,
             setPopOverVisible,
             // ---
+            modalityVisible,
+            setModalityVisible,
+            // ---
             showAlert,
             showSnackBar,
             showBottomSheet,
             showLoader,
             showPopOverMenu,
+            showModality,
             // ---
             hideNotify,
         }}>
@@ -248,6 +268,8 @@ export function NotifyProvider({
                 primaryButtonTextStyle={primaryButtonTextStyle}
                 singleButtonTextStyle={singleButtonTextStyle}
             />
+
+            <Modality modalityComponent={modalityComponent} />
 
             <LoadingNotify
                 loaderComponent={loaderComponent}
