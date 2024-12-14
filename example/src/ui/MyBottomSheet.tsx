@@ -22,7 +22,7 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
 
   return (
     <ZSView style={styles.container}>
-      <View style={{ flexDirection: 'row',gap:15}}>
+      <View style={{ flexDirection: 'row', gap: 15 }}>
         <ZSPressable fullWidth style={styles.confirm} onPress={handleConfirmPress}>
           <ZSText>확인</ZSText>
         </ZSPressable>
@@ -43,9 +43,8 @@ const createStyles = ({
 }) =>
   StyleSheet.create({
     container: {
-      paddingTop: 150,
       width: '100%',
-      height: 2000
+      height: 300,
     },
     confirm: {
       justifyContent: 'center',

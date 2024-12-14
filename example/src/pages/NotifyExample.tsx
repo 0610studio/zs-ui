@@ -139,7 +139,7 @@ const createStyles = ({
   StyleSheet.create({
     container: {
       gap: 30,
-      paddingVertical: 20,
+      paddingTop: 90,
       backgroundColor: background.layer2,
       paddingHorizontal: 15,
     },

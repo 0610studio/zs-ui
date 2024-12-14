@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Pressable, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Pressable, ScrollView, Dimensions } from 'react-native';
 import ThemeExample from './pages/ThemeExample';
 import LayoutExample from './pages/LayoutExample';
 import NotifyExample from './pages/NotifyExample';
 import { useTheme } from 'zs-ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BUTTONS = [
   { id: 'Theme', title: 'Theme Example', component: <ThemeExample /> },
@@ -14,6 +15,7 @@ const BUTTONS = [
 export default function NavigateComponent() {
   const { palette: { toggleTheme, mode } } = useTheme();
   const [currentPage, setCurrentPage] = useState('Theme');
+  const { top } = useSafeAreaInsets();
 
   const renderPage = () => {
     const selected = BUTTONS.find(button => button.id === currentPage);
@@ -21,9 +23,9 @@ export default function NavigateComponent() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* 버튼 그룹 */}
-      <View style={styles.buttonContainer}>
+      <View style={[styles.buttonContainer, { top }]}>
         <ScrollView horizontal={true} style={{ width: '100%' }} contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 10, gap: 10 }}>
 
           {/* 테마 토글 버튼 */}
@@ -57,9 +59,7 @@ export default function NavigateComponent() {
       <View style={styles.pageContainer}>
         {renderPage()}
       </View>
-
-
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -71,6 +71,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     backgroundColor: '#00000022',
+    position: 'absolute',
+    width: Dimensions.get('window').width,
+    zIndex: 999
   },
   modeButton: {
     padding: 8,
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#BB86FC',
     alignItems: 'center',
-    paddingHorizontal:10
+    paddingHorizontal: 10
   },
   buttonSelected: {
     backgroundColor: '#3700B3',

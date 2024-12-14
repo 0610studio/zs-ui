@@ -88,7 +88,7 @@ function ZSBottomButton({
     );
 
     return {
-      bottom: withTiming(getBottom, DURATION),
+      marginBottom: withTiming(getBottom, DURATION),
       marginLeft: withTiming(getMargin, DURATION),
       marginRight: withTiming(getMargin, DURATION),
       borderRadius: withTiming(getRadius, DURATION),
@@ -134,12 +134,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: DEFAULT_BORDER_RADIUS,
-    bottom: DEFAULT_MARGIN_BOTTOM,
+    marginBottom: DEFAULT_MARGIN_BOTTOM,
     marginLeft: DEFAULT_MARGIN_X,
     marginRight: DEFAULT_MARGIN_X,
     overflow: 'hidden',
     flexDirection: 'row',
-    position:'absolute'
   },
 });
 

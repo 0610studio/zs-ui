@@ -65,7 +65,7 @@ function ZSContainer({
           ) : isScrollView ? (
             <ScrollViewAtom
               ref={scrollViewRef}
-              style={styles.fullWidth}
+              style={[styles.flex1, styles.fullWidth]}
               bounces={false}
               contentContainerStyle={styles.scrollContainerStyle}
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}

@@ -34,7 +34,7 @@ export default function ThemeExample() {
   );
 
   return (
-    <ZSContainer style={{ gap: 30, paddingVertical: 20, backgroundColor: background.layer2, paddingHorizontal: 15 }} edges={['top']}>
+    <ZSContainer style={{ gap: 30, paddingTop: 90,paddingBottom:50, backgroundColor: background.layer2, paddingHorizontal: 15 }} edges={['top']}>
       {/* 배경색 예제 */}
       <TitleCard title='Background Colors'>
         <View style={styles.layer1Box}>

@@ -1,9 +1,7 @@
 {
-  "platforms": ["ios", "tvos", "android", "web"],
+  "platforms": ["ios", "android", "web"],
   "ios": {
-    "modules": ["ZsUiModule"]
   },
   "android": {
-    "modules": ["kr.co.studio0610.zsui.ZsUiModule"]
   }
 }
