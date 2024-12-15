@@ -182,6 +182,7 @@ function ZSTextField({
           allowFontScaling={allowFontScaling}
           selectionColor={palette.grey[50]}
           autoCorrect={false}
+          spellCheck={false}
         />
 
         <ViewAtom pointerEvents="none" style={{ position: 'absolute' }}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   FadeOut,
@@ -9,6 +9,7 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 import { useNotify } from '../../model/useNotify';
+import { ScrollViewAtom } from '../../ui';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,10 +21,9 @@ function Modality({
   onModalityClosed?: () => void;
 }) {
   const [localVisible, setLocalVisible] = useState(false);
-  const { modalityVisible, setModalityVisible } = useNotify();
+  const { modalityVisible } = useNotify();
   const insets = useSafeAreaInsets();
 
-  // Shared Values 추가
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);
   const backBorderRadius = useSharedValue(0);
@@ -53,7 +53,7 @@ function Modality({
     }
   }, [modalityVisible, insets.top, onModalityClosed]);
 
-  // 배경
+  // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -84,33 +84,22 @@ function Modality({
 
   return (
     <Animated.View
-      style={{ width, height, backgroundColor: 'black', position: 'absolute' }}
+      style={[
+        styles.animatedBackground,
+        backgroundAnimatedStyle
+      ]}
     >
       <Animated.View
         exiting={FadeOut.duration(300)}
         style={[
-          {
-            position: 'absolute',
-            width: width,
-            height: height,
-            backgroundColor: 'white',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 8000
-          },
+          styles.backScreen,
           backScreenAnimatedStyle
         ]}
       />
 
       <Animated.View
         style={[
-          {
-            width: width,
-            height: height,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            zIndex: 8001,
-            position: 'absolute'
-          },
+          styles.overlayBackground,
           backgroundAnimatedStyle
         ]}
       />
@@ -118,21 +107,68 @@ function Modality({
       <Animated.View
         style={[
           {
-            width,
-            height,
-            backgroundColor: 'white',
-            position: 'absolute',
-            borderRadius: 16,
-            zIndex: 8002,
-            overflow: 'hidden'
+            height: height - (10 + insets.top),
+            paddingBottom: insets.bottom
           },
+          styles.mainScreen,
           mainScreenAnimatedStyle
         ]}
       >
-        {modalityComponent}
+        <ScrollViewAtom
+          style={styles.scrollStyle}
+          bounces={false}
+          contentContainerStyle={styles.scrollContainerStyle}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
+        >
+          {modalityComponent}
+        </ScrollViewAtom>
       </Animated.View>
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollStyle: {
+    flex: 1,
+    width: width,
+  },
+  scrollContainerStyle: {
+    flexGrow: 1,
+    alignItems: 'center',
+    width: width,
+    paddingTop: 10,
+  },
+  animatedBackground: {
+    width,
+    height,
+    position: 'absolute',
+    backgroundColor: 'black',
+  },
+  backScreen: {
+    position: 'absolute',
+    width,
+    height,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 8000,
+  },
+  overlayBackground: {
+    width,
+    height,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 8001,
+    position: 'absolute',
+  },
+  mainScreen: {
+    width,
+    backgroundColor: 'white',
+    position: 'absolute',
+    borderRadius: 16,
+    zIndex: 8002,
+    overflow: 'hidden',
+  },
+});
 
 export default Modality;

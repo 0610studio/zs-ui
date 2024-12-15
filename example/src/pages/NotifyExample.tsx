@@ -4,6 +4,7 @@ import { PopOverButton, useNotify, ZSContainer, ZSText, ZSView, useTheme } from 
 import MyBottomSheet from "../ui/MyBottomSheet";
 import TitleCard from "../ui/TitleCard";
 import RenderPopOverMenu from "../ui/RenderPopOverMenu";
+import MyModal from "../ui/MyModal";
 
 const NotifyExample = () => {
   const { showAlert, showSnackBar, showBottomSheet, showModality, hideNotify } = useNotify();
@@ -115,7 +116,7 @@ const NotifyExample = () => {
         onPress={() => {
           showModality({
             component: (
-              <MyBottomSheet
+              <MyModal
                 onConfirm={() => {
                   console.log("event");
                   hideNotify('all');
