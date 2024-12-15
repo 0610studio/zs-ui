@@ -9,7 +9,7 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 import { useOverlay } from '../../model/useOverlay';
-import { ScrollViewAtom } from '../../ui';
+import { ZSView } from '../../ui';
 import { useTheme } from '../../model';
 
 const { width, height } = Dimensions.get('window');
@@ -88,7 +88,7 @@ function Modality({
     <Animated.View
       style={[
         styles.animatedBackground,
-        {backgroundColor: palette.background.neutral},
+        { backgroundColor: palette.background.neutral },
         backgroundAnimatedStyle
       ]}
     >
@@ -112,28 +112,17 @@ function Modality({
           mainScreenAnimatedStyle
         ]}
       >
-        <ScrollViewAtom
-          style={styles.scrollStyle}
-          bounces={false}
-          contentContainerStyle={styles.scrollContainerStyle}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets={true}
-        >
+        <ZSView style={styles.contents}>
           {modalityComponent}
-        </ScrollViewAtom>
+        </ZSView>
       </Animated.View>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollStyle: {
+  contents: {
     flex: 1,
-    width: width,
-  },
-  scrollContainerStyle: {
-    flexGrow: 1,
-    alignItems: 'center',
     width: width,
     paddingTop: 10,
   },
