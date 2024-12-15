@@ -44,13 +44,13 @@ function ZSTextField({
   value,
   onChangeText,
   label = 'Placeholder',
-  labelColor = '#757575',
-  placeHolderColor = '#B1B1B1',
-  inputBgColor = 'white',
-  labelBgColor = 'white',
+  labelColor,
+  placeHolderColor,
+  inputBgColor,
+  labelBgColor,
   borderWidth = 1.2,
-  borderColor = '#E7EDF0',
-  focusColor = '#007AFF',
+  borderColor,
+  focusColor,
   errorColor = '#FF3B30',
   borderRadius = 14,
   paddingHorizontal = 15,
@@ -77,7 +77,7 @@ function ZSTextField({
   // 포커스 및 값 변경 시 라벨 애니메이션 트리거
   useEffect(() => {
     labelAnimationValue.value = withTiming(
-      value !== '' || isFocused ? 1 : 0, 
+      value !== '' || isFocused ? 1 : 0,
       { duration: 150 }
     );
   }, [value, isFocused]);
@@ -119,13 +119,13 @@ function ZSTextField({
 
   // 상태에 따른 테두리 색상 설정
   const computedBorderColor = useMemo(() => (
-    status === 'error' ? errorColor : isFocused ? focusColor : borderColor
-  ), [status, errorColor, isFocused, focusColor, borderColor]);
+    status === 'error' ? errorColor : isFocused ? (focusColor || palette.primary.main) : (borderColor || palette.grey[30])
+  ), [status, errorColor, isFocused, focusColor, borderColor, palette]);
 
   // 상태에 따른 라벨 색상 설정
   const computedLabelColor = useMemo(() => (
-    status === 'error' ? errorColor : isFocused ? focusColor : value ? labelColor : placeHolderColor
-  ), [status, errorColor, isFocused, focusColor, value, placeHolderColor, labelColor]);
+    status === 'error' ? errorColor : isFocused ? (focusColor || palette.primary.main) : value ? (labelColor || palette.text.secondary) : (placeHolderColor || palette.grey[40])
+  ), [status, errorColor, isFocused, focusColor, value, placeHolderColor, labelColor, palette]);
 
   // 컨테이너 스타일 정의
   const containerStyle: StyleProp<ViewStyle> = useMemo(() => ({
@@ -133,7 +133,7 @@ function ZSTextField({
     justifyContent: isTextArea ? 'flex-start' : 'center',
     borderRadius,
     paddingHorizontal,
-    backgroundColor: inputBgColor,
+    backgroundColor: inputBgColor || palette.background.base,
     paddingTop: boxStyle === 'inbox' ? 13 : 0,
     ...(boxStyle === 'outline' || boxStyle === 'inbox' ? { borderWidth } : {}),
     ...(boxStyle === 'underline' ? { borderBottomWidth: borderWidth } : {}),
@@ -141,20 +141,20 @@ function ZSTextField({
       : innerBoxStyle === 'middle' ? { borderRadius: 0, borderTopWidth: borderWidth / 2, borderBottomWidth: borderWidth / 2 }
         : innerBoxStyle === 'bottom' ? { borderTopLeftRadius: 0, borderTopRightRadius: 0, borderTopWidth: borderWidth / 2 }
           : {}),
-  }), [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle]);
+  }), [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, palette]);
 
   // 라벨 스타일 정의
   const labelTextStyle: StyleProp<TextStyle> = useMemo(() => ({
     fontSize,
     left: paddingHorizontal,
-    backgroundColor: labelBgColor,
+    backgroundColor: labelBgColor || palette.background.base,
     paddingHorizontal: boxStyle === 'outline' ? 5 : 0,
     paddingVertical: 2,
     textAlignVertical: 'center',
     fontFamily,
     borderRadius: boxStyle === 'outline' ? 5 : 0,
     overflow: 'hidden',
-  }), [fontSize, paddingHorizontal, labelBgColor, boxStyle, fontFamily]);
+  }), [fontSize, paddingHorizontal, labelBgColor, boxStyle, fontFamily, palette]);
 
   // 텍스트 변경 핸들러
   const handleTextChange = useCallback((text: string) => {
@@ -171,7 +171,7 @@ function ZSTextField({
         <TextInput
           {...textInputProps}
           style={[
-            { paddingTop: 7 + iosOffset, paddingBottom: 5 + iosOffset },
+            { paddingTop: 7 + iosOffset, paddingBottom: 5 + iosOffset, color: palette.text.primary },
             textInputProps?.style,
             { fontSize, width: '100%', paddingRight: 25, fontFamily },
           ]}

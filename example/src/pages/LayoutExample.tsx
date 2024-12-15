@@ -87,7 +87,7 @@ function LayoutExample(): React.JSX.Element {
           value={nick}
           inputBgColor={background.base}
           labelBgColor={background.base}
-          focusColor={primary.main}
+          focusColor={primary.darker}
           onChangeText={setNick}
           textInputProps={{
             multiline: false,
@@ -99,27 +99,15 @@ function LayoutExample(): React.JSX.Element {
           boxStyle="outline"
           label="아이디"
           value={userId}
-          inputBgColor={background.base}
-          labelBgColor={background.base}
-          focusColor={primary.main}
           onChangeText={serUserId}
-          textInputProps={{
-            multiline: false,
-          }}
+          focusColor={'red'}
         />
 
         <ZSTextField
           boxStyle="inbox"
           label="이메일"
           value={email}
-          inputBgColor={background.base}
-          labelBgColor={background.base}
-          focusColor={primary.main}
           onChangeText={setEmail}
-          textInputProps={{
-            multiline: false,
-            style: { color: text.primary },
-          }}
         />
       </TitleCard>
 
