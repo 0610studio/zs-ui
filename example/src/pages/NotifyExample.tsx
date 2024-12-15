@@ -4,9 +4,10 @@ import { PopOverButton, useNotify, ZSContainer, ZSText, ZSView, useTheme } from 
 import MyBottomSheet from "../ui/MyBottomSheet";
 import TitleCard from "../ui/TitleCard";
 import RenderPopOverMenu from "../ui/RenderPopOverMenu";
+import MyModal from "../ui/MyModal";
 
 const NotifyExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet } = useNotify();
+  const { showAlert, showSnackBar, showBottomSheet, showModality, hideNotify } = useNotify();
   const {
     palette: {
       background,
@@ -108,6 +109,23 @@ const NotifyExample = () => {
           });
         }}
         title="show_BottomSheet"
+        color="#331599"
+      />
+
+      <Button
+        onPress={() => {
+          showModality({
+            component: (
+              <MyModal
+                onConfirm={() => {
+                  console.log("event");
+                  hideNotify('all');
+                }}
+              />
+            ),
+          });
+        }}
+        title="show_Modality"
         color="#331599"
       />
     </ZSContainer>

@@ -13,14 +13,18 @@ export interface NotifyProps {
     // ---
     loaderVisible: boolean;
     // ---
-    popOverVisible: boolean;
+    modalityVisible: boolean;
     setPopOverVisible: (visible: boolean) => void;
+    // ---
+    popOverVisible: boolean;
+    setModalityVisible: (visible: boolean) => void;
     // ---
     showAlert: (props: ShowAlertProps) => void;
     showSnackBar: (props: ShowSnackBarProps) => void;
     showBottomSheet: (props: ShowBottomSheetProps) => void;
     showLoader: () => void;
     showPopOverMenu: (props: PopOverMenuProps) => void;
+    showModality: (props: ModalityProps) => void;
     // ---
     hideNotify: (option: HideOption) => void;
 }
@@ -28,6 +32,10 @@ export interface NotifyProps {
 export interface PopOverMenuProps {
     px: number;
     py: number;
+    component: React.ReactNode;
+}
+
+export interface ModalityProps {
     component: React.ReactNode;
 }
 
@@ -90,7 +98,7 @@ export interface SnackItem {
 
 export type SnackType = 'success' | 'error' | '';
 
-export type HideOption = 'all' | 'snack' | 'alert' | 'bottomSheet' | 'loader' | 'popOver';
+export type HideOption = 'all' | 'snack' | 'alert' | 'bottomSheet' | 'loader' | 'popOver' | 'modal';
 
 export interface ShowSnackBarProps {
     message: string;
