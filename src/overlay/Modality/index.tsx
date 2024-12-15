@@ -41,14 +41,14 @@ function Modality({
       backTranslateY.value = withDelay(400, withTiming(insets.top, { duration: 300 }));
       backBorderRadius.value = withDelay(200, withTiming(16, { duration: 300 }));
       mainTranslateY.value = withDelay(300, withTiming(10 + insets.top, { duration: 300 }));
-      backgroundOpacity.value = withTiming(1, { duration: 300 });
+      backgroundOpacity.value = withTiming(1, { duration: 600 });
     } else {
       // 모달이 닫히는 애니메이션 (역순)
       backScale.value = withTiming(1, { duration: 100 });
       backTranslateY.value = withTiming(0, { duration: 100 });
       backBorderRadius.value = withTiming(0, { duration: 100 });
       mainTranslateY.value = withTiming(height, { duration: 200 });
-      backgroundOpacity.value = withTiming(0, { duration: 500 });
+      backgroundOpacity.value = withTiming(0, { duration: 300 });
       setTimeout(() => {
         setLocalVisible(false);
       }, 500);
