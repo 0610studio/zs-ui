@@ -1,19 +1,19 @@
 import { useCallback, useRef, useState } from 'react';
 import { Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
-import NotifyContext from './useNotify';
-import { AlertActions, BottomSheetRef, HideOption, ModalityProps, NotifyProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
-import AlertNotify from '../notify/AlertNotify';
-import SnackbarNotify from '../notify/SnackbarNotify';
-import BottomSheetNotify from '../notify/BottomSheetNotify';
-import LoadingNotify from '../notify/LoadingNotify';
-import PopOverMenu from '../notify/PopOver/PopOverMenu';
-import Modality from '../notify/Modality';
+import OverlayContext from './useOverlay';
+import { AlertActions, BottomSheetRef, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
+import AlertOverlay from '../overlay/AlertOverlay';
+import SnackbarNotify from '../overlay/SnackbarNotify';
+import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
+import LoadingNotify from '../overlay/LoadingNotify';
+import PopOverMenu from '../overlay/PopOver/PopOverMenu';
+import Modality from '../overlay/Modality';
 
-export function NotifyProvider({
+export function OverlayProvider({
     customSnackbar,
     loaderComponent,
     children
-}: NotifyProviderProps) {
+}: OverlayProviderProps) {
     // Alert
     const [title, setTitle] = useState<string>('');
     const [informative, setInformative] = useState<string>('');
@@ -165,7 +165,7 @@ export function NotifyProvider({
         setSnackItemStack((prev) => prev.filter((item) => item.index !== index));
     };
 
-    const hideNotify = useCallback((option: HideOption) => {
+    const hideOverlay = useCallback((option: HideOption) => {
         switch (option) {
             case 'alert':
                 setAlertVisible(false);
@@ -200,7 +200,7 @@ export function NotifyProvider({
 
 
     return (
-        <NotifyContext.Provider value={{
+        <OverlayContext.Provider value={{
             alertVisible,
             setAlertVisible,
             // ---
@@ -225,11 +225,11 @@ export function NotifyProvider({
             showPopOverMenu,
             showModality,
             // ---
-            hideNotify,
+            hideOverlay,
         }}>
             {children}
 
-            <BottomSheetNotify
+            <BottomSheetOverlay
                 ref={bottomSheetRef}
                 bottomSheetComponent={bottomSheetComponent}
                 contentsGestureEnable={contentsGestureEnable}
@@ -255,7 +255,7 @@ export function NotifyProvider({
                 customSnackbar={customSnackbar}
             />
 
-            <AlertNotify
+            <AlertOverlay
                 title={title}
                 informative={informative}
                 actions={actions || {} as AlertActions}
@@ -274,6 +274,6 @@ export function NotifyProvider({
             <LoadingNotify
                 loaderComponent={loaderComponent}
             />
-        </NotifyContext.Provider>
+        </OverlayContext.Provider>
     );
 }

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Pressable, ScrollView, Dimensions } from 'react-native';
 import ThemeExample from './pages/ThemeExample';
 import LayoutExample from './pages/LayoutExample';
-import NotifyExample from './pages/NotifyExample';
+import OverlayExample from './pages/OverlayExample';
 import { useTheme } from 'zs-ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BUTTONS = [
   { id: 'Theme', title: 'Theme Example', component: <ThemeExample /> },
   { id: 'Layout', title: 'Layout Example', component: <LayoutExample /> },
-  { id: 'Notify', title: 'Notify Example', component: <NotifyExample /> },
+  { id: 'Overlay', title: 'Overlay Example', component: <OverlayExample /> },
 ];
 
 export default function NavigateComponent() {

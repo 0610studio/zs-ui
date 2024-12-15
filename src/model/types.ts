@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { TextProps, TouchableOpacityProps } from "react-native";
 
-export interface NotifyProps {
+export interface OverlayProps {
     alertVisible: boolean;
     setAlertVisible: (visible: boolean) => void;
     // ---
@@ -26,7 +26,7 @@ export interface NotifyProps {
     showPopOverMenu: (props: PopOverMenuProps) => void;
     showModality: (props: ModalityProps) => void;
     // ---
-    hideNotify: (option: HideOption) => void;
+    hideOverlay: (option: HideOption) => void;
 }
 
 export interface PopOverMenuProps {
@@ -59,7 +59,7 @@ export interface CustomSnackbarProps {
     snackMessage: string;
 };
 
-export interface NotifyProviderProps {
+export interface OverlayProviderProps {
     children: ReactNode;
     customSnackbar?: (props: CustomSnackbarProps) => React.ReactNode;
     loaderComponent?: () => React.ReactNode;

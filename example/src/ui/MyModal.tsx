@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useNotify, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
 interface MyModalProps {
@@ -8,7 +8,7 @@ interface MyModalProps {
 }
 
 function MyModal({ onConfirm }: MyModalProps) {
-  const { hideNotify } = useNotify();
+  const { hideOverlay } = useOverlay();
   const { palette: { background, primary, divider } } = useTheme();
   const [search, setSearch] = useState<string>('');
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
@@ -18,8 +18,8 @@ function MyModal({ onConfirm }: MyModalProps) {
   }, [onConfirm]);
 
   const handleClosePress = useCallback(() => {
-    hideNotify('all');
-  }, [hideNotify]);
+    hideOverlay('all');
+  }, [hideOverlay]);
 
   return (
     <ZSView style={styles.container}>

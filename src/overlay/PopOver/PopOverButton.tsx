@@ -1,6 +1,6 @@
 import React, { useRef, useCallback } from 'react';
 import { View, Pressable, ViewProps, StyleSheet } from 'react-native';
-import { useNotify } from '../../model/useNotify';
+import { useOverlay } from '../../model/useOverlay';
 
 interface PopOverButtonProps extends ViewProps {
   width: number;
@@ -18,7 +18,7 @@ const PopOverButton: React.FC<PopOverButtonProps> = ({
   ...props
 }) => {
   const buttonRef = useRef<View>(null);
-  const { showPopOverMenu } = useNotify();
+  const { showPopOverMenu } = useOverlay();
 
   const handlePress = useCallback(() => {
     buttonRef.current?.measure((fx, fy, measuredWidth, measuredHeight, pageX, pageY) => {

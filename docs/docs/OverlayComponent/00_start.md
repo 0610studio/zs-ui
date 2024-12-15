@@ -8,26 +8,26 @@ sidebar_position: 1
 
 스크린 마다 모달 컴포넌트를 배치하고 visible 상태를 선언, props를 전달하는 과정을 생략하고 간단하게 모달을 관리할 수 있습니다.
 
-`NotifyProvider`로 감싸서 전체 앱에서 Notify를 사용할 수 있도록 설정합니다.
+`OverlayProvider`로 감싸서 전체 앱에서 Overlay를 사용할 수 있도록 설정합니다.
 
 ```jsx
 import React from 'react';
-import { NotifyProvider } from '@0610studio/zs-ui';
+import { OverlayProvider } from '@0610studio/zs-ui';
 import App from './App';
 
 const Root = () => (
-  <NotifyProvider>
+  <OverlayProvider>
     <App />
-  </NotifyProvider>
+  </OverlayProvider>
 );
 
 export default Root;
 ```
 
 
-## NotifyProvider
+## OverlayProvider
 
-`NotifyProvider`는 다양한 유형의 알림을 표시하는 데 필요한 상태와 함수를 관리하는 컨텍스트 제공자입니다. 전체 애플리케이션을 감싸서 컨텍스트를 통해 알림 기능에 접근할 수 있도록 합니다.
+`OverlayProvider`는 다양한 유형의 알림을 표시하는 데 필요한 상태와 함수를 관리하는 컨텍스트 제공자입니다. 전체 애플리케이션을 감싸서 컨텍스트를 통해 알림 기능에 접근할 수 있도록 합니다.
 
 ### Props
 
@@ -39,14 +39,14 @@ export default Root;
 
 ---
 
-## Notify 컨텍스트 사용하기
+## Overlay 컨텍스트 사용하기
 
-알림 기능을 사용하려면 `useNotify` 훅을 사용하여 컨텍스트에 접근하세요.
+알림 기능을 사용하려면 `useOverlay` 훅을 사용하여 컨텍스트에 접근하세요.
 
 ```jsx
-import { useNotify } from "@0610studio/zs-ui";
+import { useOverlay } from "@0610studio/zs-ui";
 
 const SomeComponent = () => {
-  const { showAlert, showSnackBar, showBottomSheet, showLoader } = useNotify();
+  const { showAlert, showSnackBar, showBottomSheet, showLoader } = useOverlay();
 };
 ```

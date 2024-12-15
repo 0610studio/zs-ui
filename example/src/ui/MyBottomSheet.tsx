@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useNotify, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
 interface MyBottomSheetProps {
@@ -8,7 +8,7 @@ interface MyBottomSheetProps {
 }
 
 function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
-  const { hideNotify } = useNotify();
+  const { hideOverlay } = useOverlay();
   const { palette: { background, primary } } = useTheme();
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
 
@@ -17,8 +17,8 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
   }, [onConfirm]);
 
   const handleClosePress = useCallback(() => {
-    hideNotify('bottomSheet');
-  }, [hideNotify]);
+    hideOverlay('bottomSheet');
+  }, [hideOverlay]);
 
   return (
     <ZSView style={styles.container}>

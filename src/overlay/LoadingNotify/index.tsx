@@ -1,6 +1,6 @@
 import { ActivityIndicator, BackHandler } from "react-native";
 import React, { ReactNode, useEffect, useCallback } from "react";
-import { useNotify } from "../../model/useNotify";
+import { useOverlay } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 
 // 함수 선언식으로 변경
@@ -9,7 +9,7 @@ function LoadingNotify({
 }: {
   loaderComponent?: () => ReactNode;
 }) {
-  const { loaderVisible } = useNotify();
+  const { loaderVisible } = useOverlay();
 
   // BackHandler 이벤트 처리 최적화
   useEffect(() => {

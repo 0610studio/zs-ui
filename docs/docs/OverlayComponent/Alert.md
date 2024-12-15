@@ -15,10 +15,10 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 ```jsx
 import React, { useContext } from 'react';
 import { Button } from 'react-native';
-import { useNotify } from "@0610studio/zs-ui";
+import { useOverlay } from "@0610studio/zs-ui";
 
 const AlertExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet } = useNotify();
+  const { showAlert, showSnackBar, showBottomSheet } = useOverlay();
 
   const handleShowAlert = () => {
     showAlert({

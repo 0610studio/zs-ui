@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, Dimensions, LayoutChangeEvent, Pressable } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { useNotify } from "../../model/useNotify";
+import { useOverlay } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { PopOverMenuProps } from "../../model/types";
 
@@ -16,7 +16,7 @@ function PopOverMenu({
   const [isContentVisible, setIsContentVisible] = useState<boolean>(false);
   const [contentWidth, setContentWidth] = useState<number>(0);
   const [contentHeight, setContentHeight] = useState<number>(0);
-  const { popOverVisible, setPopOverVisible } = useNotify();
+  const { popOverVisible, setPopOverVisible } = useOverlay();
   const timerRef = useRef<number | null>(null);
 
   // 뒤로가기 버튼 처리 핸들러

@@ -28,7 +28,7 @@ interface Props {
   bottomSheetMarginX: number;
 }
 
-function useBottomSheetNotify({
+function useBottomSheetOverlay({
   bottomSheetPadding,
   closeOffset,
   contentsGestureEnable,
@@ -267,4 +267,4 @@ function useBottomSheetNotify({
   };
 }
 
-export default useBottomSheetNotify;
+export default useBottomSheetOverlay;

@@ -13,9 +13,9 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 ## 기본 사용법
 
 ```tsx
-import { useNotify, ZSContainer, useTheme } from "@0610studio/zs-ui";
+import { useOverlay, ZSContainer, useTheme } from "@0610studio/zs-ui";
 
-const { showBottomSheet } = useNotify();
+const { showBottomSheet } = useOverlay();
 
 <Button
   title="show_BottomSheet"
@@ -39,18 +39,18 @@ const { showBottomSheet } = useNotify();
 ```
 
 ```tsx title="MyBottomSheet.tsx"
-import { ColorPalette, ThemeBackground, useNotify, ZSPressable, ZSText, ZSView, useTheme } from '@0610studio/zs-ui';
+import { ColorPalette, ThemeBackground, useOverlay, ZSPressable, ZSText, ZSView, useTheme } from '@0610studio/zs-ui';
 
 function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
-  const { hideNotify } = useNotify();
+  const { hideOverlay } = useOverlay();
 
   const handleConfirmPress = useCallback(() => {
     onConfirm?.();
   }, [onConfirm]);
 
   const handleClosePress = useCallback(() => {
-    hideNotify('bottomSheet');
-  }, [hideNotify]);
+    hideOverlay('bottomSheet');
+  }, [hideOverlay]);
 
   return (
     <ZSView style={styles.container}>

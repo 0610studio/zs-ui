@@ -2,8 +2,8 @@ import React, { forwardRef, useImperativeHandle, useMemo } from 'react';
 import { StyleSheet, Dimensions, ViewProps, Keyboard } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import useBottomSheetNotify from './model/useBottomSheetNotify';
-import { BottomSheetNotifyRef } from './types';
+import useBottomSheetOverlay from './model/useBottomSheetOverlay';
+import { BottomSheetOverlayRef } from './types';
 import ContentsComponent from './ui/ContentsComponent';
 import { useTheme } from '../../model/useThemeProvider';
 import { ThemeBackground } from '../../theme';
@@ -30,7 +30,7 @@ interface Props extends ViewProps {
   headerComponent?: React.ReactNode;
 }
 
-function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
+function BottomSheetOverlay(props: Props, ref: React.Ref<BottomSheetOverlayRef>) {
   const {
     marginBottomBS = 15,
     bottomSheetPadding = 20,
@@ -61,7 +61,7 @@ function BottomSheetNotify(props: Props, ref: React.Ref<BottomSheetNotifyRef>) {
     listScrollPosition,
     bsModalBgStyle,
     backgroundPressHandler
-  } = useBottomSheetNotify({
+  } = useBottomSheetOverlay({
     bottomSheetPadding,
     closeOffset,
     contentsGestureEnable,
@@ -176,4 +176,4 @@ const createStyles = ({
     },
   });
 
-export default forwardRef(BottomSheetNotify);
+export default forwardRef(BottomSheetOverlay);

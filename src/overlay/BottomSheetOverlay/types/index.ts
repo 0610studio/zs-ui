@@ -1,3 +1,3 @@
-export interface BottomSheetNotifyRef {
+export interface BottomSheetOverlayRef {
     handleVisible: (isOpen: boolean) => void;
 }

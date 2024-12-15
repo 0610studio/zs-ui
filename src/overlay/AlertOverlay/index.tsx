@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableOpacity, BackHandler, Text } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
-import { useNotify } from '../../model/useNotify';
+import { useOverlay } from '../../model/useOverlay';
 import { useTheme } from '../../model/useThemeProvider';
 import { ThemeBackground } from '../../theme';
 import { ZSText } from '../../ui';
@@ -11,7 +11,7 @@ import ViewAtom from '../../ui/atoms/ViewAtom';
 
 const modalWidth = Dimensions.get('window').width - 60;
 
-function AlertNotify({
+function AlertOverlay({
   actions,
   title,
   informative,
@@ -24,7 +24,7 @@ function AlertNotify({
   primaryButtonTextStyle,
   singleButtonTextStyle,
 }: ShowAlertProps) {
-  const { alertVisible, setAlertVisible } = useNotify();
+  const { alertVisible, setAlertVisible } = useOverlay();
   const { palette: { background, text, primary: primaryColor } } = useTheme();
 
   const styles = useMemo(
@@ -124,7 +124,7 @@ function AlertNotify({
   ) : null;
 }
 
-export default AlertNotify;
+export default AlertOverlay;
 
 const createStyles = ({
   background,

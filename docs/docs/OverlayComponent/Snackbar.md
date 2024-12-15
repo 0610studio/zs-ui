@@ -15,10 +15,10 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 ```jsx
 import React, { useContext } from 'react';
 import { Button } from 'react-native';
-import { useNotify } from '@0610studio/zs-ui';
+import { useOverlay } from '@0610studio/zs-ui';
 
 const SnackbarExample = () => {
-const { showSnackBar } = useNotify();
+const { showSnackBar } = useOverlay();
 
   const handleShowSnackbar = () => {
     showSnackBar({
@@ -89,18 +89,18 @@ interface CustomSnackbarProps {
 
 ## 커스터마이징
 
-NotifyProvider에 커스텀 Snackbar 적용
+OverlayProvider에 커스텀 Snackbar 적용
 
 ```jsx
 import React from 'react';
-import { NotifyProvider } from '@0610studio/zs-ui';
+import { OverlayProvider } from '@0610studio/zs-ui';
 import App from './App';
 import CustomSnackbar from './CustomSnackbar';
 
 const Root = () => (
-  <NotifyProvider customSnackbar={CustomSnackbar}>
+  <OverlayProvider customSnackbar={CustomSnackbar}>
     <App />
-  </NotifyProvider>
+  </OverlayProvider>
 );
 
 export default Root;

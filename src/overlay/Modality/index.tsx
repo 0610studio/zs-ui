@@ -8,8 +8,9 @@ import Animated, {
   withDelay,
   useSharedValue
 } from 'react-native-reanimated';
-import { useNotify } from '../../model/useNotify';
+import { useOverlay } from '../../model/useOverlay';
 import { ScrollViewAtom } from '../../ui';
+import { useTheme } from '../../model';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,8 +22,9 @@ function Modality({
   onModalityClosed?: () => void;
 }) {
   const [localVisible, setLocalVisible] = useState(false);
-  const { modalityVisible } = useNotify();
+  const { modalityVisible } = useOverlay();
   const insets = useSafeAreaInsets();
+  const { palette } = useTheme();
 
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);
@@ -86,6 +88,7 @@ function Modality({
     <Animated.View
       style={[
         styles.animatedBackground,
+        {backgroundColor: palette.background.neutral},
         backgroundAnimatedStyle
       ]}
     >
@@ -93,14 +96,8 @@ function Modality({
         exiting={FadeOut.duration(300)}
         style={[
           styles.backScreen,
+          { backgroundColor: palette.background.layer2 },
           backScreenAnimatedStyle
-        ]}
-      />
-
-      <Animated.View
-        style={[
-          styles.overlayBackground,
-          backgroundAnimatedStyle
         ]}
       />
 
@@ -108,7 +105,8 @@ function Modality({
         style={[
           {
             height: height - (10 + insets.top),
-            paddingBottom: insets.bottom
+            paddingBottom: insets.bottom,
+            backgroundColor: palette.background.base
           },
           styles.mainScreen,
           mainScreenAnimatedStyle
@@ -143,27 +141,17 @@ const styles = StyleSheet.create({
     width,
     height,
     position: 'absolute',
-    backgroundColor: 'black',
   },
   backScreen: {
     position: 'absolute',
     width,
     height,
-    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 8000,
   },
-  overlayBackground: {
-    width,
-    height,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    zIndex: 8001,
-    position: 'absolute',
-  },
   mainScreen: {
     width,
-    backgroundColor: 'white',
     position: 'absolute',
     borderRadius: 16,
     zIndex: 8002,

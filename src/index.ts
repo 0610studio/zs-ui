@@ -1,8 +1,7 @@
 import {
   useTheme,
-  NotifyProvider,
+  OverlayProvider,
   ThemeProvider,
-  
 } from './model'
 
 import { 
@@ -20,19 +19,19 @@ import {
 } from './ui';
 
 import { 
-  AlertNotify, 
-  BottomSheetNotify, 
+  AlertOverlay, 
+  BottomSheetOverlay, 
   SnackbarNotify, 
-  useNotifyProvider, 
-  useNotify,
+  useOverlayProvider, 
+  useOverlay,
   BSTextInput,
   PopOverButton,
   PopOverMenu,
-} from './notify';
+} from './overlay';
 
 export {
   useTheme,
-  NotifyProvider,
+  OverlayProvider,
   ThemeProvider,
   // ---
   ZSView,
@@ -47,11 +46,11 @@ export {
   ZSRadioGroup,
   ZSBottomButton,
   // ---
-  AlertNotify, 
-  BottomSheetNotify, 
+  AlertOverlay, 
+  BottomSheetOverlay, 
   SnackbarNotify, 
-  useNotifyProvider, 
-  useNotify, 
+  useOverlayProvider, 
+  useOverlay, 
   BSTextInput,
   PopOverButton,
   PopOverMenu,
@@ -59,7 +58,7 @@ export {
 
 // ------------------------------------------------------
 
-import { BottomSheetNotifyRef } from "./notify/BottomSheetNotify/types";
+import { BottomSheetOverlayRef } from "./overlay/BottomSheetOverlay/types";
 import type {
   ThemeProviderProps,
   ThemeProps,
@@ -91,7 +90,7 @@ import {
   ShowBottomSheetProps,
   PopOverMenuProps,
   CustomSnackbarProps,
-  NotifyProviderProps,
+  OverlayProviderProps,
   AlertAction,
   AlertActions,
   SnackType,
@@ -105,7 +104,7 @@ import {
 } from "./ui/types";
 
 export type {
-  BottomSheetNotifyRef,
+  BottomSheetOverlayRef,
   ThemeProviderProps,
   ThemeProps,
   Palette,
@@ -132,7 +131,7 @@ export type {
   ShowBottomSheetProps,
   PopOverMenuProps,
   CustomSnackbarProps,
-  NotifyProviderProps,
+  OverlayProviderProps,
   AlertAction,
   AlertActions,
   SnackType,

@@ -39,7 +39,7 @@ sidebar_position: 1
     <video controls width="300">
       <source src="https://github.com/user-attachments/assets/24918e91-9afc-4777-b6c7-b914bfb30e60" type="video/mp4" />
     </video>
-    <p>Notify 컴포넌트</p>
+    <p>Overlay 컴포넌트</p>
   </div>
 </div>
 
@@ -68,7 +68,7 @@ root/
 ├── src/
 │   ├── assets/          # 폰트와 이미지 같은 정적 파일들을 저장
 │   ├── model/           # Provider 및 전역 상태 관리 관련 폴더
-│   ├── notify/          # Alert, 스낵바, 바텀시트 등의 알림 관련 UI 컴포넌트
+│   ├── overlay/          # Alert, 스낵바, 바텀시트 등의 overlay 관련 UI 컴포넌트
 │   ├── theme/           # 색상 팔레트와 타이포그래피 등의 테마 설정 파일
 │   └── ui/              # UI 컴포넌트와 atomic 기본 요소들
 └──

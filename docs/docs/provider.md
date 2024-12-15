@@ -15,9 +15,9 @@ ThemeProvider는 프로젝트 전반에서 사용할 폰트와 테마 관련 설
 - `requireFonts` : require 구문을 사용하여 각 폰트 파일을 로드합니다.
 
 
-### NotifyProvider
+### OverlayProvider
 
-NotifyProvider는 프로젝트 전역에서 사용할 알림 시스템을 관리합니다. customSnackbar와 loaderComponent를 통해 커스텀 스낵바 및 로더 컴포넌트를 설정할 수 있습니다.
+OverlayProvider는 프로젝트 전역에서 사용할 알림 시스템을 관리합니다. customSnackbar와 loaderComponent를 통해 커스텀 스낵바 및 로더 컴포넌트를 설정할 수 있습니다.
 
 - `customSnackbar` : 알림을 표시할 때 사용할 사용자 정의 스낵바 컴포넌트입니다. 프로젝트에 맞게 커스터마이징한 스낵바를 설정할 수 있습니다.
 
@@ -54,11 +54,11 @@ const requireFonts = {
 const [loaded] = useFonts(requireFonts);
 
 <ThemeProvider themeFonts={themeFonts}>
-  <NotifyProvider
+  <OverlayProvider
     customSnackbar={SnackBar} // Optional - 사용자 정의 스낵바 컴포넌트
     loaderComponent={LoadingLottieComponent}  // Optional - 사용자 정의 로더 컴포넌트
   >
 
-  </NotifyProvider>
+  </OverlayProvider>
 </ThemeProvider>
 ```

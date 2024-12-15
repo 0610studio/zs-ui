@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 import { Button, StyleSheet } from "react-native";
-import { PopOverButton, useNotify, ZSContainer, ZSText, ZSView, useTheme } from "zs-ui";
+import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme } from "zs-ui";
 import MyBottomSheet from "../ui/MyBottomSheet";
 import TitleCard from "../ui/TitleCard";
 import RenderPopOverMenu from "../ui/RenderPopOverMenu";
 import MyModal from "../ui/MyModal";
 
-const NotifyExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet, showModality, hideNotify } = useNotify();
+const OverlayExample = () => {
+  const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();
   const {
     palette: {
       background,
@@ -119,7 +119,7 @@ const NotifyExample = () => {
               <MyModal
                 onConfirm={() => {
                   console.log("event");
-                  hideNotify('all');
+                  hideOverlay('all');
                 }}
               />
             ),
@@ -191,4 +191,4 @@ const createStyles = ({
   });
 
 
-export default NotifyExample;
+export default OverlayExample;
