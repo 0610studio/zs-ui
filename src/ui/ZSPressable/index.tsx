@@ -54,7 +54,7 @@ function ZSPressable({
         borderRadius: pressedBackgroundBorderRadius,
         flex: fullWidth ? 1 : flex,
         minWidth: minWidth,
-        alignSelf: fullWidth ? 'stretch' : 'flex-start' as FlexAlignType,
+        alignSelf: fullWidth ? 'stretch' : undefined as FlexAlignType | undefined,
       };
     },
     [pressedBackgroundColor, pressedBackgroundBorderRadius, flex, minWidth, fullWidth]
