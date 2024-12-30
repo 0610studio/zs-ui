@@ -51,7 +51,7 @@ function ZSTextField({
   borderWidth = 1.2,
   borderColor,
   focusColor,
-  errorColor = '#FF3B30',
+  errorColor,
   borderRadius = 14,
   paddingHorizontal = 15,
   errorMessage,
@@ -64,6 +64,7 @@ function ZSTextField({
 }: TextFieldProps): JSX.Element {
   const { typography, palette } = useTheme();
   const [primaryStyle, subStyle] = typo.split('.') as [TypoStyle, TypoSubStyle];
+  let fErrorColor = errorColor || palette.danger.main;
 
   // 폰트 크기 및 패밀리 추출
   const fontSize = useMemo(() => extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17, [typography, primaryStyle, subStyle]);
@@ -119,13 +120,13 @@ function ZSTextField({
 
   // 상태에 따른 테두리 색상 설정
   const computedBorderColor = useMemo(() => (
-    status === 'error' ? errorColor : isFocused ? (focusColor || palette.primary.main) : (borderColor || palette.grey[30])
-  ), [status, errorColor, isFocused, focusColor, borderColor, palette]);
+    status === 'error' ? fErrorColor : isFocused ? (focusColor || palette.primary.main) : (borderColor || palette.grey[30])
+  ), [status, fErrorColor, isFocused, focusColor, borderColor, palette]);
 
   // 상태에 따른 라벨 색상 설정
   const computedLabelColor = useMemo(() => (
-    status === 'error' ? errorColor : isFocused ? (focusColor || palette.primary.main) : value ? (labelColor || palette.text.secondary) : (placeHolderColor || palette.grey[40])
-  ), [status, errorColor, isFocused, focusColor, value, placeHolderColor, labelColor, palette]);
+    status === 'error' ? fErrorColor : isFocused ? (focusColor || palette.primary.main) : value ? (labelColor || palette.text.secondary) : (placeHolderColor || palette.grey[40])
+  ), [status, fErrorColor, isFocused, focusColor, value, placeHolderColor, labelColor, palette]);
 
   // 컨테이너 스타일 정의
   const containerStyle: StyleProp<ViewStyle> = useMemo(() => ({
@@ -162,7 +163,7 @@ function ZSTextField({
   }, [onChangeText]);
 
   return (
-    <>
+    <ViewAtom style={{ alignSelf: 'stretch', width: '100%' }}>
       <ViewAtom
         style={[containerStyle, { borderColor: computedBorderColor }]}
         onLayout={handleLayout}
@@ -197,9 +198,9 @@ function ZSTextField({
       </ViewAtom>
 
       {status === 'error' && errorMessage && (
-        <ErrorComponent errorMessage={errorMessage} errorColor={errorColor} fontFamily={fontFamily} />
+        <ErrorComponent errorMessage={errorMessage} errorColor={fErrorColor} fontFamily={fontFamily} />
       )}
-    </>
+    </ViewAtom>
   );
 }
 
