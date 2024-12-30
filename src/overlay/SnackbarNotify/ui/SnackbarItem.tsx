@@ -24,7 +24,6 @@ const Snackbar = ({
 
   useEffect(() => {
     const closeTimeout = setTimeout(closeSnackbar, snackbarDuration);
-
     return () => clearTimeout(closeTimeout);
   }, [snackbarDuration, closeSnackbar]);
 

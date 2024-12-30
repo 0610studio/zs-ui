@@ -1,25 +1,26 @@
 import { Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 const ErrorComponent = ({
-    errorMessage, errorColor, fontFamily
-}:{
-    errorMessage: string;
-    errorColor: string;
-    fontFamily: string;
+  errorMessage, errorColor, fontFamily
+}: {
+  errorMessage: string;
+  errorColor: string;
+  fontFamily: string;
 }) => {
-    return (
-        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingLeft: 3, marginTop: 5 }}>
-            <View style={{ width: 18, height: 18, justifyContent: 'center', alignItems: 'center', borderRadius: 30, backgroundColor: errorColor }}>
-                <Text allowFontScaling={false} style={{ fontWeight: 'bold', color: 'white', textAlign: 'center', textAlignVertical: 'center', fontSize: 11, fontFamily: fontFamily }}>
-                    {`!`}
-                </Text>
-            </View>
+  return (
+    <Animated.View entering={FadeInDown} style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingLeft: 5, marginTop: 6 }}>
+      <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center', borderRadius: 30, backgroundColor: errorColor }}>
+        <Text allowFontScaling={false} style={{ fontWeight: 'bold', color: 'white', textAlign: 'center', textAlignVertical: 'center', fontSize: 11, fontFamily: fontFamily }}>
+          {`!`}
+        </Text>
+      </View>
 
-            <Text allowFontScaling={false} style={{ marginLeft: 5, fontSize: 14, color: errorColor, fontFamily: fontFamily }}>
-                {errorMessage}
-            </Text>
-        </View>
-    )
+      <Text allowFontScaling={false} style={{ marginLeft: 5, fontSize: 13, color: errorColor, fontFamily: fontFamily }}>
+        {errorMessage}
+      </Text>
+    </Animated.View>
+  )
 }
 
 export default ErrorComponent;

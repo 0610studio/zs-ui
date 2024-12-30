@@ -8,6 +8,7 @@ function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [userId, serUserId] = useState<string>('');
+  const [memo, setMemo] = useState<string>('');
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
   const [responseType, setResponseType] = useState<RadioOption>();
   const { palette: { background, primary, text } } = useTheme();
@@ -80,7 +81,7 @@ function LayoutExample(): React.JSX.Element {
         <ZSText typo="body.6">body.6</ZSText>
       </TitleCard>
 
-      <TitleCard title='ZSTextField' gap={20}>
+      <TitleCard title='ZSTextField' gap={20} flexDirection='column'>
         <ZSTextField
           boxStyle="underline"
           label="닉네임"
@@ -93,6 +94,8 @@ function LayoutExample(): React.JSX.Element {
             multiline: false,
             style: { color: text.primary },
           }}
+          status={nick ? 'default' : 'error'}
+          errorMessage='닉네임을 입력해주세요'
         />
 
         <ZSTextField
@@ -108,6 +111,18 @@ function LayoutExample(): React.JSX.Element {
           label="이메일"
           value={email}
           onChangeText={setEmail}
+          textInputProps={{ maxLength: 5 }}
+        />
+
+        <ZSTextField
+          label="메모"
+          value={memo}
+          onChangeText={setMemo}
+          textInputProps={{
+            multiline: true,
+            style: { minHeight: 150, textAlignVertical: 'top' },
+          }}
+          isTextArea
         />
       </TitleCard>
 
