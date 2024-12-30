@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
-import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme } from 'zs-ui';
+import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme, ErrorComponent } from 'zs-ui';
 import TitleCard from '../ui/TitleCard';
 import type { RadioOption } from 'zs-ui';
+import palette from 'zs-ui/theme/palette';
 
 function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
@@ -11,7 +12,7 @@ function LayoutExample(): React.JSX.Element {
   const [memo, setMemo] = useState<string>('');
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
   const [responseType, setResponseType] = useState<RadioOption>();
-  const { palette: { background, primary, text } } = useTheme();
+  const { palette: { background, primary, text, danger } } = useTheme();
 
   const styles = useMemo(
     () =>
@@ -79,6 +80,11 @@ function LayoutExample(): React.JSX.Element {
         <ZSText typo="body.4">body.4</ZSText>
         <ZSText typo="body.5">body.5</ZSText>
         <ZSText typo="body.6">body.6</ZSText>
+
+        <ErrorComponent
+          errorMessage='에러메시지'
+          errorColor={danger.main}
+        />
       </TitleCard>
 
       <TitleCard title='ZSTextField' gap={20} flexDirection='column'>

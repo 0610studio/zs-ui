@@ -198,7 +198,7 @@ function ZSTextField({
       </ViewAtom>
 
       {status === 'error' && errorMessage && (
-        <ErrorComponent errorMessage={errorMessage} errorColor={fErrorColor} fontFamily={fontFamily} />
+        <ErrorComponent errorMessage={errorMessage} errorColor={fErrorColor} />
       )}
     </ViewAtom>
   );

@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from './model'
 
-import { 
+import {
   ZSView,
   AnimatedWrapper,
   TextAtom,
@@ -18,11 +18,13 @@ import {
   ZSBottomButton,
 } from './ui';
 
-import { 
-  AlertOverlay, 
-  BottomSheetOverlay, 
-  SnackbarNotify, 
-  useOverlayProvider, 
+import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
+
+import {
+  AlertOverlay,
+  BottomSheetOverlay,
+  SnackbarNotify,
+  useOverlayProvider,
   useOverlay,
   BSTextInput,
   PopOverButton,
@@ -45,12 +47,13 @@ export {
   ZSTextField,
   ZSRadioGroup,
   ZSBottomButton,
+  ErrorComponent,
   // ---
-  AlertOverlay, 
-  BottomSheetOverlay, 
-  SnackbarNotify, 
-  useOverlayProvider, 
-  useOverlay, 
+  AlertOverlay,
+  BottomSheetOverlay,
+  SnackbarNotify,
+  useOverlayProvider,
+  useOverlay,
   BSTextInput,
   PopOverButton,
   PopOverMenu,
