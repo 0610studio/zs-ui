@@ -69,7 +69,7 @@ function AlertOverlay({
       >
         <Pressable style={[styles.contentContainer, { width: modalWidth }]}>
           {title && (
-            <ZSText typo='title.1' style={[styles.title, titleStyle]}>{title}</ZSText>
+            <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
           )}
           {informative && (
             <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
@@ -86,14 +86,14 @@ function AlertOverlay({
                     ]}
                     onPress={handleButtonPress(secondary?.onPress)}
                   >
-                    <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
+                    <ZSText typo='subTitle.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                     onPress={handleButtonPress(primary?.onPress)}
                   >
-                    <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+                    <ZSText typo='subTitle.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                   </TouchableOpacity>
                 </>
               ) : (
@@ -101,7 +101,7 @@ function AlertOverlay({
                   style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                   onPress={handleButtonPress(primary?.onPress)}
                 >
-                  <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+                  <ZSText typo='subTitle.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                 </TouchableOpacity>
               )}
             </ViewAtom>
