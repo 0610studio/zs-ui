@@ -69,7 +69,7 @@ function AlertOverlay({
       >
         <Pressable style={[styles.contentContainer, { width: modalWidth }]}>
           {title && (
-            <ZSText typo='title.1' style={[styles.title, titleStyle]}>{title}</ZSText>
+            <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
           )}
           {informative && (
             <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
