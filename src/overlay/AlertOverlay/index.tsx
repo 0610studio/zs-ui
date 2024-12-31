@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableOpacity, BackHandler, Text } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useOverlay } from '../../model/useOverlay';
@@ -32,7 +32,6 @@ function AlertOverlay({
     [background, text, primaryColor]
   );
 
-  // 버튼 클릭 핸들러 함수, 콜백 메모이제이션으로 성능 최적화
   const handleButtonPress = useCallback(
     (onPressFunction?: () => void) => () => {
       if (onPressFunction) {
@@ -43,22 +42,6 @@ function AlertOverlay({
     [setAlertVisible]
   );
 
-  // 뒤로가기 버튼 핸들러 함수
-  const backPressHandler = useCallback(() => {
-    if (alertVisible) {
-      setAlertVisible(false);
-      return true;
-    }
-    return false;
-  }, [alertVisible, setAlertVisible]);
-
-  // 뒤로가기 버튼 리스너 설정
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backPressHandler);
-    return () => backHandler.remove();
-  }, [backPressHandler]);
-
-  // content를 useMemo로 감싸서 불필요한 재렌더링 방지
   const content = useMemo(() => {
     const { primary, secondary } = actions || {} as AlertActions;
 

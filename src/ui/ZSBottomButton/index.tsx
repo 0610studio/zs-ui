@@ -63,7 +63,7 @@ function ZSBottomButton({
       keyboardShowSubscription.remove();
       keyboardHideSubscription.remove();
     };
-  }, [isKeyboardVisible, keyboardHeight]);
+  }, [isKeyboardVisible]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const getBottom = interpolate(

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { BackHandler, Dimensions, LayoutChangeEvent, Pressable } from "react-native";
+import { Dimensions, LayoutChangeEvent, Pressable } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useOverlay } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
@@ -18,23 +18,6 @@ function PopOverMenu({
   const [contentHeight, setContentHeight] = useState<number>(0);
   const { popOverVisible, setPopOverVisible } = useOverlay();
   const timerRef = useRef<number | null>(null);
-
-  // 뒤로가기 버튼 처리 핸들러
-  const handleBackPress = useCallback((): boolean => {
-    if (popOverVisible) {
-      setIsContentVisible(false);
-      setPopOverVisible(false);
-      return true; // 뒤로가기 액션을 막음
-    }
-    return false; // 기본 동작 허용
-  }, [popOverVisible, setPopOverVisible]);
-
-  // 뒤로가기 이벤트 리스너 추가 및 제거
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-
-    return () => backHandler.remove();
-  }, [handleBackPress]);
 
   // 레이아웃 크기 계산
   const handleLayout = useCallback((event: LayoutChangeEvent): void => {

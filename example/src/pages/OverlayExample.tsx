@@ -89,6 +89,17 @@ const OverlayExample = () => {
           });
         }}
         title="show_SnackBar"
+        color="#00cc00"
+      />
+
+      <Button
+        onPress={() => {
+          showSnackBar({
+            message: Date.now().toString() + '길~~~~~~어진 스낵바 테스트 입니다아아아아아',
+            type: "error",
+          });
+        }}
+        title="show_SnackBar_Error"
         color="#841500"
       />
 
