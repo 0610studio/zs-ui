@@ -16,10 +16,8 @@ const { width, height } = Dimensions.get('window');
 
 function Modality({
   modalityComponent,
-  onModalityClosed
 }: {
   modalityComponent?: React.ReactNode;
-  onModalityClosed?: () => void;
 }) {
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useOverlay();
@@ -53,7 +51,7 @@ function Modality({
         setLocalVisible(false);
       }, 500);
     }
-  }, [modalityVisible, insets.top, onModalityClosed]);
+  }, [modalityVisible]);
 
   // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {

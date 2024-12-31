@@ -25,16 +25,16 @@ const Snackbar = ({
   useEffect(() => {
     const closeTimeout = setTimeout(closeSnackbar, snackbarDuration);
     return () => clearTimeout(closeTimeout);
-  }, [snackbarDuration, closeSnackbar]);
+  }, []);
 
   return (
     <Animated.View
-      style={[styles.container, styles.aosShadow, styles.snackbarWrapper]}
+      style={[styles.snackbarWrapper]}
       entering={FadeInUp}
       exiting={FadeOutUp}
     >
       <TouchableOpacity
-        style={[styles.container, styles.iosShadow, styles.touchable]}
+        style={[styles.container]}
         activeOpacity={1}
         onPress={closeSnackbar}
       >
@@ -60,29 +60,11 @@ const Snackbar = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: 16,
-    backgroundColor: "white",
-  },
-  iosShadow: {
-    ...Platform.select({
-      ios: {
-        shadowColor: "rgb(50, 50, 50)",
-        shadowOpacity: 0.12,
-        shadowRadius: 5,
-        shadowOffset: { height: 3, width: 0 },
-      },
-    }),
-  },
-  aosShadow: {
-    ...Platform.select({
-      android: { elevation: 5 },
-    }),
+    width: "100%",
   },
   snackbarWrapper: {
-    width: "94%",
-    marginTop: 10,
-  },
-  touchable: {
-    width: "100%",
+    width: "96%",
+    marginTop: 8,
   },
   snackBar: {
     borderRadius: 16,

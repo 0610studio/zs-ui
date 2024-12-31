@@ -1,5 +1,5 @@
-import { ActivityIndicator, BackHandler } from "react-native";
-import React, { ReactNode, useEffect, useCallback } from "react";
+import { ActivityIndicator } from "react-native";
+import React, { ReactNode, useCallback } from "react";
 import { useOverlay } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 
@@ -10,22 +10,6 @@ function LoadingNotify({
   loaderComponent?: () => ReactNode;
 }) {
   const { loaderVisible } = useOverlay();
-
-  // BackHandler 이벤트 처리 최적화
-  useEffect(() => {
-    const handleBackPressed = () => {
-      if (loaderVisible) return true; // 로더가 보이는 경우 뒤로가기 방지
-      return false;
-    };
-
-    const handler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      handleBackPressed
-    );
-
-    // cleanup 함수 추가
-    return () => handler.remove();
-  }, [loaderVisible]);
 
   // loaderComponent를 메모이제이션
   const renderLoader = useCallback(() => {
