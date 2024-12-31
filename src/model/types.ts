@@ -71,8 +71,8 @@ export interface AlertAction {
 };
 
 export interface ShowAlertProps {
-    title: string;
-    informative: string;
+    title?: string;
+    informative?: string;
     actions?: AlertActions;
     isBackgroundTouchClose?: boolean;
     titleStyle?: TextProps['style'];
