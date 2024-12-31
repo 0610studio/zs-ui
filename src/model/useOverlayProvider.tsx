@@ -77,8 +77,8 @@ export function OverlayProvider({
         singleButtonTextStyle,
     }: ShowAlertProps) => {
         Keyboard.dismiss();
-        setTitle(title);
-        setInformative(informative);
+        setTitle(title || '');
+        setInformative(informative || '');
         setActions(actions || {} as AlertActions);
         setIsBackgroundTouchClose(isBackgroundTouchClose);
         setAlertVisible(true);
