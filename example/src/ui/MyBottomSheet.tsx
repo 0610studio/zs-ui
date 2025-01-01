@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useOverlay, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
@@ -22,7 +22,19 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
 
   return (
     <ZSView style={styles.container}>
-      <View style={{ flexDirection: 'row', gap: 15 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, gap: 10 }}>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
+        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
+      </ScrollView>
+
+      <View style={{ flexDirection: 'row', gap: 10 }}>
         <ZSPressable fullWidth style={styles.confirm} onPress={handleConfirmPress}>
           <ZSText>확인</ZSText>
         </ZSPressable>
@@ -45,6 +57,7 @@ const createStyles = ({
     container: {
       width: '100%',
       height: 300,
+      flex: 1,
     },
     confirm: {
       justifyContent: 'center',

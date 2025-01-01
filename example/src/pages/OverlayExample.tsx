@@ -106,10 +106,12 @@ const OverlayExample = () => {
       <Button
         onPress={() => {
           showBottomSheet({
-            isScrollView: true,
-            contentsGestureEnable: false,
-            maxHeight: 300,
-            showsVerticalScrollIndicator: true,
+            options:{
+              height: 500
+            },
+            headerComponent: (
+              <ZSText style={{ textAlign: "center", padding: 30, backgroundColor: '#ff00ff' }}>헤더 컴포넌트</ZSText>
+            ),
             component: (
               <MyBottomSheet
                 onConfirm={() => {

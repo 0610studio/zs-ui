@@ -58,14 +58,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       }
     };
     loadSettings();
-  }, [systemColorScheme]);
+  }, []);
 
   // 시스템 다크 모드 변경에 따른 효과 적용
   useEffect(() => {
     if (isUsingSystemColorScheme) {
       setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
     }
-  }, [systemColorScheme, isUsingSystemColorScheme]);
+  }, [isUsingSystemColorScheme]);
 
   // 테마 토글 함수
   const toggleTheme = async () => {

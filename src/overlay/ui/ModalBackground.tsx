@@ -10,7 +10,10 @@ interface ModalBackgroundProps {
 }
 
 function ModalBackground({ isCenter = true, children, onPress }: ModalBackgroundProps) {
-  const { palette: { modalBgColor } } = useTheme();
+  const {
+    palette: { modalBgColor },
+  } = useTheme();
+
   const styles = useMemo(() => createStyles(modalBgColor), [modalBgColor]);
 
   return (
@@ -20,11 +23,15 @@ function ModalBackground({ isCenter = true, children, onPress }: ModalBackground
       exiting={FadeOut.duration(50)}
     >
       <Pressable
-        style={[styles.fullScreen, isCenter && { justifyContent: 'center', alignItems: 'center' }]}
+        style={[
+          styles.fullScreen,
+          isCenter && { justifyContent: 'center', alignItems: 'center' },
+        ]}
         onPress={onPress ?? (() => { })}
       >
-        {children}
       </Pressable>
+
+      {children}
     </Animated.View>
   );
 }
@@ -35,9 +42,12 @@ const createStyles = (modalBgColor: string) =>
       zIndex: 9997,
       backgroundColor: modalBgColor,
       ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     fullScreen: {
-      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
     },
   });
 

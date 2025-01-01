@@ -1,179 +1,160 @@
-import React, { forwardRef, useImperativeHandle, useMemo } from 'react';
-import { StyleSheet, Dimensions, ViewProps, Keyboard } from 'react-native';
-import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import useBottomSheetOverlay from './model/useBottomSheetOverlay';
-import { BottomSheetOverlayRef } from './types';
-import ContentsComponent from './ui/ContentsComponent';
-import { useTheme } from '../../model/useThemeProvider';
-import { ThemeBackground } from '../../theme';
-import ViewAtom from '../../ui/atoms/ViewAtom';
-import { ZSView } from '../../ui';
+import React, { useEffect, useState, useRef } from 'react';
+import { Dimensions, StyleSheet, View, PanResponder } from 'react-native';
+import { useOverlay } from '../../model/useOverlay';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import ModalBackground from '../ui/ModalBackground';
+import { useTheme } from '../../model';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ShowBottomSheetProps } from '../../model/types';
 
-const DEFAULT_BORDER_RADIUS = 24;
-const BS_MAX_HEIGHT = Dimensions.get('window').height - 80;
+const { width } = Dimensions.get('window');
 
-interface Props extends ViewProps {
-  marginBottomBS?: number;
-  bottomSheetBackgroundColor?: string;
-  bottomSheetPadding?: number;
-  closeOffset?: number;
-  contentsGestureEnable?: boolean;
-  isHandleVisible?: boolean;
-  bottomSheetMarginX?: number;
-  isBottomRadius?: boolean;
-  maxHeight?: number;
-  isScrollView?: boolean;
-  bottomSheetComponent: React.ReactNode;
-  showsVerticalScrollIndicator: boolean;
-  headerComponent?: React.ReactNode;
-}
-
-function BottomSheetOverlay(props: Props, ref: React.Ref<BottomSheetOverlayRef>) {
+function BottomSheetOverlay({
+  headerComponent,
+  component,
+  options = {},
+}: ShowBottomSheetProps) {
+  const [localVisible, setLocalVisible] = useState(false);
+  const { palette } = useTheme();
+  const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
+  const { bottom } = useSafeAreaInsets();
   const {
-    marginBottomBS = 15,
-    bottomSheetPadding = 20,
-    bottomSheetBackgroundColor,
-    closeOffset = Dimensions.get('window').height,
-    contentsGestureEnable = true,
-    isHandleVisible = true,
-    bottomSheetMarginX = 10,
-    isBottomRadius = true,
-    isScrollView = true,
-    maxHeight = BS_MAX_HEIGHT,
-    bottomSheetComponent,
-    showsVerticalScrollIndicator,
-    headerComponent
-  } = props;
+    isBackgroundTouchClose = true,
+    marginHorizontal = 10,
+    marginBottom = 10,
+    height = 300,
+    padding = 14,
+  } = options;
 
-  const {
-    HANDLE_HEIGHT,
-    bottomSheetVisible,
-    bsAnimatedStyle,
-    onGestureEvent,
-    handleVisible,
-    onTapEvent,
-    openPosition,
-    screenWidth,
-    screenHeight,
-    panGestureRef,
-    listScrollPosition,
-    bsModalBgStyle,
-    backgroundPressHandler
-  } = useBottomSheetOverlay({
-    bottomSheetPadding,
-    closeOffset,
-    contentsGestureEnable,
-    bottomSheetMarginX,
-    isHandleVisible,
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(height);
+  const startX = useRef(0);
+  const startY = useRef(0);
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }, { translateX: translateX.value }],
+    };
   });
 
-  const { palette: { background } } = useTheme();
-  const { bottom, top } = useSafeAreaInsets();
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        startX.current = translateX.value;
+        startY.current = translateY.value;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const newTranslateX = (startX.current + gestureState.dx) / 20;
+        translateX.value = newTranslateX;
 
-  const styles = useMemo(
-    () => createStyles({ background }),
-    [background]
-  );
+        const newTranslateY = startY.current + gestureState.dy;
+        if (newTranslateY < 0) {
+          translateY.value = newTranslateY / 20;
+        } else {
+          translateY.value = newTranslateY / 1.5;
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        translateX.value = withTiming(0, { duration: 100 });
 
-  useImperativeHandle(ref, () => ({
-    handleVisible,
-  }));
+        // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
+        if (gestureState.vy > 0.5 || translateY.value > height / 3) {
+          translateY.value = withTiming(height + 100, { duration: 150 });
+          setBottomSheetVisible(false);
+        } else {
+          translateY.value = withTiming(0, { duration: 150 });
+        }
+      },
+    })
+  ).current;
 
-  return bottomSheetVisible && bottomSheetComponent ? (
-    <Animated.View
-      style={[styles.modalBg, bsModalBgStyle]}
-      entering={FadeIn.duration(50)}
-      exiting={FadeOut.duration(50)}
-      onTouchEnd={backgroundPressHandler} // 외부 터치 시 시트 닫기
+  useEffect(() => {
+    if (bottomSheetVisible) {
+      setLocalVisible(true);
+      translateY.value = withSpring(0, {
+        damping: 50,
+        stiffness: 300,
+        mass: 0.7,
+        velocity: 100,
+        restDisplacementThreshold: 0.2,
+      });
+    } else {
+      translateY.value = withTiming(height + 100, { duration: 150 });
+      setTimeout(() => {
+        setLocalVisible(false);
+      }, 200);
+    }
+  }, [bottomSheetVisible]);
+
+  if (!localVisible) return null;
+
+  return (
+    <ModalBackground
+      onPress={() => {
+        if (isBackgroundTouchClose) setBottomSheetVisible(false);
+      }}
     >
-      <GestureHandlerRootView style={styles.rootViewWrapper}>
-        <GestureDetector gesture={onGestureEvent}>
-          <Animated.View
-            onTouchEnd={(e) => {
-              e.stopPropagation();
-              Keyboard.dismiss(); // 키보드 숨김
-            }}
-            style={[
-              styles.sheet,
-              {
-                width: screenWidth,
-                height: screenHeight,
-                left: bottomSheetMarginX,
-                right: bottomSheetMarginX,
-                borderTopLeftRadius: DEFAULT_BORDER_RADIUS,
-                borderTopRightRadius: DEFAULT_BORDER_RADIUS,
-                borderBottomLeftRadius: isBottomRadius ? DEFAULT_BORDER_RADIUS : 0,
-                borderBottomRightRadius: isBottomRadius ? DEFAULT_BORDER_RADIUS : 0,
-                backgroundColor: bottomSheetBackgroundColor || background.base,
-              },
-              bsAnimatedStyle, // 애니메이션 스타일 적용
-            ]}
-          >
-            {isHandleVisible && (
-              <ZSView style={[styles.handleContainer, { height: HANDLE_HEIGHT }]}>
-                <ViewAtom style={styles.handle} />
-              </ZSView>
-            )}
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            width: width - marginHorizontal * 2,
+            height,
+            marginHorizontal,
+            bottom: marginBottom + bottom,
+            backgroundColor: palette.background.base,
+          },
+          animatedStyles,
+        ]}
+      >
+        <View
+          style={[
+            styles.pressableView,
+            { paddingHorizontal: padding, paddingBottom: padding },
+          ]}
+        >
+          <View {...panResponder.panHandlers}>
+            <View style={[styles.gestureBarContainer, { paddingBottom: padding }]}>
+              <View style={[styles.gestureBar, { backgroundColor: palette.divider }]} />
+            </View>
+            {headerComponent}
+          </View>
 
-            <GestureDetector gesture={onTapEvent}>
-              <ContentsComponent
-                HANDLE_HEIGHT={HANDLE_HEIGHT}
-                panGestureRef={panGestureRef}
-                listScrollPosition={listScrollPosition}
-                openPosition={openPosition}
-                marginBottomBS={marginBottomBS}
-                screenHeight={screenHeight}
-                bottomSheetComponent={bottomSheetComponent}
-                bottomSheetPadding={bottomSheetPadding}
-                maxHeight={maxHeight - bottom - top - marginBottomBS - bottomSheetMarginX}
-                isScrollView={isScrollView}
-                showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-                headerComponent={headerComponent}
-                paddingHorizontal={bottomSheetPadding}
-              />
-            </GestureDetector>
-          </Animated.View>
-        </GestureDetector>
-      </GestureHandlerRootView>
-    </Animated.View>
-  ) : null;
+          {component}
+        </View>
+      </Animated.View>
+    </ModalBackground>
+  );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    borderRadius: 26,
+    overflow: 'hidden',
+  },
+  pressableView: {
+    width: '100%',
+    height: '100%',
+  },
+  gestureBarContainer: {
+    width: '100%',
+    paddingTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gestureBar: {
+    width: 45,
+    height: 3,
+    borderRadius: 2,
+  },
+});
 
-const createStyles = ({
-  background,
-}: {
-  background: ThemeBackground;
-}) =>
-  StyleSheet.create({
-    modalBg: {
-      position: 'absolute',
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height,
-      bottom: 0,
-    },
-    sheet: {
-      position: 'absolute',
-      zIndex: 9000,
-      overflow: 'hidden',
-    },
-    handleContainer: {
-      width: '100%',
-      alignItems: 'center',
-      paddingTop: 13,
-    },
-    handle: {
-      backgroundColor: background.layer2,
-      width: 50,
-      height: 4,
-      borderRadius: 2,
-    },
-    rootViewWrapper: {
-      width: '100%',
-      height: '100%',
-    },
-  });
-
-export default forwardRef(BottomSheetOverlay);
+export default BottomSheetOverlay;

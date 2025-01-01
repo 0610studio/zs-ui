@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useOverlay } from '../../model/useOverlay';
@@ -49,60 +49,53 @@ function AlertOverlay({
       <Animated.View
         entering={FadeInDown.duration(300)}
         exiting={FadeOutDown.duration(100)}
+        style={[styles.contentContainer, { width: modalWidth }]}
       >
-        <Pressable style={[styles.contentContainer, { width: modalWidth }]}>
-          {title && (
-            <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
-          )}
-          {informative && (
-            <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
-          )}
-          {actions && (
-            <ViewAtom style={styles.buttonContainer}>
-              {secondary ? (
-                <>
-                  <TouchableOpacity
-                    style={[
-                      styles.button,
-                      { backgroundColor: background.neutral, marginRight: 8 },
-                      secondaryButtonStyle
-                    ]}
-                    onPress={handleButtonPress(secondary?.onPress)}
-                  >
-                    <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
-                  </TouchableOpacity>
+        {title && (
+          <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
+        )}
+        {informative && (
+          <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
+        )}
+        {actions && (
+          <ViewAtom style={styles.buttonContainer}>
+            {secondary ? (
+              <>
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    { backgroundColor: background.neutral, marginRight: 8 },
+                    secondaryButtonStyle
+                  ]}
+                  onPress={handleButtonPress(secondary?.onPress)}
+                >
+                  <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
+                </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
-                    onPress={handleButtonPress(primary?.onPress)}
-                  >
-                    <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
-                  </TouchableOpacity>
-                </>
-              ) : (
                 <TouchableOpacity
                   style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                   onPress={handleButtonPress(primary?.onPress)}
                 >
                   <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                 </TouchableOpacity>
-              )}
-            </ViewAtom>
-          )}
-        </Pressable>
+              </>
+            ) : (
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
+                onPress={handleButtonPress(primary?.onPress)}
+              >
+                <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+              </TouchableOpacity>
+            )}
+          </ViewAtom>
+        )}
       </Animated.View>
     );
   }, [title, informative, actions, handleButtonPress, titleStyle, informativeStyle, secondaryButtonStyle, primaryButtonStyle, secondaryButtonTextStyle, primaryButtonTextStyle, singleButtonTextStyle]);
 
   return alertVisible ? (
     <ModalBackground onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}>
-      <KeyboardAvoidingView
-        style={styles.avoidingView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        enabled
-      >
-        {content}
-      </KeyboardAvoidingView>
+      {content}
     </ModalBackground>
   ) : null;
 }
@@ -149,7 +142,9 @@ const createStyles = ({
       borderRadius: 22,
       paddingBottom: 18,
       paddingTop: 24,
-      paddingHorizontal: 20
+      paddingHorizontal: 20,
+      position: 'absolute',
+      top: '35%',
     },
   });
 
