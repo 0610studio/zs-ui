@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BackHandler, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
 import OverlayContext from './useOverlay';
-import { AlertActions, BottomSheetRef, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
+import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
 import AlertOverlay from '../overlay/AlertOverlay';
 import SnackbarNotify from '../overlay/SnackbarNotify';
 import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
@@ -32,20 +32,10 @@ export function OverlayProvider({
   const [snackItemStack, setSnackItemStack] = useState<SnackItem[]>([]);
 
   // BottomSheet
-  const [contentsGestureEnable, setContentsGestureEnable] = useState<boolean>(false);
   const [bottomSheetVisible, setBottomSheetVisible] = useState<boolean>(false);
-  const [bottomSheetBackgroundColor, setBottomSheetBackgroundColor] = useState<string>();
-  const [bottomSheetComponent, setBottomSheetComponent] = useState<React.ReactNode>(false);
-  const [bottomSheetPadding, setBottomSheetPadding] = useState<number | undefined>(undefined);
-  const [bottomSheetMarginX, setBottomSheetMarginX] = useState<number | undefined>(undefined);
-  const [bottomSheetMaxHeight, setBottomSheetMaxHeight] = useState<number>();
-  const [bottomSheetScrollView, setBottomSheetScrollView] = useState<boolean>(true);
-  const [isBottomRadius, setIsBottomRadius] = useState<boolean>(true);
-  const [handleVisible, setHandleVisible] = useState<boolean>(true);
-  const [marginBottomBS, setMarginBottomBs] = useState<number | undefined>(undefined);
-  const [showsVerticalScrollIndicator, setShowsVerticalScrollIndicator] = useState<boolean>(false);
-  const [headerComponent, setHeaderComponent] = useState<React.ReactNode | undefined>(undefined);
-  const bottomSheetRef = useRef<BottomSheetRef | null>(null);
+  const [bottomSheetComponent, setBottomSheetComponent] = useState<React.ReactNode>(null);
+  const [bottomSheetHeader, setBottomSheetHeader] = useState<React.ReactNode>(null);
+  const [bottomSheetOptions, setBottomSheetOptions] = useState<BottomSheetOptions>();
 
   // Loading
   const [loaderVisible, setLoaderVisible] = useState<boolean>(false);
@@ -94,33 +84,15 @@ export function OverlayProvider({
   };
 
   const showBottomSheet = ({
-    isHandleVisible = true,
+    headerComponent,
     component,
-    contentsGestureEnable = true,
-    marginHorizontal,
-    padding,
-    marginBottom,
-    backgroundColor,
-    isBottomRadius = true,
-    maxHeight,
-    isScrollView = true,
-    showsVerticalScrollIndicator = false,
-    headerComponent = undefined
+    options,
   }: ShowBottomSheetProps) => {
     Keyboard.dismiss();
-    padding && setBottomSheetPadding(padding);
-    marginBottom && setMarginBottomBs(marginBottom);
-    marginHorizontal && setBottomSheetMarginX(marginHorizontal);
-    backgroundColor && setBottomSheetBackgroundColor(backgroundColor);
-    maxHeight && setBottomSheetMaxHeight(maxHeight);
-    setShowsVerticalScrollIndicator(showsVerticalScrollIndicator);
-    setHeaderComponent(headerComponent);
-    setContentsGestureEnable(contentsGestureEnable);
-    setHandleVisible(isHandleVisible);
-    setBottomSheetScrollView(isScrollView);
-    setIsBottomRadius(isBottomRadius);
     setBottomSheetComponent(component);
-    bottomSheetRef.current?.handleVisible(true);
+    setBottomSheetHeader(headerComponent);
+    setBottomSheetOptions(options);
+    setBottomSheetVisible(true);
   };
 
   const showLoader = () => {
@@ -132,6 +104,7 @@ export function OverlayProvider({
     py,
     component
   }: PopOverMenuProps) => {
+    Keyboard.dismiss();
     setPopOverLocation({ px, py });
     setPopOverComponent(component);
     setPopOverVisible(true);
@@ -140,6 +113,7 @@ export function OverlayProvider({
   const showModality = ({
     component
   }: ModalityProps) => {
+    Keyboard.dismiss();
     setModalityComponent(component);
     setModalityVisible(true);
   }
@@ -176,7 +150,7 @@ export function OverlayProvider({
         setSnackItemStack([]);
         break;
       case 'bottomSheet':
-        bottomSheetRef.current?.handleVisible(false);
+        setBottomSheetVisible(false);
         break;
       case 'loader':
         setLoaderVisible(false);
@@ -190,7 +164,7 @@ export function OverlayProvider({
         setSnackItemStack([]);
         setLoaderVisible(false);
         setPopOverVisible(false);
-        bottomSheetRef.current?.handleVisible(false);
+        setBottomSheetVisible(false);
         break;
       default:
         break;
@@ -202,7 +176,7 @@ export function OverlayProvider({
     if (loaderVisible) {
       return true;
     }
-    if (alertVisible || modalityVisible || popOverVisible) {
+    if (alertVisible || modalityVisible || popOverVisible || bottomSheetVisible) {
       hideOverlay('all');
       return true;
     }
@@ -247,19 +221,9 @@ export function OverlayProvider({
       {children}
 
       <BottomSheetOverlay
-        ref={bottomSheetRef}
-        bottomSheetComponent={bottomSheetComponent}
-        contentsGestureEnable={contentsGestureEnable}
-        bottomSheetPadding={bottomSheetPadding}
-        marginBottomBS={marginBottomBS}
-        isHandleVisible={handleVisible}
-        bottomSheetMarginX={bottomSheetMarginX}
-        isBottomRadius={isBottomRadius}
-        bottomSheetBackgroundColor={bottomSheetBackgroundColor}
-        maxHeight={bottomSheetMaxHeight}
-        isScrollView={bottomSheetScrollView}
-        showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-        headerComponent={headerComponent}
+        headerComponent={bottomSheetHeader}
+        component={bottomSheetComponent}
+        options={bottomSheetOptions}
       />
 
       <PopOverMenu

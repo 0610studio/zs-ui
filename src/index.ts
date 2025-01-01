@@ -26,7 +26,6 @@ import {
   SnackbarNotify,
   useOverlayProvider,
   useOverlay,
-  BSTextInput,
   PopOverButton,
   PopOverMenu,
 } from './overlay';
@@ -54,14 +53,12 @@ export {
   SnackbarNotify,
   useOverlayProvider,
   useOverlay,
-  BSTextInput,
   PopOverButton,
   PopOverMenu,
 };
 
 // ------------------------------------------------------
 
-import { BottomSheetOverlayRef } from "./overlay/BottomSheetOverlay/types";
 import type {
   ThemeProviderProps,
   ThemeProps,
@@ -98,7 +95,7 @@ import {
   AlertActions,
   SnackType,
   HideOption,
-  BottomSheetRef
+  BottomSheetOptions
 } from "./model/types";
 import {
   RadioOption,
@@ -107,7 +104,6 @@ import {
 } from "./ui/types";
 
 export type {
-  BottomSheetOverlayRef,
   ThemeProviderProps,
   ThemeProps,
   Palette,
@@ -139,7 +135,7 @@ export type {
   AlertActions,
   SnackType,
   HideOption,
-  BottomSheetRef,
+  BottomSheetOptions,
   RadioOption,
   ShadowLevel,
   ShadowStyle

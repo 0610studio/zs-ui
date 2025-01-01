@@ -106,10 +106,6 @@ const OverlayExample = () => {
       <Button
         onPress={() => {
           showBottomSheet({
-            isScrollView: true,
-            contentsGestureEnable: false,
-            maxHeight: 300,
-            showsVerticalScrollIndicator: true,
             component: (
               <MyBottomSheet
                 onConfirm={() => {

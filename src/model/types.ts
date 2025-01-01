@@ -39,21 +39,6 @@ export interface ModalityProps {
     component: React.ReactNode;
 }
 
-export interface ShowBottomSheetProps {
-    backgroundColor?: string;
-    isBottomRadius?: boolean;
-    marginHorizontal?: number;
-    isHandleVisible?: boolean;
-    marginBottom?: number;
-    padding?: number;
-    component: React.ReactNode;
-    contentsGestureEnable?: boolean;
-    maxHeight?: number;
-    isScrollView?: boolean;
-    showsVerticalScrollIndicator?: boolean;
-    headerComponent?: React.ReactNode;
-};
-
 export interface CustomSnackbarProps {
     snackType: SnackType;
     snackMessage: string;
@@ -107,6 +92,21 @@ export interface ShowSnackBarProps {
     snackbarDuration?: number;
 };
 
-export interface BottomSheetRef {
-    handleVisible: (isOpen: boolean) => void;
+
+
+
+
+export interface BottomSheetOptions {
+    isBackgroundTouchClose?: boolean;
+    marginHorizontal?: number;
+    marginBottom?: number;
+    height?: number;
+    padding?: number;
+}
+
+
+export interface ShowBottomSheetProps {
+    headerComponent?: React.ReactNode;
+    component: React.ReactNode;
+    options?: BottomSheetOptions;
 };
