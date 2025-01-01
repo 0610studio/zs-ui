@@ -51,7 +51,7 @@ sidebar_position: 1
 
 ```sql
 # 필수 패키지 설치
-npx expo install @react-native-async-storage/async-storage react-native-gesture-handler react-native-reanimated react-native-svg react-native-safe-area-context
+npx expo install @react-native-async-storage/async-storage react-native-reanimated react-native-svg react-native-safe-area-context
 
 # ZS UI 라이브러리 설치
 npx expo install @0610studio/zs-ui

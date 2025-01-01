@@ -14,7 +14,7 @@ ZS-ui는 JavaScript만으로 구현된 Expo용 UI 컴포넌트 라이브러리�
 ### 설치
 
 ```bash
-npx expo install @react-native-async-storage/async-storage react-native-gesture-handler react-native-reanimated react-native-svg react-native-safe-area-context
+npx expo install @react-native-async-storage/async-storage react-native-reanimated react-native-svg react-native-safe-area-context
 
 npx expo install @0610studio/zs-ui
 ```

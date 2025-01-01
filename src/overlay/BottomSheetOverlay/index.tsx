@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { Dimensions, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Dimensions, StyleSheet, View, PanResponder } from 'react-native';
 import { useOverlay } from '../../model/useOverlay';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  runOnJS
+  withTiming,
 } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
@@ -19,6 +19,7 @@ function BottomSheetOverlay({
   component,
   options = {},
 }: ShowBottomSheetProps) {
+  const [localVisible, setLocalVisible] = useState(false);
   const { palette } = useTheme();
   const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
   const { bottom } = useSafeAreaInsets();
@@ -27,44 +28,79 @@ function BottomSheetOverlay({
     marginHorizontal = 10,
     marginBottom = 10,
     height = 300,
-    padding = 24,
+    padding = 14,
   } = options;
 
+  const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
+  const startX = useRef(0);
+  const startY = useRef(0);
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: translateY.value }],
+      transform: [{ translateY: translateY.value }, { translateX: translateX.value }],
     };
   });
 
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        startX.current = translateX.value;
+        startY.current = translateY.value;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const newTranslateX = (startX.current + gestureState.dx) / 20;
+        translateX.value = newTranslateX;
+
+        const newTranslateY = startY.current + gestureState.dy;
+        if (newTranslateY < 0) {
+          translateY.value = newTranslateY / 20;
+        } else {
+          translateY.value = newTranslateY / 1.5;
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        translateX.value = withTiming(0, { duration: 100 });
+
+        // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
+        if (gestureState.vy > 0.5 || translateY.value > height / 3) {
+          translateY.value = withTiming(height + 100, { duration: 150 });
+          setBottomSheetVisible(false);
+        } else {
+          translateY.value = withTiming(0, { duration: 150 });
+        }
+      },
+    })
+  ).current;
+
   useEffect(() => {
     if (bottomSheetVisible) {
+      setLocalVisible(true);
       translateY.value = withSpring(0, {
-        damping: 50,     // 높은 감쇠값으로 탄력 최소화
-        stiffness: 300,  // 높은 강성으로 빠른 초기 속도
-        mass: 0.7,       // 가벼운 질량으로 반응성 향상
-        velocity: 100,    // 초기 속도 부여
-        restDisplacementThreshold: 0.2, // 정밀한 도착 지점 제어
+        damping: 50,
+        stiffness: 300,
+        mass: 0.7,
+        velocity: 100,
+        restDisplacementThreshold: 0.2,
       });
     } else {
-      translateY.value = withSpring(height, {
-        damping: 20,
-        stiffness: 90,
-      }, (finished) => {
-        if (finished) {
-          runOnJS(setBottomSheetVisible)(false);
-        }
-      });
+      translateY.value = withTiming(height + 100, { duration: 150 });
+      setTimeout(() => {
+        setLocalVisible(false);
+      }, 200);
     }
-  }, [bottomSheetVisible, height]);
+  }, [bottomSheetVisible]);
 
-  if (!bottomSheetVisible) return null;
+  if (!localVisible) return null;
 
   return (
-    <ModalBackground onPress={() => {
-      if (isBackgroundTouchClose) setBottomSheetVisible(false);
-    }}>
+    <ModalBackground
+      onPress={() => {
+        if (isBackgroundTouchClose) setBottomSheetVisible(false);
+      }}
+    >
       <Animated.View
         style={[
           styles.container,
@@ -74,15 +110,25 @@ function BottomSheetOverlay({
             marginHorizontal,
             bottom: marginBottom + bottom,
             backgroundColor: palette.background.base,
-            padding,
           },
-          animatedStyles
+          animatedStyles,
         ]}
       >
-        <Pressable style={styles.pressableView}>
-          {headerComponent}
+        <View
+          style={[
+            styles.pressableView,
+            { paddingHorizontal: padding, paddingBottom: padding },
+          ]}
+        >
+          <View {...panResponder.panHandlers}>
+            <View style={[styles.gestureBarContainer, { paddingBottom: padding }]}>
+              <View style={[styles.gestureBar, { backgroundColor: palette.divider }]} />
+            </View>
+            {headerComponent}
+          </View>
+
           {component}
-        </Pressable>
+        </View>
       </Animated.View>
     </ModalBackground>
   );
@@ -91,15 +137,24 @@ function BottomSheetOverlay({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderRadius: 20,
+    borderRadius: 26,
     overflow: 'hidden',
   },
   pressableView: {
     width: '100%',
     height: '100%',
-  }
+  },
+  gestureBarContainer: {
+    width: '100%',
+    paddingTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gestureBar: {
+    width: 45,
+    height: 3,
+    borderRadius: 2,
+  },
 });
 
 export default BottomSheetOverlay;
