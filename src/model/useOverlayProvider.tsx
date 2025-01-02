@@ -181,7 +181,7 @@ export function OverlayProvider({
       return true;
     }
     return false;
-  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible, hideOverlay]);
+  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible]);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backPressHandler);

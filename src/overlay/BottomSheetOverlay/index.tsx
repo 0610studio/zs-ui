@@ -19,10 +19,6 @@ function BottomSheetOverlay({
   component,
   options = {},
 }: ShowBottomSheetProps) {
-  const [localVisible, setLocalVisible] = useState(false);
-  const { palette } = useTheme();
-  const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
-  const { bottom } = useSafeAreaInsets();
   const {
     isBackgroundTouchClose = true,
     marginHorizontal = 10,
@@ -31,10 +27,39 @@ function BottomSheetOverlay({
     padding = 14,
   } = options;
 
+  const [localVisible, setLocalVisible] = useState(false);
+  const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
+
+  useEffect(() => {
+    if (bottomSheetVisible) {
+      setLocalVisible(true);
+      translateY.value = withSpring(0, {
+        damping: 50,
+        stiffness: 300,
+        mass: 0.7,
+        velocity: 100,
+        restDisplacementThreshold: 0.2,
+      });
+    } else {
+      translateY.value = withTiming(height + 100, { duration: 150 });
+      setTimeout(() => {
+        setLocalVisible(false);
+      }, 200);
+    }
+  }, [bottomSheetVisible]);
+
+  // ----------------------------------------------------------------
+  
+  if (!localVisible) return null;
+
+  const { palette } = useTheme();
+  const { bottom } = useSafeAreaInsets();
   const startX = useRef(0);
   const startY = useRef(0);
+
+  // ----------------------------------------------------------------
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
@@ -74,26 +99,6 @@ function BottomSheetOverlay({
       },
     })
   ).current;
-
-  useEffect(() => {
-    if (bottomSheetVisible) {
-      setLocalVisible(true);
-      translateY.value = withSpring(0, {
-        damping: 50,
-        stiffness: 300,
-        mass: 0.7,
-        velocity: 100,
-        restDisplacementThreshold: 0.2,
-      });
-    } else {
-      translateY.value = withTiming(height + 100, { duration: 150 });
-      setTimeout(() => {
-        setLocalVisible(false);
-      }, 200);
-    }
-  }, [bottomSheetVisible]);
-
-  if (!localVisible) return null;
 
   return (
     <ModalBackground

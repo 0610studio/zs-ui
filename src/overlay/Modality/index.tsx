@@ -22,8 +22,6 @@ function Modality({
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useOverlay();
   const insets = useSafeAreaInsets();
-  const { palette } = useTheme();
-
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);
   const backBorderRadius = useSharedValue(0);
@@ -53,6 +51,14 @@ function Modality({
     }
   }, [modalityVisible]);
 
+  // ----------------------------------------------------------------
+  
+  if (!localVisible) return null;
+
+  const { palette } = useTheme();
+
+  // ----------------------------------------------------------------
+
   // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -80,7 +86,6 @@ function Modality({
     };
   });
 
-  if (!localVisible) return null;
 
   return (
     <Animated.View
