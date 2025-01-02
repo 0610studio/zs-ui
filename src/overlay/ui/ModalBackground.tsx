@@ -14,15 +14,12 @@ function ModalBackground({ modalBgColor, isCenter = true, children, onPress }: M
 
   return (
     <Animated.View
-      style={styles.modalBg}
+      style={[styles.modalBg, isCenter && { justifyContent: 'center', alignItems: 'center' }]}
       entering={FadeIn.duration(50)}
       exiting={FadeOut.duration(50)}
     >
       <Pressable
-        style={[
-          styles.fullScreen,
-          isCenter && { justifyContent: 'center', alignItems: 'center' },
-        ]}
+        style={styles.fullScreen}
         onPress={onPress ?? (() => { })}
       >
       </Pressable>
@@ -38,12 +35,11 @@ const createStyles = (modalBgColor: string) =>
       zIndex: 9997,
       backgroundColor: modalBgColor,
       ...StyleSheet.absoluteFillObject,
-      justifyContent: 'center',
-      alignItems: 'center',
     },
     fullScreen: {
       width: '100%',
       height: '100%',
+      ...StyleSheet.absoluteFillObject,
     },
   });
 

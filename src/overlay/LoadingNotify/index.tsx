@@ -10,11 +10,6 @@ function LoadingNotify({
   loaderComponent?: () => ReactNode;
 }) {
   const { loaderVisible } = useOverlay();
-
-  // ----------------------------------------------------------------
-
-  if (!loaderVisible) return null;
-
   const { palette } = useTheme();
 
   const renderLoader = useCallback(() => {
@@ -24,6 +19,8 @@ function LoadingNotify({
       <ActivityIndicator size="large" color="#fff" />
     );
   }, [loaderComponent]);
+
+  if (!loaderVisible) return null;
 
   return (
     <ModalBackground

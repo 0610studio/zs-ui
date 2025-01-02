@@ -31,6 +31,11 @@ function BottomSheetOverlay({
   const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
+  const scale = useSharedValue(1); 
+  const { palette } = useTheme();
+  const { bottom } = useSafeAreaInsets();
+  const startX = useRef(0);
+  const startY = useRef(0);
 
   useEffect(() => {
     if (bottomSheetVisible) {
@@ -50,20 +55,13 @@ function BottomSheetOverlay({
     }
   }, [bottomSheetVisible]);
 
-  // ----------------------------------------------------------------
-
-  if (!localVisible) return null;
-
-  const { palette } = useTheme();
-  const { bottom } = useSafeAreaInsets();
-  const startX = useRef(0);
-  const startY = useRef(0);
-
-  // ----------------------------------------------------------------
-
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: translateY.value }, { translateX: translateX.value }],
+      transform: [
+        { translateY: translateY.value }, 
+        { translateX: translateX.value },
+        { scale: scale.value }
+      ],
     };
   });
 
@@ -74,14 +72,18 @@ function BottomSheetOverlay({
       onPanResponderGrant: () => {
         startX.current = translateX.value;
         startY.current = translateY.value;
+        scale.value = withSpring(0.975, {
+          damping: 15,
+          stiffness: 300
+        });
       },
       onPanResponderMove: (_, gestureState) => {
-        const newTranslateX = (startX.current + gestureState.dx) / 20;
+        const newTranslateX = (startX.current + gestureState.dx) / 18;
         translateX.value = newTranslateX;
 
         const newTranslateY = startY.current + gestureState.dy;
         if (newTranslateY < 0) {
-          translateY.value = newTranslateY / 20;
+          translateY.value = newTranslateY / 18;
         } else {
           translateY.value = newTranslateY / 1.5;
         }
@@ -96,9 +98,17 @@ function BottomSheetOverlay({
         } else {
           translateY.value = withTiming(0, { duration: 150 });
         }
+
+        // 사이즈 원래대로 복귀
+        scale.value = withSpring(1, {
+          damping: 15,
+          stiffness: 300
+        });
       },
     })
   ).current;
+
+  if (!localVisible) return null;
 
   return (
     <ModalBackground

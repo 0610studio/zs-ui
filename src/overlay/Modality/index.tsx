@@ -19,6 +19,7 @@ function Modality({
 }: {
   modalityComponent?: React.ReactNode;
 }) {
+  const { palette } = useTheme();
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useOverlay();
   const insets = useSafeAreaInsets();
@@ -51,14 +52,6 @@ function Modality({
     }
   }, [modalityVisible]);
 
-  // ----------------------------------------------------------------
-  
-  if (!localVisible) return null;
-
-  const { palette } = useTheme();
-
-  // ----------------------------------------------------------------
-
   // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -86,6 +79,7 @@ function Modality({
     };
   });
 
+  if (!localVisible) return null;
 
   return (
     <Animated.View
