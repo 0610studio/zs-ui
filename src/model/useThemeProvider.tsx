@@ -42,21 +42,30 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   // AsyncStorage에서 시스템 모드 사용 설정 값 로드
   useEffect(() => {
     const loadSettings = async () => {
+      let isMounted = true;
       try {
         const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
-        if (storedUseSystemColorScheme !== null) {
-          setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
-        }
         const storedMode = await AsyncStorage.getItem('themeMode');
-        if (storedMode) {
-          setMode(storedMode === 'dark' ? 'dark' : 'light');
-        } else {
-          setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
+  
+        if (isMounted) {
+          if (storedUseSystemColorScheme !== null) {
+            setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
+          }
+          if (storedMode) {
+            setMode(storedMode === 'dark' ? 'dark' : 'light');
+          } else {
+            setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
+          }
         }
       } catch (error) {
         console.error('Failed to load theme settings', error);
       }
+  
+      return () => {
+        isMounted = false;
+      };
     };
+  
     loadSettings();
   }, []);
 
