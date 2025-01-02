@@ -51,7 +51,7 @@ function BottomSheetOverlay({
   }, [bottomSheetVisible]);
 
   // ----------------------------------------------------------------
-  
+
   if (!localVisible) return null;
 
   const { palette } = useTheme();
@@ -102,6 +102,7 @@ function BottomSheetOverlay({
 
   return (
     <ModalBackground
+      modalBgColor={palette.modalBgColor}
       onPress={() => {
         if (isBackgroundTouchClose) setBottomSheetVisible(false);
       }}

@@ -4,6 +4,7 @@ import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useOverlay } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { PopOverMenuProps } from "../../model/types";
+import { useTheme } from "../../model";
 
 // 화면 높이 가져오기
 const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -18,12 +19,6 @@ function PopOverMenu({
   const [contentHeight, setContentHeight] = useState<number>(0);
   const { popOverVisible, setPopOverVisible } = useOverlay();
   const timerRef = useRef<number | null>(null);
-
-  // 레이아웃 크기 계산
-  const handleLayout = useCallback((event: LayoutChangeEvent): void => {
-    setContentWidth(event.nativeEvent.layout.width || 0);
-    setContentHeight(event.nativeEvent.layout.height || 0);
-  }, []);
 
   // PopOver가 보일 때 콘텐츠를 딜레이 후 보여줌
   useEffect(() => {
@@ -45,14 +40,28 @@ function PopOverMenu({
     };
   }, [popOverVisible]);
 
+  // ----------------------------------------------------------------
+
+  if (!popOverVisible) return null;
+
+  const { palette } = useTheme();
+
+  // 레이아웃 크기 계산
+  const handleLayout = useCallback((event: LayoutChangeEvent): void => {
+    setContentWidth(event.nativeEvent.layout.width || 0);
+    setContentHeight(event.nativeEvent.layout.height || 0);
+  }, []);
+
   // 화면 크기에 따른 위치 조정
   const isVerticalOverflow = WINDOW_HEIGHT < (py + contentHeight);
   const isHorizontalOverflow = Dimensions.get('window').width > (px + contentWidth);
 
-  if (!popOverVisible) return null;
-
   return (
-    <ModalBackground isCenter={false} onPress={() => setPopOverVisible(false)}>
+    <ModalBackground
+      modalBgColor={palette.modalBgColor}
+      isCenter={false}
+      onPress={() => setPopOverVisible(false)}
+    >
       {isContentVisible && (
         <Animated.View
           entering={FadeInUp}

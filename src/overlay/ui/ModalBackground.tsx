@@ -1,19 +1,15 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { useTheme } from '../../model/useThemeProvider';
 
 interface ModalBackgroundProps {
+  modalBgColor: string;
   isCenter?: boolean;
   children: React.ReactNode;
   onPress?: () => void;
 }
 
-function ModalBackground({ isCenter = true, children, onPress }: ModalBackgroundProps) {
-  const {
-    palette: { modalBgColor },
-  } = useTheme();
-
+function ModalBackground({ modalBgColor, isCenter = true, children, onPress }: ModalBackgroundProps) {
   const styles = useMemo(() => createStyles(modalBgColor), [modalBgColor]);
 
   return (
