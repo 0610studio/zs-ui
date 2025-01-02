@@ -2,16 +2,16 @@ import { ActivityIndicator } from "react-native";
 import React, { ReactNode, useCallback } from "react";
 import { useOverlay } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
+import { useTheme } from "../../model";
 
-// 함수 선언식으로 변경
 function LoadingNotify({
   loaderComponent,
 }: {
   loaderComponent?: () => ReactNode;
 }) {
   const { loaderVisible } = useOverlay();
+  const { palette } = useTheme();
 
-  // loaderComponent를 메모이제이션
   const renderLoader = useCallback(() => {
     return loaderComponent ? (
       loaderComponent()
@@ -20,11 +20,15 @@ function LoadingNotify({
     );
   }, [loaderComponent]);
 
-  return loaderVisible ? (
-    <ModalBackground>
+  if (!loaderVisible) return null;
+
+  return (
+    <ModalBackground
+      modalBgColor={palette.modalBgColor}
+    >
       {renderLoader()}
     </ModalBackground>
-  ) : null;
+  )
 }
 
 export default LoadingNotify;

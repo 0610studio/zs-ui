@@ -19,11 +19,10 @@ function Modality({
 }: {
   modalityComponent?: React.ReactNode;
 }) {
+  const { palette } = useTheme();
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useOverlay();
   const insets = useSafeAreaInsets();
-  const { palette } = useTheme();
-
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);
   const backBorderRadius = useSharedValue(0);

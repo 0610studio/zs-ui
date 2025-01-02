@@ -19,10 +19,6 @@ function BottomSheetOverlay({
   component,
   options = {},
 }: ShowBottomSheetProps) {
-  const [localVisible, setLocalVisible] = useState(false);
-  const { palette } = useTheme();
-  const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
-  const { bottom } = useSafeAreaInsets();
   const {
     isBackgroundTouchClose = true,
     marginHorizontal = 10,
@@ -31,49 +27,15 @@ function BottomSheetOverlay({
     padding = 14,
   } = options;
 
+  const [localVisible, setLocalVisible] = useState(false);
+  const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
+  const scale = useSharedValue(1); 
+  const { palette } = useTheme();
+  const { bottom } = useSafeAreaInsets();
   const startX = useRef(0);
   const startY = useRef(0);
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: translateY.value }, { translateX: translateX.value }],
-    };
-  });
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        startX.current = translateX.value;
-        startY.current = translateY.value;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const newTranslateX = (startX.current + gestureState.dx) / 20;
-        translateX.value = newTranslateX;
-
-        const newTranslateY = startY.current + gestureState.dy;
-        if (newTranslateY < 0) {
-          translateY.value = newTranslateY / 20;
-        } else {
-          translateY.value = newTranslateY / 1.5;
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        translateX.value = withTiming(0, { duration: 100 });
-
-        // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
-        if (gestureState.vy > 0.5 || translateY.value > height / 3) {
-          translateY.value = withTiming(height + 100, { duration: 150 });
-          setBottomSheetVisible(false);
-        } else {
-          translateY.value = withTiming(0, { duration: 150 });
-        }
-      },
-    })
-  ).current;
 
   useEffect(() => {
     if (bottomSheetVisible) {
@@ -93,10 +55,64 @@ function BottomSheetOverlay({
     }
   }, [bottomSheetVisible]);
 
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateY: translateY.value }, 
+        { translateX: translateX.value },
+        { scale: scale.value }
+      ],
+    };
+  });
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        startX.current = translateX.value;
+        startY.current = translateY.value;
+        scale.value = withSpring(0.975, {
+          damping: 15,
+          stiffness: 300
+        });
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const newTranslateX = (startX.current + gestureState.dx) / 18;
+        translateX.value = newTranslateX;
+
+        const newTranslateY = startY.current + gestureState.dy;
+        if (newTranslateY < 0) {
+          translateY.value = newTranslateY / 18;
+        } else {
+          translateY.value = newTranslateY / 1.5;
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        translateX.value = withTiming(0, { duration: 100 });
+
+        // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
+        if (gestureState.vy > 0.5 || translateY.value > height / 3) {
+          translateY.value = withTiming(height + 100, { duration: 150 });
+          setBottomSheetVisible(false);
+        } else {
+          translateY.value = withTiming(0, { duration: 150 });
+        }
+
+        // 사이즈 원래대로 복귀
+        scale.value = withSpring(1, {
+          damping: 15,
+          stiffness: 300
+        });
+      },
+    })
+  ).current;
+
   if (!localVisible) return null;
 
   return (
     <ModalBackground
+      modalBgColor={palette.modalBgColor}
       onPress={() => {
         if (isBackgroundTouchClose) setBottomSheetVisible(false);
       }}

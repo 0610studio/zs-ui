@@ -25,7 +25,7 @@ function AlertOverlay({
   singleButtonTextStyle,
 }: ShowAlertProps) {
   const { alertVisible, setAlertVisible } = useOverlay();
-  const { palette: { background, text, primary: primaryColor } } = useTheme();
+  const { palette: { background, text, primary: primaryColor, modalBgColor } } = useTheme();
 
   const styles = useMemo(
     () => createStyles({ background }),
@@ -93,11 +93,16 @@ function AlertOverlay({
     );
   }, [title, informative, actions, handleButtonPress, titleStyle, informativeStyle, secondaryButtonStyle, primaryButtonStyle, secondaryButtonTextStyle, primaryButtonTextStyle, singleButtonTextStyle]);
 
-  return alertVisible ? (
-    <ModalBackground onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}>
+  if (!alertVisible) return null;
+
+  return (
+    <ModalBackground
+      modalBgColor={modalBgColor}
+      onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
+    >
       {content}
     </ModalBackground>
-  ) : null;
+  )
 }
 
 export default AlertOverlay;
@@ -143,8 +148,6 @@ const createStyles = ({
       paddingBottom: 18,
       paddingTop: 24,
       paddingHorizontal: 20,
-      position: 'absolute',
-      top: '35%',
     },
   });
 
