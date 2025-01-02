@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BackHandler, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
 import OverlayContext from './useOverlay';
 import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
@@ -190,34 +190,62 @@ export function OverlayProvider({
 
   // ------------------------------------------------------------
 
+  const overlayContextValue = useMemo(() => ({
+    alertVisible,
+    setAlertVisible,
+    // ---
+    snackItemStack,
+    hideSnackBar,
+    // ---
+    bottomSheetVisible,
+    setBottomSheetVisible,
+    // ---
+    loaderVisible,
+    // ---
+    popOverVisible,
+    setPopOverVisible,
+    // ---
+    modalityVisible,
+    setModalityVisible,
+    // ---
+    showAlert,
+    showSnackBar,
+    showBottomSheet,
+    showLoader,
+    showPopOverMenu,
+    showModality,
+    // ---
+    hideOverlay,
+  }), [
+    alertVisible,
+    setAlertVisible,
+    // ---
+    snackItemStack,
+    hideSnackBar,
+    // ---
+    bottomSheetVisible,
+    setBottomSheetVisible,
+    // ---
+    loaderVisible,
+    // ---
+    popOverVisible,
+    setPopOverVisible,
+    // ---
+    modalityVisible,
+    setModalityVisible,
+    // ---
+    showAlert,
+    showSnackBar,
+    showBottomSheet,
+    showLoader,
+    showPopOverMenu,
+    showModality,
+    // ---
+    hideOverlay,
+  ]);
+
   return (
-    <OverlayContext.Provider value={{
-      alertVisible,
-      setAlertVisible,
-      // ---
-      snackItemStack,
-      hideSnackBar,
-      // ---
-      bottomSheetVisible,
-      setBottomSheetVisible,
-      // ---
-      loaderVisible,
-      // ---
-      popOverVisible,
-      setPopOverVisible,
-      // ---
-      modalityVisible,
-      setModalityVisible,
-      // ---
-      showAlert,
-      showSnackBar,
-      showBottomSheet,
-      showLoader,
-      showPopOverMenu,
-      showModality,
-      // ---
-      hideOverlay,
-    }}>
+    <OverlayContext.Provider value={overlayContextValue}>
       {children}
 
       <BottomSheetOverlay
