@@ -4,7 +4,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } f
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DEFAULT_MARGIN_X = 20;
-const DEFAULT_MARGIN_BOTTOM = 20;
+const DEFAULT_MARGIN_BOTTOM = 10;
 const DEFAULT_BORDER_RADIUS = 14;
 const DURATION = { duration: 250 };
 
@@ -65,11 +65,18 @@ function ZSBottomButton({
     };
   }, [isKeyboardVisible]);
 
+  // 키보드가 올라왔을때 INPUT의 위치 조정
+  const rootViewStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(isKeyboardVisible.value ? height : 0, DURATION),
+    };
+  });
+
   const animatedStyle = useAnimatedStyle(() => {
     const getBottom = interpolate(
       isKeyboardVisible.value,
       [0, 1],
-      [DEFAULT_MARGIN_BOTTOM,Platform.OS === 'ios' ? keyboardHeight.value : 0],
+      [DEFAULT_MARGIN_BOTTOM, Platform.OS === 'ios' ? keyboardHeight.value : 0],
       'clamp',
     );
 
@@ -88,7 +95,7 @@ function ZSBottomButton({
     );
 
     return {
-      marginBottom: withTiming(getBottom, DURATION),
+      bottom: withTiming(getBottom, DURATION),
       marginLeft: withTiming(getMargin, DURATION),
       marginRight: withTiming(getMargin, DURATION),
       borderRadius: withTiming(getRadius, DURATION),
@@ -96,25 +103,27 @@ function ZSBottomButton({
   });
 
   return (
-    <Animated.View style={[styles.container, animatedStyle]}>
-      {secondaryLabelComponent && (
+    <Animated.View style={rootViewStyle}>
+      <Animated.View style={[styles.container, animatedStyle]}>
+        {secondaryLabelComponent && (
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={[secondaryButtonStyle, { height }, styles.touchSecondaryContainer]}
+            onPress={secondaryOnPress}
+          >
+            {secondaryLabelComponent}
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           activeOpacity={0.7}
-          style={[secondaryButtonStyle, { height }, styles.touchSecondaryContainer]}
-          onPress={secondaryOnPress}
+          style={[primaryButtonStyle, { height }, styles.touchContainer]}
+          onPress={handlePress}
+          disabled={disabled || isLoading}
         >
-          {secondaryLabelComponent}
+          {isLoading ? loadingComponent : primaryLabelComponent}
         </TouchableOpacity>
-      )}
-
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={[primaryButtonStyle, { height }, styles.touchContainer]}
-        onPress={handlePress}
-        disabled={disabled || isLoading}
-      >
-        {isLoading ? loadingComponent : primaryLabelComponent}
-      </TouchableOpacity>
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -134,11 +143,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: DEFAULT_BORDER_RADIUS,
-    marginBottom: DEFAULT_MARGIN_BOTTOM,
+    bottom: DEFAULT_MARGIN_BOTTOM,
     marginLeft: DEFAULT_MARGIN_X,
     marginRight: DEFAULT_MARGIN_X,
     overflow: 'hidden',
     flexDirection: 'row',
+    position: 'absolute'
   },
 });
 
