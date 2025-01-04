@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useOverlay, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
 interface MyBottomSheetProps {
@@ -11,6 +11,7 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
   const { hideOverlay } = useOverlay();
   const { palette: { background, primary } } = useTheme();
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
+  const [nick, setNick] = useState<string>('');
 
   const handleConfirmPress = useCallback(() => {
     onConfirm?.();
@@ -27,6 +28,16 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
         <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
         <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
         <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
+        <ZSTextField
+          boxStyle="underline"
+          label="닉네임"
+          value={nick}
+          inputBgColor={background.base}
+          labelBgColor={background.base}
+          focusColor={primary.darker}
+          onChangeText={setNick}
+        />
+
         <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
         <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
         <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>

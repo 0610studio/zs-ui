@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Dimensions, StyleSheet, View, PanResponder } from 'react-native';
+import { Dimensions, StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
 import { useOverlay } from '../../model/useOverlay';
 import Animated, {
   useAnimatedStyle,
@@ -31,14 +31,34 @@ function BottomSheetOverlay({
   const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
-  const scale = useSharedValue(1); 
+  const scale = useSharedValue(1);
   const { palette } = useTheme();
   const { bottom } = useSafeAreaInsets();
   const startX = useRef(0);
   const startY = useRef(0);
 
+  // ** 소프트 키보드 핸들링
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
+      translateY.value = withTiming(-event.endCoordinates.height + bottom + 90, { duration: 300 });
+    });
+
+    const keyboardHideSubscription = Keyboard.addListener(hideEvent, () => {
+      translateY.value = withTiming(0, { duration: 200 });
+    });
+
+    return () => {
+      keyboardShowSubscription.remove();
+      keyboardHideSubscription.remove();
+    };
+  }, []);
+
   useEffect(() => {
     if (bottomSheetVisible) {
+      Keyboard.dismiss();
       setLocalVisible(true);
       translateY.value = withSpring(0, {
         damping: 50,
@@ -58,7 +78,7 @@ function BottomSheetOverlay({
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateY: translateY.value }, 
+        { translateY: translateY.value },
         { translateX: translateX.value },
         { scale: scale.value }
       ],
@@ -70,12 +90,11 @@ function BottomSheetOverlay({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
+        Keyboard.dismiss();
         startX.current = translateX.value;
         startY.current = translateY.value;
-        scale.value = withSpring(0.975, {
-          damping: 15,
-          stiffness: 300
-        });
+        scale.value = withTiming(0.985, { duration: 200 });
+
       },
       onPanResponderMove: (_, gestureState) => {
         const newTranslateX = (startX.current + gestureState.dx) / 18;
