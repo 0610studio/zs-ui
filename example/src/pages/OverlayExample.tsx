@@ -107,7 +107,7 @@ const OverlayExample = () => {
         onPress={() => {
           showBottomSheet({
             options:{
-              height: 500
+              height: 400
             },
             headerComponent: (
               <ZSText style={{ textAlign: "center", padding: 30, backgroundColor: '#ff00ff' }}>헤더 컴포넌트</ZSText>
