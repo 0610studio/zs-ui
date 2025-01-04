@@ -43,7 +43,7 @@ function BottomSheetOverlay({
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
-      translateY.value = withTiming(-event.endCoordinates.height + bottom + 90, { duration: 300 });
+      translateY.value = withTiming(-event.endCoordinates.height + bottom, { duration: 300 });
     });
 
     const keyboardHideSubscription = Keyboard.addListener(hideEvent, () => {
