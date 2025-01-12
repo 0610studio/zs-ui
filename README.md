@@ -7,7 +7,7 @@ This library was created using [create-expo-module](https://docs.expo.dev/module
 
 ZS-ui는 JavaScript만으로 구현된 Expo용 UI 컴포넌트 라이브러리입니다.
 
-다크 모드, 테마, 타이포그래피(Typo), Alert, BottomSheet와 같은 주요 UI 요소가 포함되어 있으며, 직관적이고 일관된 사용자 인터페이스를 구현할 수 있습니다.
+다크 모드, 테마, 타이포그래피, Alert, BottomSheet와 같은 주요 UI 요소가 포함되어 있으며, 직관적이고 일관된 사용자 인터페이스를 구현할 수 있습니다.
 
 <br />
 

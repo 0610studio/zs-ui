@@ -36,7 +36,7 @@ function Modality({
       setLocalVisible(true);
       backScale.value = withDelay(200, withTiming(0.92, { duration: 300 }));
       backTranslateY.value = withDelay(400, withTiming(insets.top, { duration: 300 }));
-      backBorderRadius.value = withDelay(200, withTiming(16, { duration: 300 }));
+      backBorderRadius.value = withDelay(200, withTiming(12, { duration: 300 }));
       mainTranslateY.value = withDelay(300, withTiming(10 + insets.top, { duration: 300 }));
       backgroundOpacity.value = withTiming(1, { duration: 600 });
     } else {
@@ -59,7 +59,8 @@ function Modality({
         { scaleX: backScale.value },
         { translateY: backTranslateY.value }
       ],
-      borderRadius: backBorderRadius.value
+      borderTopLeftRadius: backBorderRadius.value,
+      borderTopRightRadius:  backBorderRadius.value,
     };
   });
 
@@ -139,7 +140,8 @@ const styles = StyleSheet.create({
   mainScreen: {
     width,
     position: 'absolute',
-    borderRadius: 16,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     zIndex: 8002,
     overflow: 'hidden',
   },

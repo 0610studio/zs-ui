@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import React, { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
+import { Platform, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as NavigationBar from 'expo-navigation-bar';
 import palette from '../theme/palette';
 import { Theme, ThemeFonts, TypographyVariantsProps } from '../theme/types';
 import typography from '../theme/typography';
@@ -46,7 +47,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       try {
         const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
         const storedMode = await AsyncStorage.getItem('themeMode');
-  
+
         if (isMounted) {
           if (storedUseSystemColorScheme !== null) {
             setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
@@ -60,12 +61,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       } catch (error) {
         console.error('Failed to load theme settings', error);
       }
-  
+
       return () => {
         isMounted = false;
       };
     };
-  
+
     loadSettings();
   }, []);
 
@@ -76,21 +77,29 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
     }
   }, [isUsingSystemColorScheme]);
 
+  // 안드로이드 하단 제스쳐 영역 스타일
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setButtonStyleAsync(mode);
+      NavigationBar.setBackgroundColorAsync(palette({ mode }).background.base)
+    }
+  }, [mode])
+
   // 테마 토글 함수
-  const toggleTheme = async () => {
+  const toggleTheme = useCallback(async () => {
     setUseSystemColorScheme(false); // 사용자 지정 모드로 전환
     setMode((prevMode) => {
       const newMode = prevMode === 'light' ? 'dark' : 'light';
       AsyncStorage.setItem('themeMode', newMode); // 로컬스토리지에 저장
       return newMode;
     });
-  };
+  }, []);
 
   // 시스템 모드 사용 설정 변경 함수
-  const handleSetUseSystemColorScheme = async (useSystem: boolean) => {
+  const handleSetUseSystemColorScheme = useCallback(async (useSystem: boolean) => {
     setUseSystemColorScheme(useSystem);
     await AsyncStorage.setItem('useSystemColorScheme', useSystem.toString());
-  };
+  }, []);
 
   const themeValue = useMemo(() => ({
     palette: {
