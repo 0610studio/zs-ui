@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as NavigationBar from 'expo-navigation-bar';
 import palette from '../theme/palette';
 import { Theme, ThemeFonts, TypographyVariantsProps } from '../theme/types';
 import typography from '../theme/typography';
@@ -46,7 +47,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       try {
         const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
         const storedMode = await AsyncStorage.getItem('themeMode');
-  
+
         if (isMounted) {
           if (storedUseSystemColorScheme !== null) {
             setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
@@ -60,12 +61,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       } catch (error) {
         console.error('Failed to load theme settings', error);
       }
-  
+
       return () => {
         isMounted = false;
       };
     };
-  
+
     loadSettings();
   }, []);
 
@@ -75,6 +76,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
     }
   }, [isUsingSystemColorScheme]);
+
+  // 안드로이드 하단 제스쳐 영역 스타일
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setButtonStyleAsync(mode);
+      NavigationBar.setBackgroundColorAsync(palette({ mode }).background.base)
+    }
+  }, [mode])
 
   // 테마 토글 함수
   const toggleTheme = async () => {

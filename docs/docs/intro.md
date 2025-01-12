@@ -51,9 +51,9 @@ sidebar_position: 1
 
 ```sql
 # 필수 패키지 설치
-npx expo install @react-native-async-storage/async-storage react-native-reanimated react-native-svg react-native-safe-area-context
+npx expo install @react-native-async-storage/async-storage react-native-reanimated react-native-svg react-native-safe-area-context expo-navigation-bar
 
-# ZS UI 라이브러리 설치
+# ZS UI 설치
 npx expo install @0610studio/zs-ui
 ```
 
@@ -63,7 +63,7 @@ npx expo install @0610studio/zs-ui
 
 ```sql
 root/
-├── example/             # 예제 폴더 - 라이브러리 사용 예제
+├── example/             # 예제 폴더 - 사용 예제
 │ 
 ├── src/
 │   ├── assets/          # 폰트와 이미지 같은 정적 파일들을 저장

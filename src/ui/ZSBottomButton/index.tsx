@@ -60,10 +60,12 @@ function ZSBottomButton({
     });
 
     return () => {
+      isKeyboardVisible.value = 0;
+      keyboardHeight.value = 0;
       keyboardShowSubscription.remove();
       keyboardHideSubscription.remove();
     };
-  }, [isKeyboardVisible]);
+  }, []);
 
   // 키보드가 올라왔을때 INPUT의 위치 조정
   const rootViewStyle = useAnimatedStyle(() => {
