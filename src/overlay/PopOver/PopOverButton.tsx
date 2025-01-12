@@ -1,6 +1,7 @@
 import React, { useRef, useCallback } from 'react';
-import { View, Pressable, ViewProps, StyleSheet } from 'react-native';
+import { View, ViewProps, StyleSheet } from 'react-native';
 import { useOverlay } from '../../model/useOverlay';
+import { ZSPressable } from '../../ui';
 
 interface PopOverButtonProps extends ViewProps {
   width: number;
@@ -32,7 +33,7 @@ const PopOverButton: React.FC<PopOverButtonProps> = ({
   }, [showPopOverMenu, popOverMenuComponent]);
 
   return (
-    <Pressable onPress={handlePress} style={styles.pressable}>
+    <ZSPressable isAnimation={false} onPress={handlePress} style={styles.pressable}>
       <View
         ref={buttonRef}
         style={[styles.button, { width, height, backgroundColor }]}
@@ -40,7 +41,7 @@ const PopOverButton: React.FC<PopOverButtonProps> = ({
       >
         {children}
       </View>
-    </Pressable>
+    </ZSPressable>
   );
 };
 
