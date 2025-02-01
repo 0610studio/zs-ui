@@ -67,6 +67,7 @@ function ZSContainer({
               ref={scrollViewRef}
               style={[styles.flex1, styles.fullWidth]}
               bounces={false}
+              overScrollMode="never"
               contentContainerStyle={styles.scrollContainerStyle}
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}
               keyboardShouldPersistTaps="handled"
