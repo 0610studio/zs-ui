@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, StatusBar, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   FadeOut,
@@ -60,7 +60,7 @@ function Modality({
         { translateY: backTranslateY.value }
       ],
       borderTopLeftRadius: backBorderRadius.value,
-      borderTopRightRadius:  backBorderRadius.value,
+      borderTopRightRadius: backBorderRadius.value,
     };
   });
 
@@ -90,6 +90,8 @@ function Modality({
         backgroundAnimatedStyle
       ]}
     >
+      <StatusBar backgroundColor={modalityVisible ? palette.background.neutral : palette.background.base} />
+
       <Animated.View
         exiting={FadeOut.duration(300)}
         style={[
