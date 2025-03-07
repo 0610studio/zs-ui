@@ -1,12 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Dimensions, StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
-import { useOverlay } from '../../model/useOverlay';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import { useBottomSheet } from '../../model/useOverlay';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,7 +23,7 @@ function BottomSheetOverlay({
   } = options;
 
   const [localVisible, setLocalVisible] = useState(false);
-  const { bottomSheetVisible, setBottomSheetVisible } = useOverlay();
+  const { bottomSheetVisible, setBottomSheetVisible } = useBottomSheet();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
   const scale = useSharedValue(1);

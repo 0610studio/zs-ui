@@ -3,14 +3,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, View } from "react-native";
 import { CustomSnackbarProps } from "../../model/types";
 import SnackbarItem from "./ui/SnackbarItem";
-import { useOverlay } from "../../model/useOverlay";
+import { useSnackbar } from "../../model/useOverlay";
 
 const SnackbarNotify = ({
   customSnackbar
 }: {
   customSnackbar?: (props: CustomSnackbarProps) => ReactNode
 }) => {
-  const { snackItemStack, hideSnackBar } = useOverlay();
+  const { snackItemStack, hideSnackBar } = useSnackbar();
 
   // ----------------------------------------------------------------
 

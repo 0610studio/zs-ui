@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, LayoutChangeEvent, Pressable } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { useOverlay } from "../../model/useOverlay";
+import { usePopOver } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { PopOverMenuProps } from "../../model/types";
 import { useTheme } from "../../model";
@@ -17,7 +17,7 @@ function PopOverMenu({
   const [isContentVisible, setIsContentVisible] = useState<boolean>(false);
   const [contentWidth, setContentWidth] = useState<number>(0);
   const [contentHeight, setContentHeight] = useState<number>(0);
-  const { popOverVisible, setPopOverVisible } = useOverlay();
+  const { popOverVisible, setPopOverVisible } = usePopOver();
   const timerRef = useRef<number | null>(null);
   const { palette } = useTheme();
 

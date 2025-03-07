@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
-import { useOverlay } from '../../model/useOverlay';
+import { useAlert } from '../../model/useOverlay';
 import { useTheme } from '../../model/useThemeProvider';
 import { ThemeBackground } from '../../theme';
 import { ZSText } from '../../ui';
@@ -24,23 +24,14 @@ function AlertOverlay({
   primaryButtonTextStyle,
   singleButtonTextStyle,
 }: ShowAlertProps) {
-  const { alertVisible, setAlertVisible } = useOverlay();
-  const { palette: { background, text, primary: primaryColor, modalBgColor } } = useTheme();
+  const { alertVisible, setAlertVisible } = useAlert();
+  const { palette: { background, primary: primaryColor, modalBgColor } } = useTheme();
+  const styles = useMemo(() => createStyles({ background }), [background]);
 
-  const styles = useMemo(
-    () => createStyles({ background }),
-    [background, text, primaryColor]
-  );
-
-  const handleButtonPress = useCallback(
-    (onPressFunction?: () => void) => () => {
-      if (onPressFunction) {
-        onPressFunction();
-      }
-      setAlertVisible(false);
-    },
-    [setAlertVisible]
-  );
+  const handleButtonPress = useCallback((onPressFunction?: () => void) => () => {
+    if (onPressFunction) onPressFunction();
+    setAlertVisible(false);
+  }, [setAlertVisible]);
 
   const content = useMemo(() => {
     const { primary, secondary } = actions || {} as AlertActions;
@@ -107,11 +98,7 @@ function AlertOverlay({
 
 export default AlertOverlay;
 
-const createStyles = ({
-  background,
-}: {
-  background: ThemeBackground;
-}) =>
+const createStyles = ({ background }: { background: ThemeBackground; }) =>
   StyleSheet.create({
     title: {
       marginBottom: 8,

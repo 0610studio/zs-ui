@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StatusBar, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  FadeOut,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
-  useSharedValue
-} from 'react-native-reanimated';
-import { useOverlay } from '../../model/useOverlay';
+import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
+import { useModality } from '../../model/useOverlay';
 import { ZSView } from '../../ui';
 import { useTheme } from '../../model';
 
@@ -21,7 +15,7 @@ function Modality({
 }) {
   const { palette } = useTheme();
   const [localVisible, setLocalVisible] = useState(false);
-  const { modalityVisible } = useOverlay();
+  const { modalityVisible } = useModality();
   const insets = useSafeAreaInsets();
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);
@@ -34,11 +28,11 @@ function Modality({
     if (modalityVisible) {
       // 모달이 열리는 애니메이션
       setLocalVisible(true);
-      backScale.value = withDelay(200, withTiming(0.92, { duration: 300 }));
-      backTranslateY.value = withDelay(400, withTiming(insets.top, { duration: 300 }));
-      backBorderRadius.value = withDelay(200, withTiming(12, { duration: 300 }));
-      mainTranslateY.value = withDelay(300, withTiming(10 + insets.top, { duration: 300 }));
-      backgroundOpacity.value = withTiming(1, { duration: 600 });
+      backScale.value = withDelay(100, withTiming(0.92, { duration: 200 }));
+      backTranslateY.value = withDelay(300, withTiming(insets.top, { duration: 200 }));
+      backBorderRadius.value = withDelay(100, withTiming(12, { duration: 200 }));
+      mainTranslateY.value = withDelay(200, withTiming(10 + insets.top, { duration: 200 }));
+      backgroundOpacity.value = withTiming(1, { duration: 500 });
     } else {
       // 모달이 닫히는 애니메이션 (역순)
       backScale.value = withTiming(1, { duration: 100 });

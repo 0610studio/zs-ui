@@ -30,14 +30,11 @@ function ZSRadioGroup({
 }) {
   const { palette } = useTheme();
 
-  const handleSelect = useCallback(
-    (option: RadioOption) => {
-      if (!disabled) {
-        onSelect(option);
-      }
-    },
-    [disabled, onSelect]
-  );
+  const handleSelect = useCallback((option: RadioOption) => {
+    if (!disabled) {
+      onSelect(option);
+    }
+  }, [disabled, onSelect]);
 
   return (
     <ViewAtom
