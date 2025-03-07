@@ -1,6 +1,6 @@
 import { ActivityIndicator } from "react-native";
 import React, { ReactNode, useCallback } from "react";
-import { useOverlay } from "../../model/useOverlay";
+import { useLoader } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { useTheme } from "../../model";
 
@@ -9,7 +9,7 @@ function LoadingNotify({
 }: {
   loaderComponent?: () => ReactNode;
 }) {
-  const { loaderVisible } = useOverlay();
+  const { loaderVisible } = useLoader();
   const { palette } = useTheme();
 
   const renderLoader = useCallback(() => {
@@ -23,9 +23,7 @@ function LoadingNotify({
   if (!loaderVisible) return null;
 
   return (
-    <ModalBackground
-      modalBgColor={palette.modalBgColor}
-    >
+    <ModalBackground modalBgColor={palette.modalBgColor}>
       {renderLoader()}
     </ModalBackground>
   )

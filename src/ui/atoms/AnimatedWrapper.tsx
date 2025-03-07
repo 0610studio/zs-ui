@@ -43,7 +43,6 @@ function AnimatedWrapper({
     opacity.value = withTiming(1, { duration: SHADOW_DURATION });
   }, [opacity]);
 
-  // 애니메이션 속성 메모이제이션
   const animationProps = useMemo(() => ({
     entering: FadeInDown.duration(duration).withCallback((finished) => {
       'worklet';
@@ -59,7 +58,6 @@ function AnimatedWrapper({
     return <View style={[style, staticStyle]} {...props}>{children}</View>;
   }
 
-  // 애니메이션이 적용된 View로 렌더링
   return (
     <Animated.View
       style={[style, staticStyle, animatedStyle]}

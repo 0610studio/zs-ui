@@ -1,6 +1,6 @@
 {
   "name": "@0610studio/zs-ui",
-  "version": "0.0.60",
+  "version": "0.0.61",
   "private": false,
   "description": "EXPO ZS-UI",
   "type": "module",
@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "start:android": "cd example && yarn install && npx expo run:android",
-    "start:ios": "cd example && yarn install && npx expo run:ios -d 'iPhone 14'",
+    "start:ios": "cd example && yarn install && npx expo run:ios",
     "build": "expo-module build",
     "prepare": "expo-module prepare",
     "---------------------------------------------------------------------------": "",
