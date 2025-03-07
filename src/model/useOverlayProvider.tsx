@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BackHandler, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
-import OverlayContext from './useOverlay';
+import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from './useOverlay';
 import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
 import AlertOverlay from '../overlay/AlertOverlay';
 import SnackbarNotify from '../overlay/SnackbarNotify';
@@ -189,100 +189,123 @@ export function OverlayProvider({
   }, [backPressHandler]);
 
   // ------------------------------------------------------------
-
   const overlayContextValue = useMemo(() => ({
-    alertVisible,
-    setAlertVisible,
-    // ---
-    snackItemStack,
-    hideSnackBar,
-    // ---
-    bottomSheetVisible,
-    setBottomSheetVisible,
-    // ---
-    loaderVisible,
-    // ---
-    popOverVisible,
-    setPopOverVisible,
-    // ---
-    modalityVisible,
-    setModalityVisible,
-    // ---
+    hideOverlay,
     showAlert,
     showSnackBar,
     showBottomSheet,
-    showLoader,
     showPopOverMenu,
     showModality,
-    // ---
+    showLoader,
+  }), [
     hideOverlay,
+    showAlert,
+    showSnackBar,
+    showBottomSheet,
+    showPopOverMenu,
+    showModality,
+    showLoader,
+  ]);
+
+  const alertContextValue = useMemo(() => ({
+    alertVisible,
+    setAlertVisible,
   }), [
     alertVisible,
     setAlertVisible,
-    // ---
+  ]);
+
+  const snackbarContextValue = useMemo(() => ({
     snackItemStack,
     hideSnackBar,
-    // ---
+  }), [
+    snackItemStack,
+    hideSnackBar,
+  ]);
+
+  const bottomSheetContextValue = useMemo(() => ({
     bottomSheetVisible,
     setBottomSheetVisible,
-    // ---
-    loaderVisible,
-    // ---
+  }), [
+    bottomSheetVisible,
+    setBottomSheetVisible,
+  ]);
+
+  const popOverContextValue = useMemo(() => ({
     popOverVisible,
     setPopOverVisible,
-    // ---
+  }), [
+    popOverVisible,
+    setPopOverVisible,
+  ]);
+
+  const modalityContextValue = useMemo(() => ({
     modalityVisible,
     setModalityVisible,
-    // ---
-    showAlert,
-    showSnackBar,
-    showBottomSheet,
-    showLoader,
-    showPopOverMenu,
-    showModality,
-    // ---
-    hideOverlay,
+  }), [
+    modalityVisible,
+    setModalityVisible,
+  ]);
+
+  const loaderContextValue = useMemo(() => ({
+    loaderVisible,
+    setLoaderVisible,
+  }), [
+    loaderVisible,
+    setLoaderVisible,
   ]);
 
   return (
     <OverlayContext.Provider value={overlayContextValue}>
-      {children}
+      <AlertContext.Provider value={alertContextValue}>
+        <SnackbarContext.Provider value={snackbarContextValue}>
+          <BottomSheetContext.Provider value={bottomSheetContextValue}>
+            <PopOverContext.Provider value={popOverContextValue}>
+              <ModalityContext.Provider value={modalityContextValue}>
+                <LoaderContext.Provider value={loaderContextValue}>
+                  {children}
 
-      <BottomSheetOverlay
-        headerComponent={bottomSheetHeader}
-        component={bottomSheetComponent}
-        options={bottomSheetOptions}
-      />
+                  <BottomSheetOverlay
+                    headerComponent={bottomSheetHeader}
+                    component={bottomSheetComponent}
+                    options={bottomSheetOptions}
+                  />
 
-      <PopOverMenu
-        px={popOverLocation?.px}
-        py={popOverLocation?.py}
-        component={popOverComponent}
-      />
+                  <PopOverMenu
+                    px={popOverLocation?.px}
+                    py={popOverLocation?.py}
+                    component={popOverComponent}
+                  />
 
-      <SnackbarNotify
-        customSnackbar={customSnackbar}
-      />
+                  <SnackbarNotify
+                    customSnackbar={customSnackbar}
+                  />
 
-      <AlertOverlay
-        title={title}
-        informative={informative}
-        actions={actions || {} as AlertActions}
-        isBackgroundTouchClose={isBackgroundTouchClose}
-        titleStyle={titleStyle}
-        informativeStyle={informativeStyle}
-        secondaryButtonStyle={secondaryButtonStyle}
-        primaryButtonStyle={primaryButtonStyle}
-        secondaryButtonTextStyle={secondaryButtonTextStyle}
-        primaryButtonTextStyle={primaryButtonTextStyle}
-        singleButtonTextStyle={singleButtonTextStyle}
-      />
+                  <AlertOverlay
+                    title={title}
+                    informative={informative}
+                    actions={actions || {} as AlertActions}
+                    isBackgroundTouchClose={isBackgroundTouchClose}
+                    titleStyle={titleStyle}
+                    informativeStyle={informativeStyle}
+                    secondaryButtonStyle={secondaryButtonStyle}
+                    primaryButtonStyle={primaryButtonStyle}
+                    secondaryButtonTextStyle={secondaryButtonTextStyle}
+                    primaryButtonTextStyle={primaryButtonTextStyle}
+                    singleButtonTextStyle={singleButtonTextStyle}
+                  />
 
-      <Modality modalityComponent={modalityComponent} />
+                  <Modality modalityComponent={modalityComponent} />
 
-      <LoadingNotify
-        loaderComponent={loaderComponent}
-      />
+                  <LoadingNotify
+                    loaderComponent={loaderComponent}
+                  />
+                </LoaderContext.Provider>
+              </ModalityContext.Provider>
+            </PopOverContext.Provider>
+          </BottomSheetContext.Provider>
+        </SnackbarContext.Provider>
+      </AlertContext.Provider>
     </OverlayContext.Provider>
   );
 }

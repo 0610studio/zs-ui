@@ -1,32 +1,44 @@
 import { ReactNode } from "react";
 import { TextProps, TouchableOpacityProps } from "react-native";
 
-export interface OverlayProps {
+export interface OverlayContextProps {
+    showLoader: () => void;
+    showModality: (props: ModalityProps) => void;
+    showPopOverMenu: (props: PopOverMenuProps) => void;
+    showBottomSheet: (props: ShowBottomSheetProps) => void;
+    showSnackBar: (props: ShowSnackBarProps) => void;
+    showAlert: (props: ShowAlertProps) => void;
+    hideOverlay: (option: HideOption) => void;
+}
+
+export interface AlertContextProps {
     alertVisible: boolean;
     setAlertVisible: (visible: boolean) => void;
-    // ---
+}
+
+export interface SnackbarContextProps {
     snackItemStack: SnackItem[];
     hideSnackBar: (index: number) => void;
-    // ---
+}
+
+export interface BottomSheetContextProps {
     bottomSheetVisible: boolean;
     setBottomSheetVisible: (visible: boolean) => void;
-    // ---
-    loaderVisible: boolean;
-    // ---
-    modalityVisible: boolean;
-    setPopOverVisible: (visible: boolean) => void;
-    // ---
+}
+
+export interface PopOverContextProps {
     popOverVisible: boolean;
+    setPopOverVisible: (visible: boolean) => void;
+}
+
+export interface ModalityContextProps {
+    modalityVisible: boolean;
     setModalityVisible: (visible: boolean) => void;
-    // ---
-    showAlert: (props: ShowAlertProps) => void;
-    showSnackBar: (props: ShowSnackBarProps) => void;
-    showBottomSheet: (props: ShowBottomSheetProps) => void;
-    showLoader: () => void;
-    showPopOverMenu: (props: PopOverMenuProps) => void;
-    showModality: (props: ModalityProps) => void;
-    // ---
-    hideOverlay: (option: HideOption) => void;
+}
+
+export interface LoaderContextProps {
+    loaderVisible: boolean;
+    setLoaderVisible: (visible: boolean) => void;
 }
 
 export interface PopOverMenuProps {
@@ -42,18 +54,18 @@ export interface ModalityProps {
 export interface CustomSnackbarProps {
     snackType: SnackType;
     snackMessage: string;
-};
+}
 
 export interface OverlayProviderProps {
     children: ReactNode;
     customSnackbar?: (props: CustomSnackbarProps) => React.ReactNode;
     loaderComponent?: () => React.ReactNode;
-};
+}
 
 export interface AlertAction {
     label: string;
     onPress?: () => void;
-};
+}
 
 export interface ShowAlertProps {
     title?: string;
@@ -67,19 +79,19 @@ export interface ShowAlertProps {
     secondaryButtonTextStyle?: TextProps['style'];
     primaryButtonTextStyle?: TextProps['style'];
     singleButtonTextStyle?: TextProps['style'];
-};
+}
 
 export interface AlertActions {
     primary: AlertAction;
     secondary?: AlertAction;
-};
+}
 
 export interface SnackItem {
     message: string;
     type: SnackType;
     index: number;
     snackbarDuration?: number;
-};
+}
 
 export type SnackType = 'success' | 'error' | '';
 
@@ -90,11 +102,7 @@ export interface ShowSnackBarProps {
     type?: SnackType;
     index?: number;
     snackbarDuration?: number;
-};
-
-
-
-
+}
 
 export interface BottomSheetOptions {
     isBackgroundTouchClose?: boolean;
@@ -104,9 +112,8 @@ export interface BottomSheetOptions {
     padding?: number;
 }
 
-
 export interface ShowBottomSheetProps {
     headerComponent?: React.ReactNode;
     component: React.ReactNode;
     options?: BottomSheetOptions;
-};
+}
