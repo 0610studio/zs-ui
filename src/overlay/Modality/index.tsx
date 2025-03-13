@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StatusBar, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
 import { ZSView } from '../../ui';
@@ -22,6 +22,9 @@ function Modality({
   const backBorderRadius = useSharedValue(0);
   const mainTranslateY = useSharedValue(height);
   const backgroundOpacity = useSharedValue(1);
+  const overrideMargin = 10;
+  const mainScreenMargin = overrideMargin + (initialWindowMetrics?.insets.top || insets.top);
+  const mainScrrenPadding = (initialWindowMetrics?.insets.bottom || insets.bottom);
 
   // 애니메이션 트리거
   useEffect(() => {
@@ -31,7 +34,7 @@ function Modality({
       backScale.value = withDelay(100, withTiming(0.92, { duration: 200 }));
       backTranslateY.value = withDelay(300, withTiming(insets.top, { duration: 200 }));
       backBorderRadius.value = withDelay(100, withTiming(12, { duration: 200 }));
-      mainTranslateY.value = withDelay(200, withTiming(10 + insets.top, { duration: 200 }));
+      mainTranslateY.value = withDelay(200, withTiming(overrideMargin + insets.top, { duration: 200 }));
       backgroundOpacity.value = withTiming(1, { duration: 500 });
     } else {
       // 모달이 닫히는 애니메이션 (역순)
@@ -98,8 +101,8 @@ function Modality({
       <Animated.View
         style={[
           {
-            height: height - (10 + insets.top),
-            paddingBottom: insets.bottom,
+            height: height - mainScreenMargin,
+            paddingBottom: mainScrrenPadding, // 제스쳐 공간
             backgroundColor: palette.background.base
           },
           styles.mainScreen,
