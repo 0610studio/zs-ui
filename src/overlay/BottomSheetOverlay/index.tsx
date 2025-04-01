@@ -18,12 +18,11 @@ function BottomSheetOverlay({
     isBackgroundTouchClose = true,
     marginHorizontal = 10,
     marginBottom = 10,
-    height = 300,
     padding = 14,
   } = options;
 
   const [localVisible, setLocalVisible] = useState(false);
-  const { bottomSheetVisible, setBottomSheetVisible } = useBottomSheet();
+  const { bottomSheetVisible, setBottomSheetVisible, height, setHeight } = useBottomSheet();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(height);
   const scale = useSharedValue(1);

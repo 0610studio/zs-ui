@@ -24,6 +24,8 @@ export interface SnackbarContextProps {
 export interface BottomSheetContextProps {
     bottomSheetVisible: boolean;
     setBottomSheetVisible: (visible: boolean) => void;
+    height: number;
+    setHeight: (height: number) => void;
 }
 
 export interface PopOverContextProps {

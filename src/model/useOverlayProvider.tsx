@@ -36,6 +36,7 @@ export function OverlayProvider({
   const [bottomSheetComponent, setBottomSheetComponent] = useState<React.ReactNode>(null);
   const [bottomSheetHeader, setBottomSheetHeader] = useState<React.ReactNode>(null);
   const [bottomSheetOptions, setBottomSheetOptions] = useState<BottomSheetOptions>();
+  const [bottomSheetHeight, setBottomSheetHeight] = useState<number>(300);
 
   // Loading
   const [loaderVisible, setLoaderVisible] = useState<boolean>(false);
@@ -92,6 +93,7 @@ export function OverlayProvider({
     setBottomSheetComponent(component);
     setBottomSheetHeader(headerComponent);
     setBottomSheetOptions(options);
+    setBottomSheetHeight(options?.height || 300);
     setBottomSheetVisible(true);
   };
 
@@ -226,9 +228,13 @@ export function OverlayProvider({
   const bottomSheetContextValue = useMemo(() => ({
     bottomSheetVisible,
     setBottomSheetVisible,
+    height: bottomSheetHeight,
+    setHeight: setBottomSheetHeight,
   }), [
     bottomSheetVisible,
     setBottomSheetVisible,
+    bottomSheetHeight,
+    setBottomSheetHeight,
   ]);
 
   const popOverContextValue = useMemo(() => ({

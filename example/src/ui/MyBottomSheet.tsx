@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
+import { useBottomSheet } from 'zs-ui/model/useOverlay';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
 interface MyBottomSheetProps {
@@ -12,6 +13,12 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
   const { palette: { background, primary } } = useTheme();
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
   const [nick, setNick] = useState<string>('');
+  const { setHeight: setBottomSheetHeight } = useBottomSheet();
+  const [height, setHeight] = useState<number>(300);
+
+  useEffect(() => {
+    setBottomSheetHeight(height);
+  }, [height]);
 
   const handleConfirmPress = useCallback(() => {
     onConfirm?.();
@@ -24,10 +31,13 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
   return (
     <ZSView style={styles.container}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, gap: 10 }}>
-        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
-        <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
-        <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
-        <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
+        <ZSPressable style={{ width: '100%', height: 50, backgroundColor: 'red' }} onPress={() => setHeight(height + 20)}>
+          <ZSText>높이 증가</ZSText>
+        </ZSPressable>
+        <ZSPressable style={{ width: '100%', height: 50, backgroundColor: 'red' }} onPress={() => setHeight(height - 20)}>
+          <ZSText>높이 감소</ZSText>
+        </ZSPressable>
+
         <ZSTextField
           boxStyle="underline"
           label="닉네임"
