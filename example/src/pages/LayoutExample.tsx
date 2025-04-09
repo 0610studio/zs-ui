@@ -35,6 +35,7 @@ function LayoutExample(): React.JSX.Element {
 
   return (
     <ZSContainer
+      keyboardScrollExtraOffset={130}
       style={styles.container}
       bottomComponent={
         <ZSBottomButton
