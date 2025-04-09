@@ -1,5 +1,5 @@
-import React, { ReactNode, useState, useEffect } from 'react';
-import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
+import React, { ReactNode, useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
+import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ViewAtom from '../atoms/ViewAtom';
 import ScrollViewAtom from '../atoms/ScrollViewAtom';
@@ -12,35 +12,43 @@ type ZSContainerProps = ViewProps & {
   barStyle?: 'light-content' | 'dark-content';
   edges?: Array<'top' | 'right' | 'bottom' | 'left'>;
   isScrollView?: boolean;
-  scrollViewRef?: React.RefObject<ScrollView>;
   topComponent?: ReactNode;
   bottomComponent?: ReactNode;
   showsVerticalScrollIndicator?: boolean;
   loadingComponent?: React.ReactNode;
   keyboardVerticalOffset?: number;
-  behavior?: "padding" | "height" | "position" | undefined;
+  behavior?: 'padding' | 'height' | 'position';
   automaticallyAdjustKeyboardInsets?: boolean;
+  keyboardScrollExtraOffset?: number;
 };
 
-function ZSContainer({
-  backgroundColor,
-  isLoader = false,
-  statusBarColor,
-  barStyle = 'dark-content',
-  edges = ['top', 'bottom'],
-  isScrollView = true,
-  scrollViewRef,
-  topComponent,
-  bottomComponent,
-  showsVerticalScrollIndicator = true,
-  loadingComponent = <ActivityIndicator />,
-  keyboardVerticalOffset,
-  behavior,
-  automaticallyAdjustKeyboardInsets = true,
-  ...props
-}: ZSContainerProps) {
-  const { palette } = useTheme(); // 테마 사용
+const ZSContainer = forwardRef<ScrollView, ZSContainerProps>(function ZSContainer(
+  {
+    backgroundColor,
+    isLoader = false,
+    statusBarColor,
+    barStyle = 'dark-content',
+    edges = ['top', 'bottom'],
+    isScrollView = true,
+    topComponent,
+    bottomComponent,
+    showsVerticalScrollIndicator = true,
+    loadingComponent = <ActivityIndicator />,
+    keyboardVerticalOffset,
+    behavior,
+    automaticallyAdjustKeyboardInsets = true,
+    keyboardScrollExtraOffset,
+    ...props
+  },
+  forwardedRef
+) {
+  const { palette } = useTheme();
   const [isDelayed, setIsDelayed] = useState(true);
+  const positionRef = useRef<number | null>(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const lastTouchY = useRef<number | null>(0);
+
+  useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,9 +57,46 @@ function ZSContainer({
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <SafeAreaView style={[{ backgroundColor: backgroundColor || palette.background.base }, styles.flex1, styles.fullWidth]} edges={edges}>
+  useEffect(() => {
+    const keyboardShowSubscription = Keyboard.addListener('keyboardDidShow', (e) => {
+      if (scrollViewRef.current && keyboardScrollExtraOffset) {
+        const screenHeight = Dimensions.get('window').height;
+        const keyboardHeight = e.endCoordinates.height;
+        const safeAreaBottom = 0;
+        const availableScreenHeight = screenHeight - keyboardHeight - safeAreaBottom;
+        const delta = (lastTouchY?.current || 0) + keyboardScrollExtraOffset - availableScreenHeight;
 
+        scrollViewRef.current.scrollTo({
+          y: (positionRef.current ?? 0) + delta,
+          animated: true,
+        });
+      }
+    });
+
+    return () => {
+      positionRef.current = null;
+      lastTouchY.current = null;
+      keyboardShowSubscription.remove();
+    };
+  }, [keyboardScrollExtraOffset]);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (keyboardScrollExtraOffset) positionRef.current = event.nativeEvent.contentOffset.y;
+  };
+
+  const handleTouch = (evt: any) => {
+    if (keyboardScrollExtraOffset) lastTouchY.current = evt.nativeEvent.pageY;
+  };
+
+  return (
+    <SafeAreaView
+      style={[
+        { backgroundColor: backgroundColor || palette.background.base },
+        styles.flex1,
+        styles.fullWidth,
+      ]}
+      edges={edges}
+    >
       {!isDelayed && (
         <KeyboardAvoidingView
           style={[styles.flex1, styles.fullWidth]}
@@ -72,28 +117,38 @@ function ZSContainer({
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}
               keyboardShouldPersistTaps="handled"
               automaticallyAdjustKeyboardInsets={automaticallyAdjustKeyboardInsets}
+              onScroll={handleScroll}
+              onTouchStart={handleTouch}
             >
               <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>
                 {props.children}
               </ViewAtom>
             </ScrollViewAtom>
           ) : (
-            <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>{props.children}</ViewAtom>
+            <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>
+              {props.children}
+            </ViewAtom>
           )}
 
           {!isLoader && bottomComponent && bottomComponent}
         </KeyboardAvoidingView>
       )}
-
-      <StatusBar barStyle={barStyle} backgroundColor={statusBarColor || palette.background.base} />
+      <StatusBar
+        barStyle={barStyle}
+        backgroundColor={statusBarColor || palette.background.base}
+      />
     </SafeAreaView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   flex1: { flex: 1 },
   fullWidth: { width: Dimensions.get('window').width },
-  scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: Dimensions.get('window').width },
+  scrollContainerStyle: {
+    flexGrow: 1,
+    alignItems: 'center',
+    width: Dimensions.get('window').width,
+  },
 });
 
 export default ZSContainer;
