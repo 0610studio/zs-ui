@@ -122,45 +122,45 @@ function BottomSheetOverlay({
     })
   ).current;
 
-  if (!localVisible) return null;
-
   return (
-    <ModalBackground
-      modalBgColor={palette.modalBgColor}
-      onPress={() => {
-        if (isBackgroundTouchClose) setBottomSheetVisible(false);
-      }}
-    >
-      <Animated.View
-        style={[
-          styles.container,
-          {
-            width: width - marginHorizontal * 2,
-            height: maxHeight,
-            marginHorizontal,
-            bottom: marginBottom + bottom,
-            backgroundColor: palette.background.base,
-          },
-          animatedStyles,
-        ]}
+    !localVisible ? null :
+      <ModalBackground
+        key={localVisible ? 'visiblebs' : 'hiddenbs'}
+        modalBgColor={palette.modalBgColor}
+        onPress={() => {
+          if (isBackgroundTouchClose) setBottomSheetVisible(false);
+        }}
       >
-        <View
+        <Animated.View
           style={[
-            styles.pressableView,
-            { paddingHorizontal: padding, paddingBottom: padding },
+            styles.container,
+            {
+              width: width - marginHorizontal * 2,
+              height: maxHeight,
+              marginHorizontal,
+              bottom: marginBottom + bottom,
+              backgroundColor: palette.background.base,
+            },
+            animatedStyles,
           ]}
         >
-          <View {...panResponder.panHandlers}>
-            <View style={[styles.gestureBarContainer, { paddingBottom: padding }]}>
-              <View style={[styles.gestureBar, { backgroundColor: palette.divider }]} />
+          <View
+            style={[
+              styles.pressableView,
+              { paddingHorizontal: padding, paddingBottom: padding },
+            ]}
+          >
+            <View {...panResponder.panHandlers}>
+              <View style={[styles.gestureBarContainer, { paddingBottom: padding }]}>
+                <View style={[styles.gestureBar, { backgroundColor: palette.divider }]} />
+              </View>
+              {headerComponent}
             </View>
-            {headerComponent}
-          </View>
 
-          {component}
-        </View>
-      </Animated.View>
-    </ModalBackground>
+            {component}
+          </View>
+        </Animated.View>
+      </ModalBackground>
   );
 }
 
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 26,
     overflow: 'hidden',
+    zIndex: 8100,
   },
   pressableView: {
     width: '100%',

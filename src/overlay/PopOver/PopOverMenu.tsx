@@ -75,6 +75,7 @@ function PopOverMenu({
 
   return (
     <ModalBackground
+      key={popOverVisible ? 'visiblepo' : 'hiddenpo'}
       modalBgColor={palette.modalBgColor}
       isCenter={false}
       onPress={() => setPopOverVisible(false)}

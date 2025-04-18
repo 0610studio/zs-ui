@@ -77,43 +77,43 @@ function Modality({
     };
   });
 
-  if (!localVisible) return null;
-
   return (
-    <Animated.View
-      style={[
-        styles.animatedBackground,
-        { backgroundColor: palette.background.neutral },
-        backgroundAnimatedStyle
-      ]}
-    >
-      <StatusBar backgroundColor={modalityVisible ? palette.background.neutral : palette.background.base} />
-
+    !localVisible ? null :
       <Animated.View
-        exiting={FadeOut.duration(300)}
+        key={localVisible ? 'visiblemd' : 'hiddenmd'}
         style={[
-          styles.backScreen,
-          { backgroundColor: palette.background.layer2 },
-          backScreenAnimatedStyle
-        ]}
-      />
-
-      <Animated.View
-        style={[
-          {
-            height: height - mainScreenMargin,
-            paddingBottom: mainScrrenPadding, // 제스쳐 공간
-            backgroundColor: palette.background.base
-          },
-          styles.mainScreen,
-          mainScreenAnimatedStyle
+          styles.animatedBackground,
+          { backgroundColor: palette.background.neutral },
+          backgroundAnimatedStyle
         ]}
       >
-        <ZSView style={styles.contents}>
-          {modalityComponent}
-        </ZSView>
+        <StatusBar backgroundColor={modalityVisible ? palette.background.neutral : palette.background.base} />
+
+        <Animated.View
+          exiting={FadeOut.duration(300)}
+          style={[
+            styles.backScreen,
+            { backgroundColor: palette.background.layer2 },
+            backScreenAnimatedStyle
+          ]}
+        />
+
+        <Animated.View
+          style={[
+            {
+              height: height - mainScreenMargin,
+              paddingBottom: mainScrrenPadding, // 제스쳐 공간
+              backgroundColor: palette.background.base
+            },
+            styles.mainScreen,
+            mainScreenAnimatedStyle
+          ]}
+        >
+          <ZSView style={styles.contents}>
+            {modalityComponent}
+          </ZSView>
+        </Animated.View>
       </Animated.View>
-    </Animated.View>
   );
 }
 
@@ -122,11 +122,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     paddingTop: 10,
+    zIndex: 8003,
   },
   animatedBackground: {
-    width,
-    height,
-    position: 'absolute',
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 8000,
   },
   backScreen: {
     position: 'absolute',
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     height,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 8000,
+    zIndex: 8001,
   },
   mainScreen: {
     width,

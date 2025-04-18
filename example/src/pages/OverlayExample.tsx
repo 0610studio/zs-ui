@@ -110,7 +110,7 @@ const OverlayExample = () => {
               height: 400
             },
             headerComponent: (
-              <ZSText style={{ textAlign: "center", padding: 30, backgroundColor: '#ff00ff' }}>헤더 컴포넌트</ZSText>
+              <ZSText style={{ textAlign: "center", padding: 30, backgroundColor: '#ff00ff' }}>헤더 컴포넌트1</ZSText>
             ),
             component: (
               <MyBottomSheet

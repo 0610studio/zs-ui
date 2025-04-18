@@ -84,15 +84,15 @@ function AlertOverlay({
     );
   }, [title, informative, actions, handleButtonPress, titleStyle, informativeStyle, secondaryButtonStyle, primaryButtonStyle, secondaryButtonTextStyle, primaryButtonTextStyle, singleButtonTextStyle]);
 
-  if (!alertVisible) return null;
-
   return (
-    <ModalBackground
-      modalBgColor={modalBgColor}
-      onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
-    >
-      {content}
-    </ModalBackground>
+    !alertVisible ? null :
+      <ModalBackground
+        key={alertVisible ? 'visibleao' : 'hiddenao'}
+        modalBgColor={modalBgColor}
+        onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
+      >
+        {content}
+      </ModalBackground>
   )
 }
 
