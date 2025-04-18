@@ -32,7 +32,7 @@ function ModalBackground({ modalBgColor, isCenter = true, children, onPress }: M
 const createStyles = (modalBgColor: string) =>
   StyleSheet.create({
     modalBg: {
-      zIndex: 9997,
+      zIndex: 7999,
       backgroundColor: modalBgColor,
       ...StyleSheet.absoluteFillObject,
     },

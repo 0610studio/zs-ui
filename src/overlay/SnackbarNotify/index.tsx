@@ -11,12 +11,11 @@ const SnackbarNotify = ({
   customSnackbar?: (props: CustomSnackbarProps) => ReactNode
 }) => {
   const { snackItemStack, hideSnackBar } = useSnackbar();
+  const { top } = useSafeAreaInsets();
 
   // ----------------------------------------------------------------
 
   if (!snackItemStack) return null;
-  
-  const { top } = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { paddingTop: top }]}>

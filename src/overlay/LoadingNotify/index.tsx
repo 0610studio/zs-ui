@@ -23,7 +23,7 @@ function LoadingNotify({
   if (!loaderVisible) return null;
 
   return (
-    <ModalBackground modalBgColor={palette.modalBgColor}>
+    <ModalBackground key={loaderVisible ? 'visibleln' : 'hiddenln'} modalBgColor={palette.modalBgColor}>
       {renderLoader()}
     </ModalBackground>
   )
