@@ -271,6 +271,8 @@ export function OverlayProvider({
                 <LoaderContext.Provider value={loaderContextValue}>
                   {children}
 
+                  <Modality modalityComponent={modalityComponent} />
+
                   <BottomSheetOverlay
                     headerComponent={bottomSheetHeader}
                     component={bottomSheetComponent}
@@ -281,10 +283,6 @@ export function OverlayProvider({
                     px={popOverLocation?.px}
                     py={popOverLocation?.py}
                     component={popOverComponent}
-                  />
-
-                  <SnackbarNotify
-                    customSnackbar={customSnackbar}
                   />
 
                   <AlertOverlay
@@ -301,7 +299,9 @@ export function OverlayProvider({
                     singleButtonTextStyle={singleButtonTextStyle}
                   />
 
-                  <Modality modalityComponent={modalityComponent} />
+                  <SnackbarNotify
+                    customSnackbar={customSnackbar}
+                  />
 
                   <LoadingNotify
                     loaderComponent={loaderComponent}

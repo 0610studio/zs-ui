@@ -1,45 +1,18 @@
 import React, { useMemo } from "react";
 import { Button, StyleSheet } from "react-native";
-import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme } from "zs-ui";
-import MyBottomSheet from "../ui/MyBottomSheet";
-import TitleCard from "../ui/TitleCard";
-import RenderPopOverMenu from "../ui/RenderPopOverMenu";
-import MyModal from "../ui/MyModal";
+import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, Palette } from "zs-ui";
+import MyBottomSheet from "../src/ui/MyBottomSheet";
+import TitleCard from "../src/ui/TitleCard";
+import RenderPopOverMenu from "../src/ui/RenderPopOverMenu";
+import MyModal from "../src/ui/MyModal";
 
 const OverlayExample = () => {
   const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();
-  const {
-    palette: {
-      background,
-      text,
-      primary,
-      secondary,
-      danger,
-      warning,
-      success,
-      information,
-      grey,
-    },
-  } = useTheme();
-
-  const styles = useMemo(
-    () =>
-      createStyles({
-        background,
-        text,
-        primary,
-        secondary,
-        danger,
-        warning,
-        success,
-        information,
-        grey
-      }),
-    [background, text, primary, secondary, danger, warning, success, information, createStyles, grey]
-  );
+  const { palette } = useTheme();
+  const styles = useMemo(() => createStyles(palette), [palette]);
 
   return (
-    <ZSContainer style={styles.container} edges={["top"]}>
+    <ZSContainer style={styles.container} edges={["bottom"]}>
       <TitleCard title="PopOverButton">
         <ZSView style={{ flex: 1, alignItems: "flex-end" }}>
           <PopOverButton
@@ -64,7 +37,7 @@ const OverlayExample = () => {
           showAlert({
             title: "타이틀 테스트 길어지면 줄바꿈이 될 수 있습니다.",
             informative: "테스트 informative 길~~~~~~~~어지면 줄바꿈이 될 수 있습니다.",
-            primaryButtonStyle: { backgroundColor: primary.main },
+            primaryButtonStyle: { backgroundColor: palette.primary.main },
             actions: {
               primary: {
                 label: "확인",
@@ -78,7 +51,6 @@ const OverlayExample = () => {
           })
         }
         title="show_Alert"
-        color="#841584"
       />
 
       <Button
@@ -89,7 +61,6 @@ const OverlayExample = () => {
           });
         }}
         title="show_SnackBar"
-        color="#00cc00"
       />
 
       <Button
@@ -100,13 +71,12 @@ const OverlayExample = () => {
           });
         }}
         title="show_SnackBar_Error"
-        color="#841500"
       />
 
       <Button
         onPress={() => {
           showBottomSheet({
-            options:{
+            options: {
               height: 400
             },
             headerComponent: (
@@ -122,7 +92,6 @@ const OverlayExample = () => {
           });
         }}
         title="show_BottomSheet"
-        color="#331599"
       />
 
       <Button
@@ -139,69 +108,48 @@ const OverlayExample = () => {
           });
         }}
         title="show_Modality"
-        color="#331599"
       />
     </ZSContainer>
   );
 };
 
 
-const createStyles = ({
-  background,
-  text,
-  primary,
-  secondary,
-  danger,
-  warning,
-  success,
-  information,
-  grey
-}: {
-  background: any;
-  text: any;
-  primary: any;
-  secondary: any;
-  danger: any;
-  warning: any;
-  success: any;
-  information: any;
-  grey: any
-}) =>
-  StyleSheet.create({
-    container: {
-      gap: 30,
-      paddingTop: 90,
-      backgroundColor: background.layer2,
-      paddingHorizontal: 15,
-    },
-    popOverButtonContainer: {
-      paddingRight: 10,
-      paddingLeft: 15,
-      flexDirection: "row",
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: grey[50],
-      borderRadius: 30,
-      paddingVertical: 10,
-      flex: 1,
-    },
-    popOverIcon: {
-      marginLeft: 10,
-      width: 30,
-      height: 30,
-      borderRadius: 18,
-      borderWidth: 2.2,
-      borderColor: grey[50],
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    dot: {
-      width: 4,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: grey[50],
-    },
-  });
+
+export const createStyles = (palette: Palette) => StyleSheet.create({
+  container: {
+    gap: 30,
+    paddingTop: 40,
+    backgroundColor: palette.background.layer2,
+    paddingHorizontal: 15,
+  },
+  popOverButtonContainer: {
+    paddingRight: 10,
+    paddingLeft: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: palette.grey[50],
+    borderRadius: 30,
+    paddingVertical: 10,
+    flex: 1,
+  },
+  popOverIcon: {
+    marginLeft: 10,
+    width: 30,
+    height: 30,
+    borderRadius: 18,
+    borderWidth: 2.2,
+    borderColor: palette.grey[50],
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: palette.grey[50],
+  },
+});
 
 
 export default OverlayExample;

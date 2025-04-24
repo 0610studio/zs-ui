@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { CustomSnackbarProps } from "../../model/types";
 import SnackbarItem from "./ui/SnackbarItem";
 import { useSnackbar } from "../../model/useOverlay";
+import { Z_INDEX_VALUE } from "../../model/utils";
 
 const SnackbarNotify = ({
   customSnackbar
@@ -37,7 +38,7 @@ const SnackbarNotify = ({
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: 9997,
+    zIndex: Z_INDEX_VALUE.SNACKBAR,
     width: '100%',
     alignItems: 'center',
     position: 'absolute',

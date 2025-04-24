@@ -5,6 +5,7 @@ import { usePopOver } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { PopOverMenuProps } from "../../model/types";
 import { useTheme } from "../../model";
+import { Z_INDEX_VALUE } from "../../model/utils";
 
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 const WINDOW_WIDTH = Dimensions.get('window').width;
@@ -75,6 +76,7 @@ function PopOverMenu({
 
   return (
     <ModalBackground
+      zIndex={Z_INDEX_VALUE.POPOVER}
       key={popOverVisible ? 'visiblepo' : 'hiddenpo'}
       modalBgColor={palette.modalBgColor}
       isCenter={false}

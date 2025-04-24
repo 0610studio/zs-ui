@@ -5,6 +5,7 @@ import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedVa
 import { useModality } from '../../model/useOverlay';
 import { ZSView } from '../../ui';
 import { useTheme } from '../../model';
+import { Z_INDEX_VALUE } from '../../model/utils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -122,11 +123,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     paddingTop: 10,
-    zIndex: 8003,
+    zIndex: Z_INDEX_VALUE.MODAL4,
   },
   animatedBackground: {
     ...StyleSheet.absoluteFillObject,
-    zIndex: 8000,
+    zIndex: Z_INDEX_VALUE.MODAL1,
   },
   backScreen: {
     position: 'absolute',
@@ -134,14 +135,14 @@ const styles = StyleSheet.create({
     height,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 8001,
+    zIndex: Z_INDEX_VALUE.MODAL2,
   },
   mainScreen: {
     width,
     position: 'absolute',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    zIndex: 8002,
+    zIndex: Z_INDEX_VALUE.MODAL3,
     overflow: 'hidden',
   },
 });

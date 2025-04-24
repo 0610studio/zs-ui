@@ -3,8 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "zs-ui": ["../src/index"],
-      "zs-ui/*": ["../src/*"]
+      "zs-ui": [
+        "../src/index"
+      ],
+      "zs-ui/*": [
+        "../src/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
