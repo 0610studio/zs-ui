@@ -3,6 +3,7 @@ import React, { ReactNode, useCallback } from "react";
 import { useLoader } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { useTheme } from "../../model";
+import { Z_INDEX_VALUE } from "../../model/utils";
 
 function LoadingNotify({
   loaderComponent,
@@ -23,7 +24,7 @@ function LoadingNotify({
   if (!loaderVisible) return null;
 
   return (
-    <ModalBackground key={loaderVisible ? 'visibleln' : 'hiddenln'} modalBgColor={palette.modalBgColor}>
+    <ModalBackground zIndex={Z_INDEX_VALUE.LOADING} key={loaderVisible ? 'visibleln' : 'hiddenln'} modalBgColor={palette.modalBgColor}>
       {renderLoader()}
     </ModalBackground>
   )

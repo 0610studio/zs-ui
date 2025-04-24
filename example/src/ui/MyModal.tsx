@@ -1,14 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Button, ScrollView, StyleSheet, View } from 'react-native';
 import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
+import MyBottomSheet from './MyBottomSheet';
 
 interface MyModalProps {
   onConfirm?: () => void;
 }
 
 function MyModal({ onConfirm }: MyModalProps) {
-  const { hideOverlay } = useOverlay();
+  const { hideOverlay, showBottomSheet, showAlert } = useOverlay();
   const { palette: { background, primary, divider } } = useTheme();
   const [search, setSearch] = useState<string>('');
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
@@ -48,7 +49,53 @@ function MyModal({ onConfirm }: MyModalProps) {
           }}
         />
       </View>
-    </ZSView>
+
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps='handled'>
+        <Button
+          onPress={() => {
+            showBottomSheet({
+              options: {
+                height: 400
+              },
+              headerComponent: (
+                <ZSText style={{ textAlign: "center", padding: 30, backgroundColor: '#ff00ff' }}>헤더 컴포넌트1</ZSText>
+              ),
+              component: (
+                <MyBottomSheet
+                  onConfirm={() => {
+                    console.log("event");
+                  }}
+                />
+              ),
+            });
+          }}
+          title="show_BottomSheet"
+          color="#331599"
+        />
+
+        <Button
+          onPress={() =>
+            showAlert({
+              title: "타이틀 테스트 길어지면 줄바꿈이 될 수 있습니다.",
+              informative: "테스트 informative 길~~~~~~~~어지면 줄바꿈이 될 수 있습니다.",
+              primaryButtonStyle: { backgroundColor: primary.main },
+              actions: {
+                primary: {
+                  label: "확인",
+                  onPress: () => console.log("확인"),
+                },
+                secondary: {
+                  label: "취소",
+                  onPress: () => console.log("취소"),
+                },
+              },
+            })
+          }
+          title="show_Alert"
+          color="#841584"
+        />
+      </ScrollView>
+    </ZSView >
   );
 }
 

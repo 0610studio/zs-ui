@@ -29,3 +29,17 @@ export const extractStyle = (
     }
     return undefined;
 };
+
+export const Z_INDEX_VALUE = {
+    DEFAULT: 8000,
+    MODAL1: 8001,
+    MODAL2: 8002,
+    MODAL3: 8003,
+    MODAL4: 8004,
+    BOTTOM_SHEET1: 8101,
+    BOTTOM_SHEET2: 8102,
+    POPOVER: 8200,
+    ALERT: 8300,
+    SNACKBAR: 8400,
+    LOADING: 8999,
+};

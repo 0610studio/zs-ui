@@ -1,9 +1,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme, ErrorComponent } from 'zs-ui';
-import TitleCard from '../ui/TitleCard';
+import TitleCard from '../src/ui/TitleCard';
 import type { RadioOption } from 'zs-ui';
-import palette from 'zs-ui/theme/palette';
 
 function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
@@ -13,14 +12,7 @@ function LayoutExample(): React.JSX.Element {
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
   const [responseType, setResponseType] = useState<RadioOption>();
   const { palette: { background, primary, text, danger } } = useTheme();
-
-  const styles = useMemo(
-    () =>
-      createStyles({
-        background,
-      }),
-    [background]
-  );
+  const styles = useMemo(() => createStyles({ background }), [background]);
 
   const handleSubmit = useCallback(
     async () => {
@@ -35,6 +27,7 @@ function LayoutExample(): React.JSX.Element {
 
   return (
     <ZSContainer
+      edges={['bottom']}
       keyboardScrollExtraOffset={130}
       style={styles.container}
       bottomComponent={
@@ -188,7 +181,7 @@ const createStyles = ({
   StyleSheet.create({
     container: {
       gap: 30,
-      paddingTop: 80,
+      paddingTop: 40,
       backgroundColor: background.layer2,
       paddingHorizontal: 15,
       paddingBottom: 90,

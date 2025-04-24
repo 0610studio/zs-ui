@@ -6,6 +6,7 @@ import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
+import { Z_INDEX_VALUE } from '../../model/utils';
 
 const { width, height: windowHeight } = Dimensions.get('window');
 
@@ -125,6 +126,7 @@ function BottomSheetOverlay({
   return (
     !localVisible ? null :
       <ModalBackground
+        zIndex={Z_INDEX_VALUE.BOTTOM_SHEET1}
         key={localVisible ? 'visiblebs' : 'hiddenbs'}
         modalBgColor={palette.modalBgColor}
         onPress={() => {
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 26,
     overflow: 'hidden',
-    zIndex: 8100,
+    zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,
   },
   pressableView: {
     width: '100%',

@@ -8,6 +8,7 @@ import { ThemeBackground } from '../../theme';
 import { ZSText } from '../../ui';
 import ModalBackground from '../ui/ModalBackground';
 import ViewAtom from '../../ui/atoms/ViewAtom';
+import { Z_INDEX_VALUE } from '../../model/utils';
 
 const modalWidth = Dimensions.get('window').width - 60;
 
@@ -87,6 +88,7 @@ function AlertOverlay({
   return (
     !alertVisible ? null :
       <ModalBackground
+        zIndex={Z_INDEX_VALUE.ALERT}
         key={alertVisible ? 'visibleao' : 'hiddenao'}
         modalBgColor={modalBgColor}
         onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
