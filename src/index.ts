@@ -102,6 +102,7 @@ import {
   ShadowLevel,
   ShadowStyle,
 } from "./ui/types";
+import { ZSContainerRef } from "./ui/ZSContainer";
 
 export type {
   ThemeProviderProps,
@@ -138,5 +139,6 @@ export type {
   BottomSheetOptions,
   RadioOption,
   ShadowLevel,
-  ShadowStyle
+  ShadowStyle,
+  ZSContainerRef
 };

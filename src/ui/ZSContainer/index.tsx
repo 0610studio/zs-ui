@@ -5,7 +5,7 @@ import ViewAtom from '../atoms/ViewAtom';
 import ScrollViewAtom from '../atoms/ScrollViewAtom';
 import { useTheme } from '../../model/useThemeProvider';
 
-type ZSContainerProps = ViewProps & {
+export type ZSContainerProps = ViewProps & {
   backgroundColor?: string;
   isLoader?: boolean;
   statusBarColor?: string;
@@ -22,7 +22,9 @@ type ZSContainerProps = ViewProps & {
   keyboardScrollExtraOffset?: number;
 };
 
-const ZSContainer = forwardRef<ScrollView, ZSContainerProps>(function ZSContainer(
+export type ZSContainerRef = ScrollView;
+
+const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSContainer(
   {
     backgroundColor,
     isLoader = false,
@@ -37,7 +39,7 @@ const ZSContainer = forwardRef<ScrollView, ZSContainerProps>(function ZSContaine
     keyboardVerticalOffset,
     behavior,
     automaticallyAdjustKeyboardInsets = true,
-    keyboardScrollExtraOffset,
+    keyboardScrollExtraOffset = 100,
     ...props
   },
   forwardedRef

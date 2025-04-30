@@ -1,12 +1,22 @@
-import { Text, StyleSheet, Pressable, Button } from 'react-native';
-import { useTheme, ZSContainer } from 'zs-ui';
+import { Text, StyleSheet, Pressable, Button, ScrollView } from 'react-native';
+import { useTheme, ZSContainer, ZSContainerRef } from 'zs-ui';
 import { router } from 'expo-router';
+import { useRef } from 'react';
 
 export default function Home() {
   const { palette: { toggleTheme, mode } } = useTheme();
+  const containerRef = useRef<ZSContainerRef>(null);
+
+  const handleScrollToTop = () => {
+    containerRef.current?.scrollTo({ y: 0, animated: true });
+  };
 
   return (
-    <ZSContainer edges={[]} style={{ gap: 20, padding: 30 }}>
+    <ZSContainer 
+      ref={containerRef}
+      edges={[]} 
+      style={{ gap: 20, padding: 30 }}
+    >
       <Pressable onPress={toggleTheme} style={[styles.button, { backgroundColor: 'orange' }]}>
         <Text style={styles.buttonText}>현재 모드: {mode}</Text>
       </Pressable>
@@ -14,6 +24,8 @@ export default function Home() {
       <Button title='Theme 예제' onPress={() => router.push('/ThemeExample')} />
       <Button title='Layout 예제' onPress={() => router.push('/LayoutExample')} />
       <Button title='Overlay 예제' onPress={() => router.push('/OverlayExample')} />
+      
+      <Button title='맨 위로 스크롤' onPress={handleScrollToTop} />
     </ZSContainer>
   );
 }
