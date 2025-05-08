@@ -7,10 +7,6 @@ export default function Home() {
   const { palette: { toggleTheme, mode } } = useTheme();
   const containerRef = useRef<ZSContainerRef>(null);
 
-  const handleScrollToTop = () => {
-    containerRef.current?.scrollTo({ y: 0, animated: true });
-  };
-
   return (
     <ZSContainer 
       ref={containerRef}
@@ -24,8 +20,6 @@ export default function Home() {
       <Button title='Theme 예제' onPress={() => router.push('/ThemeExample')} />
       <Button title='Layout 예제' onPress={() => router.push('/LayoutExample')} />
       <Button title='Overlay 예제' onPress={() => router.push('/OverlayExample')} />
-      
-      <Button title='맨 위로 스크롤' onPress={handleScrollToTop} />
     </ZSContainer>
   );
 }

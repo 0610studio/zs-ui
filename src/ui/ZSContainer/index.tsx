@@ -39,7 +39,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     keyboardVerticalOffset,
     behavior,
     automaticallyAdjustKeyboardInsets = true,
-    keyboardScrollExtraOffset = 100,
+    keyboardScrollExtraOffset,
     ...props
   },
   forwardedRef
@@ -66,10 +66,14 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
         const keyboardHeight = e.endCoordinates.height;
         const safeAreaBottom = 0;
         const availableScreenHeight = screenHeight - keyboardHeight - safeAreaBottom;
-        const delta = (lastTouchY?.current || 0) + keyboardScrollExtraOffset - availableScreenHeight;
 
+        // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
+        const currentScrollPosition = positionRef.current || 0;
+        const touchPosition = lastTouchY.current || 0;
+
+        const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
         scrollViewRef.current.scrollTo({
-          y: (positionRef.current ?? 0) + delta,
+          y: currentScrollPosition + scrollOffset,
           animated: true,
         });
       }
