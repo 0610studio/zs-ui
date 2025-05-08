@@ -6,7 +6,7 @@ import SnackBar from '../src/ui/Snackbar';
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
+      <ThemeProvider isDarkModeEnabled={false}>
         <OverlayProvider customSnackbar={SnackBar}>
           <Stack
             screenOptions={{
