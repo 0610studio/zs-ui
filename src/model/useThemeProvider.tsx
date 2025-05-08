@@ -10,6 +10,7 @@ import elevation, { ElevationStyles } from '../theme/elevation';
 export interface ThemeProviderProps {
   themeFonts?: ThemeFonts;
   children: React.ReactNode;
+  isDarkModeEnabled?: boolean;
 }
 
 export interface ThemeProps {
@@ -35,27 +36,31 @@ export const useTheme = () => {
   return context;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true }) => {
   const systemColorScheme = useColorScheme(); // 시스템 다크 모드 감지
-  const [isUsingSystemColorScheme, setUseSystemColorScheme] = useState(true);
-  const [mode, setMode] = useState<'light' | 'dark'>(systemColorScheme === 'dark' ? 'dark' : 'light');
+  const [isUsingSystemColorScheme, setUseSystemColorScheme] = useState(isDarkModeEnabled ? true : false);
+  const [mode, setMode] = useState<'light' | 'dark'>(isDarkModeEnabled ? (systemColorScheme === 'dark' ? 'dark' : 'light') : 'light');
 
   // AsyncStorage에서 시스템 모드 사용 설정 값 로드
   useEffect(() => {
     const loadSettings = async () => {
       let isMounted = true;
       try {
-        const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
-        const storedMode = await AsyncStorage.getItem('themeMode');
-
         if (isMounted) {
-          if (storedUseSystemColorScheme !== null) {
-            setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
-          }
-          if (storedMode) {
-            setMode(storedMode === 'dark' ? 'dark' : 'light');
+          if (isDarkModeEnabled) {
+            const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
+            const storedMode = await AsyncStorage.getItem('themeMode');
+
+            if (storedUseSystemColorScheme !== null) {
+              setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
+            }
+            if (storedMode) {
+              setMode(storedMode === 'dark' ? 'dark' : 'light');
+            } else {
+              setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
+            }
           } else {
-            setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
+            setMode('light');
           }
         }
       } catch (error) {
