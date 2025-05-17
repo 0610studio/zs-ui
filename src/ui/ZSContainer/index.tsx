@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
-import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, useWindowDimensions, View } from 'react-native';
+import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScrollViewAtom from '../atoms/ScrollViewAtom';
 import { useTheme } from '../../model/useThemeProvider';
@@ -56,11 +56,11 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   forwardedRef
 ) {
   const { palette } = useTheme();
-  const { width: windowWidth } = useWindowDimensions();
   const [isDelayed, setIsDelayed] = useState(true);
   const positionRef = useRef<number | null>(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastTouchY = useRef<number | null>(0);
+  const windowWidth = Dimensions.get('window').width;
   const isSplitView = (windowWidth >= splitBreakpoint) && rightComponent;
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
