@@ -1,7 +1,6 @@
 import React, { ReactNode, useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
-import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard } from 'react-native';
+import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, Dimensions, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ViewAtom from '../atoms/ViewAtom';
 import ScrollViewAtom from '../atoms/ScrollViewAtom';
 import { useTheme } from '../../model/useThemeProvider';
 
@@ -11,15 +10,24 @@ export type ZSContainerProps = ViewProps & {
   statusBarColor?: string;
   barStyle?: 'light-content' | 'dark-content';
   edges?: Array<'top' | 'right' | 'bottom' | 'left'>;
-  isScrollView?: boolean;
+  scrollViewDisabled?: boolean;
   topComponent?: ReactNode;
   bottomComponent?: ReactNode;
+  rightComponent?: ReactNode;
   showsVerticalScrollIndicator?: boolean;
   loadingComponent?: React.ReactNode;
   keyboardVerticalOffset?: number;
   behavior?: 'padding' | 'height' | 'position';
   automaticallyAdjustKeyboardInsets?: boolean;
   keyboardScrollExtraOffset?: number;
+  /**
+   * 분할 레이아웃이 적용될 최소 화면 너비 (기본값: 700dp)
+   * - 일반 스마트폰: ~430dp
+   * - 폴더블 (펼쳤을 때): ~717dp
+   * - 태블릿: 600dp ~ 1024dp
+   */
+  splitBreakpoint?: number;
+  splitRatio?: number;
 };
 
 export type ZSContainerRef = ScrollView;
@@ -31,9 +39,12 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     statusBarColor,
     barStyle = 'dark-content',
     edges = ['top', 'bottom'],
-    isScrollView = true,
+    scrollViewDisabled = false,
     topComponent,
     bottomComponent,
+    rightComponent = <View style={{ flex: 1, backgroundColor: 'red' }}></View>,
+    splitBreakpoint = 700,
+    splitRatio = 0.5,
     showsVerticalScrollIndicator = true,
     loadingComponent = <ActivityIndicator />,
     keyboardVerticalOffset,
@@ -45,10 +56,12 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   forwardedRef
 ) {
   const { palette } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
   const [isDelayed, setIsDelayed] = useState(true);
   const positionRef = useRef<number | null>(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastTouchY = useRef<number | null>(0);
+  const isSplitView = (windowWidth >= splitBreakpoint) && rightComponent;
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
 
@@ -94,6 +107,48 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     if (keyboardScrollExtraOffset) lastTouchY.current = evt.nativeEvent.pageY;
   };
 
+  const renderContent = () => {
+    if (isLoader) return loadingComponent;
+
+    const leftWidth = isSplitView ? windowWidth * splitRatio : windowWidth;
+    const rightWidth = windowWidth * (1 - splitRatio);
+
+    return (
+      <View style={[styles.splitContainer]}>
+        {
+          scrollViewDisabled ? (
+            <View style={[styles.flex1, props.style, { width: leftWidth }]}>
+              {props.children}
+            </View>
+          ) : (
+            <ScrollViewAtom
+              ref={scrollViewRef}
+              style={[styles.flex1, { width: leftWidth }]}
+              contentContainerStyle={styles.scrollContainerStyle}
+              bounces={false}
+              overScrollMode="never"
+              showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+              keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets={automaticallyAdjustKeyboardInsets}
+              onScroll={handleScroll}
+              onTouchStart={handleTouch}
+            >
+              <View style={[styles.splitView, props.style, { width: leftWidth }]}>
+                {props.children}
+              </View>
+            </ScrollViewAtom>
+          )
+        }
+
+        {rightComponent && (
+          <View style={[styles.splitView, { width: rightWidth }]}>
+            {rightComponent}
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView
       style={[
@@ -110,32 +165,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
           keyboardVerticalOffset={keyboardVerticalOffset}
         >
           {topComponent && topComponent}
-
-          {isLoader ? (
-            loadingComponent
-          ) : isScrollView ? (
-            <ScrollViewAtom
-              ref={scrollViewRef}
-              style={[styles.flex1, styles.fullWidth]}
-              bounces={false}
-              overScrollMode="never"
-              contentContainerStyle={styles.scrollContainerStyle}
-              showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-              keyboardShouldPersistTaps="handled"
-              automaticallyAdjustKeyboardInsets={automaticallyAdjustKeyboardInsets}
-              onScroll={handleScroll}
-              onTouchStart={handleTouch}
-            >
-              <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>
-                {props.children}
-              </ViewAtom>
-            </ScrollViewAtom>
-          ) : (
-            <ViewAtom style={[styles.flex1, styles.fullWidth, props.style]}>
-              {props.children}
-            </ViewAtom>
-          )}
-
+          {renderContent()}
           {!isLoader && bottomComponent && bottomComponent}
         </KeyboardAvoidingView>
       )}
@@ -153,7 +183,14 @@ const styles = StyleSheet.create({
   scrollContainerStyle: {
     flexGrow: 1,
     alignItems: 'center',
-    width: Dimensions.get('window').width,
+  },
+  splitContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+  },
+  splitView: {
+    minHeight: '100%',
   },
 });
 
