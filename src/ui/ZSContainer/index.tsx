@@ -42,7 +42,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     scrollViewDisabled = false,
     topComponent,
     bottomComponent,
-    rightComponent = <View style={{ flex: 1, backgroundColor: 'red' }}></View>,
+    rightComponent,
     splitBreakpoint = 700,
     splitRatio = 0.5,
     showsVerticalScrollIndicator = true,
