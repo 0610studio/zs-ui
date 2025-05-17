@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     overflow: 'hidden',
     zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,
+    maxWidth: 600,
   },
   pressableView: {
     width: '100%',

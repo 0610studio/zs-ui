@@ -137,6 +137,7 @@ const createStyles = ({ background }: { background: ThemeBackground; }) =>
       paddingBottom: 18,
       paddingTop: 24,
       paddingHorizontal: 20,
+      maxWidth: 500,
     },
   });
 
