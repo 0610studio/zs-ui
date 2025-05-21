@@ -38,7 +38,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     backgroundColor,
     isLoader = false,
     statusBarColor,
-    barStyle = 'dark-content',
+    barStyle,
     edges = ['top', 'bottom'],
     scrollViewDisabled = false,
     topComponent,
@@ -52,7 +52,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     behavior,
     automaticallyAdjustKeyboardInsets = true,
     keyboardScrollExtraOffset,
-    translucent = false,
+    translucent,
     ...props
   },
   forwardedRef
@@ -171,11 +171,16 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
           {!isLoader && bottomComponent && bottomComponent}
         </KeyboardAvoidingView>
       )}
-      <StatusBar
-        barStyle={barStyle}
-        backgroundColor={statusBarColor || palette.background.base}
-        translucent={translucent}
-      />
+
+      {
+        (barStyle || statusBarColor || translucent) && (
+          <StatusBar
+            barStyle={barStyle}
+            backgroundColor={statusBarColor || palette.background.base}
+            translucent={translucent}
+          />
+        )
+      }
     </SafeAreaView>
   );
 });
