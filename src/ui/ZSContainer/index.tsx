@@ -20,6 +20,7 @@ export type ZSContainerProps = ViewProps & {
   behavior?: 'padding' | 'height' | 'position';
   automaticallyAdjustKeyboardInsets?: boolean;
   keyboardScrollExtraOffset?: number;
+  translucent?: boolean;
   /**
    * 분할 레이아웃이 적용될 최소 화면 너비 (기본값: 700dp)
    * - 일반 스마트폰: ~430dp
@@ -51,6 +52,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     behavior,
     automaticallyAdjustKeyboardInsets = true,
     keyboardScrollExtraOffset,
+    translucent = false,
     ...props
   },
   forwardedRef
@@ -172,6 +174,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       <StatusBar
         barStyle={barStyle}
         backgroundColor={statusBarColor || palette.background.base}
+        translucent={translucent}
       />
     </SafeAreaView>
   );
