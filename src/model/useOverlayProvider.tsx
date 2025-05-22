@@ -11,6 +11,7 @@ import Modality from '../overlay/Modality';
 
 export function OverlayProvider({
   customSnackbar,
+  maxSnackbarCount = 3,
   loaderComponent,
   children
 }: OverlayProviderProps) {
@@ -124,15 +125,11 @@ export function OverlayProvider({
     message,
     type = 'success',
     index = Date.now(),
-    snackbarDuration = 3000
+    snackbarDuration = 3500
   }: ShowSnackBarProps) => {
-    // TODO: 스택 쌓고싶은데 삭제될 때 참조를 잃어서 삭제가 안되는 문제가 있음.
     setSnackItemStack((prev) => {
-      if (prev.length === 0) {
-        return [...prev, { message, type, index: index, snackbarDuration: snackbarDuration }];
-      } else {
-        return prev;
-      };
+      const newStack = [...prev, { message, type, index: index, snackbarDuration: snackbarDuration }];
+      return newStack.length > maxSnackbarCount ? newStack.slice(1) : newStack;
     });
   };
 

@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useCallback } from "react";
-import { Platform, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { CustomSnackbarProps, SnackItem } from "../../../model/types";
 import ViewAtom from "../../../ui/atoms/ViewAtom";

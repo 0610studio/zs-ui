@@ -21,10 +21,10 @@ const SnackbarNotify = ({
   return (
     <View style={[styles.container, { paddingTop: top }]}>
       {
-        snackItemStack.map((snackItem, index) => {
+        snackItemStack.map((snackItem) => {
           return (
             <SnackbarItem
-              key={index}
+              key={snackItem.index}
               customSnackbar={customSnackbar}
               snackItem={snackItem}
               hideSnackBar={hideSnackBar}

@@ -52,7 +52,7 @@ function SnackBar({
     <View style={styles.werapper}>
       <BlurView
         intensity={80}
-        tint="light"
+        tint="dark"
         style={styles.blurContainer}
         {...(isAndroid && {
           experimentalBlurMethod: "dimezisBlurView",
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   message: {
-    color: '#000000'
+    color: '#fff'
   },
 });
 

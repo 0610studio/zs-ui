@@ -62,6 +62,7 @@ export interface OverlayProviderProps {
     children: ReactNode;
     customSnackbar?: (props: CustomSnackbarProps) => React.ReactNode;
     loaderComponent?: () => React.ReactNode;
+    maxSnackbarCount?: number;
 }
 
 export interface AlertAction {
