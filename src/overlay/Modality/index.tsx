@@ -24,7 +24,7 @@ function Modality({
   const mainTranslateY = useSharedValue(height);
   const backgroundOpacity = useSharedValue(1);
   const overrideMargin = 10;
-  const mainScreenMargin = overrideMargin + (initialWindowMetrics?.insets.top || insets.top);
+  const mainScreenMargin = overrideMargin; //  + (initialWindowMetrics?.insets.top || insets.top)
   const mainScrrenPadding = (initialWindowMetrics?.insets.bottom || insets.bottom);
 
   // 애니메이션 트리거
@@ -103,7 +103,7 @@ function Modality({
           style={[
             {
               height: height - mainScreenMargin,
-              paddingBottom: mainScrrenPadding, // 제스쳐 공간
+              paddingBottom: mainScrrenPadding,
               backgroundColor: palette.background.base
             },
             styles.mainScreen,
