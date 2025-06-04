@@ -11,18 +11,15 @@ sidebar_position: 2
 ThemeProvider는 프로젝트 전반에서 사용할 폰트와 테마 관련 설정을 관리합니다.
 
 - `themeFonts` : 폰트 굵기별로 사용할 폰트 이름을 정의합니다.
-
 - `requireFonts` : require 구문을 사용하여 각 폰트 파일을 로드합니다.
-
 
 ### OverlayProvider
 
-OverlayProvider는 프로젝트 전역에서 사용할 알림 시스템을 관리합니다. customSnackbar와 loaderComponent를 통해 커스텀 스낵바 및 로더 컴포넌트를 설정할 수 있습니다.
+OverlayProvider는 프로젝트 전역에서 사용할 알림 시스템을 관리합니다. `customSnackbar`와 `loaderComponent`를 통해 커스텀 스낵바 및 로더 컴포넌트를 설정할 수 있습니다.
 
-- `customSnackbar` : 알림을 표시할 때 사용할 사용자 정의 스낵바 컴포넌트입니다. 프로젝트에 맞게 커스터마이징한 스낵바를 설정할 수 있습니다.
-
+- `customSnackbar` : 알림을 표시할 때 사용할 사용자 정의 스낵바 컴포넌트입니다.
 - `loaderComponent` : 로딩 상태에서 사용할 사용자 정의 로더 컴포넌트입니다.
-
+- `maxSnackbarCount` : 동시에 표시할 수 있는 스낵바 최대 개수 (기본값 3)
 
 ### 예제
 
@@ -55,10 +52,11 @@ const [loaded] = useFonts(requireFonts);
 
 <ThemeProvider themeFonts={themeFonts}>
   <OverlayProvider
-    customSnackbar={SnackBar} // Optional - 사용자 정의 스낵바 컴포넌트
-    loaderComponent={LoadingLottieComponent}  // Optional - 사용자 정의 로더 컴포넌트
+    customSnackbar={SnackBar}
+    loaderComponent={LoadingLottieComponent}
+    maxSnackbarCount={5}
   >
-
+    {/* ... */}
   </OverlayProvider>
 </ThemeProvider>
 ```
