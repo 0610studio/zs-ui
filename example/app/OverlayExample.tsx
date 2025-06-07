@@ -1,15 +1,27 @@
-import React, { useMemo } from "react";
-import { Button, StyleSheet } from "react-native";
-import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, Palette } from "zs-ui";
+import React, { useEffect, useMemo, useState } from "react";
+import { Button, StyleSheet, View } from "react-native";
+import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, Palette, ZSTextField } from "zs-ui";
 import MyBottomSheet from "../src/ui/MyBottomSheet";
 import TitleCard from "../src/ui/TitleCard";
 import RenderPopOverMenu from "../src/ui/RenderPopOverMenu";
 import MyModal from "../src/ui/MyModal";
 
 const OverlayExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();
+  const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay, showAboveKeyboard } = useOverlay();
   const { palette } = useTheme();
   const styles = useMemo(() => createStyles(palette), [palette]);
+  const [testInput, setTestInput] = useState('');
+
+  useEffect(() => {
+    showAboveKeyboard({
+      marginBottom: 0,
+      render: () => (
+        <View style={{ backgroundColor: 'red', padding: 10, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+          <ZSText>{testInput || 'AboveKeyboard Test'}</ZSText>
+        </View>
+      ),
+    });
+  }, [testInput]);
 
   return (
     <ZSContainer style={styles.container} edges={["bottom"]}>
@@ -101,7 +113,7 @@ const OverlayExample = () => {
               <MyModal
                 onConfirm={() => {
                   console.log("event");
-                  hideOverlay('all');
+                  hideOverlay('modal');
                 }}
               />
             ),
@@ -109,6 +121,15 @@ const OverlayExample = () => {
         }}
         title="show_Modality"
       />
+
+      <TitleCard title='AboveKeyboard' gap={20} flexDirection='column'>
+        <ZSTextField
+          label="AboveKeyboard Test"
+          value={testInput}
+          onChangeText={setTestInput}
+        />
+      </TitleCard>
+
     </ZSContainer>
   );
 };

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { AlertContextProps, SnackbarContextProps, BottomSheetContextProps, PopOverContextProps, ModalityContextProps, LoaderContextProps, OverlayContextProps } from './types';
+import { AlertContextProps, SnackbarContextProps, BottomSheetContextProps, PopOverContextProps, ModalityContextProps, LoaderContextProps, OverlayContextProps, AboveKeyboardContextProps } from './types';
 
 export const OverlayContext = createContext<OverlayContextProps | null>(null);
 export const AlertContext = createContext<AlertContextProps | null>(null);
@@ -8,6 +8,7 @@ export const BottomSheetContext = createContext<BottomSheetContextProps | null>(
 export const PopOverContext = createContext<PopOverContextProps | null>(null);
 export const ModalityContext = createContext<ModalityContextProps | null>(null);
 export const LoaderContext = createContext<LoaderContextProps | null>(null);
+export const AboveKeyboardContext = createContext<AboveKeyboardContextProps | null>(null);
 
 export const useOverlay = () => {
     const context = useContext(OverlayContext);
@@ -61,6 +62,14 @@ export const useLoader = () => {
     const context = useContext(LoaderContext);
     if (!context) {
         throw new Error('useLoader must be used within a LoaderProvider');
+    }
+    return context;
+};
+
+export const useAboveKeyboard = () => {
+    const context = useContext(AboveKeyboardContext);
+    if (!context) {
+        throw new Error('useAboveKeyboard must be used within a AboveKeyboardProvider');
     }
     return context;
 };

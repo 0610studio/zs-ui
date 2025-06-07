@@ -9,6 +9,7 @@ export interface OverlayContextProps {
     showSnackBar: (props: ShowSnackBarProps) => void;
     showAlert: (props: ShowAlertProps) => void;
     hideOverlay: (option: HideOption) => void;
+    showAboveKeyboard: (props: ShowAboveKeyboardProps) => void;
 }
 
 export interface AlertContextProps {
@@ -36,6 +37,12 @@ export interface PopOverContextProps {
 export interface ModalityContextProps {
     modalityVisible: boolean;
     setModalityVisible: (visible: boolean) => void;
+}
+
+export interface AboveKeyboardContextProps {
+    aboveKeyboardVisible: boolean;
+    setAboveKeyboardVisible: (visible: boolean) => void;
+    marginBottom: number;
 }
 
 export interface LoaderContextProps {
@@ -70,6 +77,11 @@ export interface AlertAction {
     onPress?: () => void;
 }
 
+export interface ShowAboveKeyboardProps {
+    render: () => React.ReactNode;
+    marginBottom?: number;
+}
+
 export interface ShowAlertProps {
     title?: string;
     informative?: string;
@@ -98,7 +110,7 @@ export interface SnackItem {
 
 export type SnackType = 'success' | 'error' | '';
 
-export type HideOption = 'all' | 'snack' | 'alert' | 'bottomSheet' | 'loader' | 'popOver' | 'modal';
+export type HideOption = 'all' | 'snack' | 'alert' | 'bottomSheet' | 'loader' | 'popOver' | 'modal' | 'aboveKeyboard';
 
 export interface ShowSnackBarProps {
     message: string;
