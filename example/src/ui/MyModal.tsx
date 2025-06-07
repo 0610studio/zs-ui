@@ -19,7 +19,7 @@ function MyModal({ onConfirm }: MyModalProps) {
   }, [onConfirm]);
 
   const handleClosePress = useCallback(() => {
-    hideOverlay('all');
+    hideOverlay('modal');
   }, [hideOverlay]);
 
   return (
