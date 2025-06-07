@@ -1,9 +1,0 @@
-{
-  "platforms": ["ios", "android", "web"],
-  "android": {
-    "newArchEnabled": true
-  },
-  "ios": {
-    "newArchEnabled": true
-  }
-}
