@@ -81,7 +81,7 @@ import {
   TypoStyle,
   TypoOptions,
   TypoSubStyle,
-  TextColorOptions
+  TypoColorOptions
 } from "./theme/types";
 import {
   SnackItem,
@@ -124,7 +124,7 @@ export type {
   TypoStyle,
   TypoOptions,
   TypoSubStyle,
-  TextColorOptions,
+  TypoColorOptions,
   SnackItem,
   ShowAlertProps,
   ShowSnackBarProps,

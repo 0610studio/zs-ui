@@ -4,6 +4,7 @@ import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedV
 import { useTheme } from '../../model/useThemeProvider';
 import { ShadowLevel } from '../types';
 import { IOS_SHADOW } from '../../theme/elevation';
+import { SubColorOptions, TypoColor, TypoColorOptions, ViewColor, ViewColorOptions } from '../../theme/types';
 
 const DEFAULT_DURATION = 200 as const;
 const SHADOW_DURATION = 50 as const;
@@ -12,6 +13,7 @@ interface AnimatedWrapperProps extends ViewProps {
   isAnimation: boolean;
   elevationLevel?: ShadowLevel;
   duration?: number;
+  color?: ViewColorOptions;
 }
 
 function AnimatedWrapper({
@@ -20,10 +22,13 @@ function AnimatedWrapper({
   duration = DEFAULT_DURATION,
   style,
   children,
+  color,
   ...props
 }: AnimatedWrapperProps) {
-  const { elevation } = useTheme();
+  const { elevation, palette } = useTheme();
   const opacity = useSharedValue(0);
+  const [c01, c02] = color ? color.split('.') as [ViewColor, SubColorOptions] : [undefined, undefined];
+  const backgroundColor  = c02 ? palette[c01][c02] : c01 ? palette.background[c01] : elevationLevel ? palette.background.base : undefined;
 
   // 그림자 및 기타 스타일을 플랫폼에 맞게 미리 계산
   const staticStyle = useMemo(() => {
@@ -55,12 +60,12 @@ function AnimatedWrapper({
 
   // 애니메이션이 비활성화된 경우 기본 View로 렌더링
   if (!isAnimation) {
-    return <View style={[style, staticStyle]} {...props}>{children}</View>;
+    return <View style={[style, { backgroundColor }, { ...elevation[elevationLevel] }]} {...props}>{children}</View>;
   }
 
   return (
     <Animated.View
-      style={[style, staticStyle, animatedStyle]}
+      style={[style, { backgroundColor }, staticStyle, animatedStyle]}
       {...animationProps}
       {...props}
     >

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Palette, ZSContainer, useTheme } from 'zs-ui';
+import { Palette, ZSContainer, ZSText, ZSView, useTheme } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 
 export default function ThemeExample() {
@@ -10,46 +10,85 @@ export default function ThemeExample() {
   return (
     <ZSContainer style={styles.container} edges={['bottom']}>
       {/* 배경색 예제 */}
-      <TitleCard title='Background Colors'>
-        <View style={styles.layer1Box}>
-          <Text style={styles.textPrimary}>Background Layer1</Text>
-        </View>
-        <View style={styles.layer2Box}>
-          <Text style={styles.textPrimary}>Background Layer2</Text>
-        </View>
-        <View style={styles.neutralBox}>
-          <Text style={styles.textPrimary}>Background Neutral</Text>
-        </View>
-        <View style={styles.baseBox}>
-          <Text style={styles.textPrimary}>Background Base</Text>
-        </View>
-        <View style={styles.dangerBox}>
-          <Text style={styles.textPrimary}>Background Danger</Text>
-        </View>
-        <View style={styles.warningBox}>
-          <Text style={styles.textPrimary}>Background Warning</Text>
-        </View>
-        <View style={styles.successBox}>
-          <Text style={styles.textPrimary}>Background Success</Text>
-        </View>
-        <View style={styles.informationBox}>
-          <Text style={styles.textPrimary}>Background Information</Text>
-        </View>
+      <TitleCard title='Background Colors' gap={5}>
+        <ZSView style={styles.box} color='base'><ZSText>Base</ZSText></ZSView>
+        <ZSView style={styles.box} color='layer1'><ZSText>Layer1</ZSText></ZSView>
+        <ZSView style={styles.box} color='layer2'><ZSText>Layer2</ZSText></ZSView>
+        <ZSView style={styles.box} color='neutral'><ZSText>Neutral</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger'><ZSText>Danger</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger.5'><ZSText>Danger.5</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger.10'><ZSText>Danger.10</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger.20'><ZSText>Danger.20</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger.30'><ZSText>Danger.30</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger.40'><ZSText>Danger.40</ZSText></ZSView>
+        <ZSView style={styles.box} color='danger.50'><ZSText>Danger.50</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning'><ZSText>Warning</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning.5'><ZSText>Warning.5</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning.10'><ZSText>Warning.10</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning.20'><ZSText>Warning.20</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning.30'><ZSText>Warning.30</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning.40'><ZSText>Warning.40</ZSText></ZSView>
+        <ZSView style={styles.box} color='warning.50'><ZSText>Warning.50</ZSText></ZSView>
+        <ZSView style={styles.box} color='success'><ZSText>Success</ZSText></ZSView>
+        <ZSView style={styles.box} color='success.5'><ZSText>Success.5</ZSText></ZSView>
+        <ZSView style={styles.box} color='success.10'><ZSText>Success.10</ZSText></ZSView>
+        <ZSView style={styles.box} color='success.20'><ZSText>Success.20</ZSText></ZSView>
+        <ZSView style={styles.box} color='success.30'><ZSText>Success.30</ZSText></ZSView>
+        <ZSView style={styles.box} color='success.40'><ZSText>Success.40</ZSText></ZSView>
+        <ZSView style={styles.box} color='success.50'><ZSText>Success.50</ZSText></ZSView>
+        <ZSView style={styles.box} color='information'><ZSText>Information</ZSText></ZSView>
+        <ZSView style={styles.box} color='information.5'><ZSText>Information.5</ZSText></ZSView>
+        <ZSView style={styles.box} color='information.10'><ZSText>Information.10</ZSText></ZSView>
+        <ZSView style={styles.box} color='information.20'><ZSText>Information.20</ZSText></ZSView>
+        <ZSView style={styles.box} color='information.30'><ZSText>Information.30</ZSText></ZSView>
+        <ZSView style={styles.box} color='information.40'><ZSText>Information.40</ZSText></ZSView>
+        <ZSView style={styles.box} color='information.50'><ZSText>Information.50</ZSText></ZSView>
+        <ZSView style={styles.box} color='grey.5'><ZSText>Grey.5</ZSText></ZSView>
+        <ZSView style={styles.box} color='grey.10'><ZSText>Grey.10</ZSText></ZSView>
+        <ZSView style={styles.box} color='grey.20'><ZSText>Grey.20</ZSText></ZSView>
+        <ZSView style={styles.box} color='grey.30'><ZSText>Grey.30</ZSText></ZSView>
+        <ZSView style={styles.box} color='grey.40'><ZSText>Grey.40</ZSText></ZSView>
+        <ZSView style={styles.box} color='grey.50'><ZSText>Grey.50</ZSText></ZSView>
       </TitleCard>
 
       {/* 텍스트 색상 예제 */}
       <TitleCard title='Text Colors'>
-        <Text style={styles.textPrimary}>Text Primary Color</Text>
-        <Text style={styles.textSecondary}>Text Secondary Color</Text>
-        <Text style={styles.textDanger}>Text Danger Color</Text>
-        <Text style={styles.textWarning}>Text Warning Color</Text>
-        <Text style={styles.textSuccess}>Text Success Color</Text>
-        <Text style={styles.textInformation}>Text Information Color</Text>
+        <ZSText color='primary'>Primary</ZSText>
+        <ZSText color='secondary'>Secondary</ZSText>
+        <ZSText color='disabled'>Disabled</ZSText>
+        <ZSText color='white' style={{ backgroundColor: 'black' }}>White</ZSText>
+        <ZSText color='black'>Black</ZSText>
+        <ZSText color='danger'>Danger</ZSText>
+        <ZSText color='danger.5'>Danger.5</ZSText>
+        <ZSText color='danger.10'>Danger.10</ZSText>
+        <ZSText color='danger.20'>Danger.20</ZSText>
+        <ZSText color='danger.30'>Danger.30</ZSText>
+        <ZSText color='danger.40'>Danger.40</ZSText>
+        <ZSText color='danger.50'>Danger.50</ZSText>
+        <ZSText color='warning'>Warning</ZSText>
+        <ZSText color='warning.5'>Warning.5</ZSText>
+        <ZSText color='warning.10'>Warning.10</ZSText>
+        <ZSText color='warning.20'>Warning.20</ZSText>
+        <ZSText color='warning.30'>Warning.30</ZSText>
+        <ZSText color='warning.40'>Warning.40</ZSText>
+        <ZSText color='warning.50'>Warning.50</ZSText>
+        <ZSText color='success'>Success</ZSText>
+        <ZSText color='success.5'>Success.5</ZSText>
+        <ZSText color='success.10'>Success.10</ZSText>
+        <ZSText color='success.20'>Success.20</ZSText>
+        <ZSText color='success.30'>Success.30</ZSText>
+        <ZSText color='success.40'>Success.40</ZSText>
+        <ZSText color='success.50'>Success.50</ZSText>
+        <ZSText color='information'>Information</ZSText>
+        <ZSText color='information.5'>Information.5</ZSText>
+        <ZSText color='information.10'>Information.10</ZSText>
+        <ZSText color='information.20'>Information.20</ZSText>
+        <ZSText color='information.30'>Information.30</ZSText>
+        <ZSText color='information.40'>Information.40</ZSText>
+        <ZSText color='information.50'>Information.50</ZSText>
       </TitleCard>
 
-      {/* Primary, Secondary, Danger, Warning, Success, Information 컬러 격자 */}
       <TitleCard title='Color Palette'>
-        {/* Primary 컬러 */}
         <View style={[styles.colorBox, { backgroundColor: palette.primary.lighter }]}>
           <Text style={styles.textWhite}>Primary Lighter</Text>
         </View>
@@ -83,13 +122,16 @@ export default function ThemeExample() {
       </TitleCard>
 
       <TitleCard title='elevation'>
-        <View style={[styles.elevationBox, { ...elevation[1] }]} />
-        <View style={[styles.elevationBox, { ...elevation[2] }]} />
-        <View style={[styles.elevationBox, { ...elevation[3] }]} />
-        <View style={[styles.elevationBox, { ...elevation[4] }]} />
-        <View style={[styles.elevationBox, { ...elevation[5] }]} />
-        <View style={[styles.elevationBox, { ...elevation[6] }]} />
-        <View style={[styles.elevationBox, { ...elevation[7] }]} />
+        <ZSView style={styles.elevationBox} elevationLevel={2}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={3}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={4}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={5}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={6}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={7}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={8}></ZSView>
+        <ZSView style={styles.elevationBox} elevationLevel={9}></ZSView>
+
+        {/* palette 사용시 */}
         <View style={[styles.elevationBox, { ...elevation[8] }]} />
         <View style={[styles.elevationBox, { ...elevation[9] }]} />
       </TitleCard>
@@ -104,85 +146,11 @@ export const createStyles = (palette: Palette) => StyleSheet.create({
     backgroundColor: palette.background.layer2,
     paddingHorizontal: 15,
   },
-  layer1Box: {
-    backgroundColor: palette.background.layer1,
+  box: {
     padding: 10,
-    marginBottom: 10,
-    width: '100%',
+    borderRadius: 10,
     alignItems: 'center',
-  },
-  layer2Box: {
-    backgroundColor: palette.background.layer2,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  neutralBox: {
-    backgroundColor: palette.background.neutral,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  baseBox: {
-    backgroundColor: palette.background.base,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  dangerBox: {
-    backgroundColor: palette.background.danger,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  warningBox: {
-    backgroundColor: palette.background.warning,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  successBox: {
-    backgroundColor: palette.background.success,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  informationBox: {
-    backgroundColor: palette.background.information,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  textPrimary: {
-    color: palette.text.primary,
-    fontSize: 16,
-  },
-  textSecondary: {
-    color: palette.text.secondary,
-    fontSize: 16,
-  },
-  textDanger: {
-    color: palette.text.danger,
-    fontSize: 16,
-  },
-  textWarning: {
-    color: palette.text.warning,
-    fontSize: 16,
-  },
-  textSuccess: {
-    color: palette.text.success,
-    fontSize: 16,
-  },
-  textInformation: {
-    color: palette.text.information,
-    fontSize: 16,
+    justifyContent: 'center',
   },
   textWhite: {
     color: '#FFFFFF',
