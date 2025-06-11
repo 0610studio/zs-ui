@@ -4,7 +4,7 @@ import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedV
 import { useTheme } from '../../model/useThemeProvider';
 import { ShadowLevel } from '../types';
 import { IOS_SHADOW } from '../../theme/elevation';
-import { SubColorOptions, TypoColor, TypoColorOptions, ViewColor, ViewColorOptions } from '../../theme/types';
+import { SubColorOptions, ViewColor, ViewColorOptions } from '../../theme/types';
 
 const DEFAULT_DURATION = 200 as const;
 const SHADOW_DURATION = 50 as const;
