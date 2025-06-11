@@ -1,5 +1,5 @@
 import { ViewProps } from "react-native";
-import { ZSText, ZSView, useTheme } from "zs-ui";
+import { ZSText, ZSView } from "zs-ui";
 
 type Props = ViewProps & {
   title?: string;
@@ -13,15 +13,10 @@ export default function TitleCard({
   children,
   flexDirection = 'row'
 }: Props) {
-  const { palette: { background } } = useTheme();
-
   return (
-    <ZSView style={{ backgroundColor: background.layer2 }}>
-      {
-        title && <ZSText typo="heading.3" style={{ marginBottom: 15 }}>{title}</ZSText>
-      }
-
-      <ZSView style={{ flexWrap: 'wrap', flexDirection: flexDirection, gap: gap, backgroundColor: background.base, padding: 14, borderRadius: 14 }}>
+    <ZSView>
+      {title && <ZSText typo="heading.4" style={{ marginBottom: 15, marginLeft: 10 }}>{title}</ZSText>}
+      <ZSView color='base' style={{ flexWrap: 'wrap', flexDirection: flexDirection, gap: gap, padding: 14, borderRadius: 14 }}>
         {children}
       </ZSView>
     </ZSView>

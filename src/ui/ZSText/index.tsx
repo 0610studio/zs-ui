@@ -1,12 +1,12 @@
 import React, { memo } from 'react';
 import { TextProps } from "react-native/types";
 import { useTheme } from "../../model/useThemeProvider";
-import { TypoOptions, TypoStyle, TextColorOptions, TypoSubStyle } from "../../theme/types";
+import { TypoOptions, TypoStyle, TypoColorOptions, TypoSubStyle, TypoColor, SubColorOptions } from "../../theme/types";
 import TextAtom from "../atoms/TextAtom"
 
 export interface ZSTextProps extends TextProps {
     typo?: TypoOptions;
-    color?: TextColorOptions;
+    color?: TypoColorOptions;
 }
 
 function ZSText({
@@ -16,7 +16,8 @@ function ZSText({
 }: ZSTextProps) {
     const { palette, typography } = useTheme();
     const [s01, s02] = typo.split('.') as [TypoStyle, TypoSubStyle];
-    return <TextAtom {...props} style={[typography[s01][s02], { color: palette.text[color] }, props.style]}>{props.children}</TextAtom>
+    const [c01, c02] = color.split('.') as [TypoColor, SubColorOptions];
+    return <TextAtom {...props} style={[typography[s01][s02], { color: c02 ? palette[c01][c02] : palette.text[c01] }, props.style]}>{props.children}</TextAtom>
 }
 
 export default memo(ZSText);
