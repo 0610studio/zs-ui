@@ -11,7 +11,7 @@ export interface ZSTextProps extends TextProps {
 
 function ZSText({
   typo = 'body.2',
-  color = 'primary',
+  color = 'base',
   ...props
 }: ZSTextProps) {
     const { palette, typography } = useTheme();

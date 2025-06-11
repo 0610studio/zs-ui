@@ -172,7 +172,7 @@ function ZSTextField({
         <TextInput
           {...textInputProps}
           style={[
-            { paddingTop: 7 + iosOffset, paddingBottom: 5 + iosOffset, color: palette.text.primary },
+            { paddingTop: 7 + iosOffset, paddingBottom: 5 + iosOffset, color: palette.text.base },
             textInputProps?.style,
             { fontSize, width: '100%', paddingRight: 25, fontFamily },
           ]}

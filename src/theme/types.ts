@@ -24,7 +24,7 @@ export type ColorPaletteExtend = ColorPalette & {
 };
 
 export interface ThemeTextType {
-  main: string;
+  base: string;
   primary: string;
   secondary: string;
   disabled: string;
@@ -47,6 +47,7 @@ export interface ThemeBorderType {
 }
 
 export interface ThemeBackground {
+  primary: string;
   layer1: string;
   layer2: string;
   neutral: string;
@@ -169,6 +170,7 @@ export type CommonColorOptions = 'danger' | 'danger.5' | 'danger.10' | 'danger.2
 | 'warning' | 'warning.5' | 'warning.10' | 'warning.20' | 'warning.30' | 'warning.40' | 'warning.50' | 'warning.60' | 'warning.70' | 'warning.80' | 'warning.90' | 'warning.100'
 | 'success' | 'success.5' | 'success.10' | 'success.20' | 'success.30' | 'success.40' | 'success.50' | 'success.60' | 'success.70' | 'success.80' | 'success.90' | 'success.100'
 | 'information' | 'information.5' | 'information.10' | 'information.20' | 'information.30' | 'information.40' | 'information.50' | 'information.60' | 'information.70' | 'information.80' | 'information.90' | 'information.100'
+| 'primary' | 'primary.5' | 'primary.10' | 'primary.20' | 'primary.30' | 'primary.40' | 'primary.50' | 'primary.60' | 'primary.70' | 'primary.80' | 'primary.90' | 'primary.100'
 | 'grey.5' | 'grey.10' | 'grey.20' | 'grey.30' | 'grey.40' | 'grey.50' | 'grey.60' | 'grey.70' | 'grey.80' | 'grey.90' | 'grey.100';
 
 export type TypoSubStyle = '1' | '2' | '3' | '4' | '5' | '6';
@@ -177,7 +179,7 @@ export type TypoColor = 'primary' | 'secondary' | 'disabled' | 'danger' | 'warni
 
 export type ViewColor = 'layer1' | 'layer2' | 'neutral' | 'base' | 'danger' | 'warning' | 'success' | 'information';
 
-export type TypoColorOptions = 'primary' | 'secondary' | 'disabled' | 'white' | 'black' | CommonColorOptions;
+export type TypoColorOptions = 'base' | 'secondary' | 'disabled' | 'white' | 'black' | CommonColorOptions;
 
 export type SubColorOptions = undefined | '0' | '5' | '10' | '20' | '30' | '40' | '50' | '60' | '70' | '80' | '90' | '100';
 
