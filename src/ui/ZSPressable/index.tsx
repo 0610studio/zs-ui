@@ -26,7 +26,7 @@ function ZSPressable({
   pressedBackgroundBorderRadius = 16,
   flex,
   minWidth,
-  elevationLevel = 0,
+  elevationLevel,
   fullWidth = false,
   ...props
 }: ZSPressableProps) {

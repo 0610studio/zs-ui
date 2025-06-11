@@ -60,12 +60,12 @@ function AnimatedWrapper({
 
   // 애니메이션이 비활성화된 경우 기본 View로 렌더링
   if (!isAnimation) {
-    return <View style={[style, { backgroundColor }, { ...elevation[elevationLevel] }]} {...props}>{children}</View>;
+    return <View style={[style, backgroundColor && { backgroundColor }, { ...elevation[elevationLevel] }]} {...props}>{children}</View>;
   }
 
   return (
     <Animated.View
-      style={[style, { backgroundColor }, staticStyle, animatedStyle]}
+      style={[style, backgroundColor && { backgroundColor }, staticStyle, animatedStyle]}
       {...animationProps}
       {...props}
     >
