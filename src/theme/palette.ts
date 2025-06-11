@@ -263,8 +263,8 @@ const MAIN_COLORS = {
 
 const TEXT_COLORS = {
   light: {
-    main: LIGHT_COLORS.primary.main,
-    primary: LIGHT_COLORS.grey[80],
+    primary: LIGHT_COLORS.primary.main,
+    base: LIGHT_COLORS.grey[80],
     secondary: LIGHT_COLORS.grey[60],
     disabled: LIGHT_COLORS.grey[50],
     danger: LIGHT_COLORS.danger[60],
@@ -275,8 +275,8 @@ const TEXT_COLORS = {
     black: '#000000',
   },
   dark: {
-    main: LIGHT_COLORS.primary.main,
-    primary: DARK_COLORS.grey[90],
+    primary: LIGHT_COLORS.primary.main,
+    base: DARK_COLORS.grey[90],
     secondary: DARK_COLORS.grey[70],
     disabled: DARK_COLORS.grey[50],
     danger: DARK_COLORS.danger[30],
@@ -311,6 +311,7 @@ const BORDER_COLORS = {
 
 const BACKGROUND_COLORS = {
   light: {
+    primary: LIGHT_COLORS.primary.main,
     layer1: LIGHT_COLORS.grey[5],
     layer2: LIGHT_COLORS.grey[20],
     neutral: LIGHT_COLORS.grey[30],
@@ -321,6 +322,7 @@ const BACKGROUND_COLORS = {
     information: LIGHT_COLORS.information[5],
   },
   dark: {
+    primary: DARK_COLORS.primary.main,
     layer1: DARK_COLORS.grey[5],
     layer2: DARK_COLORS.grey[20],
     neutral: DARK_COLORS.grey[30],

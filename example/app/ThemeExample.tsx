@@ -15,6 +15,13 @@ export default function ThemeExample() {
         <ZSView style={styles.box} color='layer1'><ZSText>Layer1</ZSText></ZSView>
         <ZSView style={styles.box} color='layer2'><ZSText>Layer2</ZSText></ZSView>
         <ZSView style={styles.box} color='neutral'><ZSText>Neutral</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary'><ZSText>primary</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary.5'><ZSText>primary.5</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary.10'><ZSText>primary.10</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary.20'><ZSText>primary.20</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary.30'><ZSText>primary.30</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary.40'><ZSText>primary.40</ZSText></ZSView>
+        <ZSView style={styles.box} color='primary.50'><ZSText>primary.50</ZSText></ZSView>
         <ZSView style={styles.box} color='danger'><ZSText>Danger</ZSText></ZSView>
         <ZSView style={styles.box} color='danger.5'><ZSText>Danger.5</ZSText></ZSView>
         <ZSView style={styles.box} color='danger.10'><ZSText>Danger.10</ZSText></ZSView>
@@ -53,11 +60,18 @@ export default function ThemeExample() {
 
       {/* 텍스트 색상 예제 */}
       <TitleCard title='Text Colors'>
-        <ZSText color='primary'>Primary</ZSText>
+        <ZSText color='base'>base</ZSText>
         <ZSText color='secondary'>Secondary</ZSText>
         <ZSText color='disabled'>Disabled</ZSText>
         <ZSText color='white' style={{ backgroundColor: 'black' }}>White</ZSText>
         <ZSText color='black'>Black</ZSText>
+        <ZSText color='primary'>Primary</ZSText>
+        <ZSText color='primary.5'>Primary.5</ZSText>
+        <ZSText color='primary.10'>Primary.10</ZSText>
+        <ZSText color='primary.20'>Primary.20</ZSText>
+        <ZSText color='primary.30'>Primary.30</ZSText>
+        <ZSText color='primary.40'>Primary.40</ZSText>
+        <ZSText color='primary.50'>Primary.50</ZSText>
         <ZSText color='danger'>Danger</ZSText>
         <ZSText color='danger.5'>Danger.5</ZSText>
         <ZSText color='danger.10'>Danger.10</ZSText>
