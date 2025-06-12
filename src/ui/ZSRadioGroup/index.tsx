@@ -55,8 +55,6 @@ function ZSRadioGroup({
             key={option.index}
             onPress={() => handleSelect(option)}
             pressedBackgroundColor="transparent"
-            flex={!minWidth ? 1 : undefined}
-            minWidth={minWidth}
             fullWidth
           >
             <ViewAtom

@@ -1,21 +1,21 @@
 import React, { useCallback } from "react";
-import { FlexAlignType, Pressable, ViewProps } from "react-native";
+import { Pressable, View, ViewProps } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
 import AnimatedWrapper from "../atoms/AnimatedWrapper";
 import type { ShadowLevel } from "../types";
+import { ViewColorOptions } from "../../theme/types";
 
 const DEFAULT_DURATION = { duration: 100 };
 
 interface ZSPressableProps extends ViewProps {
-  onPress: (value?: any) => void;
+  onPress?: (value?: any) => void;
   onLongPress?: (value?: any) => void;
   pressedBackgroundColor?: string;
   pressedBackgroundBorderRadius?: number;
-  flex?: number;
-  minWidth?: number;
   isAnimation?: boolean;
   elevationLevel?: ShadowLevel;
   fullWidth?: boolean;
+  color?: ViewColorOptions;
 }
 
 function ZSPressable({
@@ -24,10 +24,9 @@ function ZSPressable({
   isAnimation = true,
   pressedBackgroundColor = 'rgba(180, 180, 180, 0.1)',
   pressedBackgroundBorderRadius = 16,
-  flex,
-  minWidth,
   elevationLevel,
   fullWidth = false,
+  color,
   ...props
 }: ZSPressableProps) {
   const isButtonPress = useSharedValue(0);
@@ -52,30 +51,30 @@ function ZSPressable({
       return {
         backgroundColor: pressed ? pressedBackgroundColor : 'transparent',
         borderRadius: pressedBackgroundBorderRadius,
-        flex: fullWidth ? 1 : flex,
-        minWidth: minWidth,
-        alignSelf: fullWidth ? 'stretch' : undefined as FlexAlignType | undefined,
       };
     },
-    [pressedBackgroundColor, pressedBackgroundBorderRadius, flex, minWidth, fullWidth]
+    [pressedBackgroundColor, pressedBackgroundBorderRadius, fullWidth]
   );
 
   return (
-    <Pressable
-      onPress={onPress}
-      onLongPress={onLongPress}
-      style={({ pressed }) => handlePressStyle(pressed)}
-    >
-      <Animated.View style={boxAnimation}>
-        <AnimatedWrapper
-          isAnimation={isAnimation}
-          elevationLevel={elevationLevel}
-          style={props.style}
-        >
-          {props.children}
-        </AnimatedWrapper>
-      </Animated.View>
-    </Pressable>
+    <View style={{ width: fullWidth ? '100%' as const : undefined }}>
+      <Pressable
+        onPress={onPress}
+        onLongPress={onLongPress}
+        style={({ pressed }) => handlePressStyle(pressed)}
+      >
+        <Animated.View style={boxAnimation}>
+          <AnimatedWrapper
+            color={color}
+            isAnimation={isAnimation}
+            elevationLevel={elevationLevel}
+            style={props.style}
+          >
+            {props.children}
+          </AnimatedWrapper>
+        </Animated.View>
+      </Pressable>
+    </View>
   );
 }
 
