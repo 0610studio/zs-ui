@@ -128,13 +128,20 @@ function LayoutExample(): React.JSX.Element {
 
       <TitleCard title='ZSPressable'>
         <ZSPressable
-          style={[styles.sleekStyle, { backgroundColor: background.neutral }]}
-          onPress={useCallback(() => {
-            console.log('ZSPressable onPress');
-          }, [])}
+          style={styles.buttonStyle}
           fullWidth
+          onPress={useCallback(() => { console.log('ZSPressable onPress'); }, [])}
         >
-          <ZSText typo="subTitle.1">ZSPressable 버튼</ZSText>
+          <ZSText typo="subTitle.1" color='information.50'>FullWidth 버튼</ZSText>
+        </ZSPressable>
+        <ZSPressable style={styles.buttonStyle} color='primary'>
+          <ZSText typo="subTitle.1">버튼1</ZSText>
+        </ZSPressable>
+        <ZSPressable style={styles.buttonStyle} color='danger.40'>
+          <ZSText typo="heading.3">버튼2</ZSText>
+        </ZSPressable>
+        <ZSPressable style={styles.buttonStyle} color='neutral'>
+          <ZSText typo="heading.1">버튼3</ZSText>
         </ZSPressable>
       </TitleCard>
 
@@ -186,13 +193,11 @@ const createStyles = ({
       paddingHorizontal: 15,
       paddingBottom: 90,
     },
-    sleekStyle: {
-      width: '100%',
-      paddingVertical: 20,
-      paddingHorizontal: 10,
+    buttonStyle: {
+      padding: 12,
       justifyContent: 'center',
       alignItems: 'center',
-      borderRadius: 20,
+      borderRadius: 10,
     },
   });
 
