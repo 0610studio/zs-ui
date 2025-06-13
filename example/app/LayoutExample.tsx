@@ -153,8 +153,21 @@ function LayoutExample(): React.JSX.Element {
             { value: '이메일로 받고싶어요.', index: 'email' },
           ]}
           value={responseType}
-          onSelect={setResponseType} // 콜백 단축
+          onSelect={setResponseType}
           fullWidth
+        />
+      </TitleCard>
+
+      <TitleCard title='ZSRadioGroup Grid'>
+        <ZSRadioGroup
+          options={[
+            { value: '답변이 필요없어요.', index: 'none' },
+            { value: '앱 알림으로 받고싶어요.', index: 'app' },
+            { value: '이메일로 받고싶어요.', index: 'email' },
+          ]}
+          value={responseType}
+          onSelect={setResponseType}
+          rowCount={2}
         />
       </TitleCard>
 
