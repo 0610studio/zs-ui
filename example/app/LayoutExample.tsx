@@ -1,8 +1,9 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme, ErrorComponent } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
-import type { RadioOption } from 'zs-ui';
+import type { RadioOption, Theme } from 'zs-ui';
+import { useStyleSheetCreate } from 'zs-ui/model';
 
 function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
@@ -11,8 +12,8 @@ function LayoutExample(): React.JSX.Element {
   const [memo, setMemo] = useState<string>('');
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
   const [responseType, setResponseType] = useState<RadioOption>();
-  const { palette: { background, primary, text, danger } } = useTheme();
-  const styles = useMemo(() => createStyles({ background }), [background]);
+  const { palette } = useTheme();
+  const styles = useStyleSheetCreate(createStyles);
 
   const handleSubmit = useCallback(
     async () => {
@@ -44,7 +45,7 @@ function LayoutExample(): React.JSX.Element {
             console.log('ZSBottomButton primaryOnPress');
           }, [])}
           secondaryButtonStyle={{
-            backgroundColor: background.neutral,
+            backgroundColor: palette.background.neutral,
           }}
           secondaryLabelComponent={
             <ZSText typo='subTitle.3'>2번 버튼</ZSText>
@@ -77,7 +78,7 @@ function LayoutExample(): React.JSX.Element {
 
         <ErrorComponent
           errorMessage='에러메시지'
-          errorColor={danger.main}
+          errorColor={palette.danger.main}
         />
       </TitleCard>
 
@@ -86,13 +87,13 @@ function LayoutExample(): React.JSX.Element {
           boxStyle="underline"
           label="닉네임"
           value={nick}
-          inputBgColor={background.base}
-          labelBgColor={background.base}
-          focusColor={primary.darker}
+          inputBgColor={palette.background.base}
+          labelBgColor={palette.background.base}
+          focusColor={palette.primary.darker}
           onChangeText={setNick}
           textInputProps={{
             multiline: false,
-            style: { color: text.primary },
+            style: { color: palette.text.primary },
           }}
           status={nick ? 'default' : 'error'}
           errorMessage='닉네임을 입력해주세요'
@@ -175,7 +176,7 @@ function LayoutExample(): React.JSX.Element {
       <TitleCard title='ThrottleButton'>
         <ThrottleButton
           primaryButtonStyle={{
-            backgroundColor: primary.main,
+            backgroundColor: palette.primary.main,
             height: 55,
             overflow: 'hidden',
           }}
@@ -193,16 +194,11 @@ function LayoutExample(): React.JSX.Element {
   );
 }
 
-const createStyles = ({
-  background,
-}: {
-  background: any;
-}) =>
-  StyleSheet.create({
+const createStyles = (palette: Theme) => StyleSheet.create({
     container: {
       gap: 30,
       paddingTop: 40,
-      backgroundColor: background.layer2,
+      backgroundColor: palette.background.layer2,
       paddingHorizontal: 15,
       paddingBottom: 90,
     },

@@ -42,7 +42,6 @@ function ZSRadioGroup({
         flexDirection: fullWidth ? 'column' : 'row',
         flexWrap: fullWidth ? 'nowrap' : 'wrap',
         width: '100%',
-        marginHorizontal: fullWidth ? 0 : -5,
       }}
       {...containerStyle}
     >

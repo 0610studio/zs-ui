@@ -1,15 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
-import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, Palette, ZSTextField } from "zs-ui";
+import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, ZSTextField, Theme } from "zs-ui";
 import MyBottomSheet from "../src/ui/MyBottomSheet";
 import TitleCard from "../src/ui/TitleCard";
 import RenderPopOverMenu from "../src/ui/RenderPopOverMenu";
 import MyModal from "../src/ui/MyModal";
+import { useStyleSheetCreate } from "zs-ui/model";
 
 const OverlayExample = () => {
   const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay, showAboveKeyboard } = useOverlay();
   const { palette } = useTheme();
-  const styles = useMemo(() => createStyles(palette), [palette]);
+  const styles = useStyleSheetCreate(createStyles);
   const [testInput, setTestInput] = useState('');
 
   useEffect(() => {
@@ -136,7 +137,7 @@ const OverlayExample = () => {
 
 
 
-export const createStyles = (palette: Palette) => StyleSheet.create({
+const createStyles = (palette: Theme) => StyleSheet.create({
   container: {
     gap: 30,
     paddingTop: 40,
