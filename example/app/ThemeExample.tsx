@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Palette, ZSContainer, ZSText, ZSView, useTheme } from 'zs-ui';
+import { Theme, ZSContainer, ZSText, ZSView, useTheme } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
+import { useStyleSheetCreate } from 'zs-ui/model';
 
 export default function ThemeExample() {
   const { palette, elevation } = useTheme();
-  const styles = useMemo(() => createStyles(palette), [palette]);
+  const styles = useStyleSheetCreate(createStyles);
 
   return (
     <ZSContainer style={styles.container} edges={['bottom']}>
@@ -153,7 +154,7 @@ export default function ThemeExample() {
   );
 }
 
-export const createStyles = (palette: Palette) => StyleSheet.create({
+const createStyles = (palette: Theme) => StyleSheet.create({
   container: {
     gap: 30,
     paddingTop: 40,
