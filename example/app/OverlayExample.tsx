@@ -25,7 +25,10 @@ const OverlayExample = () => {
   }, [testInput]);
 
   return (
-    <ZSContainer style={styles.container} edges={["bottom"]}>
+    <ZSContainer
+      style={styles.container}
+      edges={["bottom"]}
+    >
       <TitleCard title="PopOverButton">
         <ZSView style={{ flex: 1, alignItems: "flex-end" }}>
           <PopOverButton
@@ -143,6 +146,7 @@ const createStyles = (palette: Theme) => StyleSheet.create({
     paddingTop: 40,
     backgroundColor: palette.background.layer2,
     paddingHorizontal: 15,
+    height: 1000,
   },
   popOverButtonContainer: {
     paddingRight: 10,

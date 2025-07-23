@@ -27,3 +27,5 @@ export const Z_INDEX_VALUE = {
     SNACKBAR: 8500,
     LOADING: 8999,
 };
+
+export const MAX_OVERLAY_WIDTH = 500;

@@ -1,6 +1,6 @@
 import { ThemeFonts, TypographyVariantsProps } from "./types";
 
-const baseSize = 1;
+const baseSize = 0;
 
 export default function typography({ themeFonts }: { themeFonts?: ThemeFonts }): TypographyVariantsProps {
     return {

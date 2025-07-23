@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useAlert } from '../../model/useOverlay';
@@ -8,9 +8,7 @@ import { ThemeBackground } from '../../theme';
 import { ZSText } from '../../ui';
 import ModalBackground from '../ui/ModalBackground';
 import ViewAtom from '../../ui/atoms/ViewAtom';
-import { Z_INDEX_VALUE } from '../../model/utils';
-
-const modalWidth = Dimensions.get('window').width - 60;
+import { MAX_OVERLAY_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 
 function AlertOverlay({
   actions,
@@ -26,8 +24,9 @@ function AlertOverlay({
   singleButtonTextStyle,
 }: ShowAlertProps) {
   const { alertVisible, setAlertVisible } = useAlert();
-  const { palette: { background, primary: primaryColor, modalBgColor } } = useTheme();
+  const { palette: { background, primary: primaryColor, modalBgColor }, dimensions: { width: windowWidth } } = useTheme();
   const styles = useMemo(() => createStyles({ background }), [background]);
+  const modalWidth = windowWidth - 60;
 
   const handleButtonPress = useCallback((onPressFunction?: () => void) => () => {
     if (onPressFunction) onPressFunction();
@@ -137,7 +136,7 @@ const createStyles = ({ background }: { background: ThemeBackground; }) =>
       paddingBottom: 18,
       paddingTop: 24,
       paddingHorizontal: 20,
-      maxWidth: 500,
+      maxWidth: MAX_OVERLAY_WIDTH,
     },
   });
 

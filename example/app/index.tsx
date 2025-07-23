@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Pressable, Button, ScrollView } from 'react-native';
+import { Text, StyleSheet, Pressable, Button } from 'react-native';
 import { useTheme, ZSContainer, ZSContainerRef } from 'zs-ui';
 import { router } from 'expo-router';
 import { useRef } from 'react';
@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#BB86FC',
     alignItems: 'center',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    width: '100%'
   },
   buttonText: {
     color: '#FFFFFF',
