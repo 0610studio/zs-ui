@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StatusBar, StyleSheet } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
@@ -7,21 +7,19 @@ import { ZSView } from '../../ui';
 import { useTheme } from '../../model';
 import { Z_INDEX_VALUE } from '../../model/utils';
 
-const { width, height } = Dimensions.get('window');
-
 function Modality({
   modalityComponent,
 }: {
   modalityComponent?: React.ReactNode;
 }) {
-  const { palette } = useTheme();
+  const { palette, dimensions: { height: windowHeight } } = useTheme();
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useModality();
   const insets = useSafeAreaInsets();
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);
   const backBorderRadius = useSharedValue(0);
-  const mainTranslateY = useSharedValue(height);
+  const mainTranslateY = useSharedValue(windowHeight);
   const backgroundOpacity = useSharedValue(1);
   const overrideMargin = 10;
   const mainScreenMargin = insets.top;
@@ -42,7 +40,7 @@ function Modality({
       backScale.value = withTiming(1, { duration: 100 });
       backTranslateY.value = withTiming(0, { duration: 100 });
       backBorderRadius.value = withTiming(0, { duration: 100 });
-      mainTranslateY.value = withTiming(height, { duration: 200 });
+      mainTranslateY.value = withTiming(windowHeight, { duration: 200 });
       backgroundOpacity.value = withTiming(0, { duration: 300 });
       setTimeout(() => {
         setLocalVisible(false);
@@ -94,7 +92,7 @@ function Modality({
           exiting={FadeOut.duration(300)}
           style={[
             styles.backScreen,
-            { backgroundColor: palette.background.layer2 },
+            { backgroundColor: palette.background.layer2, width: '100%', height: windowHeight },
             backScreenAnimatedStyle
           ]}
         />
@@ -102,15 +100,16 @@ function Modality({
         <Animated.View
           style={[
             {
-              height: height - mainScreenMargin,
+              height: windowHeight - mainScreenMargin,
               paddingBottom: mainScrrenPadding,
-              backgroundColor: palette.background.base
+              backgroundColor: palette.background.base,
+              width: '100%'
             },
             styles.mainScreen,
             mainScreenAnimatedStyle
           ]}
         >
-          <ZSView style={styles.contents}>
+          <ZSView style={[styles.contents, { width: '100%' }]}>
             {modalityComponent}
           </ZSView>
         </Animated.View>
@@ -121,7 +120,6 @@ function Modality({
 const styles = StyleSheet.create({
   contents: {
     flex: 1,
-    width: width,
     paddingTop: 10,
     zIndex: Z_INDEX_VALUE.MODAL4,
   },
@@ -131,14 +129,11 @@ const styles = StyleSheet.create({
   },
   backScreen: {
     position: 'absolute',
-    width,
-    height,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: Z_INDEX_VALUE.MODAL2,
   },
   mainScreen: {
-    width,
     position: 'absolute',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,

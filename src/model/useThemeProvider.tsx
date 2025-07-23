@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
-import { Platform, useColorScheme } from 'react-native';
+import { Dimensions, Platform, ScaledSize, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as NavigationBar from 'expo-navigation-bar';
 import palette from '../theme/palette';
@@ -11,12 +11,23 @@ export interface ThemeProviderProps {
   themeFonts?: ThemeFonts;
   children: React.ReactNode;
   isDarkModeEnabled?: boolean;
+  splitBreakpoint?: number;
+  splitRatio?: number;
+  isSplitView?: boolean;
 }
 
+/**
+ * ThemeProvider
+ * @property splitRatio 분할 레이아웃의 화면 분할 비율 (기본값: 0.5)
+ */
 export interface ThemeProps {
   palette: Palette;
   typography: TypographyVariantsProps;
   elevation: ElevationStyles;
+  splitBreakpoint: number;
+  splitRatio: number;
+  dimensions: ScaledSize;
+  isSplitView: boolean;
 }
 
 export interface Palette extends Theme {
@@ -36,10 +47,20 @@ export const useTheme = () => {
   return context;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, splitBreakpoint = 700, splitRatio = 0.5, isSplitView = false }) => {
   const systemColorScheme = useColorScheme(); // 시스템 다크 모드 감지
   const [isUsingSystemColorScheme, setUseSystemColorScheme] = useState(isDarkModeEnabled ? true : false);
   const [mode, setMode] = useState<'light' | 'dark'>(isDarkModeEnabled ? (systemColorScheme === 'dark' ? 'dark' : 'light') : 'light');
+  const [dimensions, setDimensions] = useState(Dimensions.get('window'));
+
+  // 화면 크기 변경 감지
+  useEffect(() => {
+    const onChange = ({ window }) => {
+      setDimensions(window);
+    };
+    const subscription = Dimensions.addEventListener('change', onChange);
+    return () => subscription.remove();
+  }, []);
 
   // AsyncStorage에서 시스템 모드 사용 설정 값 로드
   useEffect(() => {
@@ -107,6 +128,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   }, []);
 
   const themeValue = useMemo(() => ({
+    isSplitView,
+    dimensions,
+    splitBreakpoint,
+    splitRatio,
     palette: {
       isUsingSystemColorScheme,
       setUseSystemColorScheme: handleSetUseSystemColorScheme,

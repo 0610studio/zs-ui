@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
-import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme, ErrorComponent } from 'zs-ui';
+import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme, ErrorComponent, ZSView } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { RadioOption, Theme } from 'zs-ui';
 import { useStyleSheetCreate } from 'zs-ui/model';
@@ -195,19 +195,19 @@ function LayoutExample(): React.JSX.Element {
 }
 
 const createStyles = (palette: Theme) => StyleSheet.create({
-    container: {
-      gap: 30,
-      paddingTop: 40,
-      backgroundColor: palette.background.layer2,
-      paddingHorizontal: 15,
-      paddingBottom: 90,
-    },
-    buttonStyle: {
-      padding: 12,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderRadius: 10,
-    },
-  });
+  container: {
+    gap: 30,
+    paddingTop: 40,
+    backgroundColor: palette.background.layer2,
+    paddingHorizontal: 15,
+    paddingBottom: 90,
+  },
+  buttonStyle: {
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+});
 
 export default LayoutExample;

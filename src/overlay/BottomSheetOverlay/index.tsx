@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Dimensions, StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
+import { StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
-import { Z_INDEX_VALUE } from '../../model/utils';
-
-const { width, height: windowHeight } = Dimensions.get('window');
+import { MAX_OVERLAY_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 
 function BottomSheetOverlay({
   headerComponent,
@@ -21,13 +19,13 @@ function BottomSheetOverlay({
     marginBottom = 10,
     padding = 14,
   } = options;
+  const { palette, dimensions: { width: windowWidth, height: windowHeight } } = useTheme();
   const { bottomSheetVisible, setBottomSheetVisible, height } = useBottomSheet();
   // 화면의 크기보다 높이가 높으면 화면의 크기로 제한
   const maxHeight = Math.min((windowHeight - 30 - (initialWindowMetrics?.insets.bottom || 0) - (initialWindowMetrics?.insets.top || 0)), height);
   const translateY = useSharedValue(maxHeight);
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
-  const { palette } = useTheme();
   const { bottom } = useSafeAreaInsets();
   const startX = useRef(0);
   const startY = useRef(0);
@@ -137,7 +135,7 @@ function BottomSheetOverlay({
           style={[
             styles.container,
             {
-              width: width - marginHorizontal * 2,
+              width: windowWidth - marginHorizontal * 2,
               height: maxHeight,
               marginHorizontal,
               bottom: marginBottom + bottom,
@@ -172,7 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     overflow: 'hidden',
     zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,
-    maxWidth: 600,
+    maxWidth: MAX_OVERLAY_WIDTH,
   },
   pressableView: {
     width: '100%',

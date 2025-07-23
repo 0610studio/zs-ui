@@ -1,7 +1,6 @@
 import ZSView from './ZSView';
 import AnimatedWrapper from './atoms/AnimatedWrapper';
 import TextAtom from './atoms/TextAtom';
-import ScrollViewAtom from './atoms/ScrollViewAtom';
 import ZSContainer from './ZSContainer';
 import ZSPressable from './ZSPressable';
 import ZSText from './ZSText';
@@ -15,7 +14,6 @@ export {
   ZSView,
   AnimatedWrapper,
   TextAtom,
-  ScrollViewAtom,
   ZSContainer,
   ZSPressable,
   ZSText,

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, LayoutChangeEvent, Pressable } from "react-native";
+import { LayoutChangeEvent, Pressable } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { usePopOver } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
@@ -7,20 +7,17 @@ import { PopOverMenuProps } from "../../model/types";
 import { useTheme } from "../../model";
 import { Z_INDEX_VALUE } from "../../model/utils";
 
-const WINDOW_HEIGHT = Dimensions.get('window').height;
-const WINDOW_WIDTH = Dimensions.get('window').width;
-
 function PopOverMenu({
   px,
   py,
   component
 }: PopOverMenuProps): JSX.Element | null {
+  const { palette, dimensions: { width: windowWidth, height: windowHeight } } = useTheme();
   const [isContentVisible, setIsContentVisible] = useState<boolean>(false);
   const [contentWidth, setContentWidth] = useState<number>(0);
   const [contentHeight, setContentHeight] = useState<number>(0);
   const { popOverVisible, setPopOverVisible } = usePopOver();
   const timerRef = useRef<number | null>(null);
-  const { palette } = useTheme();
 
   useEffect(() => {
     if (popOverVisible) {
@@ -52,15 +49,15 @@ function PopOverMenu({
     let adjustedY = py;
 
     // 수평 방향 조정
-    if (px + contentWidth > WINDOW_WIDTH) {
-      adjustedX = WINDOW_WIDTH - contentWidth - 10; // 10px 여백
+    if (px + contentWidth > windowWidth) {
+      adjustedX = windowWidth - contentWidth - 10; // 10px 여백
     }
     if (adjustedX < 0) {
       adjustedX = 10; // 최소 10px 여백
     }
 
     // 수직 방향 조정
-    if (py + contentHeight > WINDOW_HEIGHT) {
+    if (py + contentHeight > windowHeight) {
       adjustedY = py - contentHeight; // 위쪽으로 표시
     }
     if (adjustedY < 0) {
@@ -79,7 +76,7 @@ function PopOverMenu({
       zIndex={Z_INDEX_VALUE.POPOVER}
       key={popOverVisible ? 'visiblepo' : 'hiddenpo'}
       modalBgColor={palette.modalBgColor}
-      isCenter={false}
+      position='pop'
       onPress={() => setPopOverVisible(false)}
     >
       {isContentVisible && (
