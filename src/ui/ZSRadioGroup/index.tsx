@@ -14,9 +14,8 @@ function ZSRadioGroup({
   containerStyle,
   valueStyle,
   disabled = false,
-  fullWidth = false,
   selectStyle,
-  rowCount,
+  rowCount = 1,
 }: {
   options: RadioOption[];
   value?: RadioOption;
@@ -25,10 +24,10 @@ function ZSRadioGroup({
   valueStyle?: ZSTextProps;
   selectStyle?: ZSTextProps;
   disabled?: boolean;
-  fullWidth?: boolean;
-  rowCount?: 2 | 3;
+  rowCount?: 1 | 2 | 3;
 }) {
   const { palette } = useTheme();
+  const isFullWidth = rowCount === 1;
 
   const handleSelect = useCallback((option: RadioOption) => {
     if (!disabled) {
@@ -39,8 +38,8 @@ function ZSRadioGroup({
   return (
     <ViewAtom
       style={{
-        flexDirection: fullWidth ? 'column' : 'row',
-        flexWrap: fullWidth ? 'nowrap' : 'wrap',
+        flexDirection: isFullWidth ? 'column' : 'row',
+        flexWrap: isFullWidth ? 'nowrap' : 'wrap',
         width: '100%',
       }}
       {...containerStyle}
@@ -49,15 +48,20 @@ function ZSRadioGroup({
         const isSelected = value?.index === option.index;
         const setColor = isSelected ? palette.primary.light : palette.background.neutral;
 
+        const colCount = rowCount;
+        const isLastCol = (index + 1) % colCount === 0;
+        const isLastRow = Math.ceil((index + 1) / colCount) === Math.ceil(options.length / colCount);
+
         return (
-          <ViewAtom key={option.index} style={{ 
-            width: rowCount === 2 
-              ? '50%' 
-              : rowCount === 3 
-                ? '33.33%' 
+          <ViewAtom key={option.index} style={{
+            width: rowCount === 2
+              ? '50%'
+              : rowCount === 3
+                ? '33.33%'
                 : '100%',
-            paddingHorizontal: 5,
-            paddingBottom: index === options.length - 1 ? 0 : 10,
+            paddingRight: isFullWidth ? 0 : isLastCol ? 0 : 3,
+            paddingLeft: isFullWidth ? 0 : isLastCol ? 3 : 0,
+            paddingBottom: isLastRow ? 0 : 10,
           }}>
             <ZSPressable
               onPress={() => handleSelect(option)}
@@ -72,13 +76,13 @@ function ZSRadioGroup({
                   borderWidth: 1,
                   paddingLeft: 10,
                   paddingRight: 15,
-                  borderRadius: 26,
+                  borderRadius: 100,
                   borderColor: setColor,
                   backgroundColor: isSelected ? palette.background.layer1 : 'transparent',
                 }}
               >
                 {/* fullWidth가 false일 때 동그라미 체크박스 표시 */}
-                {!fullWidth && (
+                {!(isFullWidth) && (
                   <ViewAtom
                     style={{
                       width: 20,
@@ -101,12 +105,12 @@ function ZSRadioGroup({
                   </ViewAtom>
                 )}
                 {/* 옵션 텍스트 표시 */}
-                <ZSText style={{ paddingHorizontal: 10 }} {...valueStyle}>
+                <ZSText style={{ paddingLeft: 10, paddingRight: 12 }} {...valueStyle}>
                   {option.value}
                 </ZSText>
 
                 {/* fullWidth가 true일 때 우측에 선택 버튼 표시 */}
-                {fullWidth && (
+                {isFullWidth && (
                   <ViewAtom style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <ViewAtom
                       style={{
@@ -114,7 +118,7 @@ function ZSRadioGroup({
                           ? palette.primary.main
                           : palette.background.layer2,
                         paddingHorizontal: 10,
-                        borderRadius: 50,
+                        borderRadius: 100,
                         minWidth: 42,
                         minHeight: 24,
                         justifyContent: 'center',

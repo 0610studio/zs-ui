@@ -155,7 +155,6 @@ function LayoutExample(): React.JSX.Element {
           ]}
           value={responseType}
           onSelect={setResponseType}
-          fullWidth
         />
       </TitleCard>
 
