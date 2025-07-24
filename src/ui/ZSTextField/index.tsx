@@ -88,7 +88,7 @@ function ZSTextField({
     const labelFontSize = interpolate(
       labelAnimationValue.value,
       [0, 1],
-      [fontSize + (boxStyle === 'inbox' ? 2 : 0), boxStyle === 'inbox' ? 11 : 12],
+      [fontSize + (boxStyle === 'inbox' ? 1 : 0), boxStyle === 'inbox' ? 10 : 11],
       'clamp'
     );
 
@@ -97,7 +97,7 @@ function ZSTextField({
       [0, 1],
       [
         isTextArea ? 12 : 0,
-        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + (boxStyle === 'inbox' ? 17 : 0),
+        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + (boxStyle === 'inbox' ? 17 : 2),
       ],
       'clamp'
     );
