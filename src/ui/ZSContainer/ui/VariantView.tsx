@@ -24,8 +24,8 @@ export default function VariantView({ children, scrollViewDisabled, style, scrol
     ) : (
       <ScrollView
         ref={scrollViewRef}
-        style={{ width: variantWidth, paddingBottom: keyboardHeight || 0 }}
-        contentContainerStyle={styles.scrollContainerStyle}
+        style={{ width: variantWidth }}
+        contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: keyboardHeight || 0 }]}
         bounces={false}
         overScrollMode="never"
         showsVerticalScrollIndicator={showsVerticalScrollIndicator}

@@ -78,7 +78,7 @@ function ZSBottomButton({
     const getBottom = interpolate(
       isKeyboardVisible.value,
       [0, 1],
-      [DEFAULT_MARGIN_BOTTOM, Platform.OS === 'ios' ? keyboardHeight.value : 0],
+      [DEFAULT_MARGIN_BOTTOM, keyboardHeight.value],
       'clamp',
     );
 
