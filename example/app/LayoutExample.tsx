@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSBottomButton, useTheme, ErrorComponent, ZSView } from 'zs-ui';
+import { StyleSheet, View } from 'react-native';
+import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, useTheme, ErrorComponent } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { RadioOption, Theme } from 'zs-ui';
 import { useStyleSheetCreate } from 'zs-ui/model';
-import AboveKeyboard from 'zs-ui/overlay/AboveKeyboard';
 import { ZSBottomCta } from 'zs-ui/ui';
 
 function LayoutExample(): React.JSX.Element {
@@ -12,7 +11,6 @@ function LayoutExample(): React.JSX.Element {
   const [email, setEmail] = useState<string>('');
   const [userId, serUserId] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
-  const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
   const [responseType, setResponseType] = useState<RadioOption>();
   const { palette } = useTheme();
   const styles = useStyleSheetCreate(createStyles);
@@ -39,28 +37,6 @@ function LayoutExample(): React.JSX.Element {
             <View style={{ backgroundColor: 'red', height: 100, width: '100%' }}></View>
           )}
         />
-        // <ZSBottomButton
-        //   disabled={buttonDisabled}
-        //   loadingComponent={<ActivityIndicator color="white" />}
-        //   primaryButtonStyle={{ backgroundColor: buttonDisabled ? '#ff5555' : '#5555ff' }}
-        //   primaryLabelComponent={
-        //     <ZSText typo='subTitle.1' color='white'>
-        //       키보드가 올라오면 늘어나요
-        //     </ZSText>
-        //   }
-        //   primaryOnPress={useCallback(async () => {
-        //     console.log('ZSBottomButton primaryOnPress');
-        //   }, [])}
-        //   secondaryButtonStyle={{
-        //     backgroundColor: palette.background.neutral,
-        //   }}
-        //   secondaryLabelComponent={
-        //     <ZSText typo='subTitle.3'>2번 버튼</ZSText>
-        //   }
-        //   secondaryOnPress={useCallback(() => {
-        //     console.log('건너뛰기 버튼 클릭');
-        //   }, [])}
-        // />
       }
     >
       <TitleCard title='ZSText'>

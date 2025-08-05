@@ -14,7 +14,6 @@ import {
   ThrottleButton,
   ZSTextField,
   ZSRadioGroup,
-  ZSBottomButton,
 } from './ui';
 
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
@@ -43,7 +42,6 @@ export {
   ThrottleButton,
   ZSTextField,
   ZSRadioGroup,
-  ZSBottomButton,
   ErrorComponent,
   // ---
   AlertOverlay,
