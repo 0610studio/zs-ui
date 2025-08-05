@@ -2,28 +2,29 @@ import { styles } from '..';
 import { ScrollView, NativeSyntheticEvent, NativeScrollEvent, View, DimensionValue, StyleProp, ViewStyle } from 'react-native';
 
 interface VariantViewProps {
-    children: React.ReactNode;
-    scrollViewDisabled?: boolean;
-    style: StyleProp<ViewStyle>;
-    scrollViewRef?: React.RefObject<ScrollView>;
-    variantWidth?: DimensionValue;
-    showsVerticalScrollIndicator?: boolean;
-    automaticallyAdjustKeyboardInsets?: boolean;
-    handleScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
-    handleTouch?: (event: any) => void;
-    scrollEventThrottle?: number;
+  children: React.ReactNode;
+  scrollViewDisabled?: boolean;
+  style: StyleProp<ViewStyle>;
+  scrollViewRef?: React.RefObject<ScrollView>;
+  variantWidth?: DimensionValue;
+  showsVerticalScrollIndicator?: boolean;
+  automaticallyAdjustKeyboardInsets?: boolean;
+  handleScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  handleTouch?: (event: any) => void;
+  scrollEventThrottle?: number;
+  keyboardHeight?: number;
 }
 
-export default function VariantView({ children, scrollViewDisabled, style, scrollViewRef, variantWidth, showsVerticalScrollIndicator, automaticallyAdjustKeyboardInsets, handleScroll, handleTouch, scrollEventThrottle }: VariantViewProps) {
+export default function VariantView({ children, scrollViewDisabled, style, scrollViewRef, variantWidth, showsVerticalScrollIndicator, automaticallyAdjustKeyboardInsets, handleScroll, handleTouch, scrollEventThrottle, keyboardHeight }: VariantViewProps) {
   return (
     scrollViewDisabled ? (
-      <View style={[ style, { width: variantWidth }]}>
+      <View style={[style, { width: variantWidth }]}>
         {children}
       </View>
     ) : (
       <ScrollView
         ref={scrollViewRef}
-        style={{ width: variantWidth }}
+        style={{ width: variantWidth, paddingBottom: keyboardHeight || 0 }}
         contentContainerStyle={styles.scrollContainerStyle}
         bounces={false}
         overScrollMode="never"
