@@ -5,10 +5,10 @@ import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useAlert } from '../../model/useOverlay';
 import { useTheme } from '../../model/useThemeProvider';
 import { ThemeBackground } from '../../theme';
-import { ZSText } from '../../ui';
 import ModalBackground from '../ui/ModalBackground';
 import ViewAtom from '../../ui/atoms/ViewAtom';
 import { MAX_OVERLAY_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import ZSText from '../../ui/ZSText';
 
 function AlertOverlay({
   actions,

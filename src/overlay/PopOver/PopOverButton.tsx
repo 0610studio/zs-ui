@@ -1,7 +1,7 @@
 import React, { useRef, useCallback } from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
 import { useOverlay } from '../../model/useOverlay';
-import { ZSPressable } from '../../ui';
+import ZSPressable from '../../ui/ZSPressable';
 
 interface PopOverButtonProps extends ViewProps {
   width: number;

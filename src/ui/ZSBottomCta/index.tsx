@@ -20,11 +20,13 @@ function ZSBottomCta({
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
-      setBottomValue(Platform.OS === 'ios' ? event.endCoordinates.height : 0)
+      setBottomValue(event.endCoordinates.height)
       setIsKeyboardVisible(true);
     });
 
     const keyboardHideSubscription = Keyboard.addListener(hideEvent, () => {
+      setBottomValue(0);
+      setIsKeyboardVisible(false);
     });
 
     return () => {
