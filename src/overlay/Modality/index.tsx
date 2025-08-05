@@ -3,9 +3,9 @@ import { StatusBar, StyleSheet } from 'react-native';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
-import { ZSView } from '../../ui';
 import { useTheme } from '../../model';
 import { Z_INDEX_VALUE } from '../../model/utils';
+import ZSView from '../../ui/ZSView';
 
 function Modality({
   modalityComponent,

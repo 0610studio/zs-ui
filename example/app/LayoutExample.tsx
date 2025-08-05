@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, useTheme, ErrorComponent } from 'zs-ui';
+import { ZSRadioGroup, ZSTextField, ThrottleButton, ZSText, ZSContainer, ZSPressable, useTheme, ErrorComponent, ZSBottomCta } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { RadioOption, Theme } from 'zs-ui';
 import { useStyleSheetCreate } from 'zs-ui/model';
-import { ZSBottomCta } from 'zs-ui/ui';
 
 function LayoutExample(): React.JSX.Element {
   const [nick, setNick] = useState<string>('');
@@ -31,13 +30,6 @@ function LayoutExample(): React.JSX.Element {
       edges={['bottom']}
       keyboardScrollExtraOffset={130}
       style={styles.container}
-      bottomComponent={
-        <ZSBottomCta
-          render={() => (
-            <View style={{ backgroundColor: 'red', height: 100, width: '100%' }}></View>
-          )}
-        />
-      }
     >
       <TitleCard title='ZSText'>
         <ZSText typo="heading.1">heading.1</ZSText>
