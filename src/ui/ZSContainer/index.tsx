@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
-import { ViewProps, KeyboardAvoidingView, StatusBar, StyleSheet, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View, DimensionValue } from 'react-native';
+import { ViewProps, StatusBar, StyleSheet, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View, DimensionValue, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../model/useThemeProvider';
 import VariantView from './ui/VariantView';
@@ -16,8 +16,6 @@ export type ZSContainerProps = ViewProps & {
   rightComponent?: ReactNode;
   showsVerticalScrollIndicator?: boolean;
   loadingComponent?: React.ReactNode;
-  keyboardVerticalOffset?: number;
-  behavior?: 'padding' | 'height' | 'position';
   automaticallyAdjustKeyboardInsets?: boolean;
   keyboardScrollExtraOffset?: number;
   translucent?: boolean;
@@ -40,8 +38,6 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     rightComponent,
     showsVerticalScrollIndicator = true,
     loadingComponent = <ActivityIndicator />,
-    keyboardVerticalOffset,
-    behavior,
     automaticallyAdjustKeyboardInsets = true,
     keyboardScrollExtraOffset,
     translucent,
@@ -52,6 +48,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 ) {
   const { palette, splitBreakpoint, splitRatio, dimensions: { height: windowHeight, width: windowWidth }, isSplitView } = useTheme();
   const [isDelayed, setIsDelayed] = useState(true);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const positionRef = useRef<number | null>(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastTouchY = useRef<number | null>(0);
@@ -66,8 +63,13 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     return () => clearTimeout(timer);
   }, []);
 
+
   useEffect(() => {
-    const keyboardShowSubscription = Keyboard.addListener('keyboardDidShow', (e) => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const keyboardShowSubscription = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
       if (scrollViewRef.current && keyboardScrollExtraOffset) {
         const screenHeight = windowHeight;
         const keyboardHeight = e.endCoordinates.height;
@@ -77,19 +79,26 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
         // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
         const currentScrollPosition = positionRef.current || 0;
         const touchPosition = lastTouchY.current || 0;
-
         const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
-        scrollViewRef.current.scrollTo({
-          y: currentScrollPosition + scrollOffset,
-          animated: true,
-        });
+
+        setTimeout(() => {
+          scrollViewRef.current?.scrollTo({
+            y: currentScrollPosition + scrollOffset,
+            animated: true,
+          });
+        }, 150);
       }
+    });
+
+    const keyboardHideSubscription = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
     });
 
     return () => {
       positionRef.current = null;
       lastTouchY.current = null;
       keyboardShowSubscription.remove();
+      keyboardHideSubscription.remove();
     };
   }, [keyboardScrollExtraOffset]);
 
@@ -123,6 +132,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
           scrollEventThrottle={scrollEventThrottle}
           handleScroll={handleScroll}
           handleTouch={handleTouch}
+          keyboardHeight={keyboardHeight}
         />
 
         {/* 폴드/태블릿 화면 오른쪽 컴포넌트 */}
@@ -151,15 +161,13 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       edges={edges}
     >
       {!isDelayed && (
-        <KeyboardAvoidingView
+        <View
           style={[styles.flex1, { width: '100%' }]}
-          behavior={behavior}
-          keyboardVerticalOffset={keyboardVerticalOffset}
         >
           {topComponent && topComponent}
           {renderContent()}
           {!isLoader && bottomComponent && bottomComponent}
-        </KeyboardAvoidingView>
+        </View>
       )}
 
       {

@@ -22,11 +22,16 @@ const OverlayExample = () => {
         </View>
       ),
     });
+
+    return () => {
+      hideOverlay('aboveKeyboard');
+    };
   }, [testInput]);
 
   return (
     <ZSContainer
       style={styles.container}
+      keyboardScrollExtraOffset={130}
       edges={["bottom"]}
     >
       <TitleCard title="PopOverButton">
@@ -146,7 +151,6 @@ const createStyles = (palette: Theme) => StyleSheet.create({
     paddingTop: 40,
     backgroundColor: palette.background.layer2,
     paddingHorizontal: 15,
-    height: 1000,
   },
   popOverButtonContainer: {
     paddingRight: 10,

@@ -1,6 +1,6 @@
 {
   "name": "@0610studio/zs-ui",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": false,
   "description": "EXPO ZS-UI",
   "type": "module",
@@ -49,11 +49,37 @@
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "*",
-    "expo": "*",
+    "expo": ">=52.0.0",
     "react": "*",
-    "react-native": "*",
-    "react-native-reanimated": "*",
+    "react-native": ">=0.76.0",
+    "react-native-reanimated": "^3.0.0",
     "react-native-safe-area-context": "*",
     "react-native-svg": "*"
+  },
+  "peerDependenciesMeta": {
+    "@react-native-async-storage/async-storage": {
+      "optional": false
+    },
+    "expo": {
+      "optional": false
+    },
+    "react": {
+      "optional": false
+    },
+    "react-native": {
+      "optional": false
+    },
+    "react-native-reanimated": {
+      "optional": false
+    },
+    "react-native-safe-area-context": {
+      "optional": false
+    },
+    "react-native-svg": {
+      "optional": false
+    }
+  },
+  "installConfig": {
+    "hoistingLimits": "workspaces"
   }
 }
