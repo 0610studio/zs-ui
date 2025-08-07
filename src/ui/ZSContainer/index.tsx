@@ -104,23 +104,31 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     >
       <View style={styles.flex1}>
         {topComponent && topComponent}
-        <ScrollView
-          ref={scrollViewRef}
-          style={styles.flex1}
-          contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: Platform.OS === 'ios' ? keyboardHeight || 0 : 0 }]}
-          bounces={false}
-          overScrollMode="never"
-          showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets={false}
-          onScroll={handleScroll}
-          onTouchStart={handleTouch}
-          scrollEventThrottle={scrollEventThrottle}
-        >
-          <View style={[styles.flex1, props.style]}>
-            {props.children}
-          </View>
-        </ScrollView>
+        {
+          scrollViewDisabled ? (
+            <View style={styles.flex1}>
+              {props.children}
+            </View>
+          ) : (
+            <ScrollView
+              ref={scrollViewRef}
+              style={styles.flex1}
+              contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: Platform.OS === 'ios' ? keyboardHeight || 0 : 0 }]}
+              bounces={false}
+              overScrollMode="never"
+              showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+              keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets={false}
+              onScroll={handleScroll}
+              onTouchStart={handleTouch}
+              scrollEventThrottle={scrollEventThrottle}
+            >
+              <View style={[styles.flex1, props.style]}>
+                {props.children}
+              </View>
+            </ScrollView>
+          )
+        }
         {bottomComponent && bottomComponent}
       </View>
 
