@@ -11,23 +11,21 @@ ZS-ui는 JavaScript만으로 구현된 Expo용 UI 컴포넌트 라이브러리�
 
 <br />
 
-### 설치
+## 설치
 
 ```bash
-npx expo install @react-native-async-storage/async-storage react-native-reanimated react-native-svg react-native-safe-area-context
-
 npx expo install @0610studio/zs-ui
 ```
 
 <br />
 
-### 사용법
+## 사용법
 
 사용법은 [문서](https://0610studio.github.io/zs-ui/docs/intro)를 확인해주세요.
 
 <br />
 
-### TODO
+## TODO
 
 - [ ] 폴더블 폰에서 접힘/펼침 상태 변경으로 인해 액티비티가 재시작되었을 때, `Dimensions.get('window')`가 이전 값을 반환하고 onChange가 호출되지 않는 문제
 
