@@ -25,7 +25,7 @@ export default function VariantView({ children, scrollViewDisabled, style, scrol
       <ScrollView
         ref={scrollViewRef}
         style={{ width: variantWidth }}
-        contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: keyboardHeight || 0 }]}
+        // contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: keyboardHeight || 0 }]}
         bounces={false}
         overScrollMode="never"
         showsVerticalScrollIndicator={showsVerticalScrollIndicator}
@@ -35,9 +35,9 @@ export default function VariantView({ children, scrollViewDisabled, style, scrol
         onTouchStart={handleTouch}
         scrollEventThrottle={scrollEventThrottle}
       >
-        <View style={[styles.splitView, style, { width: '100%' }]}>
+        {/* <View style={[styles.splitView, style, { width: '100%' }]}>
           {children}
-        </View>
+        </View> */}
       </ScrollView>
     )
   )

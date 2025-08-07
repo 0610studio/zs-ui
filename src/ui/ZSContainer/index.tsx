@@ -1,12 +1,10 @@
-import React, { ReactNode, useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
-import { ViewProps, StatusBar, StyleSheet, ActivityIndicator, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View, DimensionValue, Platform } from 'react-native';
+import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, useState } from 'react';
+import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../model/useThemeProvider';
-import VariantView from './ui/VariantView';
 
 export type ZSContainerProps = ViewProps & {
   backgroundColor?: string;
-  isLoader?: boolean;
   statusBarColor?: string;
   barStyle?: 'light-content' | 'dark-content';
   edges?: Array<'top' | 'right' | 'bottom' | 'left'>;
@@ -15,8 +13,6 @@ export type ZSContainerProps = ViewProps & {
   bottomComponent?: ReactNode;
   rightComponent?: ReactNode;
   showsVerticalScrollIndicator?: boolean;
-  loadingComponent?: React.ReactNode;
-  automaticallyAdjustKeyboardInsets?: boolean;
   keyboardScrollExtraOffset?: number;
   translucent?: boolean;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
@@ -28,7 +24,6 @@ export type ZSContainerRef = ScrollView;
 const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSContainer(
   {
     backgroundColor,
-    isLoader = false,
     statusBarColor,
     barStyle,
     edges = ['top', 'bottom'],
@@ -37,32 +32,20 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     bottomComponent,
     rightComponent,
     showsVerticalScrollIndicator = true,
-    loadingComponent = <ActivityIndicator />,
-    automaticallyAdjustKeyboardInsets = true,
-    keyboardScrollExtraOffset,
+    keyboardScrollExtraOffset = 30,
     translucent,
-    scrollEventThrottle = 100,
+    scrollEventThrottle = 16,
     ...props
   },
   forwardedRef
 ) {
-  const { palette, splitBreakpoint, splitRatio, dimensions: { height: windowHeight, width: windowWidth }, isSplitView } = useTheme();
-  const [isDelayed, setIsDelayed] = useState(true);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const { palette, dimensions: { height: windowHeight } } = useTheme();
   const positionRef = useRef<number | null>(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastTouchY = useRef<number | null>(0);
-  const splitEnabled = !!(isSplitView && (windowWidth >= splitBreakpoint) && rightComponent);
+  const [keyboardHeight, setKeyboardHeight] = useState<number | null>(0);
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsDelayed(false);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, []);
-
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -70,15 +53,18 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (e) => {
       setKeyboardHeight(e.endCoordinates.height);
-      if (scrollViewRef.current && keyboardScrollExtraOffset) {
+      if (scrollViewRef.current) {
         const screenHeight = windowHeight;
         const keyboardHeight = e.endCoordinates.height;
         const safeAreaBottom = 0;
         const availableScreenHeight = screenHeight - keyboardHeight - safeAreaBottom;
-
-        // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
         const currentScrollPosition = positionRef.current || 0;
         const touchPosition = lastTouchY.current || 0;
+
+        // touchPosition이 키보드 높이보다 아래인 경우
+        // const isTouchPositionBelowKeyboard = touchPosition > availableScreenHeight;
+
+        // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
         const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
 
         setTimeout(() => {
@@ -86,7 +72,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
             y: currentScrollPosition + scrollOffset,
             animated: true,
           });
-        }, 150);
+        }, 100);
       }
     });
 
@@ -104,71 +90,39 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (props.onScroll) props.onScroll(event);
-    if (keyboardScrollExtraOffset) positionRef.current = event.nativeEvent.contentOffset.y;
+    positionRef.current = event.nativeEvent.contentOffset.y;
   };
 
   const handleTouch = (evt: any) => {
-    if (keyboardScrollExtraOffset) lastTouchY.current = evt.nativeEvent.pageY;
-  };
-
-  const renderContent = () => {
-    if (isLoader) return loadingComponent;
-
-    const leftWidth = (splitEnabled ? `${splitRatio * 100}%` : '100%') as DimensionValue;
-    const rightWidth = `${(1 - splitRatio) * 100}%` as DimensionValue;
-
-    return (
-      <View style={styles.splitContainer}>
-
-        {/* 메인 컴포넌트 */}
-        <VariantView
-          style={props.style}
-          children={props.children}
-          scrollViewRef={scrollViewRef}
-          variantWidth={leftWidth}
-          showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-          automaticallyAdjustKeyboardInsets={automaticallyAdjustKeyboardInsets}
-          scrollViewDisabled={scrollViewDisabled}
-          scrollEventThrottle={scrollEventThrottle}
-          handleScroll={handleScroll}
-          handleTouch={handleTouch}
-          keyboardHeight={keyboardHeight}
-        />
-
-        {/* 폴드/태블릿 화면 오른쪽 컴포넌트 */}
-        {rightComponent && splitEnabled && (
-          <VariantView
-            style={styles.splitView}
-            children={rightComponent}
-            variantWidth={rightWidth}
-            showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-            automaticallyAdjustKeyboardInsets={automaticallyAdjustKeyboardInsets}
-            scrollViewDisabled={false}
-            scrollEventThrottle={scrollEventThrottle}
-          />
-        )}
-      </View>
-    );
+    lastTouchY.current = evt.nativeEvent.pageY;
   };
 
   return (
     <SafeAreaView
-      style={[
-        { backgroundColor: backgroundColor || palette.background.base },
-        styles.flex1,
-        { width: '100%' },
-      ]}
+      style={[{ backgroundColor: backgroundColor || palette.background.base }, styles.flex1]}
       edges={edges}
     >
-      {!isDelayed && (
-        <View
-          style={[styles.flex1, { width: '100%' }]}
+      <View style={styles.flex1}>
+        {topComponent && topComponent}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.flex1}
+          contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: Platform.OS === 'ios' ? keyboardHeight || 0 : 0 }]}
+          bounces={false}
+          overScrollMode="never"
+          showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={false}
+          onScroll={handleScroll}
+          onTouchStart={handleTouch}
+          scrollEventThrottle={scrollEventThrottle}
         >
-          {topComponent && topComponent}
-          {renderContent()}
-          {!isLoader && bottomComponent && bottomComponent}
-        </View>
-      )}
+          <View style={[styles.flex1, props.style]}>
+            {props.children}
+          </View>
+        </ScrollView>
+        {bottomComponent && bottomComponent}
+      </View>
 
       {
         (barStyle || statusBarColor || translucent) && (
@@ -184,19 +138,8 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 });
 
 export const styles = StyleSheet.create({
-  flex1: { flex: 1 },
-  scrollContainerStyle: {
-    flexGrow: 1,
-    alignItems: 'center',
-  },
-  splitContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    width: '100%',
-  },
-  splitView: {
-    minHeight: '100%',
-  },
+  flex1: { flex: 1, width: '100%' },
+  scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: '100%' },
 });
 
 export default ZSContainer;
