@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
@@ -63,32 +63,49 @@ function ZSTextField({
   isTextArea = false,
 }: TextFieldProps): JSX.Element {
   const { typography, palette } = useTheme();
-  const [primaryStyle, subStyle] = typo.split('.') as [TypoStyle, TypoSubStyle];
-  let fErrorColor = errorColor || palette.danger.main;
+  
+  const typoConfig = useMemo(() => {
+    const [primaryStyle, subStyle] = typo.split('.') as [TypoStyle, TypoSubStyle];
+    return { primaryStyle, subStyle };
+  }, [typo]);
+  
+  const fErrorColor = useMemo(() => errorColor || palette.danger.main, [errorColor, palette.danger.main]);
 
-  // 폰트 크기 및 패밀리 추출
-  const fontSize = useMemo(() => extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17, [typography, primaryStyle, subStyle]);
-  const fontFamily = useMemo(() => extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '', [typography, primaryStyle, subStyle]);
+  const fontSize = useMemo(() => {
+    return extractStyle(typography[typoConfig.primaryStyle][typoConfig.subStyle], 'fontSize') as number || 17;
+  }, [typography, typoConfig.primaryStyle, typoConfig.subStyle]);
+  
+  const fontFamily = useMemo(() => {
+    return extractStyle(typography[typoConfig.primaryStyle][typoConfig.subStyle], 'fontFamily') as string || '';
+  }, [typography, typoConfig.primaryStyle, typoConfig.subStyle]);
 
-  // 컴포넌트 상태 관리
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const labelAnimationValue = useSharedValue(0);
-  const boxHeightValue = useSharedValue(0);
+  
+  const labelAnimationValue = useRef(useSharedValue(0)).current;
+  const boxHeightValue = useRef(useSharedValue(0)).current;
 
   // 포커스 및 값 변경 시 라벨 애니메이션 트리거
   useEffect(() => {
     labelAnimationValue.value = withTiming(
       value !== '' || isFocused ? 1 : 0,
-      { duration: 150 }
+      { duration: 100 }
     );
-  }, [value, isFocused]);
+  }, [value, isFocused, labelAnimationValue]);
+
+  // 애니메이션 관련 상수
+  const animationConstants = useMemo(() => ({
+    baseFontSize: fontSize + (boxStyle === 'inbox' ? 1 : 0),
+    targetFontSize: boxStyle === 'inbox' ? 10 : 11,
+    baseTop: isTextArea ? 12 : 0,
+    targetTopOffset: boxStyle === 'inbox' ? 17 : 2,
+  }), [fontSize, boxStyle, isTextArea]);
 
   // 라벨 애니메이션 스타일
   const animatedLabelStyle = useAnimatedStyle(() => {
     const labelFontSize = interpolate(
       labelAnimationValue.value,
       [0, 1],
-      [fontSize + (boxStyle === 'inbox' ? 1 : 0), boxStyle === 'inbox' ? 10 : 11],
+      [animationConstants.baseFontSize, animationConstants.targetFontSize],
       'clamp'
     );
 
@@ -96,8 +113,8 @@ function ZSTextField({
       labelAnimationValue.value,
       [0, 1],
       [
-        isTextArea ? 12 : 0,
-        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + (boxStyle === 'inbox' ? 17 : 2),
+        animationConstants.baseTop,
+        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + animationConstants.targetTopOffset,
       ],
       'clamp'
     );
@@ -106,7 +123,7 @@ function ZSTextField({
       top: labelTop,
       fontSize: labelFontSize,
     };
-  });
+  }, [animationConstants.baseFontSize, animationConstants.targetFontSize, animationConstants.baseTop, animationConstants.targetTopOffset, isTextArea]);
 
   // 레이아웃 핸들러
   const handleLayout = useCallback((event: LayoutChangeEvent) => {
@@ -118,31 +135,73 @@ function ZSTextField({
   const handleFocus = useCallback(() => setIsFocused(true), []);
   const handleBlur = useCallback(() => setIsFocused(false), []);
 
-  // 상태에 따른 테두리 색상 설정
-  const computedBorderColor = useMemo(() => (
-    status === 'error' ? fErrorColor : isFocused ? (focusColor || palette.primary.main) : (borderColor || palette.grey[30])
-  ), [status, fErrorColor, isFocused, focusColor, borderColor, palette]);
+  const colorConfig = useMemo(() => ({
+    primaryColor: focusColor || palette.primary.main,
+    defaultBorderColor: borderColor || palette.grey[30],
+    defaultLabelColor: labelColor || palette.text.secondary,
+    placeholderColor: placeHolderColor || palette.grey[40],
+  }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor]);
 
-  // 상태에 따른 라벨 색상 설정
-  const computedLabelColor = useMemo(() => (
-    status === 'error' ? fErrorColor : isFocused ? (focusColor || palette.primary.main) : value ? (labelColor || palette.text.secondary) : (placeHolderColor || palette.grey[40])
-  ), [status, fErrorColor, isFocused, focusColor, value, placeHolderColor, labelColor, palette]);
+  // 상태에 따른 테두리 색상 설정
+  const computedBorderColor = useMemo(() => {
+    if (status === 'error') return fErrorColor;
+    if (isFocused) return colorConfig.primaryColor;
+    return colorConfig.defaultBorderColor;
+  }, [status, fErrorColor, isFocused, colorConfig.primaryColor, colorConfig.defaultBorderColor]);
+
+  // 상태에 따른 라벨 색상 설정 
+  const computedLabelColor = useMemo(() => {
+    if (status === 'error') return fErrorColor;
+    if (isFocused) return colorConfig.primaryColor;
+    if (value) return colorConfig.defaultLabelColor;
+    return colorConfig.placeholderColor;
+  }, [status, fErrorColor, isFocused, value, colorConfig.primaryColor, colorConfig.defaultLabelColor, colorConfig.placeholderColor]);
+
+  const styleConfig = useMemo(() => {
+    const baseStyle = {
+      width: '100%' as const,
+      justifyContent: isTextArea ? 'flex-start' as const : 'center' as const,
+      borderRadius,
+      paddingHorizontal,
+      backgroundColor: inputBgColor || palette.background.base,
+      paddingTop: boxStyle === 'inbox' ? 13 : 0,
+    };
+
+    // 박스 스타일에 따른 테두리 설정
+    let borderStyle = {};
+    if (boxStyle === 'outline' || boxStyle === 'inbox') {
+      borderStyle = { borderWidth };
+    } else if (boxStyle === 'underline') {
+      borderStyle = { borderBottomWidth: borderWidth };
+    }
+
+    // innerBoxStyle에 따른 스타일 설정
+    let innerStyle = {};
+    if (innerBoxStyle === 'top') {
+      innerStyle = { 
+        borderBottomLeftRadius: 0, 
+        borderBottomRightRadius: 0, 
+        borderBottomWidth: borderWidth / 2 
+      };
+    } else if (innerBoxStyle === 'middle') {
+      innerStyle = { 
+        borderRadius: 0, 
+        borderTopWidth: borderWidth / 2, 
+        borderBottomWidth: borderWidth / 2 
+      };
+    } else if (innerBoxStyle === 'bottom') {
+      innerStyle = { 
+        borderTopLeftRadius: 0, 
+        borderTopRightRadius: 0, 
+        borderTopWidth: borderWidth / 2 
+      };
+    }
+
+    return { ...baseStyle, ...borderStyle, ...innerStyle };
+  }, [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, palette.background.base]);
 
   // 컨테이너 스타일 정의
-  const containerStyle: StyleProp<ViewStyle> = useMemo(() => ({
-    width: '100%',
-    justifyContent: isTextArea ? 'flex-start' : 'center',
-    borderRadius,
-    paddingHorizontal,
-    backgroundColor: inputBgColor || palette.background.base,
-    paddingTop: boxStyle === 'inbox' ? 13 : 0,
-    ...(boxStyle === 'outline' || boxStyle === 'inbox' ? { borderWidth } : {}),
-    ...(boxStyle === 'underline' ? { borderBottomWidth: borderWidth } : {}),
-    ...(innerBoxStyle === 'top' ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottomWidth: borderWidth / 2 }
-      : innerBoxStyle === 'middle' ? { borderRadius: 0, borderTopWidth: borderWidth / 2, borderBottomWidth: borderWidth / 2 }
-        : innerBoxStyle === 'bottom' ? { borderTopLeftRadius: 0, borderTopRightRadius: 0, borderTopWidth: borderWidth / 2 }
-          : {}),
-  }), [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, palette]);
+  const containerStyle: StyleProp<ViewStyle> = styleConfig;
 
   // 라벨 스타일 정의
   const labelTextStyle: StyleProp<TextStyle> = useMemo(() => ({
@@ -155,12 +214,28 @@ function ZSTextField({
     fontFamily,
     borderRadius: boxStyle === 'outline' ? 5 : 0,
     overflow: 'hidden',
-  }), [fontSize, paddingHorizontal, labelBgColor, boxStyle, fontFamily, palette]);
+  }), [fontSize, paddingHorizontal, labelBgColor, boxStyle, fontFamily, palette.background.base]);
 
   // 텍스트 변경 핸들러
   const handleTextChange = useCallback((text: string) => {
     if (onChangeText) onChangeText(text);
   }, [onChangeText]);
+
+  const textInputStyle = useMemo(() => [
+    { 
+      paddingTop: 7 + iosOffset, 
+      paddingBottom: 5 + iosOffset, 
+      color: palette.text.base,
+      fontSize, 
+      width: '100%' as const, 
+      paddingRight: 25, 
+      fontFamily 
+    },
+    textInputProps?.style,
+  ], [palette.text.base, fontSize, fontFamily, textInputProps?.style]);
+
+  const shouldShowCloseButton = value && isFocused;
+  const shouldShowError = status === 'error' && errorMessage;
 
   return (
     <ViewAtom style={{ alignSelf: 'stretch', width: '100%' }}>
@@ -171,11 +246,7 @@ function ZSTextField({
       >
         <TextInput
           {...textInputProps}
-          style={[
-            { paddingTop: 7 + iosOffset, paddingBottom: 5 + iosOffset, color: palette.text.base },
-            textInputProps?.style,
-            { fontSize, width: '100%', paddingRight: 25, fontFamily },
-          ]}
+          style={textInputStyle}
           value={value}
           onFocus={handleFocus}
           onBlur={handleBlur}
@@ -192,16 +263,34 @@ function ZSTextField({
           </Animated.Text>
         </ViewAtom>
 
-        {(value && isFocused) && (
+        {shouldShowCloseButton && (
           <ButtonClose marginTop={isTextArea ? 13 : undefined} onChangeText={onChangeText} />
         )}
       </ViewAtom>
 
-      {status === 'error' && errorMessage && (
+      {shouldShowError && (
         <ErrorComponent errorMessage={errorMessage} errorColor={fErrorColor} />
       )}
     </ViewAtom>
   );
 }
 
-export default React.memo(ZSTextField);
+const arePropsEqual = (prevProps: TextFieldProps, nextProps: TextFieldProps): boolean => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.status === nextProps.status &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.errorMessage === nextProps.errorMessage &&
+    prevProps.typo === nextProps.typo &&
+    prevProps.boxStyle === nextProps.boxStyle &&
+    prevProps.innerBoxStyle === nextProps.innerBoxStyle &&
+    prevProps.isTextArea === nextProps.isTextArea &&
+    prevProps.label === nextProps.label &&
+    prevProps.focusColor === nextProps.focusColor &&
+    prevProps.borderColor === nextProps.borderColor &&
+    prevProps.labelColor === nextProps.labelColor &&
+    prevProps.onChangeText === nextProps.onChangeText
+  );
+};
+
+export default React.memo(ZSTextField, arePropsEqual);

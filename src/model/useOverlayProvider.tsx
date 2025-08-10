@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BackHandler, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
-import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext, AboveKeyboardContext } from './useOverlay';
-import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAboveKeyboardProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
+import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from './useOverlay';
+import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
 import AlertOverlay from '../overlay/AlertOverlay';
 import SnackbarNotify from '../overlay/SnackbarNotify';
 import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
 import LoadingNotify from '../overlay/LoadingNotify';
 import PopOverMenu from '../overlay/PopOver/PopOverMenu';
 import Modality from '../overlay/Modality';
-import AboveKeyboard from '../overlay/AboveKeyboard';
 
 export function OverlayProvider({
   customSnackbar,
@@ -51,22 +50,6 @@ export function OverlayProvider({
   // Modality
   const [modalityVisible, setModalityVisible] = useState<boolean>(false);
   const [modalityComponent, setModalityComponent] = useState<React.ReactNode>(false);
-
-  // AboveKeyboard
-  const [aboveKeyboardVisible, setAboveKeyboardVisible] = useState<boolean>(false);
-  const [aboveKeyboardRender, setAboveKeyboardRender] = useState<() => React.ReactNode>(() => null);
-  const [aboveKeyboardMarginBottom, setAboveKeyboardMarginBottom] = useState<number>(0);
-
-  // ---
-
-  const showAboveKeyboard = ({
-    render,
-    marginBottom
-  }: ShowAboveKeyboardProps) => {
-    setAboveKeyboardRender(() => render);
-    setAboveKeyboardMarginBottom(marginBottom || 0);
-    setAboveKeyboardVisible(true);
-  }
 
   const showAlert = ({
     title,
@@ -169,9 +152,6 @@ export function OverlayProvider({
       case 'popOver':
         setPopOverVisible(false);
         break;
-      case 'aboveKeyboard':
-        setAboveKeyboardVisible(false);
-        break;
       case 'all':
         setModalityVisible(false);
         setAlertVisible(false);
@@ -179,7 +159,6 @@ export function OverlayProvider({
         setLoaderVisible(false);
         setPopOverVisible(false);
         setBottomSheetVisible(false);
-        setAboveKeyboardVisible(false);
         break;
       default:
         break;
@@ -213,7 +192,6 @@ export function OverlayProvider({
     showPopOverMenu,
     showModality,
     showLoader,
-    showAboveKeyboard,
   }), [
     hideOverlay,
     showAlert,
@@ -222,7 +200,6 @@ export function OverlayProvider({
     showPopOverMenu,
     showModality,
     showLoader,
-    showAboveKeyboard,
   ]);
 
   const alertContextValue = useMemo(() => ({
@@ -277,16 +254,6 @@ export function OverlayProvider({
     setLoaderVisible,
   ]);
 
-  const aboveKeyboardContextValue = useMemo(() => ({
-    aboveKeyboardVisible,
-    setAboveKeyboardVisible,
-    marginBottom: aboveKeyboardMarginBottom,
-  }), [
-    aboveKeyboardVisible,
-    setAboveKeyboardVisible,
-    aboveKeyboardMarginBottom,
-  ]);
-
   return (
     <OverlayContext.Provider value={overlayContextValue}>
       <AlertContext.Provider value={alertContextValue}>
@@ -295,49 +262,43 @@ export function OverlayProvider({
             <PopOverContext.Provider value={popOverContextValue}>
               <ModalityContext.Provider value={modalityContextValue}>
                 <LoaderContext.Provider value={loaderContextValue}>
-                  <AboveKeyboardContext.Provider value={aboveKeyboardContextValue}>
-                    {children}
+                  {children}
 
-                    <Modality modalityComponent={modalityComponent} />
+                  <Modality modalityComponent={modalityComponent} />
 
-                    <BottomSheetOverlay
-                      headerComponent={bottomSheetHeader}
-                      component={bottomSheetComponent}
-                      options={bottomSheetOptions}
-                    />
+                  <BottomSheetOverlay
+                    headerComponent={bottomSheetHeader}
+                    component={bottomSheetComponent}
+                    options={bottomSheetOptions}
+                  />
 
-                    <PopOverMenu
-                      px={popOverLocation?.px}
-                      py={popOverLocation?.py}
-                      component={popOverComponent}
-                    />
+                  <PopOverMenu
+                    px={popOverLocation?.px}
+                    py={popOverLocation?.py}
+                    component={popOverComponent}
+                  />
 
-                    <AlertOverlay
-                      title={title}
-                      informative={informative}
-                      actions={actions || {} as AlertActions}
-                      isBackgroundTouchClose={isBackgroundTouchClose}
-                      titleStyle={titleStyle}
-                      informativeStyle={informativeStyle}
-                      secondaryButtonStyle={secondaryButtonStyle}
-                      primaryButtonStyle={primaryButtonStyle}
-                      secondaryButtonTextStyle={secondaryButtonTextStyle}
-                      primaryButtonTextStyle={primaryButtonTextStyle}
-                      singleButtonTextStyle={singleButtonTextStyle}
-                    />
+                  <AlertOverlay
+                    title={title}
+                    informative={informative}
+                    actions={actions || {} as AlertActions}
+                    isBackgroundTouchClose={isBackgroundTouchClose}
+                    titleStyle={titleStyle}
+                    informativeStyle={informativeStyle}
+                    secondaryButtonStyle={secondaryButtonStyle}
+                    primaryButtonStyle={primaryButtonStyle}
+                    secondaryButtonTextStyle={secondaryButtonTextStyle}
+                    primaryButtonTextStyle={primaryButtonTextStyle}
+                    singleButtonTextStyle={singleButtonTextStyle}
+                  />
 
-                    <AboveKeyboard
-                      render={aboveKeyboardRender}
-                    />
+                  <SnackbarNotify
+                    customSnackbar={customSnackbar}
+                  />
 
-                    <SnackbarNotify
-                      customSnackbar={customSnackbar}
-                    />
-
-                    <LoadingNotify
-                      loaderComponent={loaderComponent}
-                    />
-                  </AboveKeyboardContext.Provider>
+                  <LoadingNotify
+                    loaderComponent={loaderComponent}
+                  />
                 </LoaderContext.Provider>
               </ModalityContext.Provider>
             </PopOverContext.Provider>

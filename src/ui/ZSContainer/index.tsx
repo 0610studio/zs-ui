@@ -1,7 +1,14 @@
-import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, useState, useCallback, useMemo } from 'react';
 import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../model/useThemeProvider';
+
+const IS_IOS = Platform.OS === 'ios';
+const KEYBOARD_ANIMATION_DELAY = 50;
+const keyboardEvents = {
+  showEvent: IS_IOS ? 'keyboardWillShow' as const : 'keyboardDidShow' as const,
+  hideEvent: IS_IOS ? 'keyboardWillHide' as const : 'keyboardDidHide' as const,
+};
 
 export type ZSContainerProps = ViewProps & {
   backgroundColor?: string;
@@ -17,6 +24,7 @@ export type ZSContainerProps = ViewProps & {
   translucent?: boolean;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
   scrollEventThrottle?: number;
+  scrollToFocusedInput?: boolean;
 };
 
 export type ZSContainerRef = ScrollView;
@@ -35,6 +43,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     keyboardScrollExtraOffset = 30,
     translucent,
     scrollEventThrottle = 16,
+    scrollToFocusedInput = true,
     ...props
   },
   forwardedRef
@@ -47,38 +56,36 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
 
+  const handleKeyboardShow = useCallback((e: any) => {
+    setKeyboardHeight(e.endCoordinates.height);
+    
+    if (scrollViewRef.current && scrollToFocusedInput) {
+      const keyboardHeight = e.endCoordinates.height;
+      const safeAreaBottom = 0;
+      const availableScreenHeight = windowHeight - keyboardHeight - safeAreaBottom;
+      const currentScrollPosition = positionRef.current || 0;
+      const touchPosition = lastTouchY.current || 0;
+
+      // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
+      const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
+
+      setTimeout(() => {
+        scrollViewRef.current?.scrollTo({
+          y: currentScrollPosition + scrollOffset,
+          animated: true,
+        });
+      }, KEYBOARD_ANIMATION_DELAY);
+    }
+  }, [windowHeight, keyboardScrollExtraOffset, scrollToFocusedInput]);
+
+  // 키보드 숨김 핸들러를 메모이제이션하여 성능 최적화
+  const handleKeyboardHide = useCallback(() => {
+    setKeyboardHeight(0);
+  }, []);
+
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
-    const keyboardShowSubscription = Keyboard.addListener(showEvent, (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-      if (scrollViewRef.current) {
-        const screenHeight = windowHeight;
-        const keyboardHeight = e.endCoordinates.height;
-        const safeAreaBottom = 0;
-        const availableScreenHeight = screenHeight - keyboardHeight - safeAreaBottom;
-        const currentScrollPosition = positionRef.current || 0;
-        const touchPosition = lastTouchY.current || 0;
-
-        // touchPosition이 키보드 높이보다 아래인 경우
-        // const isTouchPositionBelowKeyboard = touchPosition > availableScreenHeight;
-
-        // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
-        const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
-
-        setTimeout(() => {
-          scrollViewRef.current?.scrollTo({
-            y: currentScrollPosition + scrollOffset,
-            animated: true,
-          });
-        }, 100);
-      }
-    });
-
-    const keyboardHideSubscription = Keyboard.addListener(hideEvent, () => {
-      setKeyboardHeight(0);
-    });
+    const keyboardShowSubscription = Keyboard.addListener(keyboardEvents.showEvent, handleKeyboardShow);
+    const keyboardHideSubscription = Keyboard.addListener(keyboardEvents.hideEvent, handleKeyboardHide);
 
     return () => {
       positionRef.current = null;
@@ -86,24 +93,46 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       keyboardShowSubscription.remove();
       keyboardHideSubscription.remove();
     };
-  }, [keyboardScrollExtraOffset]);
+  }, [keyboardEvents.showEvent, keyboardEvents.hideEvent, handleKeyboardShow, handleKeyboardHide]);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (props.onScroll) props.onScroll(event);
     positionRef.current = event.nativeEvent.contentOffset.y;
-  };
+  }, [props.onScroll]);
 
-  const handleTouch = (evt: any) => {
+  const handleTouch = useCallback((evt: any) => {
     lastTouchY.current = evt.nativeEvent.pageY;
-  };
+  }, []);
+
+  const safeAreaStyle = useMemo(() => [
+    { backgroundColor: backgroundColor || palette.background.base }, 
+    styles.flex1
+  ], [backgroundColor, palette.background.base]);
+
+  const scrollContentStyle = useMemo(() => [
+    styles.scrollContainerStyle, 
+    { 
+      paddingBottom: keyboardHeight ? (IS_IOS ? keyboardHeight : keyboardScrollExtraOffset) : 0 
+    }
+  ], [keyboardHeight, keyboardScrollExtraOffset]);
+
+  const containerStyle = useMemo(() => [
+    styles.flex1, 
+    props.style
+  ], [props.style]);
+
+  const shouldShowStatusBar = useMemo(() => 
+    Boolean(barStyle || statusBarColor || translucent), 
+    [barStyle, statusBarColor, translucent]
+  );
 
   return (
     <SafeAreaView
-      style={[{ backgroundColor: backgroundColor || palette.background.base }, styles.flex1]}
+      style={safeAreaStyle}
       edges={edges}
     >
       <View style={styles.flex1}>
-        {topComponent && topComponent}
+        {topComponent}
         {
           scrollViewDisabled ? (
             <View style={styles.flex1}>
@@ -113,7 +142,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
             <ScrollView
               ref={scrollViewRef}
               style={styles.flex1}
-              contentContainerStyle={[styles.scrollContainerStyle, { paddingBottom: Platform.OS === 'ios' ? keyboardHeight || 0 : 0 }]}
+              contentContainerStyle={scrollContentStyle}
               bounces={false}
               overScrollMode="never"
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}
@@ -123,24 +152,22 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
               onTouchStart={handleTouch}
               scrollEventThrottle={scrollEventThrottle}
             >
-              <View style={[styles.flex1, props.style]}>
+              <View style={containerStyle}>
                 {props.children}
               </View>
             </ScrollView>
           )
         }
-        {bottomComponent && bottomComponent}
+        {bottomComponent}
       </View>
 
-      {
-        (barStyle || statusBarColor || translucent) && (
-          <StatusBar
-            barStyle={barStyle}
-            backgroundColor={statusBarColor || palette.background.base}
-            translucent={translucent}
-          />
-        )
-      }
+      {shouldShowStatusBar && (
+        <StatusBar
+          barStyle={barStyle}
+          backgroundColor={statusBarColor || palette.background.base}
+          translucent={translucent}
+        />
+      )}
     </SafeAreaView>
   );
 });
@@ -150,4 +177,29 @@ export const styles = StyleSheet.create({
   scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: '100%' },
 });
 
-export default ZSContainer;
+const arePropsEqual = (
+  prevProps: ZSContainerProps, 
+  nextProps: ZSContainerProps
+): boolean => {
+  return (
+    prevProps.backgroundColor === nextProps.backgroundColor &&
+    prevProps.statusBarColor === nextProps.statusBarColor &&
+    prevProps.barStyle === nextProps.barStyle &&
+    prevProps.scrollViewDisabled === nextProps.scrollViewDisabled &&
+    prevProps.showsVerticalScrollIndicator === nextProps.showsVerticalScrollIndicator &&
+    prevProps.keyboardScrollExtraOffset === nextProps.keyboardScrollExtraOffset &&
+    prevProps.translucent === nextProps.translucent &&
+    prevProps.scrollEventThrottle === nextProps.scrollEventThrottle &&
+    prevProps.scrollToFocusedInput === nextProps.scrollToFocusedInput &&
+    prevProps.onScroll === nextProps.onScroll &&
+    prevProps.style === nextProps.style &&
+    prevProps.children === nextProps.children &&
+    prevProps.topComponent === nextProps.topComponent &&
+    prevProps.bottomComponent === nextProps.bottomComponent &&
+    prevProps.rightComponent === nextProps.rightComponent &&
+    // edges 배열 비교
+    JSON.stringify(prevProps.edges) === JSON.stringify(nextProps.edges)
+  );
+};
+
+export default React.memo(ZSContainer, arePropsEqual);

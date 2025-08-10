@@ -15,6 +15,10 @@ import ZSBottomCta from './ui/ZSBottomCta';
 import ZSView from './ui/ZSView';
 import AnimatedWrapper from './ui/atoms/AnimatedWrapper';
 import TextAtom from './ui/atoms/TextAtom';
+import ZSAboveKeyboard from "./ui/ZSAboveKeyboard";
+import { ZSContainerRef } from "./ui/ZSContainer";
+import { ZSTextProps } from "./ui/ZSText";
+import { BoxStyle } from "./ui/ZSTextField";
 
 import {
   AlertOverlay,
@@ -42,6 +46,7 @@ export {
   ZSTextField,
   ZSRadioGroup,
   ErrorComponent,
+  ZSAboveKeyboard,
   // ---
   AlertOverlay,
   BottomSheetOverlay,
@@ -59,8 +64,6 @@ import type {
   ThemeProps,
   Palette,
 } from "./model/useThemeProvider";
-import { ZSTextProps } from "./ui/ZSText";
-import { BoxStyle } from "./ui/ZSTextField";
 import {
   ColorPalette,
   ColorPaletteExtend,
@@ -97,7 +100,6 @@ import {
   ShadowLevel,
   ShadowStyle,
 } from "./ui/types";
-import { ZSContainerRef } from "./ui/ZSContainer";
 
 export type {
   ThemeProviderProps,

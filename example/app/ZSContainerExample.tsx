@@ -1,6 +1,5 @@
 import { View } from "react-native";
-import { ZSContainer, ZSTextField } from "zs-ui";
-import AboveKeyboard from "../src/ui/AboveKeyboard";
+import { ZSAboveKeyboard, ZSContainer, ZSTextField } from "zs-ui";
 import CtaButton from "../src/ui/CtaButton";
 
 function ZSContainerExample() {
@@ -10,10 +9,10 @@ function ZSContainerExample() {
       keyboardScrollExtraOffset={130}
       style={{ padding: 30 }}
       bottomComponent={
-        <AboveKeyboard
+        <ZSAboveKeyboard
           render={() => (
             <CtaButton
-              primaryButtonText='수정하기'
+              primaryButtonText='CTA 버튼'
               onPrimaryButtonPress={() => { }}
             />
           )}

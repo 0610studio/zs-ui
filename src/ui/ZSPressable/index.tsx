@@ -1,11 +1,12 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { Pressable, View, ViewProps } from "react-native";
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, runOnJS } from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AnimatedWrapper from "../atoms/AnimatedWrapper";
 import type { ShadowLevel } from "../types";
 import { ViewColorOptions } from "../../theme/types";
 
-const DEFAULT_DURATION = { duration: 100 };
+const DEFAULT_DURATION = { duration: 100 } as const;
+const SCALE_VALUES = [1, 0.96] as const;
 
 interface ZSPressableProps extends ViewProps {
   onPress?: (value?: any) => void;
@@ -29,38 +30,56 @@ function ZSPressable({
   color,
   ...props
 }: ZSPressableProps) {
-  const isButtonPress = useSharedValue(0);
+  const isButtonPress = useRef(useSharedValue(0)).current;
 
   const boxAnimation = useAnimatedStyle(() => {
     const scale = interpolate(
       isButtonPress.value,
       [0, 1],
-      [1, 0.96],
+      SCALE_VALUES,
       'clamp'
     );
     return {
-      transform: [{ scale: withTiming(scale, DEFAULT_DURATION) }],
+      transform: [{ scale }],
     };
   }, []);
+  
+  const handlePressIn = useCallback(() => {
+    isButtonPress.value = withTiming(1, DEFAULT_DURATION);
+  }, [isButtonPress]);
+  
+  const handlePressOut = useCallback(() => {
+    isButtonPress.value = withTiming(0, DEFAULT_DURATION);
+  }, [isButtonPress]);
 
+  const pressedStyle = useMemo(() => ({
+    backgroundColor: pressedBackgroundColor,
+    borderRadius: pressedBackgroundBorderRadius,
+  }), [pressedBackgroundColor, pressedBackgroundBorderRadius]);
+  
+  const unpressedStyle = useMemo(() => ({
+    backgroundColor: 'transparent',
+    borderRadius: pressedBackgroundBorderRadius,
+  }), [pressedBackgroundBorderRadius]);
+  
   const handlePressStyle = useCallback(
     (pressed: boolean) => {
-      runOnJS(() => {
-        isButtonPress.value = pressed ? 1 : 0;
-      })();
-      return {
-        backgroundColor: pressed ? pressedBackgroundColor : 'transparent',
-        borderRadius: pressedBackgroundBorderRadius,
-      };
+      return pressed ? pressedStyle : unpressedStyle;
     },
-    [pressedBackgroundColor, pressedBackgroundBorderRadius, fullWidth]
+    [pressedStyle, unpressedStyle]
   );
 
+  const containerStyle = useMemo(() => ({
+    width: fullWidth ? '100%' as const : undefined
+  }), [fullWidth]);
+
   return (
-    <View style={{ width: fullWidth ? '100%' as const : undefined }}>
+    <View style={containerStyle}>
       <Pressable
         onPress={onPress}
         onLongPress={onLongPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         style={({ pressed }) => handlePressStyle(pressed)}
       >
         <Animated.View style={boxAnimation}>
@@ -78,4 +97,22 @@ function ZSPressable({
   );
 }
 
-export default ZSPressable;
+const arePropsEqual = (
+  prevProps: ZSPressableProps, 
+  nextProps: ZSPressableProps
+): boolean => {
+  return (
+    prevProps.onPress === nextProps.onPress &&
+    prevProps.onLongPress === nextProps.onLongPress &&
+    prevProps.isAnimation === nextProps.isAnimation &&
+    prevProps.pressedBackgroundColor === nextProps.pressedBackgroundColor &&
+    prevProps.pressedBackgroundBorderRadius === nextProps.pressedBackgroundBorderRadius &&
+    prevProps.elevationLevel === nextProps.elevationLevel &&
+    prevProps.fullWidth === nextProps.fullWidth &&
+    prevProps.color === nextProps.color &&
+    prevProps.style === nextProps.style &&
+    prevProps.children === nextProps.children
+  );
+};
+
+export default React.memo(ZSPressable, arePropsEqual);
