@@ -20,6 +20,7 @@
       "bundleIdentifier": "kr.co.studio0610.zsui.example"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

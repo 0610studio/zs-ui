@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { Button, StyleSheet } from "react-native";
 import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, ZSTextField, Theme } from "zs-ui";
 import MyBottomSheet from "../src/ui/MyBottomSheet";
 import TitleCard from "../src/ui/TitleCard";
@@ -8,25 +8,10 @@ import MyModal from "../src/ui/MyModal";
 import { useStyleSheetCreate } from "zs-ui/model";
 
 const OverlayExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay, showAboveKeyboard } = useOverlay();
+  const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();
   const { palette } = useTheme();
   const styles = useStyleSheetCreate(createStyles);
   const [testInput, setTestInput] = useState('');
-
-  useEffect(() => {
-    showAboveKeyboard({
-      marginBottom: 0,
-      render: () => (
-        <View style={{ backgroundColor: 'red', padding: 10, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-          <ZSText>{testInput || 'AboveKeyboard Test'}</ZSText>
-        </View>
-      ),
-    });
-
-    return () => {
-      hideOverlay('aboveKeyboard');
-    };
-  }, [testInput]);
 
   return (
     <ZSContainer
@@ -130,15 +115,6 @@ const OverlayExample = () => {
         }}
         title="show_Modality"
       />
-
-      <TitleCard title='AboveKeyboard' gap={20} flexDirection='column'>
-        <ZSTextField
-          label="AboveKeyboard Test"
-          value={testInput}
-          onChangeText={setTestInput}
-        />
-      </TitleCard>
-
     </ZSContainer>
   );
 };

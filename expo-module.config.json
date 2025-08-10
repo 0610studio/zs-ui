@@ -1,6 +1,7 @@
 {
   "platforms": ["ios", "android", "web"],
   "android": {
+    "softwareKeyboardLayoutMode": "resize",
     "newArchEnabled": true
   },
   "ios": {

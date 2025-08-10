@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef } from 'react';
 import { View, ViewProps, Platform } from 'react-native';
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, runOnJS } from 'react-native-reanimated';
 import { useTheme } from '../../model/useThemeProvider';
@@ -8,6 +8,7 @@ import { SubColorOptions, ViewColor, ViewColorOptions } from '../../theme/types'
 
 const DEFAULT_DURATION = 200 as const;
 const SHADOW_DURATION = 50 as const;
+const IS_IOS = Platform.OS === 'ios';
 
 interface AnimatedWrapperProps extends ViewProps {
   isAnimation: boolean;
@@ -26,24 +27,46 @@ function AnimatedWrapper({
   ...props
 }: AnimatedWrapperProps) {
   const { elevation, palette } = useTheme();
-  const opacity = useSharedValue(0);
-  const [c01, c02] = color ? color.split('.') as [ViewColor, SubColorOptions] : [undefined, undefined];
-  const backgroundColor  = c02 ? palette[c01][c02] : c01 ? palette.background[c01] : elevationLevel ? palette.background.base : undefined;
+  const opacity = useRef(useSharedValue(0)).current;
+  
+  const colorConfig = useMemo(() => {
+    if (!color) return { c01: undefined, c02: undefined };
+    const [c01, c02] = color.split('.') as [ViewColor, SubColorOptions];
+    return { c01, c02 };
+  }, [color]);
+  
+  const backgroundColor = useMemo(() => {
+    const { c01, c02 } = colorConfig;
+    if (c02) return palette[c01][c02];
+    if (c01) return palette.background[c01];
+    if (elevationLevel) return palette.background.base;
+    return undefined;
+  }, [colorConfig, palette, elevationLevel]);
 
-  // 그림자 및 기타 스타일을 플랫폼에 맞게 미리 계산
   const staticStyle = useMemo(() => {
     return { ...elevation[elevationLevel] };
-  }, [elevation]);
+  }, [elevation, elevationLevel]);
 
-  // 애니메이션 스타일 정의 (iOS 그림자 및 Android elevation 처리)
-  const animatedStyle = useAnimatedStyle(() => {
-    if (Platform.OS === 'ios') {
-      return { shadowOpacity: opacity.value * IOS_SHADOW[elevationLevel].shadowOpacity };
+  const animationConfig = useMemo(() => {
+    if (IS_IOS) {
+      return {
+        type: 'ios' as const,
+        maxShadowOpacity: IOS_SHADOW[elevationLevel].shadowOpacity,
+      };
     }
-    return { elevation: opacity.value * elevationLevel };
+    return {
+      type: 'android' as const,
+      maxElevation: elevationLevel,
+    };
   }, [elevationLevel]);
 
-  // 컴포넌트가 등장할 때 애니메이션 핸들링
+  const animatedStyle = useAnimatedStyle(() => {
+    if (animationConfig.type === 'ios') {
+      return { shadowOpacity: opacity.value * animationConfig.maxShadowOpacity };
+    }
+    return { elevation: opacity.value * animationConfig.maxElevation };
+  }, [animationConfig]);
+
   const onEntering = useCallback(() => {
     opacity.value = withTiming(1, { duration: SHADOW_DURATION });
   }, [opacity]);
@@ -58,14 +81,26 @@ function AnimatedWrapper({
     exiting: FadeOut.duration(50),
   }), [duration, onEntering]);
 
-  // 애니메이션이 비활성화된 경우 기본 View로 렌더링
+  const nonAnimatedStyle = useMemo(() => [
+    style,
+    backgroundColor && { backgroundColor },
+    { ...elevation[elevationLevel] }
+  ], [style, backgroundColor, elevation, elevationLevel]);
+
+  const animatedStyleArray = useMemo(() => [
+    style,
+    backgroundColor && { backgroundColor },
+    staticStyle,
+    animatedStyle
+  ], [style, backgroundColor, staticStyle, animatedStyle]);
+
   if (!isAnimation) {
-    return <View style={[style, backgroundColor && { backgroundColor }, { ...elevation[elevationLevel] }]} {...props}>{children}</View>;
+    return <View style={nonAnimatedStyle} {...props}>{children}</View>;
   }
 
   return (
     <Animated.View
-      style={[style, backgroundColor && { backgroundColor }, staticStyle, animatedStyle]}
+      style={animatedStyleArray}
       {...animationProps}
       {...props}
     >
@@ -74,4 +109,18 @@ function AnimatedWrapper({
   );
 }
 
-export default React.memo(AnimatedWrapper);
+const arePropsEqual = (
+  prevProps: AnimatedWrapperProps, 
+  nextProps: AnimatedWrapperProps
+): boolean => {
+  return (
+    prevProps.isAnimation === nextProps.isAnimation &&
+    prevProps.elevationLevel === nextProps.elevationLevel &&
+    prevProps.duration === nextProps.duration &&
+    prevProps.color === nextProps.color &&
+    prevProps.style === nextProps.style &&
+    prevProps.children === nextProps.children
+  );
+};
+
+export default React.memo(AnimatedWrapper, arePropsEqual);
