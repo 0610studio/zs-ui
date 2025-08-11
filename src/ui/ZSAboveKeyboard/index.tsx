@@ -4,7 +4,7 @@ import { Z_INDEX_VALUE } from '../../model/utils';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ZSPortal } from '../../overlay';
 
-const windowHeight = Dimensions.get('window').height;
+const screenHeight = Dimensions.get('window').height;
 const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
 const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
@@ -25,14 +25,12 @@ function ZSAboveKeyboard({
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [componentHeight, setComponentHeight] = useState(0);
   const { bottom } = useSafeAreaInsets();
-  // const statusBarHeight = StatusBar.currentHeight || 0;
+  const statusBarHeight = StatusBar.currentHeight || 0;
 
   useEffect(() => {
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
       // 키보드 바로 위에 위치하도록 계산
-      const topValue = windowHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - 0;
-      // 구형폰에서는 상태바 높이를 빼야함
-      // const topValue = windowHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - statusBarHeight;
+      const topValue = screenHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - 0;
       setTopValue(topValue);
       setIsKeyboardVisible(true);
     });
