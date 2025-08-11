@@ -1,30 +1,38 @@
 import { useEffect, useState } from 'react';
-import { Keyboard, Platform, StyleSheet, Dimensions } from 'react-native';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
-import { getActualTopInset } from '../../model/utils';
+import { Keyboard, Platform, StyleSheet, Dimensions, View, StatusBar, LayoutChangeEvent } from 'react-native';
+import { Z_INDEX_VALUE } from '../../model/utils';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ZSPortal } from '../../overlay';
+
+const windowHeight = Dimensions.get('window').height;
+const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
 interface Props {
-  render: () => React.ReactNode;
-  offset?: number;
+  children: React.ReactNode;
+  keyboardShowOffset?: number;
+  keyboardHideOffset?: number;
+  handleLayoutHeight?: (height: number) => void;
 }
 
 function ZSAboveKeyboard({
-  render,
-  offset = 0,
+  keyboardShowOffset = 0,
+  keyboardHideOffset = 0,
+  children,
+  handleLayoutHeight,
 }: Props) {
   const [topValue, setTopValue] = useState(0);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [componentHeight, setComponentHeight] = useState(0);
-  const screenHeight = Dimensions.get('window').height;
-  const actualTop = getActualTopInset();
+  const { bottom } = useSafeAreaInsets();
+  // const statusBarHeight = StatusBar.currentHeight || 0;
 
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
-      // 키보드 바로 위에 위치하도록 계산: 화면 높이 - 키보드 높이 - 컴포넌트 높이 - offset
-      const topValue = screenHeight - event.endCoordinates.height - componentHeight - offset + actualTop;
+      // 키보드 바로 위에 위치하도록 계산
+      const topValue = windowHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - 0;
+      // 구형폰에서는 상태바 높이를 빼야함
+      // const topValue = windowHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - statusBarHeight;
       setTopValue(topValue);
       setIsKeyboardVisible(true);
     });
@@ -38,22 +46,22 @@ function ZSAboveKeyboard({
       keyboardShowSubscription.remove();
       keyboardHideSubscription.remove();
     };
-  }, [screenHeight, offset, componentHeight, actualTop]);
+  }, [componentHeight]);
 
-  const handleLayout = (event: any) => {
+  const handleLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
-    setComponentHeight(height + (Platform.OS === 'ios' ? 100 : 80));
+    setComponentHeight(height);
+    handleLayoutHeight?.(height);
   };
 
   return (
-    <Animated.View
-      entering={FadeInDown}
-      exiting={FadeOutDown}
-      style={[styles.container, isKeyboardVisible ? { top: topValue } : { bottom: 0 }]}
-      onLayout={handleLayout}
-    >
-      {render()}
-    </Animated.View>
+    <ZSPortal>
+      <View style={[styles.container, isKeyboardVisible ? { top: topValue } : { bottom: keyboardHideOffset + bottom }]}>
+        <View onLayout={handleLayout}>
+          {children}
+        </View>
+      </View>
+    </ZSPortal>
   );
 }
 
@@ -64,7 +72,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 8400,
+    zIndex: Z_INDEX_VALUE.ABOVE_KEYBOARD,
     width: '100%',
   },
 });
