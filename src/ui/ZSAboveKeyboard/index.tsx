@@ -30,7 +30,7 @@ function ZSAboveKeyboard({
   useEffect(() => {
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
       // 키보드 바로 위에 위치하도록 계산
-      const topValue = screenHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - 0;
+      const topValue = screenHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - statusBarHeight;
       setTopValue(topValue);
       setIsKeyboardVisible(true);
     });

@@ -112,9 +112,9 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   const scrollContentStyle = useMemo(() => [
     styles.scrollContainerStyle, 
     { 
-      paddingBottom: keyboardHeight ? (IS_IOS ? keyboardHeight : keyboardScrollExtraOffset) : 0 
+      paddingBottom: keyboardHeight ? (IS_IOS ? keyboardHeight : 0) : 0 
     }
-  ], [keyboardHeight, keyboardScrollExtraOffset]);
+  ], [keyboardHeight]);
 
   const containerStyle = useMemo(() => [
     styles.flex1, 
