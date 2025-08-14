@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Keyboard, Platform, StyleSheet, Dimensions, View, StatusBar, LayoutChangeEvent } from 'react-native';
+import { Keyboard, Platform, StyleSheet, Dimensions, View, LayoutChangeEvent } from 'react-native';
 import { Z_INDEX_VALUE } from '../../model/utils';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ZSPortal } from '../../overlay';
@@ -25,12 +25,11 @@ function ZSAboveKeyboard({
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [componentHeight, setComponentHeight] = useState(0);
   const { bottom } = useSafeAreaInsets();
-  const statusBarHeight = StatusBar.currentHeight || 0;
 
   useEffect(() => {
     const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
       // 키보드 바로 위에 위치하도록 계산
-      const topValue = screenHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset - statusBarHeight;
+      const topValue = screenHeight - event.endCoordinates.height - componentHeight - keyboardShowOffset;
       setTopValue(topValue);
       setIsKeyboardVisible(true);
     });
