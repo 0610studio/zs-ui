@@ -28,6 +28,7 @@ import {
   useOverlay,
   PopOverButton,
   PopOverMenu,
+  ZSPortal,
 } from './overlay';
 
 export {
@@ -55,6 +56,7 @@ export {
   useOverlay,
   PopOverButton,
   PopOverMenu,
+  ZSPortal,
 };
 
 // ------------------------------------------------------

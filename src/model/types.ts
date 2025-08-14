@@ -98,7 +98,7 @@ export interface SnackItem {
 
 export type SnackType = 'success' | 'error' | '';
 
-export type HideOption = 'all' | 'snack' | 'alert' | 'bottomSheet' | 'loader' | 'popOver' | 'modal';
+export type HideOption = 'all' | 'snack' | 'alert' | 'bottomSheet' | 'loader' | 'popOver' | 'modal' | 'aboveKeyboard';
 
 export interface ShowSnackBarProps {
     message: string;
@@ -119,4 +119,9 @@ export interface ShowBottomSheetProps {
     headerComponent?: React.ReactNode;
     component: React.ReactNode;
     options?: BottomSheetOptions;
+}
+
+export interface AboveKeyboardOptions {
+    keyboardShowOffset?: number;
+    keyboardHideOffset?: number;
 }

@@ -1,23 +1,15 @@
 import { View } from "react-native";
-import { ZSAboveKeyboard, ZSContainer, ZSTextField } from "zs-ui";
+import { ZSContainer, ZSTextField, ZSAboveKeyboard } from "zs-ui";
 import CtaButton from "../src/ui/CtaButton";
+import { useState } from "react";
 
 function ZSContainerExample() {
+  const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
   return (
     <ZSContainer
       edges={['bottom']}
       keyboardScrollExtraOffset={130}
-      style={{ padding: 30 }}
-      bottomComponent={
-        <ZSAboveKeyboard
-          render={() => (
-            <CtaButton
-              primaryButtonText='CTA 버튼'
-              onPrimaryButtonPress={() => { }}
-            />
-          )}
-        />
-      }
+      style={{ paddingHorizontal: 30, paddingTop: 30, paddingBottom: 30 + ctaLayoutHeight }}
     >
       <ZSTextField
         boxStyle="outline"
@@ -47,7 +39,17 @@ function ZSContainerExample() {
         focusColor={'red'}
       />
 
-      <View style={{ height: 100 }} />
+      <ZSAboveKeyboard handleLayoutHeight={setCtaLayoutHeight}>
+        <CtaButton
+          disabled={false}
+          // ---
+          primaryButtonText='CTA 버튼'
+          onPrimaryButtonPress={() => { }}
+          // ---
+          secondaryButtonText='취소'
+          onSecondaryButtonPress={() => { }}
+        />
+      </ZSAboveKeyboard>
     </ZSContainer>
   );
 }

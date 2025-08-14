@@ -8,6 +8,7 @@ import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
 import LoadingNotify from '../overlay/LoadingNotify';
 import PopOverMenu from '../overlay/PopOver/PopOverMenu';
 import Modality from '../overlay/Modality';
+import { PortalProvider } from '../overlay/ZSPortal';
 
 export function OverlayProvider({
   customSnackbar,
@@ -262,43 +263,45 @@ export function OverlayProvider({
             <PopOverContext.Provider value={popOverContextValue}>
               <ModalityContext.Provider value={modalityContextValue}>
                 <LoaderContext.Provider value={loaderContextValue}>
-                  {children}
+                  <PortalProvider>
+                      {children}
 
-                  <Modality modalityComponent={modalityComponent} />
+                      <Modality modalityComponent={modalityComponent} />
 
-                  <BottomSheetOverlay
-                    headerComponent={bottomSheetHeader}
-                    component={bottomSheetComponent}
-                    options={bottomSheetOptions}
-                  />
+                      <BottomSheetOverlay
+                        headerComponent={bottomSheetHeader}
+                        component={bottomSheetComponent}
+                        options={bottomSheetOptions}
+                      />
 
-                  <PopOverMenu
-                    px={popOverLocation?.px}
-                    py={popOverLocation?.py}
-                    component={popOverComponent}
-                  />
+                      <PopOverMenu
+                        px={popOverLocation?.px}
+                        py={popOverLocation?.py}
+                        component={popOverComponent}
+                      />
 
-                  <AlertOverlay
-                    title={title}
-                    informative={informative}
-                    actions={actions || {} as AlertActions}
-                    isBackgroundTouchClose={isBackgroundTouchClose}
-                    titleStyle={titleStyle}
-                    informativeStyle={informativeStyle}
-                    secondaryButtonStyle={secondaryButtonStyle}
-                    primaryButtonStyle={primaryButtonStyle}
-                    secondaryButtonTextStyle={secondaryButtonTextStyle}
-                    primaryButtonTextStyle={primaryButtonTextStyle}
-                    singleButtonTextStyle={singleButtonTextStyle}
-                  />
+                      <AlertOverlay
+                        title={title}
+                        informative={informative}
+                        actions={actions || {} as AlertActions}
+                        isBackgroundTouchClose={isBackgroundTouchClose}
+                        titleStyle={titleStyle}
+                        informativeStyle={informativeStyle}
+                        secondaryButtonStyle={secondaryButtonStyle}
+                        primaryButtonStyle={primaryButtonStyle}
+                        secondaryButtonTextStyle={secondaryButtonTextStyle}
+                        primaryButtonTextStyle={primaryButtonTextStyle}
+                        singleButtonTextStyle={singleButtonTextStyle}
+                      />
 
-                  <SnackbarNotify
-                    customSnackbar={customSnackbar}
-                  />
+                      <SnackbarNotify
+                        customSnackbar={customSnackbar}
+                      />
 
-                  <LoadingNotify
-                    loaderComponent={loaderComponent}
-                  />
+                      <LoadingNotify
+                        loaderComponent={loaderComponent}
+                      />
+                  </PortalProvider>
                 </LoaderContext.Provider>
               </ModalityContext.Provider>
             </PopOverContext.Provider>

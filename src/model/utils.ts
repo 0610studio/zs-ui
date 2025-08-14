@@ -14,14 +14,6 @@ export const extractStyle = (
     return undefined;
 };
 
-export const getActualTopInset = () => {
-    const { top } = initialWindowMetrics?.insets || { top: 0 };
-    if (Platform.OS === 'ios') {
-      return 0;
-    }
-    return StatusBar.currentHeight || top || 0;
-  };
-
 export const Z_INDEX_VALUE = {
     DEFAULT: 8000,
     MODAL1: 8001,
