@@ -112,7 +112,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   const scrollContentStyle = useMemo(() => [
     styles.scrollContainerStyle, 
     { 
-      paddingBottom: keyboardHeight ? (IS_IOS ? keyboardHeight : 0) : 0 
+      paddingBottom: keyboardHeight ? keyboardHeight : 0 
     }
   ], [keyboardHeight]);
 
