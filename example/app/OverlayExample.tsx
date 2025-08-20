@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, StyleSheet } from "react-native";
-import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, ZSTextField, Theme } from "zs-ui";
+import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, Theme } from "zs-ui";
 import MyBottomSheet from "../src/ui/MyBottomSheet";
 import TitleCard from "../src/ui/TitleCard";
 import RenderPopOverMenu from "../src/ui/RenderPopOverMenu";
@@ -11,7 +11,6 @@ const OverlayExample = () => {
   const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();
   const { palette } = useTheme();
   const styles = useStyleSheetCreate(createStyles);
-  const [testInput, setTestInput] = useState('');
 
   return (
     <ZSContainer
@@ -38,6 +37,22 @@ const OverlayExample = () => {
         </ZSView>
       </TitleCard>
 
+      <TitleCard title="PopOverButton">
+        <PopOverButton
+          width={140}
+          height={50}
+          popOverMenuComponent={<RenderPopOverMenu />}
+        >
+          <ZSView style={styles.popOverButtonContainer}>
+            <ZSText>팝오버 메뉴</ZSText>
+            <ZSView style={styles.popOverIcon}>
+              <ZSView style={styles.dot}></ZSView>
+              <ZSView style={[styles.dot, { marginVertical: 3 }]}></ZSView>
+              <ZSView style={styles.dot}></ZSView>
+            </ZSView>
+          </ZSView>
+        </PopOverButton>
+      </TitleCard>
       <Button
         onPress={() =>
           showAlert({
@@ -115,6 +130,23 @@ const OverlayExample = () => {
         }}
         title="show_Modality"
       />
+
+      <TitleCard title="PopOverButton">
+        <PopOverButton
+          width={140}
+          height={50}
+          popOverMenuComponent={<RenderPopOverMenu />}
+        >
+          <ZSView style={styles.popOverButtonContainer}>
+            <ZSText>팝오버 메뉴</ZSText>
+            <ZSView style={styles.popOverIcon}>
+              <ZSView style={styles.dot}></ZSView>
+              <ZSView style={[styles.dot, { marginVertical: 3 }]}></ZSView>
+              <ZSView style={styles.dot}></ZSView>
+            </ZSView>
+          </ZSView>
+        </PopOverButton>
+      </TitleCard>
     </ZSContainer>
   );
 };

@@ -7,6 +7,8 @@ import { PopOverMenuProps } from "../../model/types";
 import { useTheme } from "../../model";
 import { Z_INDEX_VALUE } from "../../model/utils";
 
+const MINIMUM_OFFSET = 10;
+
 function PopOverMenu({
   px,
   py,
@@ -45,23 +47,23 @@ function PopOverMenu({
 
   // 화면 경계를 벗어나는지 확인하고 위치 조정
   const getAdjustedPosition = () => {
-    let adjustedX = px;
+    let adjustedX = px - contentWidth;
     let adjustedY = py;
 
     // 수평 방향 조정
-    if (px + contentWidth > windowWidth) {
-      adjustedX = windowWidth - contentWidth - 10; // 10px 여백
+    if (adjustedX > windowWidth) {
+      adjustedX = windowWidth - MINIMUM_OFFSET;
     }
     if (adjustedX < 0) {
-      adjustedX = 10; // 최소 10px 여백
+      adjustedX = MINIMUM_OFFSET;
     }
 
     // 수직 방향 조정
     if (py + contentHeight > windowHeight) {
-      adjustedY = py - contentHeight; // 위쪽으로 표시
+      adjustedY = py - (contentHeight * 1.5); // 위쪽으로 표시
     }
     if (adjustedY < 0) {
-      adjustedY = 10; // 최소 10px 여백
+      adjustedY = MINIMUM_OFFSET;
     }
 
     return { adjustedX, adjustedY };
