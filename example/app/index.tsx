@@ -21,6 +21,7 @@ export default function Home() {
       <Button title='Layout 예제' onPress={() => router.push('/LayoutExample')} />
       <Button title='Overlay 예제' onPress={() => router.push('/OverlayExample')} />
       <Button title='ZS_Container 예제' onPress={() => router.push('/ZSContainerExample')} />
+      <Button title='Global_Overlay 예제' onPress={() => router.push('/GlobalOverlayExample')} />
     </ZSContainer>
   );
 }
