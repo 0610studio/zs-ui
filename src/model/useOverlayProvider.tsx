@@ -9,6 +9,7 @@ import LoadingNotify from '../overlay/LoadingNotify';
 import PopOverMenu from '../overlay/PopOver/PopOverMenu';
 import Modality from '../overlay/Modality';
 import { PortalProvider } from '../overlay/ZSPortal';
+import { setGlobalOverlayRef } from './globalOverlay';
 
 export function OverlayProvider({
   customSnackbar,
@@ -202,6 +203,16 @@ export function OverlayProvider({
     showModality,
     showLoader,
   ]);
+
+  // Global overlay reference 업데이트
+  useEffect(() => {
+    setGlobalOverlayRef(overlayContextValue);
+    
+    // Cleanup 시 global reference 제거
+    return () => {
+      setGlobalOverlayRef(null);
+    };
+  }, [overlayContextValue]);
 
   const alertContextValue = useMemo(() => ({
     alertVisible,

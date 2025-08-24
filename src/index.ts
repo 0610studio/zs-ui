@@ -2,6 +2,7 @@ import {
   useTheme,
   OverlayProvider,
   ThemeProvider,
+  GlobalOverlay,
 } from './model'
 
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
@@ -57,6 +58,8 @@ export {
   PopOverButton,
   PopOverMenu,
   ZSPortal,
+  // Global overlay functions
+  GlobalOverlay,
 };
 
 // ------------------------------------------------------
