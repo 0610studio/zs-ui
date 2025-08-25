@@ -20,69 +20,17 @@ function AlertOverlay({
   secondaryButtonStyle,
   primaryButtonStyle,
   secondaryButtonTextStyle,
-  primaryButtonTextStyle,
-  singleButtonTextStyle,
 }: ShowAlertProps) {
   const { alertVisible, setAlertVisible } = useAlert();
   const { palette: { background, primary: primaryColor, modalBgColor }, dimensions: { width: windowWidth } } = useTheme();
   const styles = useMemo(() => createStyles({ background }), [background]);
   const modalWidth = windowWidth - 60;
+  const { primary, secondary } = actions || {} as AlertActions;
 
   const handleButtonPress = useCallback((onPressFunction?: () => void) => () => {
     if (onPressFunction) onPressFunction();
     setAlertVisible(false);
   }, [setAlertVisible]);
-
-  const content = useMemo(() => {
-    const { primary, secondary } = actions || {} as AlertActions;
-
-    return (
-      <Animated.View
-        entering={FadeInDown.duration(300)}
-        exiting={FadeOutDown.duration(100)}
-        style={[styles.contentContainer, { width: modalWidth }]}
-      >
-        {title && (
-          <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
-        )}
-        {informative && (
-          <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
-        )}
-        {actions && (
-          <ViewAtom style={styles.buttonContainer}>
-            {secondary ? (
-              <>
-                <TouchableOpacity
-                  style={[
-                    styles.button,
-                    { backgroundColor: background.neutral, marginRight: 8 },
-                    secondaryButtonStyle
-                  ]}
-                  onPress={handleButtonPress(secondary?.onPress)}
-                >
-                  <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
-                  onPress={handleButtonPress(primary?.onPress)}
-                >
-                  <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
-                onPress={handleButtonPress(primary?.onPress)}
-              >
-                <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
-              </TouchableOpacity>
-            )}
-          </ViewAtom>
-        )}
-      </Animated.View>
-    );
-  }, [title, informative, actions, handleButtonPress, titleStyle, informativeStyle, secondaryButtonStyle, primaryButtonStyle, secondaryButtonTextStyle, primaryButtonTextStyle, singleButtonTextStyle]);
 
   return (
     !alertVisible ? null :
@@ -92,7 +40,50 @@ function AlertOverlay({
         modalBgColor={modalBgColor}
         onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
       >
-        {content}
+        <Animated.View
+          entering={FadeInDown.duration(300)}
+          exiting={FadeOutDown.duration(100)}
+          style={[styles.contentContainer, { width: modalWidth }]}
+        >
+          {title && (
+            <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
+          )}
+          {informative && (
+            <ZSText typo='body.2' style={[styles.informative, informativeStyle]}>{informative}</ZSText>
+          )}
+          {actions && (
+            <ViewAtom style={styles.buttonContainer}>
+              {secondary ? (
+                <>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      { backgroundColor: background.neutral, marginRight: 8 },
+                      secondaryButtonStyle
+                    ]}
+                    onPress={handleButtonPress(secondary?.onPress)}
+                  >
+                    <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
+                    onPress={handleButtonPress(primary?.onPress)}
+                  >
+                    <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity
+                  style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
+                  onPress={handleButtonPress(primary?.onPress)}
+                >
+                  <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+                </TouchableOpacity>
+              )}
+            </ViewAtom>
+          )}
+        </Animated.View>
       </ModalBackground>
   )
 }

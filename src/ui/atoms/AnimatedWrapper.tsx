@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { View, ViewProps, Platform } from 'react-native';
-import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, runOnJS } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, useDerivedValue } from 'react-native-reanimated';
 import { useTheme } from '../../model/useThemeProvider';
 import { ShadowLevel } from '../types';
 import { IOS_SHADOW } from '../../theme/elevation';
@@ -27,75 +27,79 @@ function AnimatedWrapper({
   ...props
 }: AnimatedWrapperProps) {
   const { elevation, palette } = useTheme();
-  const opacity = useRef(useSharedValue(0)).current;
+  const animationFinished = useSharedValue(false);
   
-  const colorConfig = useMemo(() => {
-    if (!color) return { c01: undefined, c02: undefined };
-    const [c01, c02] = color.split('.') as [ViewColor, SubColorOptions];
-    return { c01, c02 };
-  }, [color]);
+  const staticConfigRef = useRef({
+    isIOS: IS_IOS,
+    maxShadowOpacity: IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0,
+    maxElevation: IS_IOS ? 0 : elevationLevel,
+  });
+  
+  if (staticConfigRef.current.maxShadowOpacity !== (IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0) ||
+      staticConfigRef.current.maxElevation !== (IS_IOS ? 0 : elevationLevel)) {
+    staticConfigRef.current = {
+      isIOS: IS_IOS,
+      maxShadowOpacity: IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0,
+      maxElevation: IS_IOS ? 0 : elevationLevel,
+    };
+  }
   
   const backgroundColor = useMemo(() => {
-    const { c01, c02 } = colorConfig;
+    if (!color) {
+      return elevationLevel ? palette.background.base : undefined;
+    }
+    
+    const [c01, c02] = color.split('.') as [ViewColor, SubColorOptions];
     if (c02) return palette[c01][c02];
     if (c01) return palette.background[c01];
     if (elevationLevel) return palette.background.base;
     return undefined;
-  }, [colorConfig, palette, elevationLevel]);
+  }, [color, palette, elevationLevel]);
 
-  const staticStyle = useMemo(() => {
-    return { ...elevation[elevationLevel] };
-  }, [elevation, elevationLevel]);
+  const staticStyle = elevation[elevationLevel];
 
-  const animationConfig = useMemo(() => {
-    if (IS_IOS) {
-      return {
-        type: 'ios' as const,
-        maxShadowOpacity: IOS_SHADOW[elevationLevel].shadowOpacity,
-      };
+  const shadowProgress = useDerivedValue(() => {
+    'worklet';
+    if (animationFinished.value) {
+      return withTiming(1, { duration: SHADOW_DURATION });
     }
-    return {
-      type: 'android' as const,
-      maxElevation: elevationLevel,
-    };
-  }, [elevationLevel]);
+    return 0;
+  }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (animationConfig.type === 'ios') {
-      return { shadowOpacity: opacity.value * animationConfig.maxShadowOpacity };
+    'worklet';
+    const config = staticConfigRef.current;
+    const shadowValue = shadowProgress.value;
+    
+    if (config.isIOS) {
+      return { shadowOpacity: shadowValue * config.maxShadowOpacity };
     }
-    return { elevation: opacity.value * animationConfig.maxElevation };
-  }, [animationConfig]);
-
-  const onEntering = useCallback(() => {
-    opacity.value = withTiming(1, { duration: SHADOW_DURATION });
-  }, [opacity]);
+    return { elevation: shadowValue * config.maxElevation };
+  }, []);
 
   const animationProps = useMemo(() => ({
     entering: FadeInDown.duration(duration).withCallback((finished) => {
       'worklet';
       if (finished) {
-        runOnJS(onEntering)();
+        animationFinished.value = true;
       }
     }),
     exiting: FadeOut.duration(50),
-  }), [duration, onEntering]);
+  }), [duration, animationFinished]);
 
-  const nonAnimatedStyle = useMemo(() => [
+  const baseStyle = useMemo(() => [
     style,
     backgroundColor && { backgroundColor },
-    { ...elevation[elevationLevel] }
-  ], [style, backgroundColor, elevation, elevationLevel]);
+    staticStyle
+  ], [style, backgroundColor, staticStyle]);
 
   const animatedStyleArray = useMemo(() => [
-    style,
-    backgroundColor && { backgroundColor },
-    staticStyle,
+    ...baseStyle,
     animatedStyle
-  ], [style, backgroundColor, staticStyle, animatedStyle]);
+  ], [baseStyle, animatedStyle]);
 
   if (!isAnimation) {
-    return <View style={nonAnimatedStyle} {...props}>{children}</View>;
+    return <View style={baseStyle} {...props}>{children}</View>;
   }
 
   return (
@@ -113,14 +117,14 @@ const arePropsEqual = (
   prevProps: AnimatedWrapperProps, 
   nextProps: AnimatedWrapperProps
 ): boolean => {
-  return (
-    prevProps.isAnimation === nextProps.isAnimation &&
-    prevProps.elevationLevel === nextProps.elevationLevel &&
-    prevProps.duration === nextProps.duration &&
-    prevProps.color === nextProps.color &&
-    prevProps.style === nextProps.style &&
-    prevProps.children === nextProps.children
-  );
+  if (prevProps.children !== nextProps.children) return false;
+  if (prevProps.style !== nextProps.style) return false;
+  if (prevProps.isAnimation !== nextProps.isAnimation) return false;
+  if (prevProps.elevationLevel !== nextProps.elevationLevel) return false;
+  if (prevProps.duration !== nextProps.duration) return false;
+  if (prevProps.color !== nextProps.color) return false;
+  
+  return true;
 };
 
 export default React.memo(AnimatedWrapper, arePropsEqual);

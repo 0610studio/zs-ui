@@ -80,8 +80,6 @@ export interface ShowAlertProps {
     secondaryButtonStyle?: TouchableOpacityProps['style'];
     primaryButtonStyle?: TouchableOpacityProps['style'];
     secondaryButtonTextStyle?: TextProps['style'];
-    primaryButtonTextStyle?: TextProps['style'];
-    singleButtonTextStyle?: TextProps['style'];
 }
 
 export interface AlertActions {

@@ -28,8 +28,6 @@ export function OverlayProvider({
   const [secondaryButtonStyle, setSecondaryButtonStyle] = useState<TouchableOpacityProps['style']>();
   const [primaryButtonStyle, setPrimaryButtonStyle] = useState<TouchableOpacityProps['style']>();
   const [secondaryButtonTextStyle, setSecondaryButtonTextStyle] = useState<TextProps['style']>();
-  const [primaryButtonTextStyle, setPrimaryButtonTextStyle] = useState<TextProps['style']>();
-  const [singleButtonTextStyle, setSingleButtonTextStyle] = useState<TextProps['style']>();
 
   // Snackbar
   const [snackItemStack, setSnackItemStack] = useState<SnackItem[]>([]);
@@ -63,8 +61,6 @@ export function OverlayProvider({
     secondaryButtonStyle,
     primaryButtonStyle,
     secondaryButtonTextStyle,
-    primaryButtonTextStyle,
-    singleButtonTextStyle,
   }: ShowAlertProps) => {
     Keyboard.dismiss();
     setTitle(title || '');
@@ -78,8 +74,6 @@ export function OverlayProvider({
     setSecondaryButtonStyle(secondaryButtonStyle);
     setPrimaryButtonStyle(primaryButtonStyle);
     setSecondaryButtonTextStyle(secondaryButtonTextStyle);
-    setPrimaryButtonTextStyle(primaryButtonTextStyle);
-    setSingleButtonTextStyle(singleButtonTextStyle);
   };
 
   const showBottomSheet = ({
@@ -301,8 +295,6 @@ export function OverlayProvider({
                         secondaryButtonStyle={secondaryButtonStyle}
                         primaryButtonStyle={primaryButtonStyle}
                         secondaryButtonTextStyle={secondaryButtonTextStyle}
-                        primaryButtonTextStyle={primaryButtonTextStyle}
-                        singleButtonTextStyle={singleButtonTextStyle}
                       />
 
                       <SnackbarNotify

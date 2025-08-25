@@ -50,6 +50,7 @@ function Modality({
 
   // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
+    'worklet';
     return {
       transform: [
         { scaleX: backScale.value },
@@ -62,6 +63,7 @@ function Modality({
 
   // 아래에서 등장하는 Modality 화면
   const mainScreenAnimatedStyle = useAnimatedStyle(() => {
+    'worklet';
     return {
       transform: [
         { translateY: mainTranslateY.value }
@@ -71,6 +73,7 @@ function Modality({
 
   // 배경 불투명도 스타일
   const backgroundAnimatedStyle = useAnimatedStyle(() => {
+    'worklet';
     return {
       opacity: backgroundOpacity.value
     };

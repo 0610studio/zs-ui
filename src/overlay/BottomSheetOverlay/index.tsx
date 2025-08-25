@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
@@ -69,24 +69,30 @@ function BottomSheetOverlay({
     [windowHeight, height]
   );
   
-  const translateY = useRef(useSharedValue(0)).current;
-  const translateX = useRef(useSharedValue(0)).current;
-  const scale = useRef(useSharedValue(1)).current;
+  const translateY = useSharedValue(0);
+  const translateX = useSharedValue(0);
+  const scale = useSharedValue(1);
+  const startX = useSharedValue(0);
+  const startY = useSharedValue(0);
+  const isGesturing = useSharedValue(false);
   
-  const startX = useRef(0);
-  const startY = useRef(0);
   const [localVisible, setLocalVisible] = useState(false);
 
   const handleKeyboardShow = useCallback((event: any) => {
-    const targetY = IS_IOS ? (-event.endCoordinates.height + bottom) : 0;
-    translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
-  }, [translateY, bottom]);
+    'worklet';
+    if (!isGesturing.value) {
+      const targetY = IS_IOS ? (-event.endCoordinates.height + bottom) : 0;
+      translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
+    }
+  }, [translateY, bottom, isGesturing]);
 
   const handleKeyboardHide = useCallback(() => {
-    translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
-  }, [translateY]);
+    'worklet';
+    if (!isGesturing.value) {
+      translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
+    }
+  }, [translateY, isGesturing]);
 
-  // 소프트 키보드 핸들링
   useEffect(() => {
     const keyboardShowSubscription = Keyboard.addListener(keyboardEvents.showEvent, handleKeyboardShow);
     const keyboardHideSubscription = Keyboard.addListener(keyboardEvents.hideEvent, handleKeyboardHide);
@@ -112,6 +118,7 @@ function BottomSheetOverlay({
   }, [bottomSheetVisible, translateY, maxHeight]);
 
   const animatedStyles = useAnimatedStyle(() => {
+    'worklet';
     return {
       transform: [
         { translateY: translateY.value },
@@ -119,28 +126,41 @@ function BottomSheetOverlay({
         { scale: scale.value }
       ],
     };
+  }, [translateY, translateX, scale]);
+
+  const dismissKeyboard = useCallback(() => {
+    Keyboard.dismiss();
   }, []);
 
+  const closeBottomSheet = useCallback(() => {
+    setBottomSheetVisible(false);
+  }, [setBottomSheetVisible]);
+
   const handlePanResponderGrant = useCallback(() => {
-    Keyboard.dismiss();
-    startX.current = translateX.value;
-    startY.current = translateY.value;
+    'worklet';
+    runOnJS(dismissKeyboard)();
+    isGesturing.value = true;
+    startX.value = translateX.value;
+    startY.value = translateY.value;
     scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
-  }, [translateX, translateY, scale]);
+  }, [translateX, translateY, scale, startX, startY, isGesturing, dismissKeyboard]);
 
   const handlePanResponderMove = useCallback((_, gestureState) => {
-    const newTranslateX = (startX.current + gestureState.dx) / GESTURE_CONSTANTS.horizontalDamping;
+    'worklet';
+    const newTranslateX = (startX.value + gestureState.dx) / GESTURE_CONSTANTS.horizontalDamping;
     translateX.value = newTranslateX;
 
-    const newTranslateY = startY.current + gestureState.dy;
+    const newTranslateY = startY.value + gestureState.dy;
     if (newTranslateY < 0) {
       translateY.value = newTranslateY / GESTURE_CONSTANTS.verticalUpDamping;
     } else {
       translateY.value = newTranslateY / GESTURE_CONSTANTS.verticalDownDamping;
     }
-  }, [translateX, translateY]);
+  }, [translateX, translateY, startX, startY]);
 
   const handlePanResponderRelease = useCallback((_, gestureState) => {
+    'worklet';
+    isGesturing.value = false;
     translateX.value = withTiming(0, { duration: 100 });
 
     // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
@@ -149,14 +169,14 @@ function BottomSheetOverlay({
     
     if (shouldClose) {
       translateY.value = withTiming(maxHeight + 100, ANIMATION_CONFIG.close);
-      setBottomSheetVisible(false);
+      runOnJS(closeBottomSheet)();
     } else {
       translateY.value = withTiming(0, ANIMATION_CONFIG.close);
     }
 
     // 사이즈 원래대로 복귀
     scale.value = withSpring(1, ANIMATION_CONFIG.scaleRestore);
-  }, [translateX, translateY, scale, maxHeight, setBottomSheetVisible]);
+  }, [translateX, translateY, scale, maxHeight, isGesturing, closeBottomSheet]);
 
   const panResponder = useMemo(
     () => PanResponder.create({
@@ -174,7 +194,7 @@ function BottomSheetOverlay({
     if (isBackgroundTouchClose) setBottomSheetVisible(false);
   }, [isBackgroundTouchClose, setBottomSheetVisible]);
 
-  const containerStyle = useMemo(() => [
+  const containerStyle = [
     styles.container,
     {
       width: windowWidth - marginHorizontal * 2,
@@ -184,22 +204,22 @@ function BottomSheetOverlay({
       backgroundColor: palette.background.base,
     },
     animatedStyles,
-  ], [windowWidth, marginHorizontal, maxHeight, marginBottom, bottom, palette.background.base, animatedStyles]);
+  ];
 
-  const pressableViewStyle = useMemo(() => [
+  const pressableViewStyle = [
     styles.pressableView,
     { paddingHorizontal: padding, paddingBottom: padding },
-  ], [padding]);
+  ];
 
-  const gestureBarContainerStyle = useMemo(() => [
+  const gestureBarContainerStyle = [
     styles.gestureBarContainer,
     { paddingBottom: padding }
-  ], [padding]);
+  ];
 
-  const gestureBarStyle = useMemo(() => [
+  const gestureBarStyle = [
     styles.gestureBar,
     { backgroundColor: palette.divider }
-  ], [palette.divider]);
+  ];
 
   if (!localVisible) {
     return null;
