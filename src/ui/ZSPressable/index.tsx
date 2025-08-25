@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React from "react";
 import { Pressable, View, ViewProps } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AnimatedWrapper from "../atoms/AnimatedWrapper";
@@ -30,9 +30,10 @@ function ZSPressable({
   color,
   ...props
 }: ZSPressableProps) {
-  const isButtonPress = useRef(useSharedValue(0)).current;
+  const isButtonPress = useSharedValue(0);
 
   const boxAnimation = useAnimatedStyle(() => {
+    'worklet';
     const scale = interpolate(
       isButtonPress.value,
       [0, 1],
@@ -44,34 +45,29 @@ function ZSPressable({
     };
   }, []);
   
-  const handlePressIn = useCallback(() => {
+  const handlePressIn = () => {
+    'worklet';
     isButtonPress.value = withTiming(1, DEFAULT_DURATION);
-  }, [isButtonPress]);
+  };
   
-  const handlePressOut = useCallback(() => {
+  const handlePressOut = () => {
+    'worklet';
     isButtonPress.value = withTiming(0, DEFAULT_DURATION);
-  }, [isButtonPress]);
+  };
 
-  const pressedStyle = useMemo(() => ({
-    backgroundColor: pressedBackgroundColor,
-    borderRadius: pressedBackgroundBorderRadius,
-  }), [pressedBackgroundColor, pressedBackgroundBorderRadius]);
-  
-  const unpressedStyle = useMemo(() => ({
-    backgroundColor: 'transparent',
-    borderRadius: pressedBackgroundBorderRadius,
-  }), [pressedBackgroundBorderRadius]);
-  
-  const handlePressStyle = useCallback(
-    (pressed: boolean) => {
-      return pressed ? pressedStyle : unpressedStyle;
-    },
-    [pressedStyle, unpressedStyle]
-  );
+  const handlePressStyle = (pressed: boolean) => {
+    return pressed 
+      ? {
+          backgroundColor: pressedBackgroundColor,
+          borderRadius: pressedBackgroundBorderRadius,
+        }
+      : {
+          backgroundColor: 'transparent',
+          borderRadius: pressedBackgroundBorderRadius,
+        };
+  };
 
-  const containerStyle = useMemo(() => ({
-    width: fullWidth ? '100%' as const : undefined
-  }), [fullWidth]);
+  const containerStyle = fullWidth ? { width: '100%' as const } : undefined;
 
   return (
     <View style={containerStyle}>
