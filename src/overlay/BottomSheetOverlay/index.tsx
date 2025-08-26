@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
@@ -79,7 +79,6 @@ function BottomSheetOverlay({
   const [localVisible, setLocalVisible] = useState(false);
 
   const handleKeyboardShow = useCallback((event: any) => {
-    'worklet';
     if (!isGesturing.value) {
       const targetY = IS_IOS ? (-event.endCoordinates.height + bottom) : 0;
       translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
@@ -87,7 +86,6 @@ function BottomSheetOverlay({
   }, [translateY, bottom, isGesturing]);
 
   const handleKeyboardHide = useCallback(() => {
-    'worklet';
     if (!isGesturing.value) {
       translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
     }
@@ -137,8 +135,7 @@ function BottomSheetOverlay({
   }, [setBottomSheetVisible]);
 
   const handlePanResponderGrant = useCallback(() => {
-    'worklet';
-    runOnJS(dismissKeyboard)();
+    dismissKeyboard();
     isGesturing.value = true;
     startX.value = translateX.value;
     startY.value = translateY.value;
@@ -146,7 +143,6 @@ function BottomSheetOverlay({
   }, [translateX, translateY, scale, startX, startY, isGesturing, dismissKeyboard]);
 
   const handlePanResponderMove = useCallback((_, gestureState) => {
-    'worklet';
     const newTranslateX = (startX.value + gestureState.dx) / GESTURE_CONSTANTS.horizontalDamping;
     translateX.value = newTranslateX;
 
@@ -159,7 +155,6 @@ function BottomSheetOverlay({
   }, [translateX, translateY, startX, startY]);
 
   const handlePanResponderRelease = useCallback((_, gestureState) => {
-    'worklet';
     isGesturing.value = false;
     translateX.value = withTiming(0, { duration: 100 });
 
@@ -169,7 +164,7 @@ function BottomSheetOverlay({
     
     if (shouldClose) {
       translateY.value = withTiming(maxHeight + 100, ANIMATION_CONFIG.close);
-      runOnJS(closeBottomSheet)();
+      closeBottomSheet();
     } else {
       translateY.value = withTiming(0, ANIMATION_CONFIG.close);
     }

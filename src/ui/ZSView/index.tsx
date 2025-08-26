@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ViewProps, StyleSheet } from 'react-native';
 import { useTheme } from '../../model/useThemeProvider';
 import AnimatedWrapper from '../atoms/AnimatedWrapper';
@@ -31,4 +31,4 @@ const ZSView: React.FC<Props> = ({ isAnimation = false, elevationLevel = 0, styl
   );
 };
 
-export default memo(ZSView);
+export default ZSView;

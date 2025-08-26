@@ -1,4 +1,3 @@
-import React, { memo } from 'react';
 import { TextProps } from "react-native/types";
 import { useTheme } from "../../model/useThemeProvider";
 import { TypoOptions, TypoStyle, TypoColorOptions, TypoSubStyle, TypoColor, SubColorOptions } from "../../theme/types";
@@ -20,4 +19,4 @@ function ZSText({
     return <TextAtom {...props} style={[typography[s01][s02], { color: c02 ? palette[c01][c02] : palette.text[c01] }, props.style]}>{props.children}</TextAtom>
 }
 
-export default memo(ZSText);
+export default ZSText;

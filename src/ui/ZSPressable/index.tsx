@@ -46,12 +46,10 @@ function ZSPressable({
   }, []);
   
   const handlePressIn = () => {
-    'worklet';
     isButtonPress.value = withTiming(1, DEFAULT_DURATION);
   };
   
   const handlePressOut = () => {
-    'worklet';
     isButtonPress.value = withTiming(0, DEFAULT_DURATION);
   };
 
