@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle, ViewStyle } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, runOnUI, useDerivedValue } from 'react-native-reanimated';
+import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
 import ErrorComponent from './ui/ErrorComponent';
 import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme';
@@ -66,57 +66,37 @@ function ZSTextField({
   const [primaryStyle, subStyle] = typo.split('.') as [TypoStyle, TypoSubStyle];
   const fErrorColor = errorColor || palette.danger.main;
 
-  const fontSize = useMemo(() => {
-    return extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
-  }, [typography, primaryStyle, subStyle]);
-  
-  const fontFamily = useMemo(() => {
-    return extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
-  }, [typography, primaryStyle, subStyle]);
+  const fontSize = extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
+  const fontFamily = extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
 
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const boxHeightValue = useSharedValue(0);
-  const isFocusedValue = useSharedValue(false);
-  const hasValueState = useSharedValue(false);
-  const errorState = useSharedValue(false);
+  
+  const hasValue = value !== '';
+  const isError = status === 'error';
+  
+  const labelAnimationValue = useSharedValue(0);
+  const focusAnimationValue = useSharedValue(0);
+  const errorAnimationValue = useSharedValue(0);
 
-  const labelAnimationValue = useDerivedValue(() => {
-    'worklet';
-    const shouldShow = hasValueState.value || isFocusedValue.value;
-    return withTiming(shouldShow ? 1 : 0, { duration: 100 });
-  }, []);
-
-  const focusAnimationValue = useDerivedValue(() => {
-    'worklet';
-    return withTiming(isFocusedValue.value ? 1 : 0, { duration: 150 });
-  }, []);
-
-  const errorAnimationValue = useDerivedValue(() => {
-    'worklet';
-    return withTiming(errorState.value ? 1 : 0, { duration: 150 });
-  }, []);
-
-  // 상태 동기화를 위한 useEffect
   useEffect(() => {
-    runOnUI(() => {
-      'worklet';
-      isFocusedValue.value = isFocused;
-      hasValueState.value = value !== '';
-      errorState.value = status === 'error';
-    })();
-  }, [value, isFocused, status, isFocusedValue, hasValueState, errorState]);
+    const animationOptions = { duration: 200 };
+    
+    labelAnimationValue.value = withTiming(hasValue || isFocused ? 1 : 0, animationOptions);
+    focusAnimationValue.value = withTiming(isFocused ? 1 : 0, animationOptions);
+    errorAnimationValue.value = withTiming(isError ? 1 : 0, animationOptions);
+  }, [hasValue, isFocused, isError, labelAnimationValue, focusAnimationValue, errorAnimationValue]);
 
-  const animationConstants = {
+  const animationConstants = useMemo(() => ({
     baseFontSize: fontSize + (boxStyle === 'inbox' ? 1 : 0),
     targetFontSize: boxStyle === 'inbox' ? 10 : 11,
     baseTop: isTextArea ? 12 : 0,
     targetTopOffset: boxStyle === 'inbox' ? 17 : 2,
-  };
+  }), [fontSize, boxStyle, isTextArea]);
 
-  // 라벨 애니메이션 스타일
   const animatedLabelStyle = useAnimatedStyle(() => {
     'worklet';
-
+    
     const labelFontSize = interpolate(
       labelAnimationValue.value,
       [0, 1],
@@ -138,19 +118,15 @@ function ZSTextField({
       top: labelTop,
       fontSize: labelFontSize,
     };
-  }, [animationConstants.baseFontSize, animationConstants.targetFontSize, animationConstants.baseTop, animationConstants.targetTopOffset, isTextArea]);
+  }, [animationConstants, isTextArea]);
 
-  // 레이아웃 핸들러
   const handleLayout = useCallback((event: LayoutChangeEvent) => {
-    'worklet';
-    
     const { height } = event.nativeEvent.layout;
-    if (boxHeightValue.value !== height) boxHeightValue.value = height;
+    boxHeightValue.value = height;
   }, [boxHeightValue]);
 
-  // 포커스 및 블러 핸들러
-  const handleFocus = useCallback(() => setIsFocused(true), []);
-  const handleBlur = useCallback(() => setIsFocused(false), []);
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
 
   const colorConfig = useMemo(() => ({
     primaryColor: focusColor || palette.primary.main,
@@ -160,7 +136,6 @@ function ZSTextField({
     errorColor: fErrorColor,
   }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor, fErrorColor]);
 
-  // 애니메이션된 색상 스타일
   const animatedColorStyle = useAnimatedStyle(() => {
     'worklet';
     
@@ -173,25 +148,23 @@ function ZSTextField({
     return {
       borderColor,
     };
-  }, [colorConfig, errorAnimationValue, focusAnimationValue]);
+  }, [colorConfig]);
 
-  // 애니메이션된 라벨 색상 스타일
   const animatedLabelColorStyle = useAnimatedStyle(() => {
     'worklet';
     
-    const hasValueAnimation = hasValueState.value ? 1 : 0;
     const labelColor = errorAnimationValue.value > 0
       ? colorConfig.errorColor
       : focusAnimationValue.value > 0
         ? colorConfig.primaryColor
-        : hasValueAnimation > 0
+        : labelAnimationValue.value > 0
           ? colorConfig.defaultLabelColor
           : colorConfig.placeholderColor;
     
     return {
       color: labelColor,
     };
-  }, [colorConfig, errorAnimationValue, focusAnimationValue]);
+  }, [colorConfig]);
 
   const styleConfig = useMemo(() => {
     const baseStyle = {
@@ -236,11 +209,7 @@ function ZSTextField({
     return { ...baseStyle, ...borderStyle, ...innerStyle };
   }, [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, palette.background.base]);
 
-  // 컨테이너 스타일 정의
-  const containerStyle: StyleProp<ViewStyle> = styleConfig;
-
-  // 라벨 스타일 정의
-  const labelTextStyle: StyleProp<TextStyle> = useMemo(() => ({
+  const labelTextStyle: StyleProp<TextStyle> = {
     fontSize,
     left: paddingHorizontal,
     backgroundColor: labelBgColor || palette.background.base,
@@ -250,14 +219,13 @@ function ZSTextField({
     fontFamily,
     borderRadius: boxStyle === 'outline' ? 5 : 0,
     overflow: 'hidden',
-  }), [fontSize, paddingHorizontal, labelBgColor, boxStyle, fontFamily, palette.background.base]);
+  };
 
-  // 텍스트 변경 핸들러
-  const handleTextChange = useCallback((text: string) => {
+  const handleTextChange = (text: string) => {
     if (onChangeText) onChangeText(text);
-  }, [onChangeText]);
+  };
 
-  const textInputStyle = useMemo(() => [
+  const textInputStyle = [
     { 
       paddingTop: 7 + iosOffset, 
       paddingBottom: 5 + iosOffset, 
@@ -268,7 +236,7 @@ function ZSTextField({
       fontFamily 
     },
     textInputProps?.style,
-  ], [palette.text.base, fontSize, fontFamily, textInputProps?.style]);
+  ];
 
   const shouldShowCloseButton = value && isFocused;
   const shouldShowError = status === 'error' && errorMessage;
@@ -276,7 +244,7 @@ function ZSTextField({
   return (
     <ViewAtom style={{ alignSelf: 'stretch', width: '100%' }}>
       <Animated.View
-        style={[containerStyle, animatedColorStyle]}
+        style={[styleConfig, animatedColorStyle]}
         onLayout={handleLayout}
         pointerEvents={disabled ? 'none' : 'auto'}
       >
@@ -311,22 +279,4 @@ function ZSTextField({
   );
 }
 
-const arePropsEqual = (prevProps: TextFieldProps, nextProps: TextFieldProps): boolean => {
-  return (
-    prevProps.value === nextProps.value &&
-    prevProps.status === nextProps.status &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.errorMessage === nextProps.errorMessage &&
-    prevProps.typo === nextProps.typo &&
-    prevProps.boxStyle === nextProps.boxStyle &&
-    prevProps.innerBoxStyle === nextProps.innerBoxStyle &&
-    prevProps.isTextArea === nextProps.isTextArea &&
-    prevProps.label === nextProps.label &&
-    prevProps.focusColor === nextProps.focusColor &&
-    prevProps.borderColor === nextProps.borderColor &&
-    prevProps.labelColor === nextProps.labelColor &&
-    prevProps.onChangeText === nextProps.onChangeText
-  );
-};
-
-export default React.memo(ZSTextField, arePropsEqual);
+export default ZSTextField;

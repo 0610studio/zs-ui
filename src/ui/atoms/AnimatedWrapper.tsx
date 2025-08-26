@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { View, ViewProps, Platform } from 'react-native';
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, useDerivedValue } from 'react-native-reanimated';
 import { useTheme } from '../../model/useThemeProvider';
@@ -29,20 +29,11 @@ function AnimatedWrapper({
   const { elevation, palette } = useTheme();
   const animationFinished = useSharedValue(false);
   
-  const staticConfigRef = useRef({
+  const staticConfig = useMemo(() => ({
     isIOS: IS_IOS,
     maxShadowOpacity: IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0,
     maxElevation: IS_IOS ? 0 : elevationLevel,
-  });
-  
-  if (staticConfigRef.current.maxShadowOpacity !== (IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0) ||
-      staticConfigRef.current.maxElevation !== (IS_IOS ? 0 : elevationLevel)) {
-    staticConfigRef.current = {
-      isIOS: IS_IOS,
-      maxShadowOpacity: IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0,
-      maxElevation: IS_IOS ? 0 : elevationLevel,
-    };
-  }
+  }), [elevationLevel]);
   
   const backgroundColor = useMemo(() => {
     if (!color) {
@@ -68,14 +59,13 @@ function AnimatedWrapper({
 
   const animatedStyle = useAnimatedStyle(() => {
     'worklet';
-    const config = staticConfigRef.current;
     const shadowValue = shadowProgress.value;
     
-    if (config.isIOS) {
-      return { shadowOpacity: shadowValue * config.maxShadowOpacity };
+    if (staticConfig.isIOS) {
+      return { shadowOpacity: shadowValue * staticConfig.maxShadowOpacity };
     }
-    return { elevation: shadowValue * config.maxElevation };
-  }, []);
+    return { elevation: shadowValue * staticConfig.maxElevation };
+  }, [staticConfig]);
 
   const animationProps = useMemo(() => ({
     entering: FadeInDown.duration(duration).withCallback((finished) => {
@@ -85,18 +75,18 @@ function AnimatedWrapper({
       }
     }),
     exiting: FadeOut.duration(50),
-  }), [duration, animationFinished]);
+  }), [duration]);
 
-  const baseStyle = useMemo(() => [
+  const baseStyle = [
     style,
     backgroundColor && { backgroundColor },
     staticStyle
-  ], [style, backgroundColor, staticStyle]);
+  ];
 
-  const animatedStyleArray = useMemo(() => [
+  const animatedStyleArray = [
     ...baseStyle,
     animatedStyle
-  ], [baseStyle, animatedStyle]);
+  ];
 
   if (!isAnimation) {
     return <View style={baseStyle} {...props}>{children}</View>;
