@@ -1,10 +1,14 @@
 import { View } from "react-native";
-import { ZSContainer, ZSTextField, ZSAboveKeyboard } from "zs-ui";
+import { ZSContainer, ZSTextField, ZSAboveKeyboard, useOverlay } from "zs-ui";
 import CtaButton from "../src/ui/CtaButton";
 import { useState } from "react";
+import { router } from "expo-router";
+import useIsFocused from "../src/hooks/useIsFocused";
 
 function ZSContainerExample() {
   const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
+  const isFocused = useIsFocused();
+
   return (
     <ZSContainer
       edges={['bottom']}
@@ -39,12 +43,17 @@ function ZSContainerExample() {
         focusColor={'red'}
       />
 
-      <ZSAboveKeyboard handleLayoutHeight={setCtaLayoutHeight}>
+      <ZSAboveKeyboard
+        handleLayoutHeight={setCtaLayoutHeight}
+        isFocused={isFocused}
+      >
         <CtaButton
           disabled={false}
           // ---
           primaryButtonText='CTA 버튼'
-          onPrimaryButtonPress={() => { }}
+          onPrimaryButtonPress={() => {
+            router.push('/404')
+          }}
           // ---
           secondaryButtonText='취소'
           onSecondaryButtonPress={() => { }}

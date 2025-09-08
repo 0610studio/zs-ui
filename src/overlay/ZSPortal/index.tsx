@@ -55,20 +55,21 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
 
 interface PortalProps {
   children: ReactNode;
+  isFocused?: boolean;
 }
 
-export const ZSPortal: React.FC<PortalProps> = ({ children }) => {
+export const ZSPortal: React.FC<PortalProps> = ({ children, isFocused = true }) => {
   const context = useContext(PortalContext);
   const [portalId] = useState(() => `portal_${Date.now()}_${Math.random()}`);
 
   useEffect(() => {
     if (context) {
-      context.registerPortal(portalId, children);
-      return () => {
+      if (isFocused) {
+        context.registerPortal(portalId, children);
+      } else {
         context.unregisterPortal(portalId);
-      };
+      }
     }
-    return () => {};
   }, [children]);
 
   return null;
