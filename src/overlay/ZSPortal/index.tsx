@@ -63,14 +63,20 @@ export const ZSPortal: React.FC<PortalProps> = ({ children, isFocused = true }) 
   const [portalId] = useState(() => `portal_${Date.now()}_${Math.random()}`);
 
   useEffect(() => {
-    if (context) {
-      if (isFocused) {
-        context.registerPortal(portalId, children);
-      } else {
-        context.unregisterPortal(portalId);
-      }
+    if (!context) return;
+    if (isFocused) {
+      context.registerPortal(portalId, children);
+    } else {
+      context.unregisterPortal(portalId);
     }
   }, [children]);
+
+  useEffect(() => {
+    return () => {
+      if (!context) return;
+      context.unregisterPortal(portalId);
+    };
+  }, []);
 
   return null;
 };
