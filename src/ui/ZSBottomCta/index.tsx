@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { Keyboard, Platform, StyleSheet } from "react-native";
+
+import { StyleSheet } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { Z_INDEX_VALUE } from "../../model/utils";
+import useKeyboard from "../../model/useKeyboard";
 
 interface Props {
   render: () => React.ReactNode;
@@ -12,31 +13,10 @@ function ZSBottomCta({
   render,
   offset = 0,
 }: Props) {
-  const [bottomValue, setBottomValue] = useState(0);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
-    const keyboardShowSubscription = Keyboard.addListener(showEvent, (event) => {
-      setBottomValue(event.endCoordinates.height)
-      setIsKeyboardVisible(true);
-    });
-
-    const keyboardHideSubscription = Keyboard.addListener(hideEvent, () => {
-      setBottomValue(0);
-      setIsKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardShowSubscription.remove();
-      keyboardHideSubscription.remove();
-    };
-  }, []);
+  const { isKeyboardVisible, keyboardHeight } = useKeyboard();
 
   return (
-    <Animated.View entering={FadeInDown} exiting={FadeOutDown} style={[styles.container, { bottom: bottomValue + (isKeyboardVisible ? offset : 0) }]}>
+    <Animated.View entering={FadeInDown} exiting={FadeOutDown} style={[styles.container, { bottom: keyboardHeight + (isKeyboardVisible ? offset : 0) }]}>
       {render()}
     </Animated.View>
   );

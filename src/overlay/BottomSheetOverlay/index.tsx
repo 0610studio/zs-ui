@@ -7,13 +7,9 @@ import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
 import { MAX_OVERLAY_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import useKeyboard from '../../model/useKeyboard';
 
 const IS_IOS = Platform.OS === 'ios';
-
-const keyboardEvents = ({
-  showEvent: IS_IOS ? 'keyboardWillShow' as const : 'keyboardDidShow' as const,
-  hideEvent: IS_IOS ? 'keyboardWillHide' as const : 'keyboardDidHide' as const,
-});
 
 const ANIMATION_CONFIG = {
   keyboard: {
@@ -78,28 +74,23 @@ function BottomSheetOverlay({
   
   const [localVisible, setLocalVisible] = useState(false);
 
-  const handleKeyboardShow = useCallback((event: any) => {
+  const handleKeyboardShow = (event: any) => {
     if (!isGesturing.value) {
       const targetY = IS_IOS ? (-event.endCoordinates.height + bottom) : 0;
       translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
     }
-  }, [translateY, bottom, isGesturing]);
+  };
 
-  const handleKeyboardHide = useCallback(() => {
+  const handleKeyboardHide = () => {
     if (!isGesturing.value) {
       translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
     }
-  }, [translateY, isGesturing]);
+  };
 
-  useEffect(() => {
-    const keyboardShowSubscription = Keyboard.addListener(keyboardEvents.showEvent, handleKeyboardShow);
-    const keyboardHideSubscription = Keyboard.addListener(keyboardEvents.hideEvent, handleKeyboardHide);
-
-    return () => {
-      keyboardShowSubscription.remove();
-      keyboardHideSubscription.remove();
-    };
-  }, [keyboardEvents.showEvent, keyboardEvents.hideEvent, handleKeyboardShow, handleKeyboardHide]);
+  useKeyboard({
+    handleKeyboardShow,
+    handleKeyboardHide,
+  });
 
   // BottomSheet 표시/숨김 애니메이션 처리
   useEffect(() => {

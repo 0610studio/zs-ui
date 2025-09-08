@@ -17,6 +17,7 @@ export function OverlayProvider({
   loaderComponent,
   children
 }: OverlayProviderProps) {
+  const [portalClearAllFn, setPortalClearAllFn] = useState<(() => void) | null>(null);
   // Alert
   const [title, setTitle] = useState<string>('');
   const [informative, setInformative] = useState<string>('');

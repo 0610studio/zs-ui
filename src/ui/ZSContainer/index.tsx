@@ -1,14 +1,10 @@
 import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, useState, useCallback, useMemo } from 'react';
-import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, Keyboard, View, Platform } from 'react-native';
+import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../model/useThemeProvider';
+import useKeyboard from '../../model/useKeyboard';
 
-const IS_IOS = Platform.OS === 'ios';
 const KEYBOARD_ANIMATION_DELAY = 50;
-const keyboardEvents = {
-  showEvent: IS_IOS ? 'keyboardWillShow' as const : 'keyboardDidShow' as const,
-  hideEvent: IS_IOS ? 'keyboardWillHide' as const : 'keyboardDidHide' as const,
-};
 
 export type ZSContainerProps = ViewProps & {
   backgroundColor?: string;
@@ -53,10 +49,11 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   const scrollViewRef = useRef<ScrollView>(null);
   const lastTouchY = useRef<number | null>(0);
   const [keyboardHeight, setKeyboardHeight] = useState<number | null>(0);
+  const scrollTimeoutRef = useRef<number | null>(null);
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
 
-  const handleKeyboardShow = useCallback((e: any) => {
+  const handleKeyboardShow = (e: any) => {
     setKeyboardHeight(e.endCoordinates.height);
     
     if (scrollViewRef.current && scrollToFocusedInput) {
@@ -69,31 +66,36 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
       const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
 
-      setTimeout(() => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
         scrollViewRef.current?.scrollTo({
           y: currentScrollPosition + scrollOffset,
           animated: true,
         });
+        scrollTimeoutRef.current = null;
       }, KEYBOARD_ANIMATION_DELAY);
     }
-  }, [windowHeight, keyboardScrollExtraOffset, scrollToFocusedInput]);
+  };
 
-  // 키보드 숨김 핸들러를 메모이제이션하여 성능 최적화
-  const handleKeyboardHide = useCallback(() => {
+  const handleKeyboardHide = () => {
     setKeyboardHeight(0);
-  }, []);
+  };
+
+  useKeyboard({
+    handleKeyboardShow,
+    handleKeyboardHide,
+  });
 
   useEffect(() => {
-    const keyboardShowSubscription = Keyboard.addListener(keyboardEvents.showEvent, handleKeyboardShow);
-    const keyboardHideSubscription = Keyboard.addListener(keyboardEvents.hideEvent, handleKeyboardHide);
-
     return () => {
       positionRef.current = null;
       lastTouchY.current = null;
-      keyboardShowSubscription.remove();
-      keyboardHideSubscription.remove();
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
     };
-  }, [keyboardEvents.showEvent, keyboardEvents.hideEvent, handleKeyboardShow, handleKeyboardHide]);
+  }, []);
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (props.onScroll) props.onScroll(event);
