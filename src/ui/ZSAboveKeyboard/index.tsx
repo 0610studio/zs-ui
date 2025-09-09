@@ -28,14 +28,12 @@ function ZSAboveKeyboard({
   const { isKeyboardVisible, keyboardHeight } = useKeyboard();
 
   useEffect(() => {
-    if (isKeyboardVisible) {
-      // 키보드 바로 위에 위치하도록 계산
+    // 키보드 바로 위에 위치하도록 계산
+    if (keyboardHeight) {
       const topValue = screenHeight - keyboardHeight - componentHeightRef.current - keyboardShowOffset - (Platform.OS === 'android' ? 13 : 0);
       setTopValue(topValue);
-    } else {
-      setTopValue(0);
     }
-  }, [isKeyboardVisible, keyboardHeight, keyboardShowOffset]);
+  }, [keyboardHeight, keyboardShowOffset]);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
@@ -45,7 +43,7 @@ function ZSAboveKeyboard({
 
   return (
     <ZSPortal isFocused={isFocused}>
-      <View style={[styles.container, isKeyboardVisible ? { top: topValue } : { bottom: keyboardHideOffset + bottom }]}>
+      <View style={[styles.container, (isKeyboardVisible && topValue !== 0) ? { top: topValue } : { bottom: keyboardHideOffset + bottom }]}>
         <View onLayout={handleLayout}>
           {children}
         </View>
