@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import { Z_INDEX_VALUE } from '../../model/utils';
 
 interface PortalContextType {
   registerPortal: (id: string, element: ReactNode) => void;
@@ -43,7 +44,7 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
     <PortalContext.Provider value={{ registerPortal, unregisterPortal }}>
       {children}
       {Array.from(portals.entries()).map(([id, element]) => (
-        <Animated.View entering={FadeInDown} exiting={FadeOutDown} key={id} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'box-none' }}>
+        <Animated.View entering={FadeInDown} exiting={FadeOutDown} key={id} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'box-none', zIndex: Z_INDEX_VALUE.ABOVE_KEYBOARD }}>
           {element}
         </Animated.View>
       ))}

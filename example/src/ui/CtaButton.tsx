@@ -5,10 +5,10 @@ import { useTheme, ZSPressable, ZSText } from 'zs-ui';
 interface CtaButtonProps {
   primaryButtonText: string;
   onPrimaryButtonPress: () => void;
-  disabled: boolean;
+  disabled?: boolean;
   backgroundColor?: string;
   bottomComponent?: React.ReactNode;
-  secondaryButtonText: string;
+  secondaryButtonText?: string;
   onSecondaryButtonPress?: () => void;
   onDisabledPress?: () => void;
 }
@@ -16,7 +16,7 @@ interface CtaButtonProps {
 function CtaButton({
   onPrimaryButtonPress,
   primaryButtonText,
-  disabled,
+  disabled = false,
   backgroundColor,
   bottomComponent,
   secondaryButtonText,

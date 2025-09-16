@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Button, ScrollView, StyleSheet, View } from 'react-native';
-import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField, ZSAboveKeyboard } from 'zs-ui';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 import MyBottomSheet from './MyBottomSheet';
+import CtaButton from './CtaButton';
 
 interface MyModalProps {
   onConfirm?: () => void;
@@ -94,6 +95,13 @@ function MyModal({ onConfirm }: MyModalProps) {
           title="show_Alert"
           color="#841584"
         />
+
+        <ZSAboveKeyboard showOnlyKeyboardVisible>
+          <CtaButton
+            primaryButtonText='CTA 버튼'
+            onPrimaryButtonPress={() => { }}
+          />
+        </ZSAboveKeyboard>
       </ScrollView>
     </ZSView >
   );

@@ -6,6 +6,7 @@ import { ZSPortal } from '../../overlay';
 import useKeyboard from '../../model/useKeyboard';
 
 const screenHeight = Dimensions.get('window').height;
+const HIDDEN_BOTTOM_OFFSET = -300;
 
 interface Props {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ interface Props {
   keyboardHideOffset?: number;
   handleLayoutHeight?: (height: number) => void;
   isFocused?: boolean;
+  showOnlyKeyboardVisible?: boolean;
 }
 
 function ZSAboveKeyboard({
@@ -21,6 +23,7 @@ function ZSAboveKeyboard({
   children,
   handleLayoutHeight,
   isFocused = true,
+  showOnlyKeyboardVisible = false,
 }: Props) {
   const [topValue, setTopValue] = useState(0);
   const componentHeightRef = useRef(0);
@@ -41,9 +44,11 @@ function ZSAboveKeyboard({
     handleLayoutHeight?.(height);
   };
 
+  const isVisible = showOnlyKeyboardVisible ? isKeyboardVisible : true;
+
   return (
     <ZSPortal isFocused={isFocused}>
-      <View style={[styles.container, (isKeyboardVisible && topValue !== 0) ? { top: topValue } : { bottom: keyboardHideOffset + bottom }]}>
+      <View style={[styles.container, !isVisible ? { bottom: HIDDEN_BOTTOM_OFFSET } : isKeyboardVisible ? { top: topValue } : { bottom: keyboardHideOffset + bottom }]}>
         <View onLayout={handleLayout}>
           {children}
         </View>
