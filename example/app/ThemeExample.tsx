@@ -111,7 +111,7 @@ export default function ThemeExample() {
         <ZSText color='information.50'>Information.50</ZSText>
       </TitleCard>
 
-      <TitleCard title='Color Palette'>
+      <TitleCard title='Custom Color Palette (ThemeFactory 적용됨)'>
         <View style={[styles.colorBox, { backgroundColor: palette.primary.lighter }]}>
           <Text style={styles.textWhite}>Primary Lighter</Text>
         </View>
@@ -142,6 +142,24 @@ export default function ThemeExample() {
         <View style={[styles.colorBox, { backgroundColor: palette.information.main }]}>
           <Text style={styles.textWhite}>Information Main</Text>
         </View>
+      </TitleCard>
+
+      <TitleCard title='커스텀 색상 확인'>
+        <ZSText typo="body.2" color="base">
+          현재 적용된 커스텀 색상:
+        </ZSText>
+        <ZSText typo="body.3" color="primary">
+          Primary: {palette.primary.main} (기본값: #FF9F06)
+        </ZSText>
+        <ZSText typo="body.3" color="secondary">
+          Secondary: {palette.secondary.main} (기본값: #007FFF)
+        </ZSText>
+        <ZSText typo="body.3" color="success">
+          Success: {palette.success.main} (기본값: #008A1E)
+        </ZSText>
+        <ZSText typo="body.3" color="danger">
+          Danger: {palette.danger.main} (기본값: #EB003B)
+        </ZSText>
       </TitleCard>
 
       <TitleCard title='elevation'>

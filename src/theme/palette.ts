@@ -1,4 +1,4 @@
-import { Theme } from "./types";
+import { Theme, ColorPalette, ColorPaletteExtend } from "./types";
 
 export const transparency = {
   '0%': '00',   // 완전 투명
@@ -351,6 +351,216 @@ const DIVIDER_COLOR = {
   light: LIGHT_COLORS.grey[50] + transparency['20%'],
   dark: DARK_COLORS.grey[50] + transparency['20%'],
 };
+
+// ThemeFactory 타입 정의
+export interface ThemeFactoryColors {
+  primary?: Partial<ColorPaletteExtend>;
+  secondary?: Partial<ColorPalette>;
+  danger?: Partial<ColorPalette>;
+  warning?: Partial<ColorPalette>;
+  success?: Partial<ColorPalette>;
+  information?: Partial<ColorPalette>;
+  grey?: Partial<ColorPalette>;
+}
+
+export interface ThemeFactoryConfig {
+  light?: ThemeFactoryColors;
+  dark?: ThemeFactoryColors;
+}
+
+/**
+ * 테마 팩토리 함수 - LIGHT_COLORS와 DARK_COLORS를 재정의할 수 있는 기능을 제공합니다.
+ * @param config - 라이트/다크 모드별로 색상을 재정의할 수 있는 설정 객체
+ * @returns 재정의된 LIGHT_COLORS와 DARK_COLORS를 포함한 팩토리 함수
+ */
+export function themeFactory(config: ThemeFactoryConfig = {}) {
+  // 기본 색상들을 깊은 복사로 생성
+  const createCustomLightColors = (): typeof LIGHT_COLORS => {
+    const customColors = { ...LIGHT_COLORS };
+    
+    if (config.light) {
+      Object.keys(config.light).forEach((key) => {
+        const colorKey = key as keyof ThemeFactoryColors;
+        if (config.light?.[colorKey]) {
+          customColors[colorKey] = {
+            ...customColors[colorKey],
+            ...config.light[colorKey],
+          } as any;
+        }
+      });
+    }
+    
+    return customColors;
+  };
+
+  const createCustomDarkColors = (): typeof DARK_COLORS => {
+    const customColors = { ...DARK_COLORS };
+    
+    if (config.dark) {
+      Object.keys(config.dark).forEach((key) => {
+        const colorKey = key as keyof ThemeFactoryColors;
+        if (config.dark?.[colorKey]) {
+          customColors[colorKey] = {
+            ...customColors[colorKey],
+            ...config.dark[colorKey],
+          } as any;
+        }
+      });
+    }
+    
+    return customColors;
+  };
+
+  const customLightColors = createCustomLightColors();
+  const customDarkColors = createCustomDarkColors();
+
+  // 재정의된 색상으로 새로운 팔레트 함수 반환
+  return function createPalette({
+    mode = 'light',
+    themeColors = {},
+  }: {
+    mode?: 'light' | 'dark';
+    themeColors?: { light?: Theme; dark?: Theme };
+  } = {}): Theme {
+    const colors = mode === 'light' ? customLightColors : customDarkColors;
+
+    // 커스텀 색상을 기반으로 새로운 색상 매핑 생성
+    const customTextColors = {
+      light: {
+        primary: colors.primary.main,
+        base: colors.grey[80],
+        secondary: colors.grey[60],
+        disabled: colors.grey[50],
+        danger: colors.danger[60],
+        warning: colors.warning[60],
+        success: colors.success[60],
+        information: colors.information[60],
+        white: '#FFFFFF',
+        black: '#000000',
+      },
+      dark: {
+        primary: colors.primary.main,
+        base: colors.grey[90],
+        secondary: colors.grey[70],
+        disabled: colors.grey[50],
+        danger: colors.danger[30],
+        warning: colors.warning[30],
+        success: colors.success[30],
+        information: colors.information[30],
+        white: '#FFFFFF',
+        black: '#000000',
+      },
+    };
+
+    const customBorderColors = {
+      light: {
+        box: colors.grey[20],
+        active: colors.primary[50],
+        base: colors.grey[60],
+        danger: colors.danger[10],
+        warning: colors.warning[10],
+        success: colors.success[10],
+        information: colors.information[10],
+      },
+      dark: {
+        box: colors.grey[30],
+        active: colors.primary[50],
+        base: colors.grey[60],
+        danger: colors.danger[70],
+        warning: colors.warning[70],
+        success: colors.success[70],
+        information: colors.information[70],
+      },
+    };
+
+    const customBackgroundColors = {
+      light: {
+        primary: colors.primary.main,
+        layer1: colors.grey[5],
+        layer2: colors.grey[20],
+        neutral: colors.grey[30],
+        base: colors.grey[0],
+        danger: colors.danger[5],
+        warning: colors.warning[5],
+        success: colors.success[5],
+        information: colors.information[5],
+      },
+      dark: {
+        primary: colors.primary.main,
+        layer1: colors.grey[5],
+        layer2: colors.grey[20],
+        neutral: colors.grey[30],
+        base: colors.grey[0],
+        danger: colors.danger[80],
+        warning: colors.warning[80],
+        success: colors.success[80],
+        information: colors.information[80],
+      },
+    };
+
+    const customActionColors = {
+      light: {
+        hover: colors.primary[60],
+        pressed: colors.primary[70],
+        disable: colors.grey[20],
+      },
+      dark: {
+        hover: colors.primary[60],
+        pressed: colors.primary[70],
+        disable: colors.grey[30],
+      },
+    };
+
+    const customDividerColor = {
+      light: colors.grey[50] + transparency['20%'],
+      dark: colors.grey[50] + transparency['20%'],
+    };
+
+    const customMainColors = {
+      light: {
+        primary: colors.primary.main,
+        secondary: colors.secondary.main,
+        danger: colors.danger.main,
+        warning: colors.warning.main,
+        success: colors.success.main,
+        information: colors.information.main,
+        grey: colors.grey.main
+      },
+      dark: {
+        primary: colors.primary.main,
+        secondary: colors.secondary.main,
+        danger: colors.danger.main,
+        warning: colors.warning.main,
+        success: colors.success.main,
+        information: colors.information.main,
+        grey: colors.grey.main
+      }
+    };
+
+    const theme: Theme = {
+      mode,
+      ...colors,
+      text: customTextColors[mode],
+      border: customBorderColors[mode],
+      background: customBackgroundColors[mode],
+      action: customActionColors[mode],
+      divider: customDividerColor[mode],
+      elevationShadow: SHADOW_COLORS[mode],
+      modalBgColor: MODAL_BG_COLOR[mode],
+      mainColor: customMainColors[mode]
+    };
+
+    // 사용자 정의 테마 컬러가 있을 경우 병합
+    if (themeColors?.[mode]) {
+      return {
+        ...theme,
+        ...themeColors[mode],
+      };
+    }
+
+    return theme;
+  };
+}
 
 export default function palette({
   mode = 'light',

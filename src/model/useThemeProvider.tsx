@@ -14,6 +14,7 @@ export interface ThemeProviderProps {
   splitBreakpoint?: number;
   splitRatio?: number;
   isSplitView?: boolean;
+  customPalette?: (config: { mode?: 'light' | 'dark'; themeColors?: { light?: Theme; dark?: Theme } }) => Theme;
 }
 
 /**
@@ -47,7 +48,7 @@ export const useTheme = () => {
   return context;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, splitBreakpoint = 700, splitRatio = 0.5, isSplitView = false }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, splitBreakpoint = 700, splitRatio = 0.5, isSplitView = false, customPalette }) => {
   const systemColorScheme = useColorScheme(); // 시스템 다크 모드 감지
   const [isUsingSystemColorScheme, setUseSystemColorScheme] = useState(isDarkModeEnabled ? true : false);
   const [mode, setMode] = useState<'light' | 'dark'>(isDarkModeEnabled ? (systemColorScheme === 'dark' ? 'dark' : 'light') : 'light');
@@ -107,9 +108,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   useEffect(() => {
     if (Platform.OS === 'android') {
       NavigationBar.setButtonStyleAsync(mode);
-      NavigationBar.setBackgroundColorAsync(palette({ mode }).background.base)
+      const currentPalette = customPalette ? customPalette({ mode }) : palette({ mode });
+      NavigationBar.setBackgroundColorAsync(currentPalette.background.base)
     }
-  }, [mode])
+  }, [mode, customPalette])
 
   // 테마 토글 함수
   const toggleTheme = useCallback(async () => {
@@ -127,20 +129,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
     await AsyncStorage.setItem('useSystemColorScheme', useSystem.toString());
   }, []);
 
-  const themeValue = useMemo(() => ({
-    isSplitView,
-    dimensions,
-    splitBreakpoint,
-    splitRatio,
-    palette: {
-      isUsingSystemColorScheme,
-      setUseSystemColorScheme: handleSetUseSystemColorScheme,
-      toggleTheme,
-      ...palette({ mode }), // 선택된 모드에 따른 팔레트 적용
-    },
-    typography: typography({ themeFonts }),
-    elevation: elevation(palette({ mode }))
-  }), [mode, isUsingSystemColorScheme, typography, themeFonts]);
+  const themeValue = useMemo(() => {
+    const currentPalette = customPalette ? customPalette({ mode }) : palette({ mode });
+    return {
+      isSplitView,
+      dimensions,
+      splitBreakpoint,
+      splitRatio,
+      palette: {
+        isUsingSystemColorScheme,
+        setUseSystemColorScheme: handleSetUseSystemColorScheme,
+        toggleTheme,
+        ...currentPalette, // 선택된 모드에 따른 팔레트 적용
+      },
+      typography: typography({ themeFonts }),
+      elevation: elevation(currentPalette)
+    };
+  }, [mode, isUsingSystemColorScheme, typography, themeFonts, customPalette]);
 
   return (
     <ThemeContext.Provider value={themeValue}>

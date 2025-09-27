@@ -179,29 +179,4 @@ export const styles = StyleSheet.create({
   scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: '100%' },
 });
 
-const arePropsEqual = (
-  prevProps: ZSContainerProps, 
-  nextProps: ZSContainerProps
-): boolean => {
-  return (
-    prevProps.backgroundColor === nextProps.backgroundColor &&
-    prevProps.statusBarColor === nextProps.statusBarColor &&
-    prevProps.barStyle === nextProps.barStyle &&
-    prevProps.scrollViewDisabled === nextProps.scrollViewDisabled &&
-    prevProps.showsVerticalScrollIndicator === nextProps.showsVerticalScrollIndicator &&
-    prevProps.keyboardScrollExtraOffset === nextProps.keyboardScrollExtraOffset &&
-    prevProps.translucent === nextProps.translucent &&
-    prevProps.scrollEventThrottle === nextProps.scrollEventThrottle &&
-    prevProps.scrollToFocusedInput === nextProps.scrollToFocusedInput &&
-    prevProps.onScroll === nextProps.onScroll &&
-    prevProps.style === nextProps.style &&
-    prevProps.children === nextProps.children &&
-    prevProps.topComponent === nextProps.topComponent &&
-    prevProps.bottomComponent === nextProps.bottomComponent &&
-    prevProps.rightComponent === nextProps.rightComponent &&
-    // edges 배열 비교
-    JSON.stringify(prevProps.edges) === JSON.stringify(nextProps.edges)
-  );
-};
-
-export default React.memo(ZSContainer, arePropsEqual);
+export default ZSContainer;

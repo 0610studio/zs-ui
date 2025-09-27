@@ -4,6 +4,7 @@ import {
   ThemeProvider,
   GlobalOverlay,
 } from './model'
+import { themeFactory } from './theme/palette';
 
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
 import ZSContainer from './ui/ZSContainer';
@@ -36,6 +37,7 @@ export {
   useTheme,
   OverlayProvider,
   ThemeProvider,
+  themeFactory,
   // ---
   ZSBottomCta,
   ZSView,
@@ -86,6 +88,7 @@ import {
   TypoSubStyle,
   TypoColorOptions
 } from "./theme/types";
+import { ThemeFactoryColors, ThemeFactoryConfig } from "./theme/palette";
 import {
   SnackItem,
   ShowAlertProps,
@@ -127,6 +130,8 @@ export type {
   TypoOptions,
   TypoSubStyle,
   TypoColorOptions,
+  ThemeFactoryColors,
+  ThemeFactoryConfig,
   SnackItem,
   ShowAlertProps,
   ShowSnackBarProps,
