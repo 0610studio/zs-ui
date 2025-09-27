@@ -259,18 +259,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const arePropsEqual = (
-  prevProps: ShowBottomSheetProps, 
-  nextProps: ShowBottomSheetProps
-): boolean => {
-  return (
-    prevProps.headerComponent === nextProps.headerComponent &&
-    prevProps.component === nextProps.component &&
-    prevProps.options?.isBackgroundTouchClose === nextProps.options?.isBackgroundTouchClose &&
-    prevProps.options?.marginHorizontal === nextProps.options?.marginHorizontal &&
-    prevProps.options?.marginBottom === nextProps.options?.marginBottom &&
-    prevProps.options?.padding === nextProps.options?.padding
-  );
-};
-
-export default React.memo(BottomSheetOverlay, arePropsEqual);
+export default React.memo(BottomSheetOverlay);

@@ -58,10 +58,12 @@ function ZSPressable({
       ? {
           backgroundColor: pressedBackgroundColor,
           borderRadius: pressedBackgroundBorderRadius,
+          alignSelf: 'flex-start' as const,
         }
       : {
           backgroundColor: 'transparent',
           borderRadius: pressedBackgroundBorderRadius,
+          alignSelf: 'flex-start' as const,
         };
   };
 
@@ -91,22 +93,4 @@ function ZSPressable({
   );
 }
 
-const arePropsEqual = (
-  prevProps: ZSPressableProps, 
-  nextProps: ZSPressableProps
-): boolean => {
-  return (
-    prevProps.onPress === nextProps.onPress &&
-    prevProps.onLongPress === nextProps.onLongPress &&
-    prevProps.isAnimation === nextProps.isAnimation &&
-    prevProps.pressedBackgroundColor === nextProps.pressedBackgroundColor &&
-    prevProps.pressedBackgroundBorderRadius === nextProps.pressedBackgroundBorderRadius &&
-    prevProps.elevationLevel === nextProps.elevationLevel &&
-    prevProps.fullWidth === nextProps.fullWidth &&
-    prevProps.color === nextProps.color &&
-    prevProps.style === nextProps.style &&
-    prevProps.children === nextProps.children
-  );
-};
-
-export default React.memo(ZSPressable, arePropsEqual);
+export default React.memo(ZSPressable);

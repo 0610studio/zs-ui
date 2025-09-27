@@ -103,18 +103,4 @@ function AnimatedWrapper({
   );
 }
 
-const arePropsEqual = (
-  prevProps: AnimatedWrapperProps, 
-  nextProps: AnimatedWrapperProps
-): boolean => {
-  if (prevProps.children !== nextProps.children) return false;
-  if (prevProps.style !== nextProps.style) return false;
-  if (prevProps.isAnimation !== nextProps.isAnimation) return false;
-  if (prevProps.elevationLevel !== nextProps.elevationLevel) return false;
-  if (prevProps.duration !== nextProps.duration) return false;
-  if (prevProps.color !== nextProps.color) return false;
-  
-  return true;
-};
-
-export default React.memo(AnimatedWrapper, arePropsEqual);
+export default React.memo(AnimatedWrapper);
