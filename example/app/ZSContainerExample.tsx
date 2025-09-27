@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Button, View } from "react-native";
 import { ZSContainer, ZSTextField, ZSAboveKeyboard, useOverlay } from "zs-ui";
 import CtaButton from "../src/ui/CtaButton";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import useIsFocused from "../src/hooks/useIsFocused";
 function ZSContainerExample() {
   const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
   const isFocused = useIsFocused();
+  const { showAlert } = useOverlay();
 
   return (
     <ZSContainer
@@ -23,7 +24,30 @@ function ZSContainerExample() {
         focusColor={'red'}
       />
 
-      <View style={{ height: 500 }} />
+      <View style={{ height: 300 }} />
+
+      <Button
+        onPress={() =>
+          showAlert({
+            title: "타이틀 테스트 길어지면 줄바꿈이 될 수 있습니다.",
+            informative: "테스트 informative 길~~~~~~~~어지면 줄바꿈이 될 수 있습니다.",
+            actions: {
+              primary: {
+                label: "확인",
+                onPress: () => console.log("확인"),
+              },
+              secondary: {
+                label: "취소",
+                onPress: () => console.log("취소"),
+              },
+            },
+          })
+        }
+        title="show_Alert"
+        color="#841584"
+      />
+
+      <View style={{ height: 300 }} />
 
       <ZSTextField
         boxStyle="underline"

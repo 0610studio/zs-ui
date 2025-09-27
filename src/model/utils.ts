@@ -1,5 +1,4 @@
-import { Platform, StatusBar, StyleProp, TextStyle } from "react-native";
-import { initialWindowMetrics } from 'react-native-safe-area-context';
+import { StyleProp, TextStyle } from "react-native";
 
 export const extractStyle = (
     style: StyleProp<TextStyle>,
@@ -23,10 +22,10 @@ export const Z_INDEX_VALUE = {
     BOTTOM_SHEET1: 8101,
     BOTTOM_SHEET2: 8102,
     POPOVER: 8200,
-    ALERT: 8300,
     BOTTOM_CTA: 8400,
     ABOVE_KEYBOARD: 8500,
     SNACKBAR: 8600,
+    ALERT: 8700,
     LOADING: 8999,
 };
 
