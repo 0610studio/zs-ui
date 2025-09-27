@@ -93,4 +93,14 @@ function ZSPressable({
   );
 }
 
-export default React.memo(ZSPressable);
+export default React.memo(ZSPressable, (prevProps, nextProps) => {
+  return (
+    prevProps.isAnimation === nextProps.isAnimation &&
+    prevProps.elevationLevel === nextProps.elevationLevel &&
+    prevProps.fullWidth === nextProps.fullWidth &&
+    prevProps.color === nextProps.color &&
+    prevProps.pressedBackgroundColor === nextProps.pressedBackgroundColor &&
+    prevProps.pressedBackgroundBorderRadius === nextProps.pressedBackgroundBorderRadius &&
+    prevProps.style === nextProps.style
+  );
+});

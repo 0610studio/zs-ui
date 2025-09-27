@@ -179,4 +179,4 @@ export const styles = StyleSheet.create({
   scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: '100%' },
 });
 
-export default React.memo(ZSContainer);
+export default ZSContainer;
