@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, Dimensions, View, LayoutChangeEvent } from 'react-native';
-import { Z_INDEX_VALUE } from '../../model/utils';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ZSPortal } from '../../overlay';
-import useKeyboard from '../../model/useKeyboard';
+import { useRef } from "react";
+import { LayoutChangeEvent, Platform, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useKeyboard from "../../model/useKeyboard";
+import { Z_INDEX_VALUE } from "../../model/utils";
 
-const screenHeight = Dimensions.get('window').height;
+// Edge-to-edge 디스플레이 정책
+// Android 11 (API 30) 이전: adjustResize가 시스템 레벨에서 자동으로 패딩을 추가
+// Android 11 (API 30) 이후: 일부 기기에서 패딩이 적용되지 않음
+const isLegacyAndroidKeyboardBehavior = (Platform.OS === 'android' && Platform.Version < 30);
+
 const HIDDEN_BOTTOM_OFFSET = -300;
 
 interface Props {
@@ -13,7 +16,6 @@ interface Props {
   keyboardShowOffset?: number;
   keyboardHideOffset?: number;
   handleLayoutHeight?: (height: number) => void;
-  isFocused?: boolean;
   showOnlyKeyboardVisible?: boolean;
 }
 
@@ -22,21 +24,15 @@ function ZSAboveKeyboard({
   keyboardHideOffset = 0,
   children,
   handleLayoutHeight,
-  isFocused = true,
   showOnlyKeyboardVisible = false,
 }: Props) {
-  const [topValue, setTopValue] = useState(0);
-  const componentHeightRef = useRef(0);
   const { bottom } = useSafeAreaInsets();
+  const componentHeightRef = useRef(0);
   const { isKeyboardVisible, keyboardHeight } = useKeyboard();
-
-  useEffect(() => {
-    // 키보드 바로 위에 위치하도록 계산
-    if (keyboardHeight) {
-      const topValue = screenHeight - keyboardHeight - componentHeightRef.current - keyboardShowOffset - (Platform.OS === 'android' ? 13 : 0);
-      setTopValue(topValue);
-    }
-  }, [keyboardHeight, keyboardShowOffset]);
+  const keyboardVisiblePadding =
+    !isKeyboardVisible ? (0 + keyboardHideOffset)
+      : isLegacyAndroidKeyboardBehavior ? 0
+        : (keyboardHeight - (Platform.OS === 'ios' ? bottom : 0) + keyboardShowOffset);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
@@ -47,13 +43,11 @@ function ZSAboveKeyboard({
   const isVisible = showOnlyKeyboardVisible ? isKeyboardVisible : true;
 
   return (
-    <ZSPortal isFocused={isFocused}>
-      <View style={[styles.container, !isVisible ? { bottom: HIDDEN_BOTTOM_OFFSET } : isKeyboardVisible ? { top: topValue } : { bottom: keyboardHideOffset + bottom }]}>
-        <View onLayout={handleLayout}>
-          {children}
-        </View>
+    <View style={[styles.container, { bottom: !isVisible ? HIDDEN_BOTTOM_OFFSET : keyboardVisiblePadding }]} onLayout={handleLayout}>
+      <View style={{ width: "100%" }} onLayout={handleLayout}>
+        {children}
       </View>
-    </ZSPortal>
+    </View >
   );
 }
 

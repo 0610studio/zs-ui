@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
 import { useBottomSheet } from 'zs-ui/model/useOverlay';
 import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
@@ -37,17 +37,6 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
         <ZSPressable style={{ width: '100%', height: 50, backgroundColor: 'red' }} onPress={() => setHeight(height - 20)}>
           <ZSText>높이 감소</ZSText>
         </ZSPressable>
-
-        <ZSTextField
-          boxStyle="underline"
-          label="닉네임"
-          value={nick}
-          inputBgColor={background.base}
-          labelBgColor={background.base}
-          focusColor={primary.darker}
-          onChangeText={setNick}
-        />
-
         <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>
         <View style={{ width: '100%', height: 50, backgroundColor: 'yellow' }}></View>
         <View style={{ width: '100%', height: 50, backgroundColor: 'red' }}></View>

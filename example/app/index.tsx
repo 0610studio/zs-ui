@@ -1,15 +1,12 @@
 import { Text, StyleSheet, Pressable, Button } from 'react-native';
-import { useTheme, ZSContainer, ZSContainerRef } from 'zs-ui';
+import { useTheme, ZSContainer } from 'zs-ui';
 import { router } from 'expo-router';
-import { useRef } from 'react';
 
 export default function Home() {
   const { palette: { toggleTheme, mode } } = useTheme();
-  const containerRef = useRef<ZSContainerRef>(null);
 
   return (
     <ZSContainer 
-      ref={containerRef}
       edges={[]} 
       style={{ gap: 20, padding: 30 }}
     >
@@ -17,11 +14,12 @@ export default function Home() {
         <Text style={styles.buttonText}>현재 모드: {mode}</Text>
       </Pressable>
 
-      <Button title='Theme 예제' onPress={() => router.push('/ThemeExample')} />
-      <Button title='Layout 예제' onPress={() => router.push('/LayoutExample')} />
-      <Button title='Overlay 예제' onPress={() => router.push('/OverlayExample')} />
+      <Button title='테마 예제' onPress={() => router.push('/ThemeExample')} />
+      <Button title='레이아웃 예제' onPress={() => router.push('/LayoutExample')} />
+      <Button title='오버레이 예제' onPress={() => router.push('/OverlayExample')} />
       <Button title='ZS_Container 예제' onPress={() => router.push('/ZSContainerExample')} />
-      <Button title='Global_Overlay 예제' onPress={() => router.push('/GlobalOverlayExample')} />
+      <Button title='글로벌 오버레이 예제' onPress={() => router.push('/GlobalOverlayExample')} />
+      <Button title='폴딩/언폴딩 감지' onPress={() => router.push('/FoldableDevice')} />
     </ZSContainer>
   );
 }

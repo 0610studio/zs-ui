@@ -1,20 +1,33 @@
 import { Button, View } from "react-native";
-import { ZSContainer, ZSTextField, ZSAboveKeyboard, useOverlay } from "zs-ui";
+import { ZSAboveKeyboard, ZSContainer, ZSTextField, useOverlay } from "zs-ui";
 import CtaButton from "../src/ui/CtaButton";
 import { useState } from "react";
 import { router } from "expo-router";
-import useIsFocused from "../src/hooks/useIsFocused";
 
 function ZSContainerExample() {
   const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
-  const isFocused = useIsFocused();
   const { showAlert } = useOverlay();
 
   return (
     <ZSContainer
       edges={['bottom']}
-      keyboardScrollExtraOffset={130}
+      keyboardScrollExtraOffset={190}
       style={{ paddingHorizontal: 30, paddingTop: 30, paddingBottom: 30 + ctaLayoutHeight }}
+      bottomComponent={
+        <ZSAboveKeyboard
+          handleLayoutHeight={setCtaLayoutHeight}>
+          <CtaButton
+            disabled={false}
+            // ---
+            primaryButtonText='CTA 버튼'
+            onPrimaryButtonPress={() => {
+              router.push('/404')
+            }}
+            // ---
+            secondaryButtonText='취소'
+            onSecondaryButtonPress={() => { }}
+          />
+        </ZSAboveKeyboard>}
     >
       <ZSTextField
         boxStyle="outline"
@@ -66,23 +79,6 @@ function ZSContainerExample() {
         onChangeText={() => { }}
         focusColor={'red'}
       />
-
-      <ZSAboveKeyboard
-        handleLayoutHeight={setCtaLayoutHeight}
-        isFocused={isFocused}
-      >
-        <CtaButton
-          disabled={false}
-          // ---
-          primaryButtonText='CTA 버튼'
-          onPrimaryButtonPress={() => {
-            router.push('/404')
-          }}
-          // ---
-          secondaryButtonText='취소'
-          onSecondaryButtonPress={() => { }}
-        />
-      </ZSAboveKeyboard>
     </ZSContainer>
   );
 }
