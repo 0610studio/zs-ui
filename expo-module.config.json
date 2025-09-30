@@ -1,10 +1,12 @@
 {
   "platforms": ["ios", "android", "web"],
-  "android": {
-    "softwareKeyboardLayoutMode": "resize",
+  "ios": {
+    "modules": ["ZsUiModule"],
     "newArchEnabled": true
   },
-  "ios": {
+  "android": {
+    "modules": ["kr.co.studio0610.zsui.ZsUiModule"],
+    "softwareKeyboardLayoutMode": "resize",
     "newArchEnabled": true
   }
 }

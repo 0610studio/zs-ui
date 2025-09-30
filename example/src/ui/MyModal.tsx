@@ -51,7 +51,7 @@ function MyModal({ onConfirm }: MyModalProps) {
         />
       </View>
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps='handled'>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, gap: 20, paddingTop: 20 }} keyboardShouldPersistTaps='handled'>
         <Button
           onPress={() => {
             showBottomSheet({
@@ -96,7 +96,7 @@ function MyModal({ onConfirm }: MyModalProps) {
           color="#841584"
         />
 
-        <ZSAboveKeyboard showOnlyKeyboardVisible>
+        <ZSAboveKeyboard showOnlyKeyboardVisible keyboardShowOffset={15}>
           <CtaButton
             primaryButtonText='CTA 버튼'
             onPrimaryButtonPress={() => { }}

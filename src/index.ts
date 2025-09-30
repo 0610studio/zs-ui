@@ -4,6 +4,7 @@ import {
   ThemeProvider,
   GlobalOverlay,
 } from './model'
+import { useFoldingState } from './model/useFoldingState'
 import { themeFactory } from './theme/palette';
 
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
@@ -35,6 +36,7 @@ import {
 
 export {
   useTheme,
+  useFoldingState,
   OverlayProvider,
   ThemeProvider,
   themeFactory,
@@ -101,7 +103,10 @@ import {
   AlertActions,
   SnackType,
   HideOption,
-  BottomSheetOptions
+  BottomSheetOptions,
+  FoldingStateInfo,
+  UseFoldingStateReturn,
+  GetFoldingStateResponse
 } from "./model/types";
 import {
   RadioOption,
@@ -147,5 +152,8 @@ export type {
   RadioOption,
   ShadowLevel,
   ShadowStyle,
-  ZSContainerRef
+  ZSContainerRef,
+  FoldingStateInfo,
+  UseFoldingStateReturn,
+  GetFoldingStateResponse
 };

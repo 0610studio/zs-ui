@@ -123,3 +123,22 @@ export interface AboveKeyboardOptions {
     keyboardShowOffset?: number;
     keyboardHideOffset?: number;
 }
+
+export interface FoldingStateInfo {
+    foldingState: 'folding' | 'unfolding';
+    width: number; // PT 단위
+  }
+  
+  export interface UseFoldingStateReturn {
+    foldingState: 'folding' | 'unfolding';
+    width: number; // PT 단위
+    isLoading: boolean;
+    error: string | null;
+    refresh: () => void;
+  }
+  
+  export interface GetFoldingStateResponse {
+    foldingState: 'folding' | 'unfolding';
+    width: number;
+  }
+  
