@@ -1,13 +1,11 @@
 package kr.co.studio0610.zsui
 
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import expo.modules.kotlin.Promise
 
 class ZsUiModule : Module() {
   private var lastScreenWidth: Int = 0
@@ -18,7 +16,7 @@ class ZsUiModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ZsUi")
 
-    Events("onChange", "onFoldingStateChange")
+    Events("onFoldingStateChange")
 
     OnCreate {
       val context = appContext.reactContext ?: return@OnCreate
@@ -31,9 +29,7 @@ class ZsUiModule : Module() {
         "width" to 0
       )
       
-      val widthMethod1 = DimensionsHelper.getExactWindowWidth(context)
-      val widthMethod2 = DimensionsHelper.getScreenWidthFromConfig(context)
-      val width = widthMethod2
+      val width = DimensionsHelper.getScreenWidthFromConfig(context)
       val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
       val display = windowManager.defaultDisplay
       val pixelSize = android.graphics.Point()
@@ -48,10 +44,8 @@ class ZsUiModule : Module() {
     }
 
     OnDestroy {
-      configurationChangeRunnable?.let { runnable ->
-        handler.removeCallbacks(runnable)
-        configurationChangeRunnable = null
-      }
+      handler.removeCallbacksAndMessages(null)
+      configurationChangeRunnable = null
     }
 
     View(ZsUiView::class) {
@@ -82,8 +76,6 @@ class ZsUiModule : Module() {
     val isFoldingStateChanged = 
       (width != lastScreenWidth) || (currentRotation != lastRotation)
     
-    val screenDensity = metrics.densityDpi
-    val screenWidthDp = width / metrics.density
     var foldingState = "unfolding"
     
     if (isFoldingStateChanged) {
@@ -96,9 +88,7 @@ class ZsUiModule : Module() {
       lastScreenWidth = width
       lastRotation = currentRotation
       
-      configurationChangeRunnable?.let { 
-        handler.removeCallbacks(it) 
-      }
+      handler.removeCallbacksAndMessages(null)
       
       configurationChangeRunnable = Runnable {
         val context = appContext.reactContext
