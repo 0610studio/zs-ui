@@ -41,3 +41,8 @@ android {
     abortOnError false
   }
 }
+
+// 폴딩상태 감지를 위해 추가됨.
+dependencies {
+  implementation "androidx.window:window:1.2.0"
+}

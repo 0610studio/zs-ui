@@ -5,13 +5,10 @@ public class ZsUiModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ZsUi")
 
-    Events("onChange", "onFoldingStateChange")
-
-    // (iOS는 폴딩 미사용)
-    Function("getFoldingState") {
+    Function("getFoldingFeature") {
       return [
-        "foldingState": "unfolding",
-        "width": 0
+        "foldingFeature": nil,
+        "value": 0
       ]
     }
 

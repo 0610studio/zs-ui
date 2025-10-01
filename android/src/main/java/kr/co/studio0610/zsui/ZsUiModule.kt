@@ -1,51 +1,29 @@
 package kr.co.studio0610.zsui
 
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.WindowManager
+import androidx.window.layout.FoldingFeature
+import androidx.window.layout.WindowInfoTracker
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+
+data class FoldingStateResult(
+  val foldingFeature: Any?,
+  val width: Double
+)
 
 class ZsUiModule : Module() {
-  private var lastScreenWidth: Int = 0
-  private var lastRotation: Int = -1
-  private var handler: Handler = Handler(Looper.getMainLooper())
-  private var configurationChangeRunnable: Runnable? = null
+  private var windowInfoTracker: WindowInfoTracker? = null
 
   override fun definition() = ModuleDefinition {
     Name("ZsUi")
 
-    Events("onFoldingStateChange")
-
-    OnCreate {
-      val context = appContext.reactContext ?: return@OnCreate
-      monitorFoldingStateChanges(context)
-    }
-
-    Function("getFoldingState") {
-      val context = appContext.reactContext ?: return@Function mapOf(
-        "foldingState" to "unfolding",
-        "width" to 0
-      )
-      
-      val width = DimensionsHelper.getScreenWidthFromConfig(context)
-      val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-      val display = windowManager.defaultDisplay
-      val pixelSize = android.graphics.Point()
-      display.getSize(pixelSize)
-      
-      val foldingState = determineFoldingState(context, pixelSize.x)
-      
+    AsyncFunction("getFoldingFeature") {
+      val result = getCurrentFoldingState()
       mapOf(
-        "foldingState" to foldingState,
-        "width" to width
+        "foldingFeature" to result.foldingFeature,
+        "width" to result.width
       )
-    }
-
-    OnDestroy {
-      handler.removeCallbacksAndMessages(null)
-      configurationChangeRunnable = null
     }
 
     View(ZsUiView::class) {
@@ -55,56 +33,51 @@ class ZsUiModule : Module() {
     }
   }
 
-  private fun monitorFoldingStateChanges(context: Context) {
-    val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    val display = windowManager.defaultDisplay
-    val size = android.graphics.Point()
-    display.getSize(size)
+  private fun getCurrentFoldingState(): FoldingStateResult {
+    val activity = appContext.currentActivity ?: return FoldingStateResult(null, 0.0)
     
-    lastScreenWidth = size.x
-    lastRotation = context.resources.configuration.orientation
-  }
-
-  private fun determineFoldingState(context: Context, width: Int): String {
-    val configuration = context.resources.configuration
-    val currentRotation = configuration.orientation
-    val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    val display = windowManager.defaultDisplay
-    val metrics = android.util.DisplayMetrics()
-    display.getMetrics(metrics)
-    
-    val isFoldingStateChanged = 
-      (width != lastScreenWidth) || (currentRotation != lastRotation)
-    
-    var foldingState = "unfolding"
-    
-    if (isFoldingStateChanged) {
-      if (width < lastScreenWidth) {
-        foldingState = "folding"
-      } else if (width > lastScreenWidth) {
-        foldingState = "unfolding"
+    try {
+      if (windowInfoTracker == null) {
+        windowInfoTracker = WindowInfoTracker.getOrCreate(activity)
       }
-      
-      lastScreenWidth = width
-      lastRotation = currentRotation
-      
-      handler.removeCallbacksAndMessages(null)
-      
-      configurationChangeRunnable = Runnable {
-        val context = appContext.reactContext
-        if (context != null) {
-          val eventWidth = DimensionsHelper.getScreenWidthFromConfig(context)
 
-          sendEvent("onFoldingStateChange", mapOf(
-            "foldingState" to foldingState,
-            "width" to eventWidth
-          ))
-        }
+      val width = DimensionsHelper.getScreenWidthFromConfig(activity)
+
+      // 현재 레이아웃 정보
+      val layoutInfo = runBlocking {
+        windowInfoTracker?.windowLayoutInfo(activity)?.first()
       }
+      val foldingFeature = layoutInfo?.displayFeatures
+        ?.filterIsInstance<FoldingFeature>()
+        ?.firstOrNull()
+
+      // foldingFeature를 JavaScript에서 사용할 수 있는 형태로 변환
+      val foldingFeatureData = foldingFeature?.let { feature ->
+        mapOf(
+          "state" to when (feature.state) {
+            FoldingFeature.State.FLAT -> "flat"
+            FoldingFeature.State.HALF_OPENED -> "half_opened"
+            else -> "unknown"
+          },
+          "orientation" to when (feature.orientation) {
+            FoldingFeature.Orientation.HORIZONTAL -> "horizontal"
+            FoldingFeature.Orientation.VERTICAL -> "vertical"
+            else -> "unknown"
+          },
+          "isSeparating" to feature.isSeparating,
+          "bounds" to mapOf(
+            "left" to feature.bounds.left,
+            "top" to feature.bounds.top,
+            "right" to feature.bounds.right,
+            "bottom" to feature.bounds.bottom
+          )
+        )
+      }
+
+      return FoldingStateResult(foldingFeatureData, width)
       
-      handler.postDelayed(configurationChangeRunnable!!, 300)
+    } catch (e: Exception) {
+      return FoldingStateResult(null, 0.0)
     }
-    
-    return foldingState
   }
 }
