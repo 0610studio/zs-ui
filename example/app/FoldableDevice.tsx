@@ -1,20 +1,10 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { ZSContainer, useFoldingState } from 'zs-ui';
-import ZsUiModule from 'zs-ui/ZsUiModule';
+import { FoldingState } from 'zs-ui/model/types';
 
 export default function FoldableDevice() {
   const foldingState = useFoldingState();
-
-  useEffect(() => {
-    const onFoldingStateChangeSubscription = ZsUiModule.addListener('onFoldingStateChange', (event: { foldingState: string, width: number }) => {
-      console.log('폴딩 상태 변경: ', event);
-    });
-
-    return () => {
-      onFoldingStateChangeSubscription?.remove();
-    };
-  }, []);
 
   return (
     <ZSContainer edges={[]} style={styles.container}>
@@ -31,9 +21,9 @@ export default function FoldableDevice() {
               <Text style={styles.foldingInfoLabel}>상태:</Text>
               <Text style={[
                 styles.foldingInfoValue,
-                { color: foldingState.foldingState === 'folding' ? '#FF9800' : '#4CAF50' }
+                { color: foldingState.foldingState === FoldingState.FOLDED ? '#FF9800' : '#4CAF50' }
               ]}>
-                {foldingState.foldingState === 'folding' ? '폴딩' : '언폴딩'}
+                {foldingState.foldingState === FoldingState.FOLDED ? '폴딩/일반 상태' : '언폴딩'}
               </Text>
             </View>
             <View style={styles.foldingInfoItem}>
@@ -41,20 +31,9 @@ export default function FoldableDevice() {
               <Text style={styles.foldingInfoValue}>{foldingState.width} (PT)</Text>
             </View>
             <View style={styles.foldingInfoItem}>
-              <Text style={styles.foldingInfoLabel}>Dimensions.get():</Text>
+              <Text style={styles.foldingInfoLabel}>Dimensions.get().width:</Text>
               <Text style={styles.foldingInfoValue}>{Dimensions.get('window').width}</Text>
             </View>
-            {foldingState.isLoading && (
-              <View style={styles.foldingLoadingContainer}>
-                <ActivityIndicator size="small" color="#007AFF" />
-                <Text style={styles.foldingLoadingText}>Hook 업데이트 중...</Text>
-              </View>
-            )}
-            {foldingState.error && (
-              <View style={styles.foldingErrorContainer}>
-                <Text style={styles.foldingErrorText}>에러: {foldingState.error}</Text>
-              </View>
-            )}
           </View>
         </View>
       </ScrollView>

@@ -104,9 +104,7 @@ import {
   SnackType,
   HideOption,
   BottomSheetOptions,
-  FoldingStateInfo,
-  UseFoldingStateReturn,
-  GetFoldingStateResponse
+  FoldingStateInfo
 } from "./model/types";
 import {
   RadioOption,
@@ -154,6 +152,4 @@ export type {
   ShadowStyle,
   ZSContainerRef,
   FoldingStateInfo,
-  UseFoldingStateReturn,
-  GetFoldingStateResponse
 };
