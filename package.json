@@ -8,6 +8,9 @@
   "types": "build/index.d.ts",
   "files": [
     "build",
+    "android",
+    "ios",
+    "expo-module.config.json",
     "README.md",
     "LICENSE"
   ],
