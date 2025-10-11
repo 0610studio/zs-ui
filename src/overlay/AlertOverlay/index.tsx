@@ -7,7 +7,7 @@ import { useTheme } from '../../model/useThemeProvider';
 import { ThemeBackground } from '../../theme';
 import ModalBackground from '../ui/ModalBackground';
 import ViewAtom from '../../ui/atoms/ViewAtom';
-import { MAX_OVERLAY_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import { Z_INDEX_VALUE } from '../../model/utils';
 import ZSText from '../../ui/ZSText';
 
 function AlertOverlay({
@@ -24,7 +24,7 @@ function AlertOverlay({
   const { alertVisible, setAlertVisible } = useAlert();
   const { palette: { background, primary: primaryColor, modalBgColor }, dimensions: { width: windowWidth } } = useTheme();
   const styles = useMemo(() => createStyles({ background }), [background]);
-  const modalWidth = windowWidth - 60;
+  const modalWidth = Math.min(windowWidth - 60, 400);
   const { primary, secondary } = actions || {} as AlertActions;
 
   const handleButtonPress = useCallback((onPressFunction?: () => void) => () => {
@@ -127,7 +127,6 @@ const createStyles = ({ background }: { background: ThemeBackground; }) =>
       paddingBottom: 18,
       paddingTop: 24,
       paddingHorizontal: 20,
-      maxWidth: MAX_OVERLAY_WIDTH,
     },
   });
 

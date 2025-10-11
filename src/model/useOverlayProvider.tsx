@@ -171,7 +171,7 @@ export function OverlayProvider({
       return true;
     }
     return false;
-  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible]);
+  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible, bottomSheetVisible]);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backPressHandler);
@@ -201,7 +201,7 @@ export function OverlayProvider({
   // Global overlay reference 업데이트
   useEffect(() => {
     setGlobalOverlayRef(overlayContextValue);
-    
+
     // Cleanup 시 global reference 제거
     return () => {
       setGlobalOverlayRef(null);
@@ -269,41 +269,41 @@ export function OverlayProvider({
               <ModalityContext.Provider value={modalityContextValue}>
                 <LoaderContext.Provider value={loaderContextValue}>
                   <PortalProvider>
-                      {children}
+                    {children}
 
-                      <Modality modalityComponent={modalityComponent} />
+                    <Modality modalityComponent={modalityComponent} />
 
-                      <BottomSheetOverlay
-                        headerComponent={bottomSheetHeader}
-                        component={bottomSheetComponent}
-                        options={bottomSheetOptions}
-                      />
+                    <BottomSheetOverlay
+                      headerComponent={bottomSheetHeader}
+                      component={bottomSheetComponent}
+                      options={bottomSheetOptions}
+                    />
 
-                      <PopOverMenu
-                        px={popOverLocation?.px}
-                        py={popOverLocation?.py}
-                        component={popOverComponent}
-                      />
+                    <PopOverMenu
+                      px={popOverLocation?.px}
+                      py={popOverLocation?.py}
+                      component={popOverComponent}
+                    />
 
-                      <AlertOverlay
-                        title={title}
-                        informative={informative}
-                        actions={actions || {} as AlertActions}
-                        isBackgroundTouchClose={isBackgroundTouchClose}
-                        titleStyle={titleStyle}
-                        informativeStyle={informativeStyle}
-                        secondaryButtonStyle={secondaryButtonStyle}
-                        primaryButtonStyle={primaryButtonStyle}
-                        secondaryButtonTextStyle={secondaryButtonTextStyle}
-                      />
+                    <AlertOverlay
+                      title={title}
+                      informative={informative}
+                      actions={actions || {} as AlertActions}
+                      isBackgroundTouchClose={isBackgroundTouchClose}
+                      titleStyle={titleStyle}
+                      informativeStyle={informativeStyle}
+                      secondaryButtonStyle={secondaryButtonStyle}
+                      primaryButtonStyle={primaryButtonStyle}
+                      secondaryButtonTextStyle={secondaryButtonTextStyle}
+                    />
 
-                      <SnackbarNotify
-                        customSnackbar={customSnackbar}
-                      />
+                    <SnackbarNotify
+                      customSnackbar={customSnackbar}
+                    />
 
-                      <LoadingNotify
-                        loaderComponent={loaderComponent}
-                      />
+                    <LoadingNotify
+                      loaderComponent={loaderComponent}
+                    />
                   </PortalProvider>
                 </LoaderContext.Provider>
               </ModalityContext.Provider>

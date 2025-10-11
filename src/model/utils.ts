@@ -28,5 +28,3 @@ export const Z_INDEX_VALUE = {
     ALERT: 8700,
     LOADING: 8999,
 };
-
-export const MAX_OVERLAY_WIDTH = 500;

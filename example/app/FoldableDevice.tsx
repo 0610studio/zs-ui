@@ -1,52 +1,59 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { ZSContainer, useFoldingState } from 'zs-ui';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { ZSContainer, ZSText, useFoldingState, useTheme } from 'zs-ui';
 import { FoldingState } from 'zs-ui/model/types';
 
 export default function FoldableDevice() {
-  const foldingState = useFoldingState();
+  const foldingInfo = useFoldingState();
+  const { palette } = useTheme();
 
   return (
-    <ZSContainer edges={[]} style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* 현재 폴딩 상태 */}
+    <ZSContainer
+      edges={[]}
+      style={[styles.container, { backgroundColor: palette.background.layer1 }]}
+      dividerLineComponent={<View style={{ width: 3, backgroundColor: palette.divider }} />}
+      rightComponent={
+        <View style={styles.rightComponent}>
+          <ZSText>폴더블 기기가 펼쳐졌을때 표시됩니다.</ZSText>
+          <View style={{ width: 100, height: 100, backgroundColor: '#00ff0022' }} />
+          <View style={{ width: 100, height: 100, backgroundColor: '#00ff0044' }} />
+          <View style={{ width: 100, height: 100, backgroundColor: '#00ff0077' }} />
+          <View style={{ width: 100, height: 100, backgroundColor: '#00ff0088' }} />
+          <View style={{ width: 100, height: 100, backgroundColor: '#00ff0099' }} />
+          <View style={{ width: 100, height: 100, backgroundColor: '#00ff00cc' }} />
+        </View>
+      }
+    >
+      <View style={styles.contentContainer}>
         <View style={styles.foldingSection}>
           <Text style={styles.sectionTitle}>현재 폴딩 상태</Text>
           <View style={styles.foldingInfoContainer}>
             <View style={styles.foldingInfoItem}>
-              <Text style={styles.foldingInfoLabel}>상태:</Text>
+              <Text style={styles.foldingInfoLabel}>foldingState:</Text>
               <Text style={[
                 styles.foldingInfoValue,
-                { color: foldingState.foldingState === FoldingState.FOLDED ? '#FF9800' : '#4CAF50' }
+                { color: foldingInfo.foldingState === FoldingState.FOLDED ? palette.primary.main : palette.information.main }
               ]}>
-                {foldingState.foldingState === FoldingState.FOLDED ? '폴딩/일반 상태' : '언폴딩'}
+                {foldingInfo.foldingState === FoldingState.FOLDED ? '폴딩/일반 상태' : '언폴딩'}
               </Text>
             </View>
             <View style={styles.foldingInfoItem}>
-              <Text style={styles.foldingInfoLabel}>화면 너비:</Text>
-              <Text style={styles.foldingInfoValue}>{foldingState.width} (PT)</Text>
+              <Text style={styles.foldingInfoLabel}>foldingState width:</Text>
+              <Text style={styles.foldingInfoValue}>{foldingInfo.width} (PT)</Text>
             </View>
             <View style={styles.foldingInfoItem}>
               <Text style={styles.foldingInfoLabel}>Dimensions.get().width:</Text>
-              <Text style={styles.foldingInfoValue}>{Dimensions.get('window').width}</Text>
+              <Text style={[styles.foldingInfoValue, { color: palette.danger.main }]}>{Dimensions.get('window').width}</Text>
             </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </ZSContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  scrollView: {
     flex: 1,
   },
   contentContainer: {
@@ -113,5 +120,12 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  rightComponent: {
+    width: '100%',
+    alignItems: 'center',
+    flex: 1,
+    gap: 50,
+    paddingTop: 50
   },
 });
