@@ -19,7 +19,7 @@ export default function Home() {
       <Button title='오버레이 예제' onPress={() => router.push('/OverlayExample')} />
       <Button title='ZS_Container 예제' onPress={() => router.push('/ZSContainerExample')} />
       <Button title='글로벌 오버레이 예제' onPress={() => router.push('/GlobalOverlayExample')} />
-      <Button title='폴딩/언폴딩 감지' onPress={() => router.push('/FoldableDevice')} />
+      <Button title='폴더블 기기 예제' onPress={() => router.push('/FoldableDevice')} />
     </ZSContainer>
   );
 }

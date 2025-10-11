@@ -6,8 +6,9 @@ import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
-import { MAX_OVERLAY_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import { Z_INDEX_VALUE } from '../../model/utils';
 import useKeyboard from '../../model/useKeyboard';
+import useFoldingState from '../../model/useFoldingState';
 
 const IS_IOS = Platform.OS === 'ios';
 
@@ -52,7 +53,8 @@ function BottomSheetOverlay({
     marginBottom = 10,
     padding = 14,
   } = options;
-  const { palette, dimensions: { width: windowWidth, height: windowHeight } } = useTheme();
+  const { width: windowWidth } = useFoldingState();
+  const { palette, dimensions: { height: windowHeight } } = useTheme();
   const { bottomSheetVisible, setBottomSheetVisible, height } = useBottomSheet();
   const { bottom } = useSafeAreaInsets();
   
@@ -240,7 +242,6 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     overflow: 'hidden',
     zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,
-    maxWidth: MAX_OVERLAY_WIDTH,
   },
   pressableView: {
     width: '100%',

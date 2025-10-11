@@ -3,8 +3,16 @@ import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, Nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../model/useThemeProvider';
 import useKeyboard from '../../model/useKeyboard';
+import useFoldingState from '../../model/useFoldingState';
+import { FoldingState } from '../../model/types';
 
 const KEYBOARD_ANIMATION_DELAY = 50;
+const SCROLL_VIEW_OPTIONS = {
+  bounces: false,
+  overScrollMode: "never" as const,
+  keyboardShouldPersistTaps: "handled" as const,
+  automaticallyAdjustKeyboardInsets: false
+}
 
 export type ZSContainerProps = ViewProps & {
   backgroundColor?: string;
@@ -21,6 +29,7 @@ export type ZSContainerProps = ViewProps & {
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
   scrollEventThrottle?: number;
   scrollToFocusedInput?: boolean;
+  dividerLineComponent?: ReactNode;
 };
 
 export type ZSContainerRef = ScrollView;
@@ -34,17 +43,21 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     scrollViewDisabled = false,
     topComponent,
     bottomComponent,
-    rightComponent,
     showsVerticalScrollIndicator = true,
     keyboardScrollExtraOffset = 30,
     translucent,
     scrollEventThrottle = 16,
     scrollToFocusedInput = true,
+    // foldable device
+    dividerLineComponent,
+    rightComponent,
+    // ---
     ...props
   },
   forwardedRef
 ) {
   const { palette, dimensions: { height: windowHeight } } = useTheme();
+  const { foldingState, width } = useFoldingState();
   const positionRef = useRef<number | null>(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastTouchY = useRef<number | null>(0);
@@ -55,7 +68,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 
   const handleKeyboardShow = (e: any) => {
     setKeyboardHeight(e.endCoordinates.height);
-    
+
     if (scrollViewRef.current && scrollToFocusedInput) {
       const keyboardHeight = e.endCoordinates.height;
       const safeAreaBottom = 0;
@@ -107,24 +120,24 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   }, []);
 
   const safeAreaStyle = useMemo(() => [
-    { backgroundColor: backgroundColor || palette.background.base }, 
-    styles.flex1
+    { backgroundColor: backgroundColor || palette.background.base },
+    styles.w100
   ], [backgroundColor, palette.background.base]);
 
   const scrollContentStyle = useMemo(() => [
-    styles.scrollContainerStyle, 
-    { 
-      paddingBottom: keyboardHeight ? keyboardHeight : 0 
+    styles.scrollContainerStyle,
+    {
+      paddingBottom: keyboardHeight ? keyboardHeight : 0
     }
   ], [keyboardHeight]);
 
   const containerStyle = useMemo(() => [
-    styles.flex1, 
+    styles.w100,
     props.style
   ], [props.style]);
 
-  const shouldShowStatusBar = useMemo(() => 
-    Boolean(barStyle || statusBarColor || translucent), 
+  const shouldShowStatusBar = useMemo(() =>
+    Boolean(barStyle || statusBarColor || translucent),
     [barStyle, statusBarColor, translucent]
   );
 
@@ -133,33 +146,48 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       style={safeAreaStyle}
       edges={edges}
     >
-      <View style={styles.flex1}>
+      <View style={styles.w100}>
         {topComponent}
-        {
-          scrollViewDisabled ? (
-            <View style={styles.flex1}>
-              {props.children}
-            </View>
-          ) : (
+        <View style={[styles.w100, { flexDirection: 'row' }]}>
+          <View style={styles.flex1}>
             <ScrollView
               ref={scrollViewRef}
-              style={styles.flex1}
-              contentContainerStyle={scrollContentStyle}
-              bounces={false}
-              overScrollMode="never"
+              style={styles.w100}
               showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-              keyboardShouldPersistTaps="handled"
-              automaticallyAdjustKeyboardInsets={false}
+              contentContainerStyle={scrollContentStyle}
+              scrollEventThrottle={scrollEventThrottle}
               onScroll={handleScroll}
               onTouchStart={handleTouch}
-              scrollEventThrottle={scrollEventThrottle}
+              scrollEnabled={!scrollViewDisabled}
+              // ---
+              {...SCROLL_VIEW_OPTIONS}
             >
-              <View style={containerStyle}>
-                {props.children}
+              <View style={[styles.flex1, containerStyle]}>
+              {props.children}
               </View>
             </ScrollView>
-          )
-        }
+          </View>
+          {foldingState === FoldingState.UNFOLDED && rightComponent && dividerLineComponent && dividerLineComponent}
+          {
+            foldingState === FoldingState.UNFOLDED && rightComponent && (
+              <View style={styles.flex1}>
+                <ScrollView
+                  style={styles.w100}
+                  showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+                  contentContainerStyle={scrollContentStyle}
+                  scrollEventThrottle={scrollEventThrottle}
+                  scrollEnabled={!scrollViewDisabled}
+                  // ---
+                  {...SCROLL_VIEW_OPTIONS}
+                >
+                  <View style={[styles.flex1, containerStyle]}>
+                    {rightComponent}
+                  </View>
+                </ScrollView>
+              </View>
+            )
+          }
+        </View >
         {bottomComponent}
       </View>
 
@@ -175,7 +203,8 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 });
 
 export const styles = StyleSheet.create({
-  flex1: { flex: 1, width: '100%' },
+  flex1: { flex: 1 },
+  w100: { flex: 1, width: '100%' },
   scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: '100%' },
 });
 
