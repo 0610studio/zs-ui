@@ -64,7 +64,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   const [keyboardHeight, setKeyboardHeight] = useState<number | null>(0);
   const scrollTimeoutRef = useRef<number | null>(null);
 
-  useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, []);
+  useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, [scrollViewDisabled]);
 
   const handleKeyboardShow = (e: any) => {
     setKeyboardHeight(e.endCoordinates.height);
@@ -150,40 +150,50 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
         {topComponent}
         <View style={[styles.w100, { flexDirection: 'row' }]}>
           <View style={styles.flex1}>
-            <ScrollView
-              ref={scrollViewRef}
-              style={styles.w100}
-              showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-              contentContainerStyle={scrollContentStyle}
-              scrollEventThrottle={scrollEventThrottle}
-              onScroll={handleScroll}
-              onTouchStart={handleTouch}
-              scrollEnabled={!scrollViewDisabled}
-              // ---
-              {...SCROLL_VIEW_OPTIONS}
-            >
+            {scrollViewDisabled ? (
               <View style={[styles.flex1, containerStyle]}>
-              {props.children}
+                {props.children}
               </View>
-            </ScrollView>
+            ) : (
+              <ScrollView
+                ref={scrollViewRef}
+                style={styles.w100}
+                showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+                contentContainerStyle={scrollContentStyle}
+                scrollEventThrottle={scrollEventThrottle}
+                onScroll={handleScroll}
+                onTouchStart={handleTouch}
+                // ---
+                {...SCROLL_VIEW_OPTIONS}
+              >
+                <View style={[styles.flex1, containerStyle]}>
+                {props.children}
+                </View>
+              </ScrollView>
+            )}
           </View>
           {foldingState === FoldingState.UNFOLDED && rightComponent && dividerLineComponent && dividerLineComponent}
           {
             foldingState === FoldingState.UNFOLDED && rightComponent && (
               <View style={styles.flex1}>
-                <ScrollView
-                  style={styles.w100}
-                  showsVerticalScrollIndicator={showsVerticalScrollIndicator}
-                  contentContainerStyle={scrollContentStyle}
-                  scrollEventThrottle={scrollEventThrottle}
-                  scrollEnabled={!scrollViewDisabled}
-                  // ---
-                  {...SCROLL_VIEW_OPTIONS}
-                >
+                {scrollViewDisabled ? (
                   <View style={[styles.flex1, containerStyle]}>
                     {rightComponent}
                   </View>
-                </ScrollView>
+                ) : (
+                  <ScrollView
+                    style={styles.w100}
+                    showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+                    contentContainerStyle={scrollContentStyle}
+                    scrollEventThrottle={scrollEventThrottle}
+                    // ---
+                    {...SCROLL_VIEW_OPTIONS}
+                  >
+                    <View style={[styles.flex1, containerStyle]}>
+                      {rightComponent}
+                    </View>
+                  </ScrollView>
+                )}
               </View>
             )
           }
@@ -205,7 +215,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 export const styles = StyleSheet.create({
   flex1: { flex: 1 },
   w100: { flex: 1, width: '100%' },
-  scrollContainerStyle: { flexGrow: 1, alignItems: 'center', width: '100%' },
+  scrollContainerStyle: { alignItems: 'center', width: '100%' },
 });
 
 export default ZSContainer;
