@@ -1,8 +1,9 @@
 import { Stack } from 'expo-router';
-import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig } from 'zs-ui';
+import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig, useTheme, ZSText } from 'zs-ui';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import SnackBar from '../src/ui/Snackbar';
+import HeaderRight from '../src/ui/HeaderRight';
 
 // 폰트 적용 예제. 폰트의 이름을 ThemeProvider의 themeFonts에 추가해야 동작합니다.
 const themeFonts = {
@@ -72,6 +73,7 @@ const customThemeConfig: ThemeFactoryConfig = {
 // 커스텀 테마 팩토리 생성
 const customPalette = themeFactory(customThemeConfig);
 
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts(requireFonts);
 
@@ -84,6 +86,7 @@ export default function RootLayout() {
           <Stack
             screenOptions={{
               animation: 'slide_from_right',
+              headerRight: () => <HeaderRight />,
             }}
           />
         </OverlayProvider>

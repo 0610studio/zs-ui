@@ -8,6 +8,7 @@ sidebar_position: 1
 
 다크 모드, 테마, 타이포그래피, Alert 등의 주요 UI 요소가 기본 제공되며, 일관된 사용자 인터페이스를 빠르게 구축할 수 있습니다.
 
+
 <div style={{
   display: 'flex',
   overflowX: 'auto',

@@ -51,6 +51,7 @@ export interface PopOverMenuProps {
 
 export interface ModalityProps {
   component: React.ReactNode;
+  foldableSingleScreen?: boolean;
 }
 
 export interface CustomSnackbarProps {
@@ -111,6 +112,7 @@ export interface BottomSheetOptions {
   marginBottom?: number;
   height?: number;
   padding?: number;
+  foldableSingleScreen?: boolean;
 }
 
 export interface ShowBottomSheetProps {
