@@ -50,6 +50,7 @@ export function OverlayProvider({
   // Modality
   const [modalityVisible, setModalityVisible] = useState<boolean>(false);
   const [modalityComponent, setModalityComponent] = useState<React.ReactNode>(false);
+  const [modalityFoldableSingleScreen, setModalityFoldableSingleScreen] = useState<boolean>(false);
 
   const showAlert = ({
     title,
@@ -105,11 +106,13 @@ export function OverlayProvider({
   }
 
   const showModality = ({
-    component
+    component,
+    foldableSingleScreen
   }: ModalityProps) => {
     Keyboard.dismiss();
     setModalityComponent(component);
     setModalityVisible(true);
+    setModalityFoldableSingleScreen(foldableSingleScreen || false);
   }
 
   const showSnackBar = ({
@@ -271,7 +274,7 @@ export function OverlayProvider({
                   <PortalProvider>
                     {children}
 
-                    <Modality modalityComponent={modalityComponent} />
+                    <Modality modalityComponent={modalityComponent} foldableSingleScreen={modalityFoldableSingleScreen} />
 
                     <BottomSheetOverlay
                       headerComponent={bottomSheetHeader}

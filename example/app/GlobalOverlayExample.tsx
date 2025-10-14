@@ -1,10 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import { ZSText, GlobalOverlay, ZSPressable } from 'zs-ui';
+import { ZSText, GlobalOverlay, ZSPressable, ZSContainer } from 'zs-ui';
 
 export default function GlobalOverlayExample() {
   return (
-    <View style={{ padding: 20, gap: 16 }}>
+    <ZSContainer style={{ padding: 20, gap: 16 }} edges={[]}>
       <ZSPressable
         onPress={() => {
           // 컴포넌트 내에서 global 함수 사용
@@ -60,6 +60,6 @@ export default function GlobalOverlayExample() {
       >
         <ZSText color="white">SnackBar 표시</ZSText>
       </ZSPressable>
-    </View>
+    </ZSContainer>
   );
 }

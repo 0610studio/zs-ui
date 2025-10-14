@@ -16,7 +16,7 @@ function MyModal({ onConfirm }: MyModalProps) {
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
 
   const handleConfirmPress = useCallback(() => {
-    onConfirm?.();
+    console.log('confirm');
   }, [onConfirm]);
 
   const handleClosePress = useCallback(() => {
@@ -26,10 +26,10 @@ function MyModal({ onConfirm }: MyModalProps) {
   return (
     <ZSView style={styles.container}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 15, paddingHorizontal: 15, paddingTop: 5 }}>
-        <ZSPressable onPress={handleConfirmPress}>
+        <ZSPressable onPress={handleClosePress}>
           <ZSText typo='subTitle.1'>닫기</ZSText>
         </ZSPressable>
-        <ZSPressable onPress={handleClosePress}>
+        <ZSPressable onPress={handleConfirmPress}>
           <ZSText typo='subTitle.1'>확인</ZSText>
         </ZSPressable>
       </View>

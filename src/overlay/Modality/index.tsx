@@ -4,13 +4,15 @@ import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
 import { useTheme } from '../../model';
-import { Z_INDEX_VALUE } from '../../model/utils';
+import { MAX_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import ZSView from '../../ui/ZSView';
 
 function Modality({
+  foldableSingleScreen,
   modalityComponent,
 }: {
-  modalityComponent?: React.ReactNode;
+  modalityComponent: React.ReactNode;
+  foldableSingleScreen: boolean;
 }) {
   const { palette, dimensions: { height: windowHeight } } = useTheme();
   const [localVisible, setLocalVisible] = useState(false);
@@ -95,7 +97,7 @@ function Modality({
           exiting={FadeOut.duration(300)}
           style={[
             styles.backScreen,
-            { backgroundColor: palette.background.layer2, width: '100%', height: windowHeight },
+            { backgroundColor: palette.background.layer2, width: '100%', height: windowHeight, maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%' },
             backScreenAnimatedStyle
           ]}
         />
@@ -106,13 +108,15 @@ function Modality({
               height: windowHeight - mainScreenMargin,
               paddingBottom: mainScrrenPadding,
               backgroundColor: palette.background.base,
-              width: '100%'
+              width: '100%',
+              maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%',
+              alignSelf: 'center',
             },
             styles.mainScreen,
             mainScreenAnimatedStyle
           ]}
         >
-          <ZSView style={[styles.contents, { width: '100%' }]}>
+          <ZSView style={[styles.contents, { width: '100%'}]}>
             {modalityComponent}
           </ZSView>
         </Animated.View>
@@ -129,11 +133,13 @@ const styles = StyleSheet.create({
   animatedBackground: {
     ...StyleSheet.absoluteFillObject,
     zIndex: Z_INDEX_VALUE.MODAL1,
+    alignSelf: 'center',
   },
   backScreen: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
     zIndex: Z_INDEX_VALUE.MODAL2,
   },
   mainScreen: {

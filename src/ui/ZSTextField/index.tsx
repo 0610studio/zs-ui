@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useState, useEffect, forwardRef } from 'react';
 import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
@@ -38,7 +38,9 @@ interface TextFieldProps {
   isTextArea?: boolean;
 }
 
-function ZSTextField({
+export type ZSTextFieldRef = TextInput;
+
+const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   typo = 'body.2',
   status = 'default',
   value,
@@ -61,7 +63,7 @@ function ZSTextField({
   disabled = false,
   allowFontScaling = true,
   isTextArea = false,
-}: TextFieldProps): JSX.Element {
+}, ref) => {
   const { typography, palette } = useTheme();
   const [primaryStyle, subStyle] = typo.split('.') as [TypoStyle, TypoSubStyle];
   const fErrorColor = errorColor || palette.danger.main;
@@ -250,6 +252,7 @@ function ZSTextField({
       >
         <TextInput
           {...textInputProps}
+          ref={ref}
           style={textInputStyle}
           value={value}
           onFocus={handleFocus}
@@ -277,6 +280,8 @@ function ZSTextField({
       )}
     </ViewAtom>
   );
-}
+});
+
+ZSTextField.displayName = 'ZSTextField';
 
 export default ZSTextField;

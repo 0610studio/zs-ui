@@ -21,7 +21,7 @@ import TextAtom from './ui/atoms/TextAtom';
 import ZSAboveKeyboard from "./ui/ZSAboveKeyboard";
 import { ZSContainerRef } from "./ui/ZSContainer";
 import { ZSTextProps } from "./ui/ZSText";
-import { BoxStyle } from "./ui/ZSTextField";
+import { BoxStyle, ZSTextFieldRef } from "./ui/ZSTextField";
 
 import {
   AlertOverlay,
@@ -118,6 +118,7 @@ export type {
   Palette,
   ZSTextProps,
   BoxStyle,
+  ZSTextFieldRef,
   ColorPalette,
   ColorPaletteExtend,
   ThemeTextType,

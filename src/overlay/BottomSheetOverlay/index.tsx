@@ -6,7 +6,7 @@ import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../model';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
-import { Z_INDEX_VALUE } from '../../model/utils';
+import { MAX_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 
@@ -48,6 +48,7 @@ function BottomSheetOverlay({
   options = {},
 }: ShowBottomSheetProps) {
   const {
+    foldableSingleScreen = false,
     isBackgroundTouchClose = true,
     marginHorizontal = 10,
     marginBottom = 10,
@@ -186,6 +187,7 @@ function BottomSheetOverlay({
     styles.container,
     {
       width: windowWidth - marginHorizontal * 2,
+      maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%' as const,
       height: maxHeight,
       marginHorizontal,
       bottom: marginBottom + bottom,

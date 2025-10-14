@@ -28,3 +28,5 @@ export const Z_INDEX_VALUE = {
     ALERT: 8700,
     LOADING: 8999,
 };
+
+export const MAX_FOLDABLE_SINGLE_WIDTH = 600;

@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { ZSContainer, ZSText, useFoldingState, useTheme } from 'zs-ui';
+import { View, Text, StyleSheet, Dimensions, Button } from 'react-native';
+import { ZSContainer, ZSText, useFoldingState, useOverlay, useTheme } from 'zs-ui';
 import { FoldingState } from 'zs-ui/model/types';
+import MyModal from '../src/ui/MyModal';
+import MyBottomSheet from '../src/ui/MyBottomSheet';
 
 export default function FoldableDevice() {
   const foldingInfo = useFoldingState();
   const { palette } = useTheme();
+  const { showModality, showBottomSheet } = useOverlay();
 
   return (
     <ZSContainer
@@ -15,6 +18,8 @@ export default function FoldableDevice() {
       rightComponent={
         <View style={styles.rightComponent}>
           <ZSText>폴더블 기기가 펼쳐졌을때 표시됩니다.</ZSText>
+          <Button title='모달 표시' onPress={() => showModality({ component: <MyModal />, foldableSingleScreen: true })} />
+          <Button title='바텀시트 표시' onPress={() => showBottomSheet({ component: <MyBottomSheet />, options: { foldableSingleScreen: true } })} />
           <View style={{ width: 100, height: 100, backgroundColor: '#00ff0022' }} />
           <View style={{ width: 100, height: 100, backgroundColor: '#00ff0044' }} />
           <View style={{ width: 100, height: 100, backgroundColor: '#00ff0077' }} />
