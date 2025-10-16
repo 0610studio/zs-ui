@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { StyleSheet, View, PanResponder, Keyboard, Platform } from 'react-native';
+import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
@@ -14,8 +14,8 @@ const IS_IOS = Platform.OS === 'ios';
 
 const ANIMATION_CONFIG = {
   keyboard: {
-    show: { duration: IS_IOS ? 250 : 300 },
-    hide: { duration: IS_IOS ? 150 : 200 },
+    show: { duration: 250 },
+    hide: { duration: 150 },
   },
   spring: {
     damping: 50,
@@ -57,38 +57,40 @@ function BottomSheetOverlay({
   const { width: windowWidth } = useFoldingState();
   const { palette, dimensions: { height: windowHeight } } = useTheme();
   const { bottomSheetVisible, setBottomSheetVisible, height } = useBottomSheet();
-  const { bottom } = useSafeAreaInsets();
-  
+  const { bottom: bottomInsets } = useSafeAreaInsets();
+
   // 화면의 크기보다 높이가 높으면 화면의 크기로 제한 
-  const maxHeight = useMemo(() => 
+  const maxHeight = useMemo(() =>
     Math.min(
       windowHeight - 30 - (initialWindowMetrics?.insets.bottom || 0) - (initialWindowMetrics?.insets.top || 0),
       height
     ),
     [windowHeight, height]
   );
-  
+
   const translateY = useSharedValue(0);
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
   const startX = useSharedValue(0);
   const startY = useSharedValue(0);
   const isGesturing = useSharedValue(false);
-  
+
   const [localVisible, setLocalVisible] = useState(false);
 
-  const handleKeyboardShow = (event: any) => {
+  const handleKeyboardShow = useCallback((event: KeyboardEvent) => {
+    'worklet';
     if (!isGesturing.value) {
-      const targetY = IS_IOS ? (-event.endCoordinates.height + bottom) : 0;
+      const targetY = -event.endCoordinates.height + (IS_IOS ? bottomInsets : 0);
       translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
     }
-  };
+  }, []);
 
-  const handleKeyboardHide = () => {
+  const handleKeyboardHide = useCallback(() => {
+    'worklet';
     if (!isGesturing.value) {
       translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
     }
-  };
+  }, []);
 
   useKeyboard({
     handleKeyboardShow,
@@ -153,9 +155,9 @@ function BottomSheetOverlay({
     translateX.value = withTiming(0, { duration: 100 });
 
     // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
-    const shouldClose = gestureState.vy > GESTURE_CONSTANTS.closeVelocityThreshold || 
-                      translateY.value > maxHeight * GESTURE_CONSTANTS.closeDistanceRatio;
-    
+    const shouldClose = gestureState.vy > GESTURE_CONSTANTS.closeVelocityThreshold ||
+      translateY.value > maxHeight * GESTURE_CONSTANTS.closeDistanceRatio;
+
     if (shouldClose) {
       translateY.value = withTiming(maxHeight + 100, ANIMATION_CONFIG.close);
       closeBottomSheet();
@@ -190,7 +192,7 @@ function BottomSheetOverlay({
       maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%' as const,
       height: maxHeight,
       marginHorizontal,
-      bottom: marginBottom + bottom,
+      bottom: marginBottom + bottomInsets,
       backgroundColor: palette.background.base,
     },
     animatedStyles,
