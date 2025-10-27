@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Keyboard, Platform } from 'react-native';
-
-interface KeyboardEvent {
-  endCoordinates: {
-    height: number;
-  };
-}
+import { Keyboard, Platform, type KeyboardEvent } from 'react-native';
 
 interface UseKeyboardReturn {
   isKeyboardVisible: boolean;
