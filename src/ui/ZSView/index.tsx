@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import { ViewProps, StyleSheet } from 'react-native';
-import { useTheme } from '../../model/useThemeProvider';
+import { useTheme } from '../../context/ThemeContext';
 import AnimatedWrapper from '../atoms/AnimatedWrapper';
-import { ShadowLevel } from '../types';
-import { ViewColorOptions } from '../../theme';
+import { ViewColorOptions, ShadowLevel } from '../../theme/types';
 
 type Props = ViewProps & {
   isAnimation?: boolean;

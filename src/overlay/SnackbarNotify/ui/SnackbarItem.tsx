@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { CustomSnackbarProps, SnackItem } from "../../../model/types";
 import ViewAtom from "../../../ui/atoms/ViewAtom";
-import { useTheme } from "../../../model/useThemeProvider";
+import { useTheme } from "../../../context/ThemeContext";
 import ZSText from "../../../ui/ZSText";
 
 const Snackbar = ({

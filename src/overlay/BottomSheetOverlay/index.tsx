@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent } from 'react-native';
+import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent, Dimensions } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
-import { useTheme } from '../../model';
+import { useTheme } from '../../context/ThemeContext';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
 import { MAX_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
+
+const windowHeight = Dimensions.get('window').height;
 
 const IS_IOS = Platform.OS === 'ios';
 
@@ -55,7 +57,7 @@ function BottomSheetOverlay({
     padding = 14,
   } = options;
   const { width: windowWidth } = useFoldingState();
-  const { palette, dimensions: { height: windowHeight } } = useTheme();
+  const { palette } = useTheme();
   const { bottomSheetVisible, setBottomSheetVisible, height } = useBottomSheet();
   const { bottom: bottomInsets } = useSafeAreaInsets();
 
@@ -210,7 +212,7 @@ function BottomSheetOverlay({
 
   const gestureBarStyle = [
     styles.gestureBar,
-    { backgroundColor: palette.divider }
+    { backgroundColor: palette.grey[60] }
   ];
 
   if (!localVisible) {

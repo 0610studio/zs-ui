@@ -2,7 +2,7 @@ import { ActivityIndicator } from "react-native";
 import React, { ReactNode, useCallback } from "react";
 import { useLoader } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
-import { useTheme } from "../../model";
+import { useTheme } from "../../context/ThemeContext";
 import { Z_INDEX_VALUE } from "../../model/utils";
 
 function LoadingNotify({

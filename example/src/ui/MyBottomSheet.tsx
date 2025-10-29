@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField, ThemeBackground, ColorPalette } from 'zs-ui';
 import { useBottomSheet } from 'zs-ui/model/useOverlay';
-import { ColorPalette, ThemeBackground } from 'zs-ui/theme';
 
 interface MyBottomSheetProps {
   onConfirm?: () => void;

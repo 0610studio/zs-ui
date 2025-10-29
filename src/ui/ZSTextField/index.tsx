@@ -3,9 +3,9 @@ import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, Text
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
 import ErrorComponent from './ui/ErrorComponent';
-import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme';
+import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme/types';
 import { extractStyle } from '../../model/utils';
-import { useTheme } from '../../model/useThemeProvider';
+import { useTheme } from '../../context/ThemeContext';
 import ViewAtom from '../atoms/ViewAtom';
 
 export type BoxStyle = 'outline' | 'underline' | 'inbox';

@@ -1,12 +1,8 @@
-import {
-  useTheme,
-  OverlayProvider,
-  ThemeProvider,
-  GlobalOverlay,
-} from './model'
+import { GlobalOverlay } from './model'
+import { OverlayProvider } from "./context/OverlayContext";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { useFoldingState } from './model/useFoldingState'
 import { themeFactory } from './theme/palette';
-
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
 import ZSContainer from './ui/ZSContainer';
 import ZSPressable from './ui/ZSPressable';
@@ -22,23 +18,13 @@ import ZSAboveKeyboard from "./ui/ZSAboveKeyboard";
 import { ZSContainerRef } from "./ui/ZSContainer";
 import { ZSTextProps } from "./ui/ZSText";
 import { BoxStyle, ZSTextFieldRef } from "./ui/ZSTextField";
-
-import {
-  AlertOverlay,
-  BottomSheetOverlay,
-  SnackbarNotify,
-  useOverlayProvider,
-  useOverlay,
-  PopOverButton,
-  PopOverMenu,
-  ZSPortal,
-} from './overlay';
+import { AlertOverlay, BottomSheetOverlay, SnackbarNotify, useOverlay, PopOverButton, PopOverMenu, ZSPortal } from './overlay';
 
 export {
   useTheme,
   useFoldingState,
-  OverlayProvider,
   ThemeProvider,
+  OverlayProvider,
   themeFactory,
   // ---
   ZSBottomCta,
@@ -57,7 +43,6 @@ export {
   AlertOverlay,
   BottomSheetOverlay,
   SnackbarNotify,
-  useOverlayProvider,
   useOverlay,
   PopOverButton,
   PopOverMenu,
@@ -68,16 +53,11 @@ export {
 
 // ------------------------------------------------------
 
-import type {
-  ThemeProviderProps,
-  ThemeProps,
-  Palette,
-} from "./model/useThemeProvider";
+import type { ThemeProviderProps, ThemeProps, Palette } from "./context/ThemeContext";
 import {
   ColorPalette,
   ColorPaletteExtend,
   ThemeTextType,
-  ThemeBorderType,
   ThemeBackground,
   MainColors,
   Theme,
@@ -88,7 +68,9 @@ import {
   TypoStyle,
   TypoOptions,
   TypoSubStyle,
-  TypoColorOptions
+  TypoColorOptions,
+  ShadowLevel,
+  ShadowStyle,
 } from "./theme/types";
 import { ThemeFactoryColors, ThemeFactoryConfig } from "./theme/palette";
 import {
@@ -106,11 +88,7 @@ import {
   BottomSheetOptions,
   FoldingStateInfo
 } from "./model/types";
-import {
-  RadioOption,
-  ShadowLevel,
-  ShadowStyle,
-} from "./ui/types";
+import { RadioOption } from "./ui/types";
 
 export type {
   ThemeProviderProps,
@@ -122,7 +100,6 @@ export type {
   ColorPalette,
   ColorPaletteExtend,
   ThemeTextType,
-  ThemeBorderType,
   ThemeBackground,
   MainColors,
   Theme,

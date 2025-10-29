@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, ViewProps, Platform } from 'react-native';
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, useDerivedValue } from 'react-native-reanimated';
-import { useTheme } from '../../model/useThemeProvider';
-import { ShadowLevel } from '../types';
+import { useTheme } from '../../context/ThemeContext';
+import { ShadowLevel } from '../../theme/types';
 import { IOS_SHADOW } from '../../theme/elevation';
 import { SubColorOptions, ViewColor, ViewColorOptions } from '../../theme/types';
 

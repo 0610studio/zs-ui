@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig, useTheme, ZSText } from 'zs-ui';
+import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig } from 'zs-ui';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import SnackBar from '../src/ui/Snackbar';
@@ -81,7 +81,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider themeFonts={themeFonts} isDarkModeEnabled={true} isSplitView={true} customPalette={customPalette}>
+      <ThemeProvider themeFonts={themeFonts} isDarkModeEnabled={true} customPalette={customPalette}>
         <OverlayProvider customSnackbar={SnackBar}>
           <Stack
             screenOptions={{
