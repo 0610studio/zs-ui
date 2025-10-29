@@ -1,20 +1,21 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { LayoutChangeEvent, Pressable } from "react-native";
+import { Dimensions, LayoutChangeEvent, Pressable } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { usePopOver } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { PopOverMenuProps } from "../../model/types";
-import { useTheme } from "../../model";
+import { useTheme } from "../../context/ThemeContext";
 import { Z_INDEX_VALUE } from "../../model/utils";
 
 const MINIMUM_OFFSET = 10;
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 function PopOverMenu({
   px,
   py,
   component
 }: PopOverMenuProps): JSX.Element | null {
-  const { palette, dimensions: { width: windowWidth, height: windowHeight } } = useTheme();
+  const { palette } = useTheme();
   const [isContentVisible, setIsContentVisible] = useState<boolean>(false);
   const [contentWidth, setContentWidth] = useState<number>(0);
   const [contentHeight, setContentHeight] = useState<number>(0);

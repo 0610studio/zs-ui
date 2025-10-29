@@ -4,7 +4,7 @@ import { RadioOption } from '../types';
 import ViewAtom from '../atoms/ViewAtom';
 import ZSText, { ZSTextProps } from '../ZSText';
 import ZSPressable from '../ZSPressable';
-import { useTheme } from '../../model/useThemeProvider';
+import { useTheme } from '../../context/ThemeContext';
 import { SvgCheck } from '../../assets/SvgCheck';
 
 function ZSRadioGroup({

@@ -1,12 +1,13 @@
 import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, useState, useCallback, useMemo } from 'react';
-import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, View } from 'react-native';
+import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, View, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '../../model/useThemeProvider';
+import { useTheme } from '../../context/ThemeContext';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 import { FoldingState } from '../../model/types';
 import { MAX_FOLDABLE_SINGLE_WIDTH } from '../../model/utils';
 
+const windowHeight = Dimensions.get('window').height;
 const KEYBOARD_ANIMATION_DELAY = 50;
 const SCROLL_VIEW_OPTIONS = {
   bounces: false,
@@ -59,7 +60,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
   },
   forwardedRef
 ) {
-  const { palette, dimensions: { height: windowHeight } } = useTheme();
+  const { palette } = useTheme();
   const { foldingState, width } = useFoldingState();
   const positionRef = useRef<number | null>(0);
   const position2Ref = useRef<number | null>(0);

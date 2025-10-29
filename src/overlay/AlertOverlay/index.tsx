@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useAlert } from '../../model/useOverlay';
-import { useTheme } from '../../model/useThemeProvider';
-import { ThemeBackground } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { ThemeBackground } from '../../theme/types';
 import ModalBackground from '../ui/ModalBackground';
 import ViewAtom from '../../ui/atoms/ViewAtom';
 import { Z_INDEX_VALUE } from '../../model/utils';
 import ZSText from '../../ui/ZSText';
+
+const windowWidth = Dimensions.get('window').width;
 
 function AlertOverlay({
   actions,
@@ -22,7 +24,7 @@ function AlertOverlay({
   secondaryButtonTextStyle,
 }: ShowAlertProps) {
   const { alertVisible, setAlertVisible } = useAlert();
-  const { palette: { background, primary: primaryColor, modalBgColor }, dimensions: { width: windowWidth } } = useTheme();
+  const { palette: { background, primary: primaryColor, modalBgColor } } = useTheme();
   const styles = useMemo(() => createStyles({ background }), [background]);
   const modalWidth = Math.min(windowWidth - 60, 400);
   const { primary, secondary } = actions || {} as AlertActions;

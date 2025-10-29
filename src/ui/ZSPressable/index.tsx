@@ -2,8 +2,7 @@ import React from "react";
 import { Pressable, View, ViewProps } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AnimatedWrapper from "../atoms/AnimatedWrapper";
-import type { ShadowLevel } from "../types";
-import { ViewColorOptions } from "../../theme/types";
+import type { ShadowLevel, ViewColorOptions } from "../../theme/types";
 
 const DEFAULT_DURATION = { duration: 100 } as const;
 const SCALE_VALUES = [1, 0.96] as const;

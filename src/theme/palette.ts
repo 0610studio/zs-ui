@@ -288,27 +288,6 @@ const TEXT_COLORS = {
   },
 };
 
-const BORDER_COLORS = {
-  light: {
-    box: LIGHT_COLORS.grey[20],
-    active: LIGHT_COLORS.primary[50],
-    base: LIGHT_COLORS.grey[60],
-    danger: LIGHT_COLORS.danger[10],
-    warning: LIGHT_COLORS.warning[10],
-    success: LIGHT_COLORS.success[10],
-    information: LIGHT_COLORS.information[10],
-  },
-  dark: {
-    box: DARK_COLORS.grey[30],
-    active: DARK_COLORS.primary[50],
-    base: DARK_COLORS.grey[60],
-    danger: DARK_COLORS.danger[70],
-    warning: DARK_COLORS.warning[70],
-    success: DARK_COLORS.success[70],
-    information: DARK_COLORS.information[70],
-  },
-};
-
 const BACKGROUND_COLORS = {
   light: {
     primary: LIGHT_COLORS.primary.main,
@@ -332,24 +311,6 @@ const BACKGROUND_COLORS = {
     success: DARK_COLORS.success[80],
     information: DARK_COLORS.information[80],
   },
-};
-
-const ACTION_COLORS = {
-  light: {
-    hover: LIGHT_COLORS.primary[60],
-    pressed: LIGHT_COLORS.primary[70],
-    disable: LIGHT_COLORS.grey[20],
-  },
-  dark: {
-    hover: DARK_COLORS.primary[60],
-    pressed: DARK_COLORS.primary[70],
-    disable: DARK_COLORS.grey[30],
-  },
-};
-
-const DIVIDER_COLOR = {
-  light: LIGHT_COLORS.grey[50] + transparency['20%'],
-  dark: DARK_COLORS.grey[50] + transparency['20%'],
 };
 
 // ThemeFactory 타입 정의
@@ -452,27 +413,6 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
       },
     };
 
-    const customBorderColors = {
-      light: {
-        box: colors.grey[20],
-        active: colors.primary[50],
-        base: colors.grey[60],
-        danger: colors.danger[10],
-        warning: colors.warning[10],
-        success: colors.success[10],
-        information: colors.information[10],
-      },
-      dark: {
-        box: colors.grey[30],
-        active: colors.primary[50],
-        base: colors.grey[60],
-        danger: colors.danger[70],
-        warning: colors.warning[70],
-        success: colors.success[70],
-        information: colors.information[70],
-      },
-    };
-
     const customBackgroundColors = {
       light: {
         primary: colors.primary.main,
@@ -496,24 +436,6 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         success: colors.success[80],
         information: colors.information[80],
       },
-    };
-
-    const customActionColors = {
-      light: {
-        hover: colors.primary[60],
-        pressed: colors.primary[70],
-        disable: colors.grey[20],
-      },
-      dark: {
-        hover: colors.primary[60],
-        pressed: colors.primary[70],
-        disable: colors.grey[30],
-      },
-    };
-
-    const customDividerColor = {
-      light: colors.grey[50] + transparency['20%'],
-      dark: colors.grey[50] + transparency['20%'],
     };
 
     const customMainColors = {
@@ -541,10 +463,7 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
       mode,
       ...colors,
       text: customTextColors[mode],
-      border: customBorderColors[mode],
       background: customBackgroundColors[mode],
-      action: customActionColors[mode],
-      divider: customDividerColor[mode],
       elevationShadow: SHADOW_COLORS[mode],
       modalBgColor: MODAL_BG_COLOR[mode],
       mainColor: customMainColors[mode]
@@ -575,10 +494,7 @@ export default function palette({
     mode,
     ...colors,
     text: TEXT_COLORS[mode],
-    border: BORDER_COLORS[mode],
     background: BACKGROUND_COLORS[mode],
-    action: ACTION_COLORS[mode],
-    divider: DIVIDER_COLOR[mode],
     elevationShadow: SHADOW_COLORS[mode],
     modalBgColor: MODAL_BG_COLOR[mode],
     mainColor: MAIN_COLORS[mode]

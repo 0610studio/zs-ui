@@ -36,16 +36,6 @@ export interface ThemeTextType {
   black: string;
 }
 
-export interface ThemeBorderType {
-  box: string;
-  active: string;
-  base: string;
-  danger: string;
-  warning: string;
-  success: string;
-  information: string;
-}
-
 export interface ThemeBackground {
   primary: string;
   layer1: string;
@@ -78,14 +68,7 @@ export interface Theme {
   information: ColorPalette;
   grey: ColorPalette;
   text: ThemeTextType;
-  border: ThemeBorderType;
   background: ThemeBackground;
-  action: {
-    hover: string;
-    pressed: string;
-    disable: string;
-  };
-  divider: string;
   elevationShadow: string[];
   modalBgColor: string;
   mainColor: MainColors;
@@ -184,3 +167,11 @@ export type TypoColorOptions = 'base' | 'secondary' | 'disabled' | 'white' | 'bl
 export type SubColorOptions = undefined | '0' | '5' | '10' | '20' | '30' | '40' | '50' | '60' | '70' | '80' | '90' | '100';
 
 export type ViewColorOptions = 'layer1' | 'layer2' | 'neutral' | 'base' | CommonColorOptions;
+
+export type ShadowLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+export interface ShadowStyle {
+  shadowOffset: { width: number; height: number };
+  shadowOpacity: number;
+  shadowRadius: number;
+}

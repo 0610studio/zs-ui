@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BackHandler, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
-import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from './useOverlay';
-import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from './types';
+import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from '../model/useOverlay';
+import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from '../model/types';
 import AlertOverlay from '../overlay/AlertOverlay';
 import SnackbarNotify from '../overlay/SnackbarNotify';
 import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
@@ -9,7 +9,7 @@ import LoadingNotify from '../overlay/LoadingNotify';
 import PopOverMenu from '../overlay/PopOver/PopOverMenu';
 import Modality from '../overlay/Modality';
 import { PortalProvider } from '../overlay/ZSPortal';
-import { setGlobalOverlayRef } from './globalOverlay';
+import { setGlobalOverlayRef } from '../model/globalOverlay';
 
 export function OverlayProvider({
   customSnackbar,

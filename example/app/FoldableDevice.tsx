@@ -14,7 +14,7 @@ export default function FoldableDevice() {
     <ZSContainer
       edges={[]}
       style={[styles.container, { backgroundColor: palette.background.layer1 }]}
-      dividerLineComponent={<View style={{ width: 3, backgroundColor: palette.divider }} />}
+      dividerLineComponent={<View style={{ width: 3, backgroundColor: palette.grey[60] }} />}
       rightComponent={
         <View style={styles.rightComponent}>
           <ZSText>폴더블 기기가 펼쳐졌을때 표시됩니다.</ZSText>
