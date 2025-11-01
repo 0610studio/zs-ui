@@ -113,6 +113,7 @@ export interface BottomSheetOptions {
   height?: number;
   padding?: number;
   foldableSingleScreen?: boolean;
+  type?: 'floating' | 'fixed';
 }
 
 export interface ShowBottomSheetProps {

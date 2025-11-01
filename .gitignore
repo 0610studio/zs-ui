@@ -54,3 +54,6 @@ yarn-error.log
 
 # Expo
 .expo/*
+
+coverage/
+test-results.json

@@ -112,7 +112,26 @@ const OverlayExample = () => {
             ),
           });
         }}
-        title="show_BottomSheet"
+        title="show_BottomSheet_Floating"
+      />
+
+      <Button
+        onPress={() => {
+          showBottomSheet({
+            options: {
+              height: 400,
+              type: 'fixed'
+            },
+            component: (
+              <MyBottomSheet
+                onConfirm={() => {
+                  console.log("event");
+                }}
+              />
+            ),
+          });
+        }}
+        title="show_BottomSheet_Fixed"
       />
 
       <Button
