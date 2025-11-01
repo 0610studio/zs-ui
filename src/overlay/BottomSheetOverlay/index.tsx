@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent, Dimensions } from 'react-native';
+import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent, Dimensions, type ViewStyle } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import ModalBackground from '../ui/ModalBackground';
@@ -190,15 +190,17 @@ function BottomSheetOverlay({
   const containerStyle = [
     styles.container,
     {
-      width: windowWidth - marginHorizontal * 2,
-      maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%' as const,
+      width: options.type === 'fixed' ? '100%' : windowWidth - marginHorizontal * 2,
+      maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%',
       height: maxHeight,
-      marginHorizontal,
-      bottom: marginBottom + bottomInsets,
+      marginHorizontal: options.type === 'fixed' ? 0 : marginHorizontal,
+      bottom: options.type === 'fixed' ? 0 : marginBottom + bottomInsets,
+      paddingBottom: options.type === 'fixed' ? bottomInsets : 0,
       backgroundColor: palette.background.base,
+      ... (options.type === 'fixed' ? { borderTopLeftRadius: 26, borderTopRightRadius: 26, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : { borderRadius: 26 }),
     },
     animatedStyles,
-  ];
+  ] as ViewStyle[];
 
   const pressableViewStyle = [
     styles.pressableView,
