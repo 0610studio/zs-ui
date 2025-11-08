@@ -132,6 +132,7 @@ export function OverlayProvider({
   };
 
   const hideOverlay = useCallback((option: HideOption) => {
+    Keyboard.dismiss();
     switch (option) {
       case 'alert':
         setAlertVisible(false);

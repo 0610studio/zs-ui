@@ -86,28 +86,27 @@ const SHADOW_COLORS = {
   ]
 }
 
+// FF9F06
 const LIGHT_COLORS = {
   primary: {
-    0: '#FFF7E6',
-    5: '#FCEDD0',
-    10: '#F9DAA3', // p-lighter
-    20: '#F5BF64', // p-light
-    30: '#fca54c',
-    40: '#ff9225',
-    50: '#FF9F06', // p-main
-    60: '#DD9434', // p-dark
-    70: '#AC7326', // p-darker
-    80: '#c46500',
-    90: '#995400',
-    100: '#663800',
-    lighter: '#F9DAA3',
-    light: '#F5BF64',
-    main: '#FF9F06',
-    dark: '#DD9434',
-    darker: '#AC7326',
+    5: '#fffaf0',
+    10: '#ffeccc',
+    20: '#ffda9e',
+    30: '#ffc86e',
+    40: '#ffb742',
+    50: '#ffa20d',
+    60: '#e69100',
+    70: '#cc8000',
+    80: '#b37000',
+    90: '#996000',
+    100: '#805000',
+    lighter: '#ffda9e',
+    light: '#ffc86e',
+    main: '#ffa20d',
+    dark: '#e69100',
+    darker: '#b37000',
   },
   secondary: {
-    0: '#E6F7FF',
     5: '#D1EDFF',
     10: '#ADE2FF',
     20: '#85D4FF',
@@ -122,7 +121,6 @@ const LIGHT_COLORS = {
     main: '#007FFF',
   },
   danger: {
-    0: '#FFF5F7',
     5: '#FEECF0',
     10: '#FCD4DE',
     20: '#F799B1',
@@ -137,7 +135,6 @@ const LIGHT_COLORS = {
     main: '#EB003B',
   },
   warning: {
-    0: '#FFFBF2',
     5: '#FFF8E9',
     10: '#FFEAC1',
     20: '#FFE2A7',
@@ -152,7 +149,6 @@ const LIGHT_COLORS = {
     main: '#FFB724',
   },
   success: {
-    0: '#F5FBF6',
     5: '#EEF7F0',
     10: '#CEE9D4',
     20: '#B2DCBB',
@@ -167,7 +163,6 @@ const LIGHT_COLORS = {
     main: '#008A1E',
   },
   information: {
-    0: '#F3F8FF',
     5: '#E9F0FF',
     10: '#D4E1FF',
     20: '#A9C3FF',
@@ -182,7 +177,6 @@ const LIGHT_COLORS = {
     main: '#2768FF',
   },
   grey: {
-    0: '#FFFFFF',
     5: '#F8F8F8',
     10: '#F9FAFB',
     20: '#F4F6F8',
@@ -224,7 +218,6 @@ const DARK_COLORS = {
     main: '#2768FF',
   },
   grey: {
-    0: '#000000',
     5: '#141414',  // layer1
     10: '#1F1F1F', // layer2
     20: '#2C2C2C', // neutral

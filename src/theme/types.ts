@@ -1,15 +1,14 @@
 import { TextProps } from "react-native";
 
 export type ColorPalette = {
-  0: string;
   5: string;
-  10: string; // p-lighter
-  20: string; // p-light
+  10: string;
+  20: string;
   30: string;
   40: string;
-  50: string; // p-main
-  60: string; // p-dark
-  70: string; // p-darker
+  50: string;
+  60: string;
+  70: string;
   80: string;
   90: string;
   100: string;
