@@ -287,7 +287,7 @@ const BACKGROUND_COLORS = {
     layer1: LIGHT_COLORS.grey[5],
     layer2: LIGHT_COLORS.grey[20],
     neutral: LIGHT_COLORS.grey[30],
-    base: LIGHT_COLORS.grey[0],
+    base: '#fff',
     danger: LIGHT_COLORS.danger[5],
     warning: LIGHT_COLORS.warning[5],
     success: LIGHT_COLORS.success[5],
@@ -298,7 +298,7 @@ const BACKGROUND_COLORS = {
     layer1: DARK_COLORS.grey[5],
     layer2: DARK_COLORS.grey[20],
     neutral: DARK_COLORS.grey[30],
-    base: DARK_COLORS.grey[0],
+    base: '#000',
     danger: DARK_COLORS.danger[80],
     warning: DARK_COLORS.warning[80],
     success: DARK_COLORS.success[80],
@@ -378,7 +378,7 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
   } = {}): Theme {
     const colors = mode === 'light' ? customLightColors : customDarkColors;
 
-    // 커스텀 색상을 기반으로 새로운 색상 매핑 생성
+    // 재정의된 색상을 기반으로 동적으로 색상 매핑 생성
     const customTextColors = {
       light: {
         primary: colors.primary.main,
@@ -412,7 +412,7 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         layer1: colors.grey[5],
         layer2: colors.grey[20],
         neutral: colors.grey[30],
-        base: colors.grey[0],
+        base: '#fff',
         danger: colors.danger[5],
         warning: colors.warning[5],
         success: colors.success[5],
@@ -423,7 +423,7 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         layer1: colors.grey[5],
         layer2: colors.grey[20],
         neutral: colors.grey[30],
-        base: colors.grey[0],
+        base: '#000',
         danger: colors.danger[80],
         warning: colors.warning[80],
         success: colors.success[80],
