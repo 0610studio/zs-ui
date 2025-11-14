@@ -6,7 +6,7 @@ describe('palette()', () => {
     expect(theme.mode).toBe('light');
     expect(theme.mainColor.primary).toBe('#ffa20d');
     expect(theme.text.white).toBe('#FFFFFF');
-    expect(theme.background.base).toBe('#fff');
+    expect(theme.background.base).toBe('#ffffff');
   });
 
   it('다크 모드 팔레트를 생성한다', () => {
