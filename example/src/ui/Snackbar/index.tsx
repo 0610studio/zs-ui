@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   message: {
-    color: '#fff'
+    color: '#ffffff'
   },
 });
 

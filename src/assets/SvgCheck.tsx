@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-export const SvgCheck = ({ size = 24, color = '#fff', strokeWidth = "2" }) => {
+export const SvgCheck = ({ size = 24, color = '#ffffff', strokeWidth = "2" }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
