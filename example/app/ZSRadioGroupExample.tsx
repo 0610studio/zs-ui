@@ -10,7 +10,7 @@ function ZSRadioGroupExample(): React.JSX.Element {
   const styles = useStyleSheetCreate(createStyles);
 
   return (
-    <ZSContainer edges={['bottom']} style={styles.container}>
+    <ZSContainer style={styles.container}>
       <TitleCard title='ZSRadioGroup'>
         <ZSRadioGroup
           options={[

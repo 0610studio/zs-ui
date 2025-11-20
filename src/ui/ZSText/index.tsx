@@ -1,4 +1,5 @@
-import { TextProps } from "react-native/types";
+import React from "react";
+import { TextProps } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { TypoOptions, TypoStyle, TypoColorOptions, TypoSubStyle, TypoColor, SubColorOptions } from "../../theme/types";
 import TextAtom from "../atoms/TextAtom"

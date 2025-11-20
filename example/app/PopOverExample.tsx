@@ -11,7 +11,7 @@ const PopOverExample = () => {
   const styles = useStyleSheetCreate(createStyles);
 
   return (
-    <ZSContainer style={styles.container} edges={["bottom"]} >
+    <ZSContainer style={styles.container}>
       <TitleCard title="우측">
         <ZSView style={{ flex: 1, alignItems: "flex-end" }}>
           <PopOverButton

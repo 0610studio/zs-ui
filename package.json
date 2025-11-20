@@ -1,6 +1,6 @@
 {
   "name": "@0610studio/zs-ui",
-  "version": "0.12.8",
+  "version": "0.13.1",
   "private": false,
   "description": "EXPO ZS-UI",
   "type": "commonjs",
@@ -55,7 +55,7 @@
     "react": "18.3.1",
     "react-native": ">=0.76.9",
     "react-native-reanimated": ">=3.17.4",
-    "react-native-safe-area-context": "5.4.0",
+    "react-native-safe-area-context": "5.6.2",
     "react-native-svg": "15.8.0",
     "react-test-renderer": "18.3.1",
     "ts-jest": "^29.2.5",
@@ -63,7 +63,7 @@
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "*",
-    "expo": ">=52.0.0",
+    "expo": ">=53.0.0",
     "expo-navigation-bar": ">=4.0.7",
     "expo-router": "*",
     "react": "*",

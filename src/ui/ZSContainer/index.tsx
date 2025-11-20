@@ -42,7 +42,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     backgroundColor,
     statusBarColor,
     barStyle,
-    edges = ['top', 'bottom'],
+    edges = ['bottom'],
     scrollViewDisabled = false,
     topComponent,
     bottomComponent,
@@ -234,7 +234,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
                 </View>
               )
             }
-          </View >
+          </View>
           {bottomComponent}
         </View>
       </View>

@@ -9,7 +9,7 @@ function ZSTextExample(): React.JSX.Element {
   const styles = useStyleSheetCreate(createStyles);
 
   return (
-    <ZSContainer edges={['bottom']} style={styles.container}>
+    <ZSContainer style={styles.container}>
       <TitleCard title='heading' flexDirection='column'>
         <ZSText typo="heading.1">heading.1</ZSText>
         <ZSText typo="heading.2">heading.2</ZSText>
