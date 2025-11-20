@@ -1,12 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { ThrottleButton, ZSText, ZSContainer, ZSPressable, useTheme } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
-import type { RadioOption, Theme } from 'zs-ui';
+import type { Theme } from 'zs-ui';
 import { useStyleSheetCreate } from 'zs-ui/model';
 
 function ButtonExample(): React.JSX.Element {
-  const [responseType, setResponseType] = useState<RadioOption>();
   const { palette } = useTheme();
   const styles = useStyleSheetCreate(createStyles);
 
@@ -23,7 +22,6 @@ function ButtonExample(): React.JSX.Element {
 
   return (
     <ZSContainer
-      edges={['bottom']}
       keyboardScrollExtraOffset={130}
       style={styles.container}
     >

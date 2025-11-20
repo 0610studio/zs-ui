@@ -12,7 +12,6 @@ export default function FoldableDevice() {
 
   return (
     <ZSContainer
-      edges={[]}
       style={[styles.container, { backgroundColor: palette.background.layer1 }]}
       dividerLineComponent={<View style={{ width: 3, backgroundColor: palette.grey[60] }} />}
       rightComponent={

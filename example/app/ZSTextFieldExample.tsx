@@ -15,7 +15,6 @@ function ZSTextFieldExample(): React.JSX.Element {
 
   return (
     <ZSContainer
-      edges={['bottom']}
       keyboardScrollExtraOffset={130}
       style={styles.container}
     >

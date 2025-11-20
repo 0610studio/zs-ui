@@ -12,7 +12,7 @@ const HomeButton = ({ title, onPress }: { title: string, onPress: () => void }) 
 
 export default function Home() {
   return (
-    <ZSContainer edges={['bottom']} backgroundColor='layer2'>
+    <ZSContainer backgroundColor='layer2'>
       <ZSView color='layer2' style={{ paddingHorizontal: 15, flex: 1, gap: 30, paddingTop: 30 }}>
         <TitleCard title='테마'>
           <HomeButton title='테마 예제' onPress={() => router.push('/ThemeExample')} />

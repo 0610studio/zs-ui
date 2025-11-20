@@ -9,10 +9,7 @@ export default function ThemeExample() {
   const styles = useStyleSheetCreate(createStyles);
 
   return (
-    <ZSContainer
-      style={styles.container}
-      edges={['bottom']}
-    >
+    <ZSContainer style={styles.container}>
       {/* 배경색 예제 */}
       <TitleCard title='Background Colors' gap={5}>
         <ZSView style={styles.box} color='base'><ZSText>Base</ZSText></ZSView>

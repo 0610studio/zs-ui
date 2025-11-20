@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "react-native";
 import { ZSText, ZSTextField } from "zs-ui";
 import { ZSTextFieldRef } from "zs-ui";
@@ -9,11 +9,11 @@ export function TextFieldExample({ title }: { title: string }) {
   const [field3, setField3] = useState('');
   const field1Ref = useRef<ZSTextFieldRef>(null);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (field1Ref.current) field1Ref.current.focus();
-    }, 100);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (field1Ref.current) field1Ref.current.focus();
+  //   }, 300);
+  // }, []);
 
   return (
     <View style={{ gap: 200 }}>

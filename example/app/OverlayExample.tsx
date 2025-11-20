@@ -11,7 +11,7 @@ const OverlayExample = () => {
   const styles = useStyleSheetCreate(createStyles);
 
   return (
-    <ZSContainer style={styles.container} edges={["bottom"]}>
+    <ZSContainer style={styles.container}>
       <Button
         onPress={() =>
           showAlert({

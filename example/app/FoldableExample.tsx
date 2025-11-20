@@ -1,5 +1,4 @@
-import { Button, View } from "react-native";
-import { ZSAboveKeyboard, ZSContainer, ZSText, ZSTextField, useOverlay } from "zs-ui";
+import { ZSAboveKeyboard, ZSContainer } from "zs-ui";
 import CtaButton from "../src/ui/CtaButton";
 import { useState } from "react";
 import { router } from "expo-router";
@@ -10,7 +9,6 @@ function FoldableExample() {
 
   return (
     <ZSContainer
-      edges={['bottom']}
       keyboardScrollExtraOffset={190}
       style={{ paddingHorizontal: 30, paddingTop: 30, paddingBottom: 30 + ctaLayoutHeight }}
       rightComponent={<TextFieldExample title="right" />}

@@ -33,6 +33,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-system-ui",
       [
         "expo-font",
         {
@@ -53,15 +54,9 @@
         "expo-build-properties",
         {
           "ios": {
-            "newArchEnabled": true,
             "useFrameworks": "static"
           },
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0",
-            "kotlinVersion": "1.9.25",
-            "newArchEnabled": true,
             "usesCleartextTraffic": true
           }
         }

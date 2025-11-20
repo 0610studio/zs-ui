@@ -9,7 +9,6 @@ function ZSContainerExample() {
 
   return (
     <ZSContainer
-      edges={['bottom']}
       keyboardScrollExtraOffset={190}
       style={{ paddingHorizontal: 30, paddingTop: 30, paddingBottom: 30 + ctaLayoutHeight }}
       foldableSingleScreen
