@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
-import { StyleSheet } from 'react-native';
-import { ThrottleButton, ZSText, ZSContainer, ZSPressable, useTheme } from 'zs-ui';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSSwitch, useTheme } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { Theme } from 'zs-ui';
 import { useStyleSheetCreate } from 'zs-ui/model';
@@ -8,6 +8,9 @@ import { useStyleSheetCreate } from 'zs-ui/model';
 function ButtonExample(): React.JSX.Element {
   const { palette } = useTheme();
   const styles = useStyleSheetCreate(createStyles);
+  const [switch1Active, setSwitch1Active] = useState(false);
+  const [switch2Active, setSwitch2Active] = useState(true);
+  const [switch3Active, setSwitch3Active] = useState(false);
 
   const handleSubmit = useCallback(
     async () => {
@@ -62,6 +65,36 @@ function ButtonExample(): React.JSX.Element {
           }
         />
       </TitleCard>
+
+      {/* ZSSwitch */}
+      <TitleCard title='ZSSwitch' flexDirection='column'>
+        <View style={styles.switchContainer}>
+          <ZSText typo="body.1">커스텀 색상</ZSText>
+          <ZSSwitch
+            isActive={switch3Active}
+            onToggle={() => setSwitch3Active(!switch3Active)}
+            trackColorInactive="#ffcccc"
+            trackColorActive="#ff6b6b"
+            thumbColor="#ffffff"
+          />
+        </View>
+        <View style={styles.switchContainer}>
+          <ZSText typo="body.1">크기 100</ZSText>
+          <ZSSwitch
+            isActive={switch3Active}
+            onToggle={() => setSwitch3Active(!switch3Active)}
+            width={100}
+          />
+        </View>
+        <View style={styles.switchContainer}>
+          <ZSText typo="body.1">크기 10</ZSText>
+          <ZSSwitch
+            isActive={switch3Active}
+            onToggle={() => setSwitch3Active(!switch3Active)}
+            width={30}
+          />
+        </View>
+      </TitleCard>
     </ZSContainer>
   );
 }
@@ -79,6 +112,12 @@ const createStyles = (palette: Theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
   },
 });
 

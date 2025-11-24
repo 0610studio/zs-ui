@@ -25,12 +25,6 @@ npx expo install @0610studio/zs-ui
 
 <br />
 
-## TODO
-
-- [ ] 폴더블 폰에서 접힘/펼침 상태 변경으로 인해 액티비티가 재시작되었을 때, `Dimensions.get('window')`가 이전 값을 반환하고 onChange가 호출되지 않는 문제
-
-<br />
-
 ### playground
 
 [EXPO snack](https://snack.expo.dev/@studio0610/zs-ui-playground)에서 확인 가능합니다.
@@ -42,7 +36,7 @@ npx expo install @0610studio/zs-ui
 | 항목 | 값 |
 |------|-----|
 | **상태** | ✅ 성공 |
-| **실행 시간** | 2025. 10. 31. 오전 10:24 |
+| **실행 시간** | 2025. 10. 31 |
 | **전체 테스트** | 123 |
 | **성공** | ✅ 123 |
 | **실패** | ✅ 0 |
