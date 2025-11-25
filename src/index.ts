@@ -1,4 +1,5 @@
-import { GlobalOverlay } from './model'
+import { GlobalOverlay } from './model/globalOverlay'
+import { useStyleSheetCreate } from './model/useStyleSheetCreate'
 import { OverlayProvider } from "./context/OverlayContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { useFoldingState } from './model/useFoldingState'
@@ -51,6 +52,7 @@ export {
   ZSPortal,
   // Global overlay functions
   GlobalOverlay,
+  useStyleSheetCreate,
 };
 
 // ------------------------------------------------------

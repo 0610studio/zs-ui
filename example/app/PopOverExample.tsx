@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { PopOverButton, useOverlay, ZSContainer, ZSText, ZSView, useTheme, Theme } from "zs-ui";
 import TitleCard from "../src/ui/TitleCard";
 import RenderPopOverMenu from "../src/ui/RenderPopOverMenu";
-import { useStyleSheetCreate } from "zs-ui/model";
+import { useStyleSheetCreate } from "zs-ui";
 
 const PopOverExample = () => {
   const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();

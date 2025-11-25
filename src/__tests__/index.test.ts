@@ -1,4 +1,3 @@
-jest.mock("../model", () => ({ GlobalOverlay: {} }));
 jest.mock("../context/OverlayContext", () => ({ OverlayProvider: ({ children }: any) => children }));
 jest.mock("../context/ThemeContext", () => ({
   ThemeProvider: ({ children }: any) => children,

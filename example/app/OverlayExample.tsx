@@ -3,7 +3,7 @@ import { Button, StyleSheet } from "react-native";
 import { useOverlay, ZSContainer, ZSText, useTheme, Theme } from "zs-ui";
 import MyBottomSheet from "../src/ui/MyBottomSheet";
 import MyModal from "../src/ui/MyModal";
-import { useStyleSheetCreate } from "zs-ui/model";
+import { useStyleSheetCreate } from "zs-ui";
 
 const OverlayExample = () => {
   const { showAlert, showSnackBar, showBottomSheet, showModality, hideOverlay } = useOverlay();

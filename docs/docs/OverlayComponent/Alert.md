@@ -6,51 +6,44 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 
 # Alert
 
-사용자에게 중요한 메시지를 전달하거나, 모달로부터 사용자의 응답을 받을때 사용됩니다.
+사용자에게 중요한 메시지를 전달하거나, 모달로부터 사용자의 응답을 받을 때 사용되는 알림 컴포넌트입니다.
 
 <ExpoSnack id="@studio0610/zs-ui-alert" />
 
-### 기본 사용법
+## 기본 사용법
 
-```jsx
-import React, { useContext } from 'react';
-import { Button } from 'react-native';
-import { useOverlay } from "@0610studio/zs-ui";
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
 
-const AlertExample = () => {
-  const { showAlert, showSnackBar, showBottomSheet } = useOverlay();
+function MyComponent() {
+  const { showAlert } = useOverlay();
 
   const handleShowAlert = () => {
     showAlert({
-      title: "타이틀 테스트 길어지면 줄바꿈이 될 수 있습니다.",
-      informative: "테스트 informative 길~~~~~~~~어지면 줄바꿈이 될 수 있습니다.",
-      primaryButtonStyle: { backgroundColor: primary.main },
+      title: '확인',
+      informative: '이 작업을 계속하시겠습니까?',
       actions: {
         primary: {
-          label: "확인",
-          onPress: () => console.log("확인"),
+          label: '확인',
+          onPress: () => console.log('확인'),
         },
         secondary: {
-          label: "취소",
-          onPress: () => console.log("취소"),
+          label: '취소',
+          onPress: () => console.log('취소'),
         },
       },
-    })
+    });
   };
 
   return <Button title="Alert 표시" onPress={handleShowAlert} />;
-};
-
-export default AlertExample;
+}
 ```
-
----
 
 ## API 참조
 
 ### `showAlert` 함수
 
-`showAlert` 함수는 Alert 알림을 표시하는 데 사용됩니다. 이 함수는 `ShowAlertProps` 타입의 객체를 인수로 받습니다.
+`showAlert` 함수는 Alert 알림을 표시하는 데 사용됩니다.
 
 ```typescript
 showAlert(props: ShowAlertProps): void
@@ -58,43 +51,19 @@ showAlert(props: ShowAlertProps): void
 
 ### `ShowAlertProps` 인터페이스
 
-`ShowAlertProps`는 `showAlert` 함수에 전달되는 속성을 정의합니다.
-
-```typescript
-interface ShowAlertProps {
-  title: string;
-  informative: string;
-  actions?: AlertActions;
-  isBackgroundTouchClose?: boolean;
-  titleStyle?: TextProps['style'];
-  informativeStyle?: TextProps['style'];
-  secondaryButtonStyle?: TouchableOpacityProps['style'];
-  primaryButtonStyle?: TouchableOpacityProps['style'];
-  secondaryButtonTextStyle?: TextProps['style'];
-  primaryButtonTextStyle?: TextProps['style'];
-  singleButtonTextStyle?: TextProps['style'];
-}
-```
-
-#### 속성 설명
-
-| 속성                      | 타입                                        | 설명                                                                                       |
-| ------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `title`                   | `string`                                    | 알림의 제목입니다.                                                                         |
-| `informative`             | `string`                                    | 알림의 설명 메시지입니다.                                                                   |
-| `actions`                 | `AlertActions` *(선택 사항)*                | 알림에 표시할 액션들 (예: 기본 및 보조 버튼)입니다.                                         |
-| `isBackgroundTouchClose`  | `boolean` *(선택 사항, 기본값: `true`)*     | 배경을 터치하면 알림이 닫히는지 여부를 결정합니다.                                           |
-| `titleStyle`              | `TextStyle` *(선택 사항)*                   | 알림 제목의 커스텀 스타일입니다.                                                            |
-| `informativeStyle`        | `TextStyle` *(선택 사항)*                   | 설명 메시지의 커스텀 스타일입니다.                                                           |
-| `secondaryButtonStyle`    | `TouchableOpacityStyle` *(선택 사항)*        | 보조 버튼의 커스텀 스타일입니다.                                                              |
-| `primaryButtonStyle`      | `TouchableOpacityStyle` *(선택 사항)*        | 기본 버튼의 커스텀 스타일입니다.                                                              |
-| `secondaryButtonTextStyle`| `TextStyle` *(선택 사항)*                   | 보조 버튼 텍스트의 커스텀 스타일입니다.                                                       |
-| `primaryButtonTextStyle`  | `TextStyle` *(선택 사항)*                   | 기본 버튼 텍스트의 커스텀 스타일입니다.                                                       |
-| `singleButtonTextStyle`   | `TextStyle` *(선택 사항)*                   | 버튼이 하나만 있을 때의 텍스트 커스텀 스타일입니다.                                           |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | `undefined` | 알림의 제목 |
+| `informative` | `string` | `undefined` | 알림의 설명 메시지 |
+| `actions` | `AlertActions` | `undefined` | 알림에 표시할 액션들 (기본 및 보조 버튼) |
+| `isBackgroundTouchClose` | `boolean` | `true` | 배경을 터치하면 알림이 닫히는지 여부 |
+| `titleStyle` | `TextProps['style']` | `undefined` | 알림 제목의 커스텀 스타일 |
+| `informativeStyle` | `TextProps['style']` | `undefined` | 설명 메시지의 커스텀 스타일 |
+| `secondaryButtonStyle` | `TouchableOpacityProps['style']` | `undefined` | 보조 버튼의 커스텀 스타일 |
+| `primaryButtonStyle` | `TouchableOpacityProps['style']` | `undefined` | 기본 버튼의 커스텀 스타일 |
+| `secondaryButtonTextStyle` | `TextProps['style']` | `undefined` | 보조 버튼 텍스트의 커스텀 스타일 |
 
 ### `AlertActions` 인터페이스
-
-`AlertActions`는 Alert 알림에 포함될 버튼들을 정의합니다.
 
 ```typescript
 interface AlertActions {
@@ -103,16 +72,7 @@ interface AlertActions {
 }
 ```
 
-#### 속성 설명
-
-| 속성       | 타입               | 설명                                     |
-| ---------- | ------------------ | ---------------------------------------- |
-| `primary`  | `AlertAction`      | 기본 버튼을 정의합니다.                   |
-| `secondary`| `AlertAction` *(선택 사항)* | 보조 버튼을 정의합니다. (선택 사항) |
-
 ### `AlertAction` 인터페이스
-
-`AlertAction`은 개별 버튼의 속성을 정의합니다.
 
 ```typescript
 interface AlertAction {
@@ -121,31 +81,152 @@ interface AlertAction {
 }
 ```
 
-#### 속성 설명
+## 특징
 
-| 속성      | 타입                 | 설명                          |
-| --------- | -------------------- | ----------------------------- |
-| `label`   | `string`             | 버튼에 표시될 텍스트입니다.    |
-| `onPress` | `() => void` *(선택 사항)* | 버튼 클릭 시 실행될 함수입니다. |
+- **모달 알림**: 사용자의 주의를 끌기 위한 모달 형태의 알림
+- **액션 버튼**: 기본 버튼과 보조 버튼을 통해 사용자 응답 수집
+- **커스터마이징**: 버튼 스타일과 텍스트 스타일을 자유롭게 설정 가능
+- **배경 터치 제어**: 배경 터치로 닫기 여부를 설정할 수 있습니다
 
----
+## 예제
 
-## 커스터마이징
+### 단일 버튼 Alert
 
-Alert 알림의 외관과 동작을 커스터마이징하여 애플리케이션의 디자인과 일관되게 만들 수 있습니다.
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
 
-```jsx
-  showAlert({
-    title: '경고',
-    informative: '이 작업은 되돌릴 수 없습니다.',
-    actions: {
-      primary: { label: '삭제', onPress: () => console.log('삭제 클릭됨') },
-      secondary: { label: '취소', onPress: () => console.log('취소 클릭됨') },
-    },
-    primaryButtonStyle: { backgroundColor: '#e74c3c', padding: 10 },
-    secondaryButtonStyle: { backgroundColor: '#95a5a6', padding: 10 },
-    primaryButtonTextStyle: { color: '#fff', fontWeight: 'bold' },
-    secondaryButtonTextStyle: { color: '#fff', fontWeight: 'bold' },
-  });
+function MyComponent() {
+  const { showAlert } = useOverlay();
+
+  const handleShowAlert = () => {
+    showAlert({
+      title: '알림',
+      informative: '작업이 완료되었습니다.',
+      actions: {
+        primary: {
+          label: '확인',
+          onPress: () => console.log('확인'),
+        },
+      },
+    });
+  };
+
+  return <Button title="Alert 표시" onPress={handleShowAlert} />;
+}
 ```
----
+
+### 두 개의 버튼 Alert
+
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
+
+function MyComponent() {
+  const { showAlert } = useOverlay();
+
+  const handleDelete = () => {
+    showAlert({
+      title: '삭제 확인',
+      informative: '이 항목을 삭제하시겠습니까?',
+      actions: {
+        primary: {
+          label: '삭제',
+          onPress: () => {
+            // 삭제 로직
+          },
+        },
+        secondary: {
+          label: '취소',
+          onPress: () => {
+            // 취소 로직
+          },
+        },
+      },
+    });
+  };
+
+  return <Button title="삭제" onPress={handleDelete} />;
+}
+```
+
+### 커스텀 스타일
+
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
+
+function MyComponent() {
+  const { showAlert } = useOverlay();
+
+  const handleShowAlert = () => {
+    showAlert({
+      title: '경고',
+      informative: '이 작업은 되돌릴 수 없습니다.',
+      actions: {
+        primary: {
+          label: '삭제',
+          onPress: () => console.log('삭제'),
+        },
+        secondary: {
+          label: '취소',
+          onPress: () => console.log('취소'),
+        },
+      },
+      primaryButtonStyle: {
+        backgroundColor: '#e74c3c',
+        padding: 10,
+      },
+      secondaryButtonStyle: {
+        backgroundColor: '#95a5a6',
+        padding: 10,
+      },
+      primaryButtonTextStyle: {
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+      secondaryButtonTextStyle: {
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+    });
+  };
+
+  return <Button title="경고 표시" onPress={handleShowAlert} />;
+}
+```
+
+### 배경 터치로 닫기 비활성화
+
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
+
+function MyComponent() {
+  const { showAlert } = useOverlay();
+
+  const handleShowAlert = () => {
+    showAlert({
+      title: '중요한 알림',
+      informative: '이 알림은 배경을 터치해도 닫히지 않습니다.',
+      isBackgroundTouchClose: false,
+      actions: {
+        primary: {
+          label: '확인',
+          onPress: () => console.log('확인'),
+        },
+      },
+    });
+  };
+
+  return <Button title="Alert 표시" onPress={handleShowAlert} />;
+}
+```
+
+### Alert 닫기
+
+Alert는 버튼을 누르거나 배경을 터치하면 자동으로 닫힙니다. 프로그래밍 방식으로 닫으려면:
+
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
+
+const { hideOverlay } = useOverlay();
+
+hideOverlay('alert');
+```
