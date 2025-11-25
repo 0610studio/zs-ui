@@ -133,5 +133,5 @@ function MyComponent() {
 - `showLoader()` - Loader 표시
 - `hideOverlay(option)` - 오버레이 숨기기
 
-각 오버레이 컴포넌트에 대한 자세한 내용은 [Overlay 컴포넌트 문서](../OverlayComponent/00_start)를 참조하세요.
+각 오버레이 컴포넌트에 대한 자세한 내용은 [Overlay 컴포넌트 문서](/docs/OverlayComponent/start)를 참조하세요.
 

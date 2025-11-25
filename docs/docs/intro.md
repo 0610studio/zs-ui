@@ -20,7 +20,7 @@ sidebar_position: 1
     flexShrink: 0
   }}>
     <video controls width="300">
-      <source src="/video/theme.mp4" type="video/mp4" />
+      <source src="/zs-ui/video/theme.mp4" type="video/mp4" />
     </video>
     <p>Theme</p>
   </div>
@@ -29,7 +29,7 @@ sidebar_position: 1
     flexShrink: 0
   }}>
     <video controls width="300">
-      <source src="/video/layout.mp4" type="video/mp4" />
+      <source src="/zs-ui/video/layout.mp4" type="video/mp4" />
     </video>
     <p>Layout</p>
   </div>
@@ -38,7 +38,7 @@ sidebar_position: 1
     flexShrink: 0
   }}>
     <video controls width="300">
-      <source src="/video/overlay.mp4" type="video/mp4" />
+      <source src="/zs-ui/video/overlay.mp4" type="video/mp4" />
     </video>
     <p>Overlay</p>
   </div>
@@ -86,7 +86,7 @@ export default function App() {
 }
 ```
 
-자세한 설정 방법은 [Provider 구성](./Provider/00_start) 문서를 참조하세요.
+자세한 설정 방법은 [Provider 구성](/docs/Provider/start) 문서를 참조하세요.
 
 ### 첫 번째 컴포넌트 사용
 
@@ -109,10 +109,10 @@ export default function MyScreen() {
 
 ## 문서 구조
 
-- **[Provider 구성](./Provider/00_start)**: 앱의 기본 설정과 Provider 구성 방법
-- **[Theme](./Theme/00_start)**: 테마 시스템과 스타일링
-- **[UI 컴포넌트](./UiComponent/ZSText)**: 기본 UI 컴포넌트 사용법
-- **[Overlay 컴포넌트](./OverlayComponent/00_start)**: 오버레이 컴포넌트 사용법
+- **[Provider 구성](/docs/Provider/start)**: 앱의 기본 설정과 Provider 구성 방법
+- **[Theme](/docs/Theme/start)**: 테마 시스템과 스타일링
+- **[UI 컴포넌트](/docs/UiComponent/ZSText)**: 기본 UI 컴포넌트 사용법
+- **[Overlay 컴포넌트](/docs/OverlayComponent/start)**: 오버레이 컴포넌트 사용법
 
 ## 추가 리소스
 
