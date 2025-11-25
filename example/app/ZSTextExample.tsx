@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { ZSText, ZSContainer } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { Theme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui/model';
+import { useStyleSheetCreate } from 'zs-ui';
 
 function ZSTextExample(): React.JSX.Element {
   const styles = useStyleSheetCreate(createStyles);

@@ -27,7 +27,7 @@ npx expo install @0610studio/zs-ui
 
 ### playground
 
-[EXPO snack](https://snack.expo.dev/@studio0610/zs-ui-playground)에서 확인 가능합니다.
+[EXPO snack](https://snack.expo.dev/@studio0610/zs-ui_13_playground)에서 확인 가능합니다.
 
 <br />
 <!-- TEST_RESULTS -->

@@ -29,36 +29,39 @@ export type ElevationStyles = {
 };
 
 export default function elevation(palette: Theme): ElevationStyles {
+  // iOS와 웹에서는 shadowOffset/shadowOpacity/shadowRadius를 사용 (웹은 CSS box-shadow로 변환됨)
+  // Android에서는 elevation 속성을 사용
+  const useShadowStyle = Platform.OS === 'ios' || Platform.OS === 'web';
 
   return {
-    0: Platform.OS === 'ios'
+    0: useShadowStyle
       ? { ...IOS_SHADOW[0], shadowColor: palette.elevationShadow[0] }
       : { elevation: 0, shadowColor: palette.elevationShadow[0] },
-    1: Platform.OS === 'ios'
+    1: useShadowStyle
       ? { ...IOS_SHADOW[1], shadowColor: palette.elevationShadow[1] }
       : { elevation: 1, shadowColor: palette.elevationShadow[1] },
-    2: Platform.OS === 'ios'
+    2: useShadowStyle
       ? { ...IOS_SHADOW[2], shadowColor: palette.elevationShadow[2] }
       : { elevation: 2, shadowColor: palette.elevationShadow[2] },
-    3: Platform.OS === 'ios'
+    3: useShadowStyle
       ? { ...IOS_SHADOW[3], shadowColor: palette.elevationShadow[3] }
       : { elevation: 3, shadowColor: palette.elevationShadow[3] },
-    4: Platform.OS === 'ios'
+    4: useShadowStyle
       ? { ...IOS_SHADOW[4], shadowColor: palette.elevationShadow[4] }
       : { elevation: 4, shadowColor: palette.elevationShadow[4] },
-    5: Platform.OS === 'ios'
+    5: useShadowStyle
       ? { ...IOS_SHADOW[5], shadowColor: palette.elevationShadow[5] }
       : { elevation: 5, shadowColor: palette.elevationShadow[5] },
-    6: Platform.OS === 'ios'
+    6: useShadowStyle
       ? { ...IOS_SHADOW[6], shadowColor: palette.elevationShadow[6] }
       : { elevation: 6, shadowColor: palette.elevationShadow[6] },
-    7: Platform.OS === 'ios'
+    7: useShadowStyle
       ? { ...IOS_SHADOW[7], shadowColor: palette.elevationShadow[7] }
       : { elevation: 7, shadowColor: palette.elevationShadow[7] },
-    8: Platform.OS === 'ios'
+    8: useShadowStyle
       ? { ...IOS_SHADOW[8], shadowColor: palette.elevationShadow[8] }
       : { elevation: 8, shadowColor: palette.elevationShadow[8] },
-    9: Platform.OS === 'ios'
+    9: useShadowStyle
       ? { ...IOS_SHADOW[9], shadowColor: palette.elevationShadow[9] }
       : { elevation: 9, shadowColor: palette.elevationShadow[9] },
   };

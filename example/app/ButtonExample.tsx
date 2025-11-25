@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSSwitch, useTheme } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { Theme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui/model';
+import { useStyleSheetCreate } from 'zs-ui';
 
 function ButtonExample(): React.JSX.Element {
   const { palette } = useTheme();
@@ -57,7 +57,7 @@ function ButtonExample(): React.JSX.Element {
           }}
           primaryOnPress={useCallback(async () => {
             await handleSubmit();
-          }, [handleSubmit])} // useCallback과 handleSubmit 메모이제이션 유지
+          }, [handleSubmit])}
           primaryLabelComponent={
             <ZSText typo="body.1" style={{ color: 'black' }}>
               ThrottleButton
@@ -71,8 +71,8 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.switchContainer}>
           <ZSText typo="body.1">커스텀 색상</ZSText>
           <ZSSwitch
-            isActive={switch3Active}
-            onToggle={() => setSwitch3Active(!switch3Active)}
+            isActive={switch1Active}
+            onToggle={() => setSwitch1Active(!switch1Active)}
             trackColorInactive="#ffcccc"
             trackColorActive="#ff6b6b"
             thumbColor="#ffffff"
@@ -81,8 +81,8 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.switchContainer}>
           <ZSText typo="body.1">크기 100</ZSText>
           <ZSSwitch
-            isActive={switch3Active}
-            onToggle={() => setSwitch3Active(!switch3Active)}
+            isActive={switch2Active}
+            onToggle={() => setSwitch2Active(!switch2Active)}
             width={100}
           />
         </View>

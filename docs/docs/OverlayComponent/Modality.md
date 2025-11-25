@@ -11,19 +11,141 @@ sidebar_position: 6
 ```tsx
 import { useOverlay } from '@0610studio/zs-ui';
 
+function MyComponent() {
+  const { showModality } = useOverlay();
+
+  const handleOpenModal = () => {
+    showModality({
+      component: <MyModalContent />,
+    });
+  };
+
+  return <Button title="모달 열기" onPress={handleOpenModal} />;
+}
+```
+
+## API 참조
+
+### `showModality` 함수
+
+```typescript
+showModality(props: ModalityProps): void
+```
+
+### `ModalityProps` 인터페이스
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `component` | `React.ReactNode` | Required | 모달로 표시할 컴포넌트 |
+| `foldableSingleScreen` | `boolean` | `false` | 폴더블 디바이스에서 단일 화면 모드 사용 여부 |
+
+## 특징
+
+- **부드러운 애니메이션**: 배경 화면이 축소되고 새 화면이 슬라이드됩니다
+- **전체 화면**: 모달 컴포넌트는 전체 화면 높이를 차지합니다
+- **SafeArea 지원**: iOS의 SafeArea를 자동으로 고려합니다
+- **폴더블 디바이스 지원**: 폴더블 디바이스에서도 올바르게 동작합니다
+
+## 예제
+
+- **부드러운 애니메이션**: 배경 화면이 축소되고 새 화면이 슬라이드됩니다
+- **전체 화면**: 모달 컴포넌트는 전체 화면 높이를 차지합니다
+- **SafeArea 지원**: iOS의 SafeArea를 자동으로 고려합니다
+- **폴더블 디바이스 지원**: 폴더블 디바이스에서도 올바르게 동작합니다
+
+## 예제
+
+### 기본 사용
+
+```tsx
+import { useOverlay, ZSContainer, ZSText, ZSPressable } from '@0610studio/zs-ui';
+
+function MyModalContent() {
+  const { hideOverlay } = useOverlay();
+
+  return (
+    <ZSContainer>
+      <ZSText typo="heading.1">모달 제목</ZSText>
+      <ZSText typo="body.2">모달 내용</ZSText>
+      <ZSPressable onPress={() => hideOverlay('modal')}>
+        <ZSText typo="body.2">닫기</ZSText>
+      </ZSPressable>
+    </ZSContainer>
+  );
+}
+
+function MyComponent() {
+  const { showModality } = useOverlay();
+
+  const handleOpenModal = () => {
+    showModality({
+      component: <MyModalContent />,
+    });
+  };
+
+  return <Button title="모달 열기" onPress={handleOpenModal} />;
+}
+```
+
+### 폴더블 디바이스 지원
+
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
+
 const { showModality } = useOverlay();
 
 showModality({
-  component: <View><Text>새 모달 화면</Text></View>,
+  component: <MyModalContent />,
+  foldableSingleScreen: true,
 });
 ```
 
-`showModality`로 전달하는 컴포넌트는 전체 화면 높이를 차지하며, 내부에서 필요한 레이아웃을 자유롭게 구성할 수 있습니다.
+### Modality 닫기
 
-## Props
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
 
-| 이름 | 타입 | 설명 |
-|------|------|------|
-| `component` | `React.ReactNode` | 모달로 표시할 컴포넌트 |
+const { hideOverlay } = useOverlay();
 
-Modality는 내부적으로 애니메이션을 사용하여 화면 전환을 수행하며, `hideOverlay('modal')`을 호출하여 닫을 수 있습니다.
+hideOverlay('modal');
+```
+
+### 전체 화면 모달 예제
+
+```tsx
+import { useOverlay, ZSContainer, ZSText, ZSPressable } from '@0610studio/zs-ui';
+import { View } from 'react-native';
+
+function FullScreenModal() {
+  const { hideOverlay } = useOverlay();
+
+  return (
+    <ZSContainer>
+      <View style={{ padding: 20 }}>
+        <ZSText typo="heading.1">전체 화면 모달</ZSText>
+        <ZSText typo="body.2" style={{ marginTop: 20 }}>
+          이 모달은 전체 화면을 차지합니다.
+        </ZSText>
+        <ZSPressable
+          onPress={() => hideOverlay('modal')}
+          style={{ marginTop: 40 }}
+        >
+          <ZSText typo="body.1">닫기</ZSText>
+        </ZSPressable>
+      </View>
+    </ZSContainer>
+  );
+}
+
+function MyComponent() {
+  const { showModality } = useOverlay();
+
+  const handleOpenModal = () => {
+    showModality({
+      component: <FullScreenModal />,
+    });
+  };
+
+  return <Button title="모달 열기" onPress={handleOpenModal} />;
+}
+```

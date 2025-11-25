@@ -235,7 +235,8 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
       fontSize, 
       width: '100%' as const, 
       paddingRight: 25, 
-      fontFamily 
+      fontFamily,
+      ...(Platform.OS === 'web' ? { outline: 'none' } : {}),
     },
     textInputProps?.style,
   ];

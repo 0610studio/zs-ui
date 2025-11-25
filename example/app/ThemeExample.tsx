@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Theme, ZSContainer, ZSText, ZSView, useTheme } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
-import { useStyleSheetCreate } from 'zs-ui/model';
+import { useStyleSheetCreate } from 'zs-ui';
 
 export default function ThemeExample() {
   const { palette, elevation } = useTheme();
@@ -10,7 +10,6 @@ export default function ThemeExample() {
 
   return (
     <ZSContainer style={styles.container}>
-      {/* 배경색 예제 */}
       <TitleCard title='Background Colors' gap={5}>
         <ZSView style={styles.box} color='base'><ZSText>Base</ZSText></ZSView>
         <ZSView style={styles.box} color='layer1'><ZSText>Layer1</ZSText></ZSView>
@@ -59,7 +58,6 @@ export default function ThemeExample() {
         <ZSView style={styles.box} color='grey.50'><ZSText>Grey.50</ZSText></ZSView>
       </TitleCard>
 
-      {/* 텍스트 색상 예제 */}
       <TitleCard title='Text Colors'>
         <ZSText color='base'>base</ZSText>
         <ZSText color='secondary'>Secondary</ZSText>
@@ -103,7 +101,7 @@ export default function ThemeExample() {
         <ZSText color='information.50'>Information.50</ZSText>
       </TitleCard>
 
-      <TitleCard title='Custom Color Palette (ThemeFactory 적용됨)'>
+      <TitleCard title='Custom Color Palette'>
         <View style={[styles.colorBox, { backgroundColor: palette.primary.lighter }]}>
           <Text style={styles.textWhite}>Primary Lighter</Text>
         </View>

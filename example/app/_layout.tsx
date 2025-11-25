@@ -71,8 +71,8 @@ const customThemeConfig: ThemeFactoryConfig = {
 };
 
 // 커스텀 테마 팩토리 생성
-const customPalette = themeFactory(customThemeConfig);
-
+const IS_CUSTOM_THEME = false;
+const customPalette = IS_CUSTOM_THEME ? themeFactory(customThemeConfig) : undefined;
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts(requireFonts);
@@ -81,7 +81,11 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider themeFonts={themeFonts} isDarkModeEnabled={true} customPalette={customPalette}>
+      <ThemeProvider
+        themeFonts={themeFonts}
+        isDarkModeEnabled={true}
+        customPalette={customPalette}
+      >
         <OverlayProvider customSnackbar={SnackBar}>
           <Stack
             screenOptions={{

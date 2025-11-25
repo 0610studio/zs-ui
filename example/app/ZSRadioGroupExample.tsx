@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { ZSRadioGroup, ZSContainer } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { RadioOption, Theme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui/model';
+import { useStyleSheetCreate } from 'zs-ui';
 
 function ZSRadioGroupExample(): React.JSX.Element {
   const [responseType, setResponseType] = useState<RadioOption>();
