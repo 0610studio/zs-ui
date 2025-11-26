@@ -167,6 +167,8 @@ export type SubColorOptions = undefined | '0' | '5' | '10' | '20' | '30' | '40' 
 
 export type ViewColorOptions = 'layer1' | 'layer2' | 'neutral' | 'base' | CommonColorOptions;
 
+export type IntentOptions = Exclude<keyof Pick<Theme, 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey'>, 'secondary'>;
+
 export type ShadowLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export interface ShadowStyle {
