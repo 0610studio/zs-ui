@@ -21,6 +21,7 @@ import { ZSContainerRef } from "./ui/ZSContainer";
 import { ZSTextProps } from "./ui/ZSText";
 import { BoxStyle, ZSTextFieldRef } from "./ui/ZSTextField";
 import { AlertOverlay, BottomSheetOverlay, SnackbarNotify, useOverlay, PopOverButton, PopOverMenu, ZSPortal } from './overlay';
+import ZSBlockButton from './ui/ZSBlockButton';
 
 export {
   useTheme,
@@ -42,6 +43,7 @@ export {
   ZSSwitch,
   ErrorComponent,
   ZSAboveKeyboard,
+  ZSBlockButton,
   // ---
   AlertOverlay,
   BottomSheetOverlay,
