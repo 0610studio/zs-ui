@@ -1,10 +1,14 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 ---
+
+import ExpoSnack from '@site/src/components/ExpoSnack';
 
 # ZSSwitch
 
 애니메이션이 적용된 토글 스위치 컴포넌트입니다. React Native Reanimated를 사용하여 부드러운 전환 효과를 제공합니다.
+
+<ExpoSnack id="@studio0610/zs-ui_13_zsswitch" />
 
 ## 기본 사용법
 

@@ -2,9 +2,13 @@
 sidebar_position: 7
 ---
 
+import ExpoSnack from '@site/src/components/ExpoSnack';
+
 # PopOver
 
 작은 메뉴나 도구 모음을 버튼 위치 기준으로 표시할 수 있는 오버레이 컴포넌트입니다. `PopOverButton`을 사용하면 손쉽게 메뉴를 열 수 있으며, 메뉴 내용은 `PopOverMenu`에 전달한 컴포넌트로 렌더링됩니다.
+
+<ExpoSnack id="@studio0610/zs-ui_13_popover" />
 
 ## 기본 사용법
 

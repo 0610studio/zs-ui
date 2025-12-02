@@ -30,6 +30,13 @@ npx expo install @0610studio/zs-ui
 [EXPO snack](https://snack.expo.dev/@studio0610/zs-ui_13_playground)에서 확인 가능합니다.
 
 <br />
+
+### TODO
+
+- [] Modality 웹 미동작
+
+<br />
+
 <!-- TEST_RESULTS -->
 ## 테스트 결과
 

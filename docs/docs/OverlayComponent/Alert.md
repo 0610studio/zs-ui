@@ -8,7 +8,7 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 
 사용자에게 중요한 메시지를 전달하거나, 모달로부터 사용자의 응답을 받을 때 사용되는 알림 컴포넌트입니다.
 
-<ExpoSnack id="@studio0610/zs-ui-alert" />
+<ExpoSnack id="@studio0610/zs-ui_13_alert" />
 
 ## 기본 사용법
 

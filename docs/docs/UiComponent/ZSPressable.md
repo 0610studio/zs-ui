@@ -2,9 +2,13 @@
 sidebar_position: 4
 ---
 
+import ExpoSnack from '@site/src/components/ExpoSnack';
+
 # ZSPressable
 
 커스텀 스타일과 애니메이션이 적용된 프레서블 컴포넌트입니다. 사용자의 클릭 및 롱클릭 이벤트를 다루며, 배경 색상, 애니메이션 효과, 그림자 레벨 등을 쉽게 설정할 수 있도록 설계되었습니다.
+
+<ExpoSnack id="@studio0610/zs-ui_13_zspressable" />
 
 ## 기본 사용법
 

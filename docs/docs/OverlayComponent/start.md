@@ -2,6 +2,8 @@
 sidebar_position: 1
 ---
 
+import ExpoSnack from '@site/src/components/ExpoSnack';
+
 # 시작하기
 
 `Alert`, `Snackbar`, `Bottom Sheet`, `Loader`, `PopOver`, `Modality` 등의 **오버레이**를 선언적으로 관리할 수 있는 모듈입니다.
@@ -9,6 +11,10 @@ sidebar_position: 1
 스크린마다 모달 컴포넌트를 배치하고 visible 상태를 직접 관리하는 과정을 생략하고 간단하게 오버레이를 제어할 수 있습니다.
 
 `OverlayProvider`로 감싸서 전체 앱에서 Overlay를 사용할 수 있도록 설정합니다.
+
+<ExpoSnack id="@studio0610/zs-ui_13_overlay" />
+
+## 기본 사용법
 
 ```jsx
 import React from 'react';
