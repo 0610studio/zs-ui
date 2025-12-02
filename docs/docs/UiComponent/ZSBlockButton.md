@@ -131,7 +131,6 @@ export default function App() {
 
 ```tsx
 import { ZSBlockButton } from '@0610studio/zs-ui';
-import { require } from 'react-native';
 
 <ZSBlockButton
   title="아이콘 버튼"
