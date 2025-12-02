@@ -8,7 +8,7 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 
 화면 상단에 일시적인 메시지를 표시하여 사용자에게 정보를 전달하는 컴포넌트입니다. 여러 개의 Snackbar를 동시에 표시할 수 있으며, 자동으로 사라집니다.
 
-<ExpoSnack id="@studio0610/zs-ui-snackbar" />
+<ExpoSnack id="@studio0610/zs-ui_13_snackbar" />
 
 ## 기본 사용법
 

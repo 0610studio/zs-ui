@@ -8,7 +8,7 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 
 화면 하단에서 위로 슬라이드하며 나타나는 모달 인터페이스입니다. 제스처로 드래그하여 닫을 수 있으며, 키보드가 나타나면 자동으로 위치를 조정합니다.
 
-<ExpoSnack id="@studio0610/zs-ui-bottom-sheet" />
+<ExpoSnack id="@studio0610/zs-ui_13_bottomsheet" />
 
 ## 기본 사용법
 

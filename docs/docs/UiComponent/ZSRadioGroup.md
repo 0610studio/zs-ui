@@ -1,10 +1,14 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 ---
+
+import ExpoSnack from '@site/src/components/ExpoSnack';
 
 # ZSRadioGroup
 
 여러 개의 라디오 버튼을 그룹으로 묶어 선택할 수 있는 컴포넌트입니다. 옵션은 배열 형태로 전달하며, 선택된 값을 상위 컴포넌트로 전달합니다.
+
+<ExpoSnack id="@studio0610/zs-ui_13_zsradiogroup" />
 
 ## 기본 사용법
 

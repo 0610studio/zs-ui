@@ -2,9 +2,13 @@
 sidebar_position: 2
 ---
 
+import ExpoSnack from '@site/src/components/ExpoSnack';
+
 # ZSText
 
 애플리케이션에서 타이포그래피를 간단하고 일관되게 관리할 수 있도록 설계된 텍스트 컴포넌트입니다. 테마 시스템과 통합되어 자동으로 색상과 폰트 스타일이 적용됩니다.
+
+<ExpoSnack id="@studio0610/zs-ui_13_zstext" />
 
 ## 기본 사용법
 
