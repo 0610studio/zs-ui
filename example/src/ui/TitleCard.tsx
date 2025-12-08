@@ -14,9 +14,9 @@ export default function TitleCard({
   flexDirection = 'row'
 }: Props) {
   return (
-    <ZSView color='layer2'>
+    <ZSView color='layer2' style={{ width: '100%' }}>
       {title && <ZSText typo="heading.4" style={{ marginBottom: 15, marginLeft: 10 }}>{title}</ZSText>}
-      <ZSView color='base' style={{ flexWrap: 'wrap', flexDirection: flexDirection, gap: gap, padding: 14, borderRadius: 14 }}>
+      <ZSView color='base' style={{ flexWrap: 'wrap', flexDirection: flexDirection, gap: gap, padding: 14, borderRadius: 14, width: '100%' }}>
         {children}
       </ZSView>
     </ZSView>
