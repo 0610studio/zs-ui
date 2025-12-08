@@ -23,6 +23,7 @@ export default function Home() {
           <HomeButton title='ZSTextField 예제' onPress={() => router.push('/ZSTextFieldExample')} />
           <HomeButton title='Button 예제' onPress={() => router.push('/ButtonExample')} />
           <HomeButton title='ZSRadioGroup 예제' onPress={() => router.push('/ZSRadioGroupExample')} />
+          <HomeButton title='ZSSkeleton 예제' onPress={() => router.push('/ZSSkeletonExample')} />
         </TitleCard>
         <TitleCard title='오버레이'>
           <HomeButton title='PopOver 예제' onPress={() => router.push('/PopOverExample')} />
