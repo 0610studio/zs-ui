@@ -16,10 +16,8 @@ jest.mock("../ui/ZSTextField/ui/ErrorComponent", () => () => null);
 jest.mock("../ui/ZSContainer", () => () => null);
 jest.mock("../ui/ZSPressable", () => () => null);
 jest.mock("../ui/ZSText", () => () => null);
-jest.mock("../ui/ThrottleButton", () => () => null);
 jest.mock("../ui/ZSTextField", () => () => null);
 jest.mock("../ui/ZSRadioGroup", () => () => null);
-jest.mock("../ui/ZSBottomCta", () => () => null);
 jest.mock("../ui/ZSView", () => () => null);
 jest.mock("../ui/atoms/AnimatedWrapper", () => () => null);
 jest.mock("../ui/atoms/TextAtom", () => () => null);
@@ -39,7 +37,6 @@ describe("index exports", () => {
     expect(mod).toHaveProperty("ZSTextField");
     expect(mod).toHaveProperty("ZSRadioGroup");
     expect(mod).toHaveProperty("ZSPressable");
-    expect(mod).toHaveProperty("ZSBottomCta");
     expect(mod).toHaveProperty("ZSView");
     expect(mod).toHaveProperty("AnimatedWrapper");
     expect(mod).toHaveProperty("TextAtom");

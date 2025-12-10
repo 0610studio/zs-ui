@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Pressable, View, ViewProps } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AnimatedWrapper from "../atoms/AnimatedWrapper";
@@ -6,6 +6,7 @@ import type { ShadowLevel, ViewColorOptions } from "../../theme/types";
 
 const DEFAULT_DURATION = { duration: 100 } as const;
 const SCALE_VALUES = [1, 0.96] as const;
+const DEBOUNCE_TIME = 300;
 
 interface ZSPressableProps extends ViewProps {
   onPress?: (value?: any) => void;
@@ -16,6 +17,8 @@ interface ZSPressableProps extends ViewProps {
   elevationLevel?: ShadowLevel;
   fullWidth?: boolean;
   color?: ViewColorOptions;
+  isLoading?: boolean;
+  disabled?: boolean;
 }
 
 function ZSPressable({
@@ -27,9 +30,30 @@ function ZSPressable({
   elevationLevel,
   fullWidth = false,
   color,
+  isLoading = false,
+  disabled = false,
   ...props
 }: ZSPressableProps) {
   const isButtonPress = useSharedValue(0);
+  const lastClickTime = useRef<number>(0);
+
+  // ------------------------------------------------------------
+
+  const createPressHandler = (callback?: () => void) => {
+    return () => {
+      const now = Date.now();
+      if (now - lastClickTime.current < DEBOUNCE_TIME) return;
+      if (isLoading || disabled) return;
+      lastClickTime.current = now;
+
+      callback?.();
+    };
+  };
+
+  const handlePress = createPressHandler(onPress);
+  const handleLongPress = createPressHandler(onLongPress);
+
+  // ------------------------------------------------------------
 
   const boxAnimation = useAnimatedStyle(() => {
     'worklet';
@@ -43,36 +67,35 @@ function ZSPressable({
       transform: [{ scale }],
     };
   }, []);
-  
+
   const handlePressIn = () => {
     isButtonPress.value = withTiming(1, DEFAULT_DURATION);
   };
-  
+
   const handlePressOut = () => {
     isButtonPress.value = withTiming(0, DEFAULT_DURATION);
   };
 
   const handlePressStyle = (pressed: boolean) => {
-    return pressed 
+    return pressed
       ? {
-          backgroundColor: pressedBackgroundColor,
-          borderRadius: pressedBackgroundBorderRadius,
-        }
+        backgroundColor: pressedBackgroundColor,
+        borderRadius: pressedBackgroundBorderRadius,
+      }
       : {
-          backgroundColor: 'transparent',
-          borderRadius: pressedBackgroundBorderRadius,
-        };
+        backgroundColor: 'transparent',
+        borderRadius: pressedBackgroundBorderRadius,
+      };
   };
 
-  const containerStyle = fullWidth ? { width: '100%' as const } : undefined;
-
   return (
-    <View style={containerStyle}>
+    <View style={[fullWidth ? { width: '100%' as const } : undefined, { opacity: (isLoading || disabled) ? 0.55 : 1 }]}>
       <Pressable
-        onPress={onPress}
-        onLongPress={onLongPress}
+        onPress={handlePress}
+        onLongPress={handleLongPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        disabled={isLoading || disabled}
         style={({ pressed }) => handlePressStyle(pressed)}
       >
         <Animated.View style={boxAnimation}>

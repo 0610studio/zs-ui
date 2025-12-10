@@ -8,11 +8,9 @@ import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
 import ZSContainer from './ui/ZSContainer';
 import ZSPressable from './ui/ZSPressable';
 import ZSText from './ui/ZSText';
-import ThrottleButton from './ui/ThrottleButton';
 import ZSTextField from './ui/ZSTextField';
 import ZSRadioGroup from './ui/ZSRadioGroup';
 import ZSSwitch from './ui/ZSSwitch';
-import ZSBottomCta from './ui/ZSBottomCta';
 import ZSView from './ui/ZSView';
 import AnimatedWrapper from './ui/atoms/AnimatedWrapper';
 import TextAtom from './ui/atoms/TextAtom';
@@ -32,14 +30,12 @@ export {
   OverlayProvider,
   themeFactory,
   // ---
-  ZSBottomCta,
   ZSView,
   AnimatedWrapper,
   TextAtom,
   ZSContainer,
   ZSPressable,
   ZSText,
-  ThrottleButton,
   ZSTextField,
   ZSRadioGroup,
   ZSSwitch,

@@ -91,25 +91,3 @@ import { ZSAboveKeyboard } from '@0610studio/zs-ui';
   <Button title="전송" onPress={handleSend} />
 </ZSAboveKeyboard>
 ```
-
-### ZSTextField와 함께 사용
-
-```tsx
-<ZSContainer>
-  <ZSTextField
-    label="메시지"
-    value={message}
-    onChangeText={setMessage}
-  />
-  
-  <ZSAboveKeyboard>
-    <ThrottleButton
-      primaryLabelComponent={<ZSText typo="body.1">전송</ZSText>}
-      primaryOnPress={async () => {
-        await sendMessage();
-      }}
-    />
-  </ZSAboveKeyboard>
-</ZSContainer>
-```
-

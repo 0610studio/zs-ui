@@ -8,6 +8,8 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 
 로딩 상태를 시각적으로 표현하기 위한 스켈레톤 UI 컴포넌트입니다. `ZSSkeleton`은 기존 컴포넌트에 shimmer 효과를 적용하는 래퍼 컴포넌트이고, `ZSSkeletonBox`는 고정 높이의 박스 형태 스켈레톤 컴포넌트입니다. React Native Reanimated를 사용하여 부드러운 애니메이션 효과를 제공합니다.
 
+<ExpoSnack id="@studio0610/zs-ui_13_zsskeleton" />
+
 ## ZSSkeleton
 
 기존 컴포넌트를 감싸서 로딩 상태일 때 shimmer 효과를 적용하는 래퍼 컴포넌트입니다. `isFetching` prop을 통해 로딩 상태를 제어할 수 있습니다.
