@@ -13,9 +13,11 @@ type Props = {
   variant?: 'solid' | 'pastel' | 'stroke';
   typo: TypoOptions;
   prefixIcon?: ImageSourcePropType;
+  isLoading?: boolean;
+  disabled?: boolean;
 };
 
-function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid' }: Props) {
+function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false }: Props) {
   const { palette } = useTheme();
   const size = typo.split('.')[1];
 
@@ -97,7 +99,7 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
   const textColorValue = getTextColorValue();
 
   return (
-    <ZSPressable onPress={onPress} style={style}>
+    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled}>
       <ZSView
         style={{
           paddingHorizontal,

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThrottleButton, ZSText, ZSContainer, ZSPressable, ZSSwitch, useTheme, ZSBlockButton } from 'zs-ui';
+import { ZSText, ZSContainer, ZSPressable, ZSSwitch, useTheme, ZSBlockButton } from 'zs-ui';
 import TitleCard from '../src/ui/TitleCard';
 import type { Theme } from 'zs-ui';
 import { useStyleSheetCreate } from 'zs-ui';
@@ -12,16 +12,13 @@ function ButtonExample(): React.JSX.Element {
   const [switch2Active, setSwitch2Active] = useState(true);
   const [switch3Active, setSwitch3Active] = useState(false);
 
-  const handleSubmit = useCallback(
-    async () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('완료');
-        }, 500);
-      });
-    },
-    []
-  );
+  const handleSubmit = useCallback(async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('완료');
+      }, 500);
+    });
+  }, []);
 
   return (
     <ZSContainer
@@ -29,13 +26,6 @@ function ButtonExample(): React.JSX.Element {
       style={styles.container}
     >
       <TitleCard title='ZSPressable' flexDirection='column'>
-        <ZSPressable
-          style={styles.buttonStyle}
-          fullWidth
-          onPress={useCallback(() => { console.log('ZSPressable onPress'); }, [])}
-        >
-          <ZSText typo="subTitle.1" color='information.50'>FullWidth 버튼</ZSText>
-        </ZSPressable>
         <ZSPressable
           style={[styles.buttonStyle, { backgroundColor: palette.primary[50] }]}
           fullWidth
@@ -50,27 +40,35 @@ function ButtonExample(): React.JSX.Element {
         >
           <ZSText typo="body.1" color='white'>Danger FullWidth 버튼</ZSText>
         </ZSPressable>
+        <ZSPressable
+          style={[styles.buttonStyle, { backgroundColor: palette.primary[50] }]}
+          fullWidth
+          isLoading={true}
+          onPress={useCallback(() => { console.log('Primary FullWidth'); }, [])}
+        >
+          <ZSText typo="subTitle.1" color='white'>Primary FullWidth (Loading)</ZSText>
+        </ZSPressable>
       </TitleCard>
 
       <TitleCard title='BlockButton' flexDirection='column'>
         <View style={styles.buttonGroup}>
           <ZSText typo="body.1" style={styles.sectionTitle}>Primary</ZSText>
           <View style={styles.buttonRow}>
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Primary Solid'); }}
               title='Solid'
               intent='primary'
               variant='solid'
               typo='label.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Primary Pastel'); }}
               title='Pastel'
               intent='primary'
               variant='pastel'
               typo='label.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Primary Stroke'); }}
               title='Stroke'
               intent='primary'
@@ -83,21 +81,21 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.buttonGroup}>
           <ZSText typo="body.1" style={styles.sectionTitle}>Danger</ZSText>
           <View style={styles.buttonRow}>
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Danger Solid'); }}
               title='Solid'
               intent='danger'
               variant='solid'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Danger Pastel'); }}
               title='Pastel'
               intent='danger'
               variant='pastel'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Danger Stroke'); }}
               title='Stroke'
               intent='danger'
@@ -110,21 +108,21 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.buttonGroup}>
           <ZSText typo="body.1" style={styles.sectionTitle}>Information</ZSText>
           <View style={styles.buttonRow}>
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Information Solid'); }}
               title='Solid'
               intent='information'
               variant='solid'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Information Pastel'); }}
               title='Pastel'
               intent='information'
               variant='pastel'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Information Stroke'); }}
               title='Stroke'
               intent='information'
@@ -137,21 +135,21 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.buttonGroup}>
           <ZSText typo="body.1" style={styles.sectionTitle}>Success</ZSText>
           <View style={styles.buttonRow}>
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Success Solid'); }}
               title='Solid'
               intent='success'
               variant='solid'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Success Pastel'); }}
               title='Pastel'
               intent='success'
               variant='pastel'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Success Stroke'); }}
               title='Stroke'
               intent='success'
@@ -164,21 +162,21 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.buttonGroup}>
           <ZSText typo="body.1" style={styles.sectionTitle}>Warning</ZSText>
           <View style={styles.buttonRow}>
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Warning Solid'); }}
               title='Solid'
               intent='warning'
               variant='solid'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Warning Pastel'); }}
               title='Pastel'
               intent='warning'
               variant='pastel'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Warning Stroke'); }}
               title='Stroke'
               intent='warning'
@@ -191,21 +189,21 @@ function ButtonExample(): React.JSX.Element {
         <View style={styles.buttonGroup}>
           <ZSText typo="body.1" style={styles.sectionTitle}>Grey</ZSText>
           <View style={styles.buttonRow}>
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Grey Solid'); }}
               title='Solid'
               intent='grey'
               variant='solid'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Grey Pastel'); }}
               title='Pastel'
               intent='grey'
               variant='pastel'
               typo='subTitle.1'
             />
-            <ZSBlockButton 
+            <ZSBlockButton
               onPress={() => { console.log('Grey Stroke'); }}
               title='Stroke'
               intent='grey'
@@ -214,24 +212,6 @@ function ButtonExample(): React.JSX.Element {
             />
           </View>
         </View>
-      </TitleCard>
-
-      <TitleCard title='ThrottleButton'>
-        <ThrottleButton
-          primaryButtonStyle={{
-            backgroundColor: palette.primary.main,
-            height: 55,
-            overflow: 'hidden',
-          }}
-          primaryOnPress={useCallback(async () => {
-            await handleSubmit();
-          }, [handleSubmit])}
-          primaryLabelComponent={
-            <ZSText typo="body.1" style={{ color: 'black' }}>
-              ThrottleButton
-            </ZSText>
-          }
-        />
       </TitleCard>
 
       <TitleCard title='ZSSwitch' flexDirection='column'>

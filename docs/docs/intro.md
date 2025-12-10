@@ -52,7 +52,7 @@ sidebar_position: 1
 
 ### UI 컴포넌트
 
-Text, View, Container 등 기본 컴포넌트부터 TextField, RadioGroup, Switch 등 입력 컴포넌트, Pressable, ThrottleButton 등 인터랙션 컴포넌트까지 다양한 컴포넌트를 제공합니다.
+Text, View, Container 등 기본 컴포넌트부터 TextField, RadioGroup, Switch 등 입력 컴포넌트, Pressable 등 인터랙션 컴포넌트까지 다양한 컴포넌트를 제공합니다.
 
 ### Overlay 시스템
 
