@@ -1,3 +1,4 @@
+import { BLACK, PRIMITIVE_BLUE, PRIMITIVE_GREEN, PRIMITIVE_GREY, PRIMITIVE_GREY_DARK, PRIMITIVE_ORANGE, PRIMITIVE_RED, PRIMITIVE_TEAL, PRIMITIVE_YELLOW, SHADOW_COLORS, WHITE } from "./primitive";
 import { Theme, ColorPalette, ColorPaletteExtend } from "./types";
 
 export const transparency = {
@@ -55,254 +56,198 @@ export const transparency = {
 };
 
 const MODAL_BG_COLOR = {
-  light: '#212B3688',
-  dark: '#00000088'
+  light: PRIMITIVE_GREY[90] + transparency['52%'],
+  dark: PRIMITIVE_GREY[90] + transparency['40%'],
 }
 
-const SHADOW_COLORS = {
-  light: [
-    'rgba(0, 0, 0, 0.18)',
-    'rgba(0, 0, 0, 0.20)',
-    'rgba(0, 0, 0, 0.22)',
-    'rgba(0, 0, 0, 0.23)',
-    'rgba(0, 0, 0, 0.25)',
-    'rgba(0, 0, 0, 0.27)',
-    'rgba(0, 0, 0, 0.29)',
-    'rgba(0, 0, 0, 0.30)',
-    'rgba(0, 0, 0, 0.32)',
-    'rgba(0, 0, 0, 0.34)',
-  ],
-  dark: [
-    'rgba(255, 255, 255, 0.58)',
-    'rgba(255, 255, 255, 0.60)',
-    'rgba(255, 255, 255, 0.62)',
-    'rgba(255, 255, 255, 0.63)',
-    'rgba(255, 255, 255, 0.65)',
-    'rgba(255, 255, 255, 0.67)',
-    'rgba(255, 255, 255, 0.69)',
-    'rgba(255, 255, 255, 0.70)',
-    'rgba(255, 255, 255, 0.72)',
-    'rgba(255, 255, 255, 0.74)',
-  ]
-}
-
-// FF9F06
-const LIGHT_COLORS = {
+const SEMANTIC_LIGHT_COLORS = {
   primary: {
-    5: '#fffaf0',
-    10: '#fff2dc',
-    20: '#ffda9e',
-    30: '#ffc86e',
-    40: '#ffb742',
-    50: '#ffa20d',
-    60: '#e69100',
-    70: '#cc8000',
-    80: '#b37000',
-    90: '#996000',
-    100: '#805000',
-    lighter: '#ffda9e',
-    light: '#ffc86e',
-    main: '#ffa20d',
-    dark: '#e69100',
-    darker: '#b37000',
+    ...PRIMITIVE_ORANGE,
+    lighter: PRIMITIVE_ORANGE[20],
+    light: PRIMITIVE_ORANGE[30],
+    main: PRIMITIVE_ORANGE[50],
+    dark: PRIMITIVE_ORANGE[60],
+    darker: PRIMITIVE_ORANGE[70],
   },
   secondary: {
-    5: '#D1EDFF',
-    10: '#ADE2FF',
-    20: '#85D4FF',
-    30: '#5CC5FF',
-    40: '#33B7FF',
-    50: '#1A9FFF',
-    60: '#0088E6',
-    70: '#0072CC',
-    80: '#005CB3',
-    90: '#004699',
-    100: '#003080',
-    main: '#1A9FFF',
+    ...PRIMITIVE_TEAL,
+    lighter: PRIMITIVE_TEAL[20],
+    light: PRIMITIVE_TEAL[30],
+    main: PRIMITIVE_TEAL[50],
+    dark: PRIMITIVE_TEAL[60],
+    darker: PRIMITIVE_TEAL[70],
   },
   danger: {
-    5: '#FFF5F6',
-    10: '#FFE8EB',
-    20: '#FFB8C4',
-    30: '#FF8FA3',
-    40: '#FF6B85',
-    50: '#FF4D6F',
-    60: '#F02D5A',
-    70: '#E01E4A',
-    80: '#CC163E',
-    90: '#B30F33',
-    100: '#990A2A',
-    main: '#FF4D6F',
+    ...PRIMITIVE_RED,
+    lighter: PRIMITIVE_RED[20],
+    light: PRIMITIVE_RED[30],
+    main: PRIMITIVE_RED[50],
+    dark: PRIMITIVE_RED[60],
+    darker: PRIMITIVE_RED[70],
   },
   warning: {
-    5: '#FFFBF0',
-    10: '#FFF7DC',
-    20: '#FFEF9E',
-    30: '#FFE76E',
-    40: '#FFDF42',
-    50: '#FFD700',
-    60: '#E6C200',
-    70: '#CCAD00',
-    80: '#B39800',
-    90: '#998300',
-    100: '#806E00',
-    main: '#FFD700',
+    ...PRIMITIVE_YELLOW,
+    lighter: PRIMITIVE_YELLOW[20],
+    light: PRIMITIVE_YELLOW[30],
+    main: PRIMITIVE_YELLOW[50],
+    dark: PRIMITIVE_YELLOW[60],
+    darker: PRIMITIVE_YELLOW[70],
   },
   success: {
-    5: '#F5FFF7',
-    10: '#E8FFEC',
-    20: '#B8FFC4',
-    30: '#8FFFA3',
-    40: '#6BFF85',
-    50: '#4FD165',
-    60: '#2DB84A',
-    70: '#1A9F38',
-    80: '#0F8B2B',
-    90: '#0A7A24',
-    100: '#00691D',
-    main: '#4FD165',
+    ...PRIMITIVE_GREEN,
+    lighter: PRIMITIVE_GREEN[20],
+    light: PRIMITIVE_GREEN[30],
+    main: PRIMITIVE_GREEN[50],
+    dark: PRIMITIVE_GREEN[60],
+    darker: PRIMITIVE_GREEN[70],
   },
   information: {
-    5: '#F5F7FF',
-    10: '#E8EDFF',
-    20: '#B8C8FF',
-    30: '#8FA8FF',
-    40: '#6B8AFF',
-    50: '#4981FF',
-    60: '#1F53E6',
-    70: '#173ECC',
-    80: '#0C2EB3',
-    90: '#041F99',
-    100: '#021980',
-    main: '#4981FF',
+    ...PRIMITIVE_BLUE,
+    lighter: PRIMITIVE_BLUE[20],
+    light: PRIMITIVE_BLUE[30],
+    main: PRIMITIVE_BLUE[50],
+    dark: PRIMITIVE_BLUE[60],
+    darker: PRIMITIVE_BLUE[70],
   },
   grey: {
-    5: '#F8F8F8',
-    10: '#F5F7F9',
-    20: '#F0F2F4',
-    30: '#DFE3E8',
-    40: '#C4CDD5',
-    50: '#919EAB',
-    60: '#637381',
-    70: '#454F5B',
-    80: '#1C252E',
-    90: '#141A21',
-    100: '#000000',
-    main: '#F4F6F8',
+    ...PRIMITIVE_GREY,
+    lighter: PRIMITIVE_GREY[20],
+    light: PRIMITIVE_GREY[30],
+    main: PRIMITIVE_GREY[20],
+    dark: PRIMITIVE_GREY[60],
+    darker: PRIMITIVE_GREY[70],
   },
 };
 
-const DARK_COLORS = {
+const SEMANTIC_DARK_COLORS = {
   primary: {
-    ...LIGHT_COLORS.primary,
-    main: '#FF9F06',
+    ...SEMANTIC_LIGHT_COLORS.primary,
+    lighter: PRIMITIVE_ORANGE[20],
+    light: PRIMITIVE_ORANGE[30],
+    main: PRIMITIVE_ORANGE[50],
+    dark: PRIMITIVE_ORANGE[60],
+    darker: PRIMITIVE_ORANGE[70],
   },
   secondary: {
-    ...LIGHT_COLORS.secondary,
-    main: '#1A9FFF',
+    ...SEMANTIC_LIGHT_COLORS.secondary,
+    lighter: PRIMITIVE_TEAL[20],
+    light: PRIMITIVE_TEAL[30],
+    main: PRIMITIVE_TEAL[50],
+    dark: PRIMITIVE_TEAL[60],
+    darker: PRIMITIVE_TEAL[70],
   },
   danger: {
-    ...LIGHT_COLORS.danger,
-    main: '#FF4D6F',
+    ...SEMANTIC_LIGHT_COLORS.danger,
+    lighter: PRIMITIVE_RED[20],
+    light: PRIMITIVE_RED[30],
+    main: PRIMITIVE_RED[50],
+    dark: PRIMITIVE_RED[60],
+    darker: PRIMITIVE_RED[70],
   },
   warning: {
-    ...LIGHT_COLORS.warning,
-    main: '#FFE033',
+    ...SEMANTIC_LIGHT_COLORS.warning,
+    lighter: PRIMITIVE_YELLOW[20],
+    light: PRIMITIVE_YELLOW[30],
+    main: PRIMITIVE_YELLOW[50],
+    dark: PRIMITIVE_YELLOW[60],
+    darker: PRIMITIVE_YELLOW[70],
   },
   success: {
-    ...LIGHT_COLORS.success,
-    main: '#4FD165',
+    ...SEMANTIC_LIGHT_COLORS.success,
+    lighter: PRIMITIVE_GREEN[20],
+    light: PRIMITIVE_GREEN[30],
+    main: PRIMITIVE_GREEN[50],
+    dark: PRIMITIVE_GREEN[60],
+    darker: PRIMITIVE_GREEN[70],
   },
   information: {
-    ...LIGHT_COLORS.information,
-    main: '#4981FF',
+    ...SEMANTIC_LIGHT_COLORS.information,
+    lighter: PRIMITIVE_BLUE[20],
+    light: PRIMITIVE_BLUE[30],
+    main: PRIMITIVE_BLUE[50],
+    dark: PRIMITIVE_BLUE[60],
+    darker: PRIMITIVE_BLUE[70],
   },
   grey: {
-    5: '#141414',  // layer1
-    10: '#1F1F1F', // layer2
-    20: '#2C2C2C', // neutral
-    30: '#3D3D3D',
-    40: '#4F4F4F',
-    50: '#606060',
-    60: '#737373',
-    70: '#8C8C8C',
-    80: '#bfbfbf',
-    90: '#ededed',
-    100: '#FFFFFF',
-    main: '#2C2C2C',
+    ...PRIMITIVE_GREY_DARK,
+    lighter: PRIMITIVE_GREY_DARK[20],
+    light: PRIMITIVE_GREY_DARK[30],
+    main: PRIMITIVE_GREY_DARK[20],
+    dark: PRIMITIVE_GREY_DARK[60],
+    darker: PRIMITIVE_GREY_DARK[70],
   },
 };
 
 const MAIN_COLORS = {
   light: {
-    primary: LIGHT_COLORS.primary.main,
-    secondary: LIGHT_COLORS.secondary.main,
-    danger: LIGHT_COLORS.danger.main,
-    warning: LIGHT_COLORS.warning.main,
-    success: LIGHT_COLORS.success.main,
-    information: LIGHT_COLORS.information.main,
-    grey: LIGHT_COLORS.grey.main
+    primary: SEMANTIC_LIGHT_COLORS.primary.main,
+    secondary: SEMANTIC_LIGHT_COLORS.secondary.main,
+    danger: SEMANTIC_LIGHT_COLORS.danger.main,
+    warning: SEMANTIC_LIGHT_COLORS.warning.main,
+    success: SEMANTIC_LIGHT_COLORS.success.main,
+    information: SEMANTIC_LIGHT_COLORS.information.main,
+    grey: SEMANTIC_LIGHT_COLORS.grey.main
   },
   dark: {
-    primary: DARK_COLORS.primary.main,
-    secondary: DARK_COLORS.secondary.main,
-    danger: DARK_COLORS.danger.main,
-    warning: DARK_COLORS.warning.main,
-    success: DARK_COLORS.success.main,
-    information: DARK_COLORS.information.main,
-    grey: DARK_COLORS.grey.main
+    primary: SEMANTIC_DARK_COLORS.primary.main,
+    secondary: SEMANTIC_DARK_COLORS.secondary.main,
+    danger: SEMANTIC_DARK_COLORS.danger.main,
+    warning: SEMANTIC_DARK_COLORS.warning.main,
+    success: SEMANTIC_DARK_COLORS.success.main,
+    information: SEMANTIC_DARK_COLORS.information.main,
+    grey: SEMANTIC_DARK_COLORS.grey.main
   }
 }
 
-const TEXT_COLORS = {
+const SEMANTIC_TEXT_COLORS = {
   light: {
-    primary: LIGHT_COLORS.primary.main,
-    base: LIGHT_COLORS.grey[80],
-    secondary: LIGHT_COLORS.grey[60],
-    disabled: LIGHT_COLORS.grey[50],
-    danger: LIGHT_COLORS.danger[60],
-    warning: LIGHT_COLORS.warning[60],
-    success: LIGHT_COLORS.success[60],
-    information: LIGHT_COLORS.information[60],
-    white: '#FFFFFF',
-    black: '#000000',
+    primary: SEMANTIC_LIGHT_COLORS.primary.main,
+    base: SEMANTIC_LIGHT_COLORS.grey[80],
+    secondary: SEMANTIC_LIGHT_COLORS.grey[60],
+    disabled: SEMANTIC_LIGHT_COLORS.grey[50],
+    danger: SEMANTIC_LIGHT_COLORS.danger[60],
+    warning: SEMANTIC_LIGHT_COLORS.warning[60],
+    success: SEMANTIC_LIGHT_COLORS.success[60],
+    information: SEMANTIC_LIGHT_COLORS.information[60],
+    white: WHITE,
+    black: BLACK,
   },
   dark: {
-    primary: LIGHT_COLORS.primary.main,
-    base: DARK_COLORS.grey[90],
-    secondary: DARK_COLORS.grey[70],
-    disabled: DARK_COLORS.grey[50],
-    danger: DARK_COLORS.danger[30],
-    warning: DARK_COLORS.warning[30],
-    success: DARK_COLORS.success[30],
-    information: DARK_COLORS.information[30],
-    white: '#FFFFFF',
-    black: '#000000',
+    primary: SEMANTIC_DARK_COLORS.primary.main,
+    base: SEMANTIC_DARK_COLORS.grey[90],
+    secondary: SEMANTIC_DARK_COLORS.grey[70],
+    disabled: SEMANTIC_DARK_COLORS.grey[50],
+    danger: SEMANTIC_DARK_COLORS.danger[30],
+    warning: SEMANTIC_DARK_COLORS.warning[30],
+    success: SEMANTIC_DARK_COLORS.success[30],
+    information: SEMANTIC_DARK_COLORS.information[30],
+    white: WHITE,
+    black: BLACK,
   },
 };
 
-const BACKGROUND_COLORS = {
+const SEMANTIC_BACKGROUND_COLORS = {
   light: {
-    primary: LIGHT_COLORS.primary.main,
-    layer1: LIGHT_COLORS.grey[5],
-    layer2: LIGHT_COLORS.grey[20],
-    neutral: LIGHT_COLORS.grey[30],
-    base: '#ffffff',
-    danger: LIGHT_COLORS.danger[5],
-    warning: LIGHT_COLORS.warning[5],
-    success: LIGHT_COLORS.success[5],
-    information: LIGHT_COLORS.information[5],
+    primary: SEMANTIC_LIGHT_COLORS.primary.main,
+    layer1: SEMANTIC_LIGHT_COLORS.grey[5],
+    layer2: SEMANTIC_LIGHT_COLORS.grey[20],
+    neutral: SEMANTIC_LIGHT_COLORS.grey[30],
+    base: WHITE,
+    danger: SEMANTIC_LIGHT_COLORS.danger[5],
+    warning: SEMANTIC_LIGHT_COLORS.warning[5],
+    success: SEMANTIC_LIGHT_COLORS.success[5],
+    information: SEMANTIC_LIGHT_COLORS.information[5],
   },
   dark: {
-    primary: DARK_COLORS.primary.main,
-    layer1: DARK_COLORS.grey[5],
-    layer2: DARK_COLORS.grey[20],
-    neutral: DARK_COLORS.grey[30],
-    base: '#000000',
-    danger: DARK_COLORS.danger[80],
-    warning: DARK_COLORS.warning[80],
-    success: DARK_COLORS.success[80],
-    information: DARK_COLORS.information[80],
+    primary: SEMANTIC_DARK_COLORS.primary.main,
+    layer1: SEMANTIC_DARK_COLORS.grey[5],
+    layer2: SEMANTIC_DARK_COLORS.grey[20],
+    neutral: SEMANTIC_DARK_COLORS.grey[30],
+    base: BLACK,
+    danger: SEMANTIC_DARK_COLORS.danger[80],
+    warning: SEMANTIC_DARK_COLORS.warning[80],
+    success: SEMANTIC_DARK_COLORS.success[80],
+    information: SEMANTIC_DARK_COLORS.information[80],
   },
 };
 
@@ -323,14 +268,14 @@ export interface ThemeFactoryConfig {
 }
 
 /**
- * 테마 팩토리 함수 - LIGHT_COLORS와 DARK_COLORS를 재정의할 수 있는 기능을 제공합니다.
+ * 테마 팩토리 함수 - SEMANTIC_LIGHT_COLORS와 SEMANTIC_DARK_COLORS를 재정의할 수 있는 기능을 제공합니다.
  * @param config - 라이트/다크 모드별로 색상을 재정의할 수 있는 설정 객체
- * @returns 재정의된 LIGHT_COLORS와 DARK_COLORS를 포함한 팩토리 함수
+ * @returns 재정의된 SEMANTIC_LIGHT_COLORS와 SEMANTIC_DARK_COLORS를 포함한 팩토리 함수
  */
 export function themeFactory(config: ThemeFactoryConfig = {}) {
   // 기본 색상들을 깊은 복사로 생성
-  const createCustomLightColors = (): typeof LIGHT_COLORS => {
-    const customColors = { ...LIGHT_COLORS };
+  const createCustomLightColors = (): typeof SEMANTIC_LIGHT_COLORS => {
+    const customColors = { ...SEMANTIC_LIGHT_COLORS };
     
     if (config.light) {
       Object.keys(config.light).forEach((key) => {
@@ -347,8 +292,8 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
     return customColors;
   };
 
-  const createCustomDarkColors = (): typeof DARK_COLORS => {
-    const customColors = { ...DARK_COLORS };
+  const createCustomDarkColors = (): typeof SEMANTIC_DARK_COLORS => {
+    const customColors = { ...SEMANTIC_DARK_COLORS };
     
     if (config.dark) {
       Object.keys(config.dark).forEach((key) => {
@@ -389,8 +334,8 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         warning: colors.warning[60],
         success: colors.success[60],
         information: colors.information[60],
-        white: '#FFFFFF',
-        black: '#000000',
+        white: WHITE,
+        black: BLACK,
       },
       dark: {
         primary: colors.primary.main,
@@ -401,8 +346,8 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         warning: colors.warning[30],
         success: colors.success[30],
         information: colors.information[30],
-        white: '#FFFFFF',
-        black: '#000000',
+        white: WHITE,
+        black: BLACK,
       },
     };
 
@@ -412,7 +357,7 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         layer1: colors.grey[5],
         layer2: colors.grey[20],
         neutral: colors.grey[30],
-        base: '#ffffff',
+        base: WHITE,
         danger: colors.danger[5],
         warning: colors.warning[5],
         success: colors.success[5],
@@ -423,7 +368,7 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
         layer1: colors.grey[5],
         layer2: colors.grey[20],
         neutral: colors.grey[30],
-        base: '#000000',
+        base: BLACK,
         danger: colors.danger[80],
         warning: colors.warning[80],
         success: colors.success[80],
@@ -481,13 +426,13 @@ export default function palette({
   mode?: 'light' | 'dark';
   themeColors?: { light?: Theme; dark?: Theme };
 } = {}): Theme {
-  const colors = mode === 'light' ? LIGHT_COLORS : DARK_COLORS;
+  const colors = mode === 'light' ? SEMANTIC_LIGHT_COLORS : SEMANTIC_DARK_COLORS;
 
   const theme: Theme = {
     mode,
     ...colors,
-    text: TEXT_COLORS[mode],
-    background: BACKGROUND_COLORS[mode],
+    text: SEMANTIC_TEXT_COLORS[mode],
+    background: SEMANTIC_BACKGROUND_COLORS[mode],
     elevationShadow: SHADOW_COLORS[mode],
     modalBgColor: MODAL_BG_COLOR[mode],
     mainColor: MAIN_COLORS[mode]
