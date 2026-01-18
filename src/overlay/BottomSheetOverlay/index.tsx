@@ -42,6 +42,7 @@ const GESTURE_CONSTANTS = {
   closeVelocityThreshold: 0.5,
   closeDistanceRatio: 1 / 3,
   hideDelay: 200,
+  moveThreshold: 10, // 드래그로 인식하기 위한 최소 이동 거리 (px)
 } as const;
 
 function BottomSheetOverlay({
@@ -173,8 +174,14 @@ function BottomSheetOverlay({
 
   const panResponder = useMemo(
     () => PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // 일정 거리 이상 이동했을 때만 PanResponder가 응답 (탭과 드래그 구분)
+        const { dx, dy } = gestureState;
+        return Math.abs(dx) > GESTURE_CONSTANTS.moveThreshold || Math.abs(dy) > GESTURE_CONSTANTS.moveThreshold;
+      },
+      onMoveShouldSetPanResponderCapture: () => false,
       onPanResponderGrant: handlePanResponderGrant,
       onPanResponderMove: handlePanResponderMove,
       onPanResponderRelease: handlePanResponderRelease,
