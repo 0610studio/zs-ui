@@ -31,6 +31,8 @@ function Modality({
 
   // 애니메이션 트리거
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
     if (modalityVisible) {
       // 모달이 열리는 애니메이션
       setLocalVisible(true);
@@ -46,11 +48,15 @@ function Modality({
       backBorderRadius.value = withTiming(0, { duration: 100 });
       mainTranslateY.value = withTiming(windowHeight, { duration: 200 });
       backgroundOpacity.value = withTiming(0, { duration: 300 });
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setLocalVisible(false);
       }, 500);
     }
-  }, [modalityVisible]);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [modalityVisible, insets.top]);
 
   // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {

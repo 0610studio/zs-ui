@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, useState, useEffect, forwardRef } from 'react';
+import React, { useMemo, useCallback, useState, forwardRef } from 'react';
 import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, useDerivedValue } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
 import ErrorComponent from './ui/ErrorComponent';
 import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme/types';
@@ -77,17 +77,18 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const hasValue = value !== '';
   const isError = status === 'error';
   
-  const labelAnimationValue = useSharedValue(0);
-  const focusAnimationValue = useSharedValue(0);
-  const errorAnimationValue = useSharedValue(0);
+  // useDerivedValue: 애니메이션을 UI 스레드에서 직접 처리하여 JS Thread 블로킹 방지
+  const labelAnimationValue = useDerivedValue(() => {
+    return withTiming(hasValue || isFocused ? 1 : 0, { duration: 200 });
+  }, [hasValue, isFocused]);
 
-  useEffect(() => {
-    const animationOptions = { duration: 200 };
-    
-    labelAnimationValue.value = withTiming(hasValue || isFocused ? 1 : 0, animationOptions);
-    focusAnimationValue.value = withTiming(isFocused ? 1 : 0, animationOptions);
-    errorAnimationValue.value = withTiming(isError ? 1 : 0, animationOptions);
-  }, [hasValue, isFocused, isError, labelAnimationValue, focusAnimationValue, errorAnimationValue]);
+  const focusAnimationValue = useDerivedValue(() => {
+    return withTiming(isFocused ? 1 : 0, { duration: 200 });
+  }, [isFocused]);
+
+  const errorAnimationValue = useDerivedValue(() => {
+    return withTiming(isError ? 1 : 0, { duration: 200 });
+  }, [isError]);
 
   const animationConstants = useMemo(() => ({
     baseFontSize: fontSize + (boxStyle === 'inbox' ? 1 : 0),
@@ -125,7 +126,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const handleLayout = useCallback((event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     boxHeightValue.value = height;
-  }, [boxHeightValue]);
+  }, []);
 
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);

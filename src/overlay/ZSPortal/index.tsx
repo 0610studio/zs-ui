@@ -70,7 +70,7 @@ export const ZSPortal: React.FC<PortalProps> = ({ children, isFocused = true }) 
     } else {
       context.unregisterPortal(portalId);
     }
-  }, [children]);
+  }, [isFocused, children]);
 
   useEffect(() => {
     return () => {
