@@ -81,15 +81,13 @@ function BottomSheetOverlay({
   const [localVisible, setLocalVisible] = useState(false);
 
   const handleKeyboardShow = useCallback((event: KeyboardEvent) => {
-    'worklet';
     if (!isGesturing.value) {
       const targetY = -event.endCoordinates.height + (IS_IOS ? bottomInsets : 0);
       translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
     }
-  }, []);
+  }, [bottomInsets]);
 
   const handleKeyboardHide = useCallback(() => {
-    'worklet';
     if (!isGesturing.value) {
       translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
     }
@@ -102,17 +100,23 @@ function BottomSheetOverlay({
 
   // BottomSheet 표시/숨김 애니메이션 처리
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
     if (bottomSheetVisible) {
       Keyboard.dismiss();
       setLocalVisible(true);
       translateY.value = withSpring(0, ANIMATION_CONFIG.spring);
     } else {
       translateY.value = withTiming(maxHeight + 100, ANIMATION_CONFIG.close);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setLocalVisible(false);
       }, GESTURE_CONSTANTS.hideDelay);
     }
-  }, [bottomSheetVisible, translateY, maxHeight]);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [bottomSheetVisible, maxHeight]);
 
   const animatedStyles = useAnimatedStyle(() => {
     'worklet';
@@ -123,7 +127,7 @@ function BottomSheetOverlay({
         { scale: scale.value }
       ],
     };
-  }, [translateY, translateX, scale]);
+  });
 
   const dismissKeyboard = useCallback(() => {
     Keyboard.dismiss();
@@ -139,7 +143,7 @@ function BottomSheetOverlay({
     startX.value = translateX.value;
     startY.value = translateY.value;
     scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
-  }, [translateX, translateY, scale, startX, startY, isGesturing, dismissKeyboard]);
+  }, [dismissKeyboard]);
 
   const handlePanResponderMove = useCallback((_, gestureState) => {
     const newTranslateX = (startX.value + gestureState.dx) / GESTURE_CONSTANTS.horizontalDamping;
@@ -151,13 +155,12 @@ function BottomSheetOverlay({
     } else {
       translateY.value = newTranslateY / GESTURE_CONSTANTS.verticalDownDamping;
     }
-  }, [translateX, translateY, startX, startY]);
+  }, []);
 
   const handlePanResponderRelease = useCallback((_, gestureState) => {
     isGesturing.value = false;
     translateX.value = withTiming(0, { duration: 100 });
 
-    // 빠른 플리킹 제스처를 했을 때, 혹은 화면의 1/3 이상 내렸을 때, 닫기
     const shouldClose = gestureState.vy > GESTURE_CONSTANTS.closeVelocityThreshold ||
       translateY.value > maxHeight * GESTURE_CONSTANTS.closeDistanceRatio;
 
@@ -168,9 +171,8 @@ function BottomSheetOverlay({
       translateY.value = withTiming(0, ANIMATION_CONFIG.close);
     }
 
-    // 사이즈 원래대로 복귀
     scale.value = withSpring(1, ANIMATION_CONFIG.scaleRestore);
-  }, [translateX, translateY, scale, maxHeight, isGesturing, closeBottomSheet]);
+  }, [maxHeight, closeBottomSheet]);
 
   const panResponder = useMemo(
     () => PanResponder.create({

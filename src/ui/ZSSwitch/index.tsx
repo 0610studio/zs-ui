@@ -5,6 +5,7 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   withTiming,
+  useDerivedValue,
 } from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -35,28 +36,37 @@ function ZSSwitch({
   const toggleBorderRadius = height * 1.2;
   const thumbBorderRadius = thumbSize / 2;
 
+  const inactiveColor = trackColorInactive ?? palette.grey[30];
+  const activeColor = trackColorActive ?? palette.primary.main;
+
+  const toggleProgress = useDerivedValue(() => {
+    return withTiming(isActive ? 1 : 0, { duration: 200 });
+  }, [isActive]);
+
   const colorAnimation = useAnimatedStyle(() => {
+    'worklet';
     const color = interpolateColor(
-      isActive ? 1 : 0,
+      toggleProgress.value,
       [0, 1],
-      [trackColorInactive ?? palette.grey[30], trackColorActive ?? palette.primary.main],
+      [inactiveColor, activeColor],
     );
 
     return { backgroundColor: color };
-  });
+  }, [inactiveColor, activeColor]);
 
   const togglePositionAnimation = useAnimatedStyle(() => {
+    'worklet';
     const positionStyle = interpolate(
-      isActive ? 1 : 0,
+      toggleProgress.value,
       [0, 1],
       [0, toggledWidth - thumbSize - padding * 2],
       'clamp',
     );
 
     return {
-      transform: [{ translateX: withTiming(positionStyle, { duration: 200 }) }],
+      transform: [{ translateX: positionStyle }],
     };
-  });
+  }, [toggledWidth, thumbSize, padding]);
 
   const toggleStyle = {
     width,

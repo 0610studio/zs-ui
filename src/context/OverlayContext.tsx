@@ -52,7 +52,7 @@ export function OverlayProvider({
   const [modalityComponent, setModalityComponent] = useState<React.ReactNode>(false);
   const [modalityFoldableSingleScreen, setModalityFoldableSingleScreen] = useState<boolean>(false);
 
-  const showAlert = ({
+  const showAlert = useCallback(({
     title,
     informative,
     actions,
@@ -75,9 +75,9 @@ export function OverlayProvider({
     setSecondaryButtonStyle(secondaryButtonStyle);
     setPrimaryButtonStyle(primaryButtonStyle);
     setSecondaryButtonTextStyle(secondaryButtonTextStyle);
-  };
+  }, []);
 
-  const showBottomSheet = ({
+  const showBottomSheet = useCallback(({
     headerComponent,
     component,
     options,
@@ -88,13 +88,13 @@ export function OverlayProvider({
     setBottomSheetOptions(options);
     setBottomSheetHeight(options?.height || 300);
     setBottomSheetVisible(true);
-  };
+  }, []);
 
-  const showLoader = () => {
+  const showLoader = useCallback(() => {
     setLoaderVisible(true);
-  };
+  }, []);
 
-  const showPopOverMenu = ({
+  const showPopOverMenu = useCallback(({
     px,
     py,
     component
@@ -103,9 +103,9 @@ export function OverlayProvider({
     setPopOverLocation({ px, py });
     setPopOverComponent(component);
     setPopOverVisible(true);
-  }
+  }, []);
 
-  const showModality = ({
+  const showModality = useCallback(({
     component,
     foldableSingleScreen
   }: ModalityProps) => {
@@ -113,9 +113,9 @@ export function OverlayProvider({
     setModalityComponent(component);
     setModalityVisible(true);
     setModalityFoldableSingleScreen(foldableSingleScreen || false);
-  }
+  }, []);
 
-  const showSnackBar = ({
+  const showSnackBar = useCallback(({
     message,
     type = 'success',
     index = Date.now(),
@@ -125,11 +125,11 @@ export function OverlayProvider({
       const newStack = [...prev, { message, type, index: index, snackbarDuration: snackbarDuration }];
       return newStack.length > maxSnackbarCount ? newStack.slice(1) : newStack;
     });
-  };
+  }, [maxSnackbarCount]);
 
-  const hideSnackBar = (index: number) => {
+  const hideSnackBar = useCallback((index: number) => {
     setSnackItemStack((prev) => prev.filter((item) => item.index !== index));
-  };
+  }, []);
 
   const hideOverlay = useCallback((option: HideOption) => {
     Keyboard.dismiss();
@@ -175,7 +175,7 @@ export function OverlayProvider({
       return true;
     }
     return false;
-  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible, bottomSheetVisible]);
+  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible, bottomSheetVisible, hideOverlay]);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backPressHandler);
@@ -192,15 +192,7 @@ export function OverlayProvider({
     showPopOverMenu,
     showModality,
     showLoader,
-  }), [
-    hideOverlay,
-    showAlert,
-    showSnackBar,
-    showBottomSheet,
-    showPopOverMenu,
-    showModality,
-    showLoader,
-  ]);
+  }), [hideOverlay, showAlert, showSnackBar, showBottomSheet, showPopOverMenu, showModality, showLoader]);
 
   // Global overlay reference 업데이트
   useEffect(() => {

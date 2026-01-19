@@ -31,6 +31,8 @@ function PopOverMenu({
       timerRef.current = setTimeout(() => {
         setIsContentVisible(true);
       }, 200);
+    } else {
+      setIsContentVisible(false);
     }
 
     return () => {

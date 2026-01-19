@@ -44,44 +44,47 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
 
   // AsyncStorage에서 시스템 모드 사용 설정 값 로드
   useEffect(() => {
-    const loadSettings = async () => {
-      let isMounted = true;
-      try {
-        if (isMounted) {
-          if (isDarkModeEnabled) {
-            const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
-            const storedMode = await AsyncStorage.getItem('themeMode');
+    let isMounted = true;
 
-            if (storedUseSystemColorScheme !== null) {
-              setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
-            }
-            if (storedMode) {
-              setMode(storedMode === 'dark' ? 'dark' : 'light');
-            } else {
-              setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
-            }
-          } else {
-            setMode('light');
+    const loadSettings = async () => {
+      try {
+        if (!isMounted) return;
+        
+        if (isDarkModeEnabled) {
+          const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
+          const storedMode = await AsyncStorage.getItem('themeMode');
+
+          if (!isMounted) return;
+
+          if (storedUseSystemColorScheme !== null) {
+            setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
           }
+          if (storedMode) {
+            setMode(storedMode === 'dark' ? 'dark' : 'light');
+          } else {
+            setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
+          }
+        } else {
+          setMode('light');
         }
       } catch (error) {
         console.error('Failed to load theme settings', error);
       }
-
-      return () => {
-        isMounted = false;
-      };
     };
 
     loadSettings();
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isDarkModeEnabled, systemColorScheme]);
 
   // 시스템 다크 모드 변경에 따른 효과 적용
   useEffect(() => {
     if (isUsingSystemColorScheme) {
       setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
     }
-  }, [isUsingSystemColorScheme]);
+  }, [isUsingSystemColorScheme, systemColorScheme]);
 
   // 안드로이드 하단 제스쳐 영역 스타일
   useEffect(() => {
