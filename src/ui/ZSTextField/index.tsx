@@ -71,20 +71,27 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const fontSize = extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
   const fontFamily = extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
 
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const isFocusedShared = useSharedValue(0);
+  const [isFocusedForUI, setIsFocusedForUI] = useState<boolean>(false);
   const boxHeightValue = useSharedValue(0);
+  const hasValueShared = useSharedValue(value !== '' ? 1 : 0);
   
-  const hasValue = value !== '';
   const isError = status === 'error';
+
+  React.useEffect(() => {
+    hasValueShared.value = value !== '' ? 1 : 0;
+  }, [value]);
   
-  // useDerivedValue: 애니메이션을 UI 스레드에서 직접 처리하여 JS Thread 블로킹 방지
   const labelAnimationValue = useDerivedValue(() => {
-    return withTiming(hasValue || isFocused ? 1 : 0, { duration: 200 });
-  }, [hasValue, isFocused]);
+    'worklet';
+    const shouldFloat = hasValueShared.value === 1 || isFocusedShared.value === 1;
+    return withTiming(shouldFloat ? 1 : 0, { duration: 200 });
+  });
 
   const focusAnimationValue = useDerivedValue(() => {
-    return withTiming(isFocused ? 1 : 0, { duration: 200 });
-  }, [isFocused]);
+    'worklet';
+    return withTiming(isFocusedShared.value, { duration: 200 });
+  });
 
   const errorAnimationValue = useDerivedValue(() => {
     return withTiming(isError ? 1 : 0, { duration: 200 });
@@ -128,8 +135,14 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     boxHeightValue.value = height;
   }, []);
 
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
+  const handleFocus = () => {
+    isFocusedShared.value = 1;
+    setIsFocusedForUI(true);
+  };
+  const handleBlur = () => {
+    isFocusedShared.value = 0;
+    setIsFocusedForUI(false);
+  };
 
   const colorConfig = useMemo(() => ({
     primaryColor: focusColor || palette.primary.main,
@@ -242,7 +255,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     textInputProps?.style,
   ];
 
-  const shouldShowCloseButton = value && isFocused;
+  const shouldShowCloseButton = value && isFocusedForUI;
   const shouldShowError = status === 'error' && errorMessage;
 
   return (

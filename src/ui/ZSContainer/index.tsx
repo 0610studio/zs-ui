@@ -73,7 +73,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollView, [scrollViewDisabled]);
 
-  const handleKeyboardShow = (e: any) => {
+  const handleKeyboardShow = useCallback((e: any) => {
     setKeyboardHeight(e.endCoordinates.height);
 
     if ((scrollViewRef.current || scrollView2Ref.current) && scrollToFocusedInput) {
@@ -107,11 +107,11 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
         scrollTimeoutRef.current = null;
       }, KEYBOARD_ANIMATION_DELAY);
     }
-  };
+  }, [scrollToFocusedInput, keyboardScrollExtraOffset]);
 
-  const handleKeyboardHide = () => {
+  const handleKeyboardHide = useCallback(() => {
     setKeyboardHeight(0);
-  };
+  }, []);
 
   useKeyboard({
     handleKeyboardShow,
