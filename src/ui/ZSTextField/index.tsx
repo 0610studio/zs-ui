@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback, useState, forwardRef } from 'react';
+import { useMemo, useCallback, useState, forwardRef, useEffect } from 'react';
 import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, useDerivedValue } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, withDelay, ReduceMotion } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
 import ErrorComponent from './ui/ErrorComponent';
 import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme/types';
@@ -11,6 +11,8 @@ import ViewAtom from '../atoms/ViewAtom';
 export type BoxStyle = 'outline' | 'underline' | 'inbox';
 
 const iosOffset = Platform.OS === 'ios' ? 8 : 4;
+const ANIM_DURATION = 150;
+const KEYBOARD_SETTLE_DELAY = Platform.OS === 'ios' ? 50 : 0;
 
 interface TextFieldProps {
   typo?: TypoOptions;
@@ -71,30 +73,20 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const fontSize = extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
   const fontFamily = extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
 
-  const isFocusedShared = useSharedValue(0);
+  const labelProgress = useSharedValue(value !== '' ? 1 : 0);
+  const focusProgress = useSharedValue(0);
+  const errorProgress = useSharedValue(0);
   const [isFocusedForUI, setIsFocusedForUI] = useState<boolean>(false);
   const boxHeightValue = useSharedValue(0);
-  const hasValueShared = useSharedValue(value !== '' ? 1 : 0);
   
   const isError = status === 'error';
 
-  React.useEffect(() => {
-    hasValueShared.value = value !== '' ? 1 : 0;
+  useEffect(() => {
+    labelProgress.value = withTiming(value !== '' ? 1 : 0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
   }, [value]);
-  
-  const labelAnimationValue = useDerivedValue(() => {
-    'worklet';
-    const shouldFloat = hasValueShared.value === 1 || isFocusedShared.value === 1;
-    return withTiming(shouldFloat ? 1 : 0, { duration: 200 });
-  });
 
-  const focusAnimationValue = useDerivedValue(() => {
-    'worklet';
-    return withTiming(isFocusedShared.value, { duration: 200 });
-  });
-
-  const errorAnimationValue = useDerivedValue(() => {
-    return withTiming(isError ? 1 : 0, { duration: 200 });
+  useEffect(() => {
+    errorProgress.value = withTiming(isError ? 1 : 0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
   }, [isError]);
 
   const animationConstants = useMemo(() => ({
@@ -107,15 +99,17 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const animatedLabelStyle = useAnimatedStyle(() => {
     'worklet';
     
+    const progress = Math.max(labelProgress.value, focusProgress.value);
+    
     const labelFontSize = interpolate(
-      labelAnimationValue.value,
+      progress,
       [0, 1],
       [animationConstants.baseFontSize, animationConstants.targetFontSize],
       'clamp'
     );
 
     const labelTop = interpolate(
-      labelAnimationValue.value,
+      progress,
       [0, 1],
       [
         animationConstants.baseTop,
@@ -135,14 +129,16 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     boxHeightValue.value = height;
   }, []);
 
-  const handleFocus = () => {
-    isFocusedShared.value = 1;
+  const handleFocus = useCallback(() => {
+    const timing = withTiming(1, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
+    focusProgress.value = KEYBOARD_SETTLE_DELAY > 0 ? withDelay(KEYBOARD_SETTLE_DELAY, timing) : timing;
     setIsFocusedForUI(true);
-  };
-  const handleBlur = () => {
-    isFocusedShared.value = 0;
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    focusProgress.value = withTiming(0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
     setIsFocusedForUI(false);
-  };
+  }, []);
 
   const colorConfig = useMemo(() => ({
     primaryColor: focusColor || palette.primary.main,
@@ -155,9 +151,9 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const animatedColorStyle = useAnimatedStyle(() => {
     'worklet';
     
-    const borderColor = errorAnimationValue.value > 0 
+    const borderColor = errorProgress.value > 0 
       ? colorConfig.errorColor
-      : focusAnimationValue.value > 0
+      : focusProgress.value > 0
         ? colorConfig.primaryColor
         : colorConfig.defaultBorderColor;
     
@@ -169,11 +165,13 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const animatedLabelColorStyle = useAnimatedStyle(() => {
     'worklet';
     
-    const labelColor = errorAnimationValue.value > 0
+    const floatProgress = Math.max(labelProgress.value, focusProgress.value);
+    
+    const labelColor = errorProgress.value > 0
       ? colorConfig.errorColor
-      : focusAnimationValue.value > 0
+      : focusProgress.value > 0
         ? colorConfig.primaryColor
-        : labelAnimationValue.value > 0
+        : floatProgress > 0
           ? colorConfig.defaultLabelColor
           : colorConfig.placeholderColor;
     

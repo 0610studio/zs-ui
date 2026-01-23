@@ -80,13 +80,16 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
       : size === '3' ? 10
         : size === '4' ? 8
           : size === '5' ? 7
-            : 10;
+            : size === '6' ? 5
+              : 10;
+
   const paddingVertical = size === '1' ? 9
     : size === '2' ? 9
       : size === '3' ? 8
         : size === '4' ? 6
           : size === '5' ? 5
-            : 8;
+            : size === '6' ? 4
+              : 8;
 
   const getTextColorValue = () => {
     const [c01, c02] = colors.textColor.split('.');
