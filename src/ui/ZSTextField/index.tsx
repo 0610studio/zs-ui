@@ -83,11 +83,11 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
 
   useEffect(() => {
     labelProgress.value = withTiming(value !== '' ? 1 : 0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
-  }, [value, labelProgress]);
+  }, [value]);
 
   useEffect(() => {
     errorProgress.value = withTiming(isError ? 1 : 0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
-  }, [isError, errorProgress]);
+  }, [isError]);
 
   const animationConstants = useMemo(() => ({
     baseFontSize: fontSize + (boxStyle === 'inbox' ? 1 : 0),
@@ -133,12 +133,12 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     const timing = withTiming(1, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
     focusProgress.value = KEYBOARD_SETTLE_DELAY > 0 ? withDelay(KEYBOARD_SETTLE_DELAY, timing) : timing;
     setIsFocusedForUI(true);
-  }, [focusProgress]);
+  }, []);
 
   const handleBlur = useCallback(() => {
     focusProgress.value = withTiming(0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
     setIsFocusedForUI(false);
-  }, [focusProgress]);
+  }, []);
 
   const colorConfig = useMemo(() => ({
     primaryColor: focusColor || palette.primary.main,
