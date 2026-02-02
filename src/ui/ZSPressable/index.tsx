@@ -97,6 +97,7 @@ function ZSPressable({
         onPressOut={handlePressOut}
         disabled={isLoading || disabled}
         style={({ pressed }) => handlePressStyle(pressed)}
+        {...props}
       >
         <Animated.View style={boxAnimation}>
           <AnimatedWrapper

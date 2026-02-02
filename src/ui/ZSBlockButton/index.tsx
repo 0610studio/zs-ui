@@ -1,11 +1,11 @@
-import { Image, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native';
+import { Image, type ImageSourcePropType, type StyleProp, type ViewStyle, type ViewProps } from 'react-native';
 import { TypoColorOptions, TypoOptions, ViewColorOptions, IntentOptions } from '../../theme/types';
 import { useTheme } from '../../context/ThemeContext';
 import ZSPressable from '../ZSPressable';
 import ZSView from '../ZSView';
 import ZSText from '../ZSText';
 
-type Props = {
+type Props = ViewProps & {
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   title: string;
@@ -17,7 +17,7 @@ type Props = {
   disabled?: boolean;
 };
 
-function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false }: Props) {
+function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false, ...accessibilityProps }: Props) {
   const { palette } = useTheme();
   const size = typo.split('.')[1];
 
@@ -102,7 +102,7 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
   const textColorValue = getTextColorValue();
 
   return (
-    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled}>
+    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled} {...accessibilityProps}>
       <ZSView
         style={{
           paddingHorizontal,

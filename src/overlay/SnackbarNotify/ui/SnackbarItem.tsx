@@ -32,11 +32,16 @@ const Snackbar = ({
       style={[styles.snackbarWrapper]}
       entering={FadeInUp}
       exiting={FadeOutUp}
+      accessibilityLiveRegion="polite"
+      accessibilityRole="alert"
     >
       <TouchableOpacity
         style={[styles.container]}
         activeOpacity={1}
         onPress={closeSnackbar}
+        accessibilityRole="button"
+        accessibilityLabel="닫기"
+        accessibilityHint="메시지를 닫으려면 탭하세요"
       >
         {customSnackbar ? (
           customSnackbar({ snackType: type, snackMessage: message })

@@ -1,18 +1,18 @@
 import React, { useEffect } from "react";
-import { Dimensions, type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
+import { Dimensions, type StyleProp, StyleSheet, View, type ViewStyle, type ViewProps } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, cancelAnimation } from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
-interface ZSSkeletonProps {
+interface ZSSkeletonProps extends ViewProps {
     isFetching?: boolean;
     style?: StyleProp<ViewStyle>;
     children?: React.ReactNode;
     overlayColor?: string;
 }
 
-function ZSSkeleton({ isFetching, style, children, overlayColor }: ZSSkeletonProps) {
+function ZSSkeleton({ isFetching, style, children, overlayColor, ...accessibilityProps }: ZSSkeletonProps) {
     const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
     const { palette } = useTheme();
     const effectColor = overlayColor || palette.background.base;
@@ -38,7 +38,7 @@ function ZSSkeleton({ isFetching, style, children, overlayColor }: ZSSkeletonPro
     });
 
     return isFetching ? (
-        <View style={[style, { overflow: "hidden" }]}>
+        <View style={[style, { overflow: "hidden" }]} {...accessibilityProps}>
             <View style={styles.container}>
                 {children}
 

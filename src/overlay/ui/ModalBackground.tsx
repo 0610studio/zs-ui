@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, type ViewProps } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Z_INDEX_VALUE } from '../../model/utils';
 
-interface ModalBackgroundProps {
+interface ModalBackgroundProps extends ViewProps {
   zIndex?: number;
   modalBgColor: string;
   position?: 'center' | 'left' | 'right' | 'pop'; // TODO: 'left' | 'right' 미구현
@@ -11,7 +11,7 @@ interface ModalBackgroundProps {
   onPress?: () => void;
 }
 
-function ModalBackground({ modalBgColor, position = 'center', children, onPress, zIndex = Z_INDEX_VALUE.DEFAULT }: ModalBackgroundProps) {
+function ModalBackground({ modalBgColor, position = 'center', children, onPress, zIndex = Z_INDEX_VALUE.DEFAULT, ...accessibilityProps }: ModalBackgroundProps) {
   const styles = useMemo(() => createStyles(modalBgColor), [modalBgColor]);
 
   return (
@@ -19,10 +19,13 @@ function ModalBackground({ modalBgColor, position = 'center', children, onPress,
       style={[styles.modalBg, { zIndex }, position === 'center' && { justifyContent: 'center', alignItems: 'center' }, position === 'left' && { justifyContent: 'flex-start', alignItems: 'center' }, position === 'right' && { justifyContent: 'flex-end', alignItems: 'center' }]}
       entering={FadeIn.duration(50)}
       exiting={FadeOut.duration(50)}
+      {...accessibilityProps}
     >
       <Pressable
         style={styles.fullScreen}
         onPress={onPress ?? (() => { })}
+        accessibilityRole="button"
+        accessibilityLabel="닫기"
       >
       </Pressable>
 

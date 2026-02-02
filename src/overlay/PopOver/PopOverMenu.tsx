@@ -83,11 +83,14 @@ function PopOverMenu({
       modalBgColor={palette.modalBgColor}
       position='pop'
       onPress={() => setPopOverVisible(false)}
+      accessibilityViewIsModal={true}
     >
       {isContentVisible && (
         <Animated.View
           entering={FadeInUp}
           exiting={FadeOutUp}
+          accessibilityRole="menu"
+          accessibilityLiveRegion="polite"
         >
           <Pressable
             style={{
@@ -96,6 +99,8 @@ function PopOverMenu({
               top: adjustedY,
             }}
             onLayout={handleLayout}
+            accessibilityRole="none"
+            importantForAccessibility="no"
           >
             {component}
           </Pressable>
