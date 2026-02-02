@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { LayoutChangeEvent, Platform, StyleSheet, View } from "react-native";
+import { LayoutChangeEvent, Platform, StyleSheet, View, type ViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useKeyboard from "../../model/useKeyboard";
 import { Z_INDEX_VALUE } from "../../model/utils";
@@ -11,7 +11,7 @@ const isLegacyAndroidKeyboardBehavior = (Platform.OS === 'android' && Platform.V
 
 const HIDDEN_BOTTOM_OFFSET = -300;
 
-interface Props {
+interface Props extends ViewProps {
   children: React.ReactNode;
   keyboardShowOffset?: number;
   keyboardHideOffset?: number;
@@ -27,6 +27,7 @@ function ZSAboveKeyboard({
   handleLayoutHeight,
   showOnlyKeyboardVisible = false,
   backgroundColor,
+  ...accessibilityProps
 }: Props) {
   const { bottom } = useSafeAreaInsets();
   const componentHeightRef = useRef(0);
@@ -45,7 +46,7 @@ function ZSAboveKeyboard({
   const isVisible = showOnlyKeyboardVisible ? isKeyboardVisible : true;
 
   return (
-    <View style={[styles.container, { bottom: !isVisible ? HIDDEN_BOTTOM_OFFSET : 0 }]} onLayout={handleLayout}>
+    <View style={[styles.container, { bottom: !isVisible ? HIDDEN_BOTTOM_OFFSET : 0 }]} onLayout={handleLayout} {...accessibilityProps}>
       <View style={{ width: "100%", backgroundColor, paddingBottom: keyboardVisiblePadding }}>
         {children}
       </View>

@@ -17,14 +17,24 @@ function LoadingNotify({
     return loaderComponent ? (
       loaderComponent()
     ) : (
-      <ActivityIndicator size="large" color="#fff" />
+      <ActivityIndicator
+        size="large"
+        color="#fff"
+        accessibilityLabel="로딩 중"
+        accessibilityLiveRegion="polite"
+      />
     );
   }, [loaderComponent]);
 
   if (!loaderVisible) return null;
 
   return (
-    <ModalBackground zIndex={Z_INDEX_VALUE.LOADING} key={loaderVisible ? 'visibleln' : 'hiddenln'} modalBgColor={palette.modalBgColor}>
+    <ModalBackground
+      zIndex={Z_INDEX_VALUE.LOADING}
+      key={loaderVisible ? 'visibleln' : 'hiddenln'}
+      modalBgColor={palette.modalBgColor}
+      accessibilityViewIsModal={true}
+    >
       {renderLoader()}
     </ModalBackground>
   )

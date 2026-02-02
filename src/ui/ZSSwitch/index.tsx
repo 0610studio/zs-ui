@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { type StyleProp, type ViewStyle, Pressable } from "react-native";
+import { type StyleProp, type ViewStyle, Pressable, type ViewProps } from "react-native";
 import Animated, {
   interpolate,
   interpolateColor,
@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
 
-interface ZSSwitchProps {
+interface ZSSwitchProps extends ViewProps {
   isActive: boolean;
   onToggle: () => void;
   style?: StyleProp<ViewStyle>;
@@ -27,6 +27,7 @@ function ZSSwitch({
   trackColorInactive,
   trackColorActive,
   thumbColor = '#ffffff',
+  ...accessibilityProps
 }: ZSSwitchProps) {
   const [toggledWidth, setToggledWidth] = useState(0);
   const { palette } = useTheme();
@@ -84,7 +85,7 @@ function ZSSwitch({
   };
 
   return (
-    <Pressable onPress={onToggle} style={style}>
+    <Pressable onPress={onToggle} style={style} {...accessibilityProps}>
       <Animated.View
         style={[colorAnimation, toggleStyle]}
         onLayout={e => setToggledWidth(e.nativeEvent.layout.width)}

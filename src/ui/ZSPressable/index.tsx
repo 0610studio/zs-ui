@@ -91,6 +91,7 @@ function ZSPressable({
   return (
     <View style={[fullWidth ? { width: '100%' as const } : undefined, { opacity: (isLoading || disabled) ? 0.55 : 1 }]}>
       <Pressable
+        {...props}
         onPress={handlePress}
         onLongPress={handleLongPress}
         onPressIn={handlePressIn}

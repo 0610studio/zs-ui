@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Dimensions, type StyleProp, StyleSheet, View, type ViewStyle } from "react-native";
+import { Dimensions, type StyleProp, StyleSheet, View, type ViewStyle, type ViewProps } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, cancelAnimation } from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
 import ZSView from "../ZSView";
@@ -7,14 +7,14 @@ import { ViewColorOptions } from "../../theme/types";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
-interface ZSSkeletonBoxProps {
+interface ZSSkeletonBoxProps extends ViewProps {
     height: number;
     style?: StyleProp<ViewStyle>;
     overlayColor?: string;
     color?: ViewColorOptions;
 }
 
-function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral' }: ZSSkeletonBoxProps) {
+function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral', ...accessibilityProps }: ZSSkeletonBoxProps) {
     const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
     const { palette } = useTheme();
     const effectColor = overlayColor || palette.background.layer1;
@@ -35,7 +35,7 @@ function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral' }: ZSSke
     });
 
     return (
-        <View style={[{ width: '100%' }, style, { height, overflow: "hidden" }]}>
+        <View style={[{ width: '100%' }, style, { height, overflow: "hidden" }]} {...accessibilityProps}>
             <ZSView
                 style={[
                     styles.container,
