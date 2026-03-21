@@ -268,7 +268,12 @@ function BottomSheetOverlay({
   const pressableViewStyle = [
     styles.pressableView,
     { paddingHorizontal: padding, paddingBottom: padding },
-    !isAutoHeight && styles.pressableViewFill,
+    isAutoHeight ? styles.pressableViewAuto : styles.pressableViewFill,
+  ];
+
+  const contentWrapperStyle = [
+    styles.contentWrapper,
+    isAutoHeight ? styles.contentWrapperAuto : styles.contentWrapperFill,
   ];
 
   const gestureBarContainerStyle = [
@@ -303,7 +308,9 @@ function BottomSheetOverlay({
             {headerComponent}
           </View>
 
-          {component}
+          <View style={contentWrapperStyle}>
+            {component}
+          </View>
         </View>
       </Animated.View>
     </ModalBackground>
@@ -319,9 +326,23 @@ const styles = StyleSheet.create({
   },
   pressableView: {
     width: '100%',
+    maxHeight: '100%',
   },
   pressableViewFill: {
     height: '100%',
+  },
+  pressableViewAuto: {
+    flexShrink: 1,
+  },
+  contentWrapper: {
+    minHeight: 0,
+  },
+  contentWrapperFill: {
+    flex: 1,
+  },
+  contentWrapperAuto: {
+    flexShrink: 1,
+    maxHeight: '100%',
   },
   gestureBarContainer: {
     width: '100%',
