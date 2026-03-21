@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent, type LayoutChangeEvent, type PanResponderGestureState, type GestureResponderEvent, useWindowDimensions, type ViewStyle } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -86,8 +86,6 @@ function BottomSheetOverlay({
     return Math.min(viewportMaxHeight, maxHeightLimit, Math.max(getSafeFiniteNumber(height, 0), 0));
   }, [height, isAutoHeight, maxHeight, viewportMaxHeight]);
 
-  const closeOffset = sheetHeight > 0 ? sheetHeight + 100 : constrainedMaxHeight + 100;
-
   const translateY = useSharedValue(0);
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
@@ -96,6 +94,12 @@ function BottomSheetOverlay({
   const isGesturing = useSharedValue(false);
 
   const [localVisible, setLocalVisible] = useState(false);
+  const latestCloseOffsetRef = useRef(constrainedMaxHeight + 100);
+  const closingOffsetRef = useRef(constrainedMaxHeight + 100);
+
+  useEffect(() => {
+    latestCloseOffsetRef.current = sheetHeight > 0 ? sheetHeight + 100 : constrainedMaxHeight + 100;
+  }, [constrainedMaxHeight, sheetHeight]);
 
   const handleKeyboardShow = useCallback((event: KeyboardEvent) => {
     if (!isGesturing.value) {
@@ -118,13 +122,16 @@ function BottomSheetOverlay({
   // BottomSheet 표시/숨김 애니메이션 처리
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
-    
+
     if (bottomSheetVisible) {
+      closingOffsetRef.current = latestCloseOffsetRef.current;
       Keyboard.dismiss();
       setLocalVisible(true);
       translateY.value = withSpring(0, ANIMATION_CONFIG.spring);
     } else {
-      translateY.value = withTiming(closeOffset, ANIMATION_CONFIG.close);
+      const targetCloseOffset = closingOffsetRef.current || latestCloseOffsetRef.current;
+      closingOffsetRef.current = targetCloseOffset;
+      translateY.value = withTiming(targetCloseOffset, ANIMATION_CONFIG.close);
       timeoutId = setTimeout(() => {
         setLocalVisible(false);
       }, GESTURE_CONSTANTS.hideDelay);
@@ -133,7 +140,7 @@ function BottomSheetOverlay({
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [bottomSheetVisible, closeOffset, translateY]);
+  }, [bottomSheetVisible]);
 
   const animatedStyles = useAnimatedStyle(() => {
     'worklet';
@@ -199,14 +206,16 @@ function BottomSheetOverlay({
       translateY.value > dismissDistanceThreshold;
 
     if (shouldClose) {
-      translateY.value = withTiming(closeOffset, ANIMATION_CONFIG.close);
+      const targetCloseOffset = latestCloseOffsetRef.current;
+      closingOffsetRef.current = targetCloseOffset;
+      translateY.value = withTiming(targetCloseOffset, ANIMATION_CONFIG.close);
       closeBottomSheet();
     } else {
       translateY.value = withTiming(0, ANIMATION_CONFIG.close);
     }
 
     scale.value = withSpring(1, ANIMATION_CONFIG.scaleRestore);
-  }, [closeBottomSheet, closeOffset, constrainedMaxHeight, sheetHeight]);
+  }, [closeBottomSheet, constrainedMaxHeight, sheetHeight]);
 
   const panResponder = useMemo(
     () => PanResponder.create({

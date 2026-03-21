@@ -1,7 +1,9 @@
-import { render } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import React from 'react';
+import { act, fireEvent, render } from '@testing-library/react-native';
+import { Text, View } from 'react-native';
 import BottomSheetOverlay from '../../overlay/BottomSheetOverlay';
 import type { BottomSheetContextProps } from '../../model/types';
+import * as Reanimated from 'react-native-reanimated';
 
 const createBottomSheetContext = (
   overrides: Partial<BottomSheetContextProps> = {}
@@ -37,7 +39,14 @@ jest.mock('../../model/useFoldingState', () => ({
 }));
 
 describe('BottomSheetOverlay', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+    jest.clearAllMocks();
     mockUseBottomSheet.mockReset();
     mockUseBottomSheet.mockReturnValue(createBottomSheetContext());
   });
@@ -65,5 +74,49 @@ describe('BottomSheetOverlay', () => {
 
     getByText('auto header');
     getByText('auto content');
+  });
+
+  it('닫히는 동안 layout 변경이 발생해도 close 애니메이션을 다시 시작하지 않는다', () => {
+    const withTimingSpy = jest.spyOn(Reanimated, 'withTiming');
+
+    const { getByText, rerender, UNSAFE_getAllByType } = render(
+      <BottomSheetOverlay
+        headerComponent={<Text>header</Text>}
+        component={<Text>content</Text>}
+      />
+    );
+
+    const sheetContainer = UNSAFE_getAllByType(View).find((node) => typeof node.props.onLayout === 'function');
+
+    expect(sheetContainer).toBeDefined();
+
+    act(() => {
+      fireEvent(sheetContainer!, 'layout', {
+        nativeEvent: { layout: { height: 280 } },
+      });
+    });
+
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ bottomSheetVisible: false }));
+
+    act(() => {
+      rerender(
+        <BottomSheetOverlay
+          headerComponent={<Text>header</Text>}
+          component={<Text>content</Text>}
+        />
+      );
+    });
+
+    expect(getByText('content')).toBeTruthy();
+    expect(withTimingSpy).toHaveBeenCalledTimes(1);
+    expect(withTimingSpy).toHaveBeenLastCalledWith(380, { duration: 150 });
+
+    act(() => {
+      fireEvent(sheetContainer!, 'layout', {
+        nativeEvent: { layout: { height: 420 } },
+      });
+    });
+
+    expect(withTimingSpy).toHaveBeenCalledTimes(1);
   });
 });
