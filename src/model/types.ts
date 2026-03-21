@@ -24,8 +24,9 @@ export interface SnackbarContextProps {
 export interface BottomSheetContextProps {
   bottomSheetVisible: boolean;
   setBottomSheetVisible: (visible: boolean) => void;
-  height: number;
-  setHeight: (height: number) => void;
+  height: BottomSheetHeight;
+  setHeight: (height: BottomSheetHeight) => void;
+  maxHeight: number;
 }
 
 export interface PopOverContextProps {
@@ -110,11 +111,14 @@ export interface BottomSheetOptions {
   isBackgroundTouchClose?: boolean;
   marginHorizontal?: number;
   marginBottom?: number;
-  height?: number;
+  height?: BottomSheetHeight;
+  maxHeight?: number;
   padding?: number;
   foldableSingleScreen?: boolean;
   type?: 'floating' | 'fixed';
 }
+
+export type BottomSheetHeight = number | 'auto';
 
 export interface ShowBottomSheetProps {
   headerComponent?: React.ReactNode;

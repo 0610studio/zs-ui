@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, StyleSheet } from "react-native";
+import { Button, ScrollView, StyleSheet, View } from "react-native";
 import { useOverlay, ZSContainer, ZSText, useTheme, Theme } from "zs-ui";
 import MyBottomSheet from "../src/ui/MyBottomSheet";
 import MyModal from "../src/ui/MyModal";
@@ -57,21 +57,21 @@ const OverlayExample = () => {
         onPress={() => {
           showBottomSheet({
             options: {
-              height: 400
+              height: 'auto',
             },
             headerComponent: (
               <ZSText style={{ textAlign: "center", padding: 30, backgroundColor: '#ff00ff' }}>헤더 컴포넌트1</ZSText>
             ),
             component: (
-              <MyBottomSheet
-                onConfirm={() => {
-                  console.log("event");
-                }}
-              />
+              <ScrollView contentContainerStyle={{ gap: 10 }}>
+                <View style={{ width: '100%', height: 100, backgroundColor: 'red' }} />
+                <View style={{ width: '100%', height: 100, backgroundColor: 'red' }} />
+                <View style={{ width: '100%', height: 100, backgroundColor: 'red' }} />
+              </ScrollView>
             ),
           });
         }}
-        title="show_BottomSheet_Floating"
+        title="show_BottomSheet_Floating_auto"
       />
 
       <Button
