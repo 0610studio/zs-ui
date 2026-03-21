@@ -1,7 +1,20 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import BottomSheetOverlay from '../../overlay/BottomSheetOverlay';
+import type { BottomSheetContextProps } from '../../model/types';
+
+const createBottomSheetContext = (
+  overrides: Partial<BottomSheetContextProps> = {}
+): BottomSheetContextProps => ({
+  bottomSheetVisible: true,
+  setBottomSheetVisible: () => {},
+  height: 300,
+  maxHeight: 500,
+  setHeight: () => {},
+  ...overrides,
+});
+
+const mockUseBottomSheet = jest.fn<BottomSheetContextProps, []>(() => createBottomSheetContext());
 
 jest.mock('../../context/ThemeContext', () => {
   const paletteFn = require('../../theme/palette').default;
@@ -15,7 +28,7 @@ jest.mock('../../context/ThemeContext', () => {
 });
 
 jest.mock('../../model/useOverlay', () => ({
-  useBottomSheet: () => ({ bottomSheetVisible: true, setBottomSheetVisible: () => {}, height: 300 })
+  useBottomSheet: () => mockUseBottomSheet(),
 }));
 
 jest.mock('../../model/useFoldingState', () => ({
@@ -24,6 +37,11 @@ jest.mock('../../model/useFoldingState', () => ({
 }));
 
 describe('BottomSheetOverlay', () => {
+  afterEach(() => {
+    mockUseBottomSheet.mockReset();
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext());
+  });
+
   it('헤더/콘텐츠를 렌더한다', () => {
     const { getByText } = render(
       <BottomSheetOverlay
@@ -34,7 +52,18 @@ describe('BottomSheetOverlay', () => {
     getByText('header');
     getByText('content');
   });
+
+  it('height가 auto여도 콘텐츠를 렌더한다', () => {
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ height: 'auto', maxHeight: 320 }));
+
+    const { getByText } = render(
+      <BottomSheetOverlay
+        headerComponent={<Text>auto header</Text>}
+        component={<Text>auto content</Text>}
+      />
+    );
+
+    getByText('auto header');
+    getByText('auto content');
+  });
 });
-
-
-

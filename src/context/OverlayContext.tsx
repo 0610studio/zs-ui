@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BackHandler, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
+import { BackHandler, Dimensions, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
 import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from '../model/useOverlay';
-import { AlertActions, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from '../model/types';
+import { AlertActions, BottomSheetHeight, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from '../model/types';
 import AlertOverlay from '../overlay/AlertOverlay';
 import SnackbarNotify from '../overlay/SnackbarNotify';
 import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
@@ -17,6 +17,8 @@ export function OverlayProvider({
   loaderComponent,
   children
 }: OverlayProviderProps) {
+  const defaultBottomSheetMaxHeight = Dimensions.get('window').height;
+
   // Alert
   const [title, setTitle] = useState<string>('');
   const [informative, setInformative] = useState<string>('');
@@ -37,7 +39,8 @@ export function OverlayProvider({
   const [bottomSheetComponent, setBottomSheetComponent] = useState<React.ReactNode>(null);
   const [bottomSheetHeader, setBottomSheetHeader] = useState<React.ReactNode>(null);
   const [bottomSheetOptions, setBottomSheetOptions] = useState<BottomSheetOptions>();
-  const [bottomSheetHeight, setBottomSheetHeight] = useState<number>(300);
+  const [bottomSheetHeight, setBottomSheetHeight] = useState<BottomSheetHeight>(300);
+  const [bottomSheetMaxHeight, setBottomSheetMaxHeight] = useState<number>(defaultBottomSheetMaxHeight);
 
   // Loading
   const [loaderVisible, setLoaderVisible] = useState<boolean>(false);
@@ -86,9 +89,10 @@ export function OverlayProvider({
     setBottomSheetComponent(component);
     setBottomSheetHeader(headerComponent);
     setBottomSheetOptions(options);
-    setBottomSheetHeight(options?.height || 300);
+    setBottomSheetHeight(options?.height ?? 300);
+    setBottomSheetMaxHeight(options?.maxHeight ?? defaultBottomSheetMaxHeight);
     setBottomSheetVisible(true);
-  }, []);
+  }, [defaultBottomSheetMaxHeight]);
 
   const showLoader = useCallback(() => {
     setLoaderVisible(true);
@@ -225,11 +229,13 @@ export function OverlayProvider({
     setBottomSheetVisible,
     height: bottomSheetHeight,
     setHeight: setBottomSheetHeight,
+    maxHeight: bottomSheetMaxHeight,
   }), [
     bottomSheetVisible,
     setBottomSheetVisible,
     bottomSheetHeight,
     setBottomSheetHeight,
+    bottomSheetMaxHeight,
   ]);
 
   const popOverContextValue = useMemo(() => ({
