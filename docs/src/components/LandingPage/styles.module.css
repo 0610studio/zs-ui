@@ -1,4 +1,5 @@
 .root {
+  --landing-viewport-height: calc(100vh - var(--ifm-navbar-height));
   --landing-bg: #f3f4f8;
   --landing-bg-secondary: #ffffff;
   --landing-bg-tertiary: rgba(255, 255, 255, 0.42);
@@ -15,6 +16,7 @@
     radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.92), transparent 24%),
     linear-gradient(180deg, var(--landing-bg) 0%, var(--landing-bg-secondary) 100%);
   color: var(--landing-text);
+  min-height: var(--landing-viewport-height);
   overflow-x: clip;
   transition:
     background 700ms ease,
@@ -71,8 +73,8 @@
 
 .stickyViewport {
   position: sticky;
-  top: 0;
-  min-height: 100vh;
+  top: var(--ifm-navbar-height);
+  height: var(--landing-viewport-height);
   display: flex;
   align-items: stretch;
   overflow: clip;
@@ -165,15 +167,14 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;
   gap: clamp(1.4rem, 2vw, 2rem);
   padding: clamp(1.2rem, 2vw, 1.8rem);
 }
 
-.stageTopRow,
-.stageFooter {
+.stageTopRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -182,7 +183,6 @@
 
 .brandChip,
 .sceneChip,
-.footerCard,
 .storyCard,
 .centerDockBody {
   -webkit-backdrop-filter: blur(22px) saturate(180%);
@@ -359,26 +359,6 @@
   text-wrap: pretty;
 }
 
-.stageFooter {
-  flex-wrap: wrap;
-}
-
-.footerCard {
-  flex: 1 1 14rem;
-  min-height: 5.2rem;
-  display: grid;
-  align-content: center;
-  gap: 0.25rem;
-  padding: 1rem 1.1rem;
-  border-radius: 1.45rem;
-  border: 1px solid var(--landing-border);
-  background: color-mix(in srgb, var(--landing-bg-tertiary) 76%, transparent);
-  box-shadow:
-    0 16px 36px rgba(18, 24, 38, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.footerLabel,
 .storyEyebrow,
 .statLabel {
   color: var(--landing-text-muted);
@@ -386,13 +366,6 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-
-.footerCard strong {
-  color: var(--landing-text);
-  font-size: 0.98rem;
-  font-weight: 650;
-  line-height: 1.4;
 }
 
 .scrollRail {
@@ -590,12 +563,15 @@
 }
 
 @media (max-width: 768px) {
-  .stickyViewport {
-    min-height: 100svh;
+  .root {
+    --landing-viewport-height: calc(100svh - var(--ifm-navbar-height));
   }
 
-  .stageTopRow,
-  .stageFooter {
+  .stickyViewport {
+    height: var(--landing-viewport-height);
+  }
+
+  .stageTopRow {
     flex-direction: column;
     align-items: stretch;
   }

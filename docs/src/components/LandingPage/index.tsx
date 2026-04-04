@@ -226,20 +226,6 @@ const LandingPage = () => {
               </div>
             </div>
 
-            <div className={styles.stageFooter}>
-              <div className={styles.footerCard}>
-                <span className={styles.footerLabel}>Focus</span>
-                <strong>{scene.title}</strong>
-              </div>
-              <div className={styles.footerCard}>
-                <span className={styles.footerLabel}>Material</span>
-                <strong>Liquid glass surfaces</strong>
-              </div>
-              <div className={styles.footerCard}>
-                <span className={styles.footerLabel}>Action</span>
-                <strong>Always ready for docs</strong>
-              </div>
-            </div>
           </div>
         </div>
 
