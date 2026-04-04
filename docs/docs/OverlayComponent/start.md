@@ -6,53 +6,37 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 
 # 시작하기
 
-`Alert`, `Snackbar`, `Bottom Sheet`, `Loader`, `PopOver`, `Modality` 등의 **오버레이**를 선언적으로 관리할 수 있는 모듈입니다.
+`Alert`, `Snackbar`, `BottomSheet`, `PopOver`, `Modality`, `Loader` 등의 오버레이를 `useOverlay` 훅으로 선언적으로 제어할 수 있습니다.
 
-스크린마다 모달 컴포넌트를 배치하고 visible 상태를 직접 관리하는 과정을 생략하고 간단하게 오버레이를 제어할 수 있습니다.
+별도의 visible 상태를 관리하거나 컴포넌트를 수동으로 배치할 필요 없이, 원하는 위치에서 `show*` 메서드를 호출하면 됩니다.
 
-`OverlayProvider`로 감싸서 전체 앱에서 Overlay를 사용할 수 있도록 설정합니다.
+:::info
+오버레이를 사용하려면 먼저 [OverlayProvider](../Provider/OverlayProvider)로 앱을 감싸야 합니다.
+:::
 
 <ExpoSnack id="@studio0610/zs-ui_13_overlay" />
 
+## useOverlay 훅
+
+`useOverlay` 훅에서 제공하는 메서드 목록입니다.
+
+| 메서드 | 설명 |
+| ------ | ---- |
+| `showAlert(props)` | Alert 표시 |
+| `showSnackBar(props)` | Snackbar 표시 |
+| `showBottomSheet(props)` | BottomSheet 표시 |
+| `showPopOverMenu(props)` | PopOver 메뉴 표시 |
+| `showModality(props)` | Modality 표시 |
+| `showLoader()` | Loader 표시 |
+| `hideOverlay(option)` | 특정 오버레이를 닫거나 전체 닫기 |
+
 ## 기본 사용법
 
-```jsx
-import React from 'react';
-import { OverlayProvider } from '@0610studio/zs-ui';
-import App from './App';
-
-const Root = () => (
-  <OverlayProvider>
-    <App />
-  </OverlayProvider>
-);
-
-export default Root;
-```
-
-## OverlayProvider
-
-`OverlayProvider`는 다양한 유형의 알림을 표시하기 위한 상태와 함수를 관리하는 컨텍스트 제공자입니다.
-
-### Props
-
-| Prop | Type | 설명 |
-| ---- | ---- | ---- |
-| `children` | `ReactNode` | 알림 컨텍스트에 접근할 수 있는 자식 컴포넌트들입니다. |
-| `customSnackbar` | `(props: CustomSnackbarProps) => React.ReactNode` *(선택 사항)* | 기본 Snackbar 동작을 대체할 커스텀 컴포넌트입니다. |
-| `loaderComponent` | `() => React.ReactNode` *(선택 사항)* | 기본 Loader 동작을 대체할 커스텀 컴포넌트입니다. |
-| `maxSnackbarCount` | `number` *(선택 사항, 기본값: 3)* | 동시에 표시할 수 있는 Snackbar 최대 개수입니다. |
-
----
-
-## Overlay 컨텍스트 사용하기
-
-알림 기능을 사용하려면 `useOverlay` 훅을 이용해 컨텍스트에 접근합니다.
-
-```jsx
+```tsx
 import { useOverlay } from '@0610studio/zs-ui';
+import { Button } from 'react-native';
 
-const SomeComponent = () => {
+function MyComponent() {
   const {
     showAlert,
     showSnackBar,
@@ -62,5 +46,59 @@ const SomeComponent = () => {
     showLoader,
     hideOverlay,
   } = useOverlay();
-};
+
+  const handleShowAlert = () => {
+    showAlert({
+      title: '알림',
+      informative: '메시지 내용',
+      actions: {
+        primary: { label: '확인', onPress: () => {} },
+      },
+    });
+  };
+
+  const handleShowLoader = () => {
+    showLoader();
+    setTimeout(() => hideOverlay('loader'), 2000);
+  };
+
+  return (
+    <>
+      <Button title="알림 표시" onPress={handleShowAlert} />
+      <Button title="로더 표시" onPress={handleShowLoader} />
+    </>
+  );
+}
 ```
+
+## hideOverlay
+
+`hideOverlay`는 특정 오버레이를 닫거나 한 번에 모두 닫을 수 있습니다.
+
+```tsx
+// 특정 오버레이 닫기
+hideOverlay('alert');
+hideOverlay('bottomSheet');
+hideOverlay('snack');
+hideOverlay('loader');
+hideOverlay('popOver');
+hideOverlay('modal');
+
+// 전체 닫기
+hideOverlay('all');
+```
+
+:::caution
+`hideOverlay('all')`은 Alert, BottomSheet, Snackbar, Loader, PopOver, Modality를 닫습니다. `ZSAboveKeyboard`는 오버레이 시스템과 독립적으로 동작하므로 포함되지 않습니다.
+:::
+
+## 개별 오버레이 문서
+
+각 컴포넌트의 상세한 props와 예제는 해당 문서를 참조하세요.
+
+- [Alert](./Alert)
+- [Snackbar](./Snackbar)
+- [BottomSheet](./BottomSheet)
+- [Loader](./Loader)
+- [PopOver](./PopOver)
+- [Modality](./Modality)

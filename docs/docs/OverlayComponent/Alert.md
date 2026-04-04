@@ -178,10 +178,6 @@ function MyComponent() {
         backgroundColor: '#95a5a6',
         padding: 10,
       },
-      primaryButtonTextStyle: {
-        color: '#fff',
-        fontWeight: 'bold',
-      },
       secondaryButtonTextStyle: {
         color: '#fff',
         fontWeight: 'bold',
