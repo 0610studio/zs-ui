@@ -38,7 +38,7 @@ type HeroScene = {
 };
 
 const introHero: HeroScene = {
-  eyebrow: 'React Native UI Toolkit',
+  eyebrow: '@0610studio',
   title: 'ZS-UI',
   accent: 'UI toolkit for Expo.',
   auraLabel: 'Overview',
@@ -98,20 +98,20 @@ const scenes: Scene[] = [
     icon: TabletSmartphone,
   },
   {
-    word: '기본 UI 세트',
+    word: '일관된 Theme',
     eyebrow: 'Capability 04',
-    title: '기본 UI 세트',
+    title: '일관된 Theme',
     description:
-      '자주 쓰는 기본 UI를 같은 테마 규칙으로 제공합니다.',
-    detail: '텍스트, 뷰, 입력, 버튼을 같은 기준으로 조합할 수 있습니다.',
-    accent: 'Core UI primitives with shared theme behavior.',
-    auraLabel: 'System primitives',
+      'ThemeProvider로 팔레트, 다크 모드, 타이포그래피 기준을 앱 전체에 적용합니다.',
+    detail: 'useTheme로 현재 mode와 palette를 읽고, ZSView 같은 컴포넌트에서는 color prop으로 layer와 primary 계열 배경을 바로 사용할 수 있습니다.',
+    accent: 'One theme system for palette, dark mode, and palette-aware view props.',
+    auraLabel: 'Consistent theme',
     stats: [
-      { label: 'Primitives', value: 'Text · View · Input' },
-      { label: 'Actions', value: 'Pressable · Button' },
-      { label: 'Theme', value: 'Palette-aware' },
+      { label: 'Provider', value: 'ThemeProvider' },
+      { label: 'Mode', value: 'Light / Dark' },
+      { label: 'View', value: 'color prop' },
     ],
-    principles: ['테마 기반 기본 컴포넌트', '공통 스타일 규칙', '빠른 화면 조합'],
+    principles: ['앱 전체에 같은 팔레트 적용', '다크 모드와 시스템 모드 대응', 'ZSView 색상 prop으로 빠른 배경 지정'],
     icon: BookOpen,
   },
   {
