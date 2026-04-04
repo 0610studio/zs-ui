@@ -218,12 +218,15 @@
 }
 
 .heroWordWrap {
+  position: relative;
+  z-index: 1;
   width: min(76rem, calc(100vw - 3rem));
   display: grid;
   gap: 0.9rem;
   justify-items: center;
   text-align: center;
   padding-bottom: 24rem;
+  pointer-events: none;
 }
 
 .heroEyebrow {
@@ -260,6 +263,7 @@
 
 .centerDock {
   position: absolute;
+  z-index: 2;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -6%);
@@ -371,6 +375,7 @@
 .scrollRail {
   position: relative;
   z-index: 2;
+  pointer-events: none;
 }
 
 .storyStep {
@@ -381,6 +386,7 @@
 }
 
 .storyCard {
+  pointer-events: auto;
   width: min(32rem, calc(100vw - 1.5rem));
   margin-left: clamp(1rem, 4vw, 4rem);
   padding: 1.3rem;

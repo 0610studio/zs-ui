@@ -35,16 +35,16 @@ const scenes: Scene[] = [
     eyebrow: 'Capability 01',
     title: '오버레이 컴포넌트',
     description:
-      'Alert, BottomSheet, Snackbar, Loader를 같은 방식으로 다룰 수 있습니다.',
-    detail: '화면마다 별도 상태를 반복해서 만들지 않고, 같은 호출 문법으로 피드백과 액션을 연결할 수 있습니다.',
-    accent: 'One interaction language for alerts, sheets, snackbars, and loading states.',
+      'useOverlay로 Alert, Snackbar, BottomSheet, Loader 등을 한 방식으로 제어합니다.',
+    detail: 'OverlayProvider 하나로 화면별 오버레이 상태를 따로 만들지 않아도 됩니다.',
+    accent: 'One overlay pattern for common feedback and actions.',
     auraLabel: 'Unified overlays',
     stats: [
-      { label: 'Alert', value: 'Immediate action' },
-      { label: 'BottomSheet', value: 'Layered flow' },
-      { label: 'Loader', value: 'Shared feedback' },
+      { label: 'API', value: 'show* / hideOverlay' },
+      { label: 'Coverage', value: '6 overlay types' },
+      { label: 'Provider', value: 'Global state' },
     ],
-    principles: ['함수 호출 중심의 간결한 제어', '모달 상태 중복 감소', '화면 전반의 피드백 톤 통일'],
+    principles: ['함수 호출 중심 제어', '상태 중복 감소', '일관된 피드백 흐름'],
     icon: Sparkles,
   },
   {
@@ -52,16 +52,16 @@ const scenes: Scene[] = [
     eyebrow: 'Capability 02',
     title: '타이포그래피 스케일',
     description:
-      '읽기 좋은 계층을 빠르게 맞출 수 있는 6×6 타이포그래피 스케일을 제공합니다.',
-    detail: '헤딩부터 캡션까지 같은 체계 안에서 흐름을 잡아주기 때문에 문서, 설정, 입력 화면 모두 톤을 잃지 않습니다.',
-    accent: 'A readable scale that keeps hierarchy sharp without over-designing every screen.',
+      'heading부터 caption까지 6×6 타이포그래피 체계를 제공합니다.',
+    detail: 'ZSText와 useTheme.typography가 같은 기준을 사용합니다.',
+    accent: 'A shared type scale for consistent text hierarchy.',
     auraLabel: 'Readable hierarchy',
     stats: [
-      { label: 'Scale', value: '6 × 6' },
-      { label: 'Tone', value: 'Consistent rhythm' },
-      { label: 'Readability', value: 'Fast alignment' },
+      { label: 'Scale', value: '6 groups × 6 levels' },
+      { label: 'Access', value: 'useTheme.typography' },
+      { label: 'Bridge', value: 'ZSText + Text' },
     ],
-    principles: ['텍스트 계층을 빠르게 정렬', '컴포넌트 전반의 리듬 통일', '가독성과 밀도의 균형 유지'],
+    principles: ['일관된 텍스트 계층', '같은 기준으로 재사용', '읽기 흐름 유지'],
     icon: Type,
   },
   {
@@ -69,16 +69,16 @@ const scenes: Scene[] = [
     eyebrow: 'Capability 03',
     title: '폴더블 대응',
     description:
-      'Android 폴더블의 접힘과 펼침 상태를 감지해 두 화면 레이아웃으로 확장합니다.',
-    detail: '기기 형태가 바뀌어도 같은 코드 흐름 안에서 더 넓은 화면 전략을 자연스럽게 연결할 수 있습니다.',
-    accent: 'Responsive behavior that expands with the device instead of breaking around it.',
+      'Android 폴더블의 접힘과 펼침 상태를 감지할 수 있습니다.',
+    detail: 'ZSContainer로 펼침 상태의 양면 레이아웃을 구성할 수 있습니다.',
+    accent: 'Fold-aware layout for devices that open wider.',
     auraLabel: 'Foldable ready',
     stats: [
-      { label: 'Device', value: 'Android foldables' },
-      { label: 'Layout', value: 'Dual-screen aware' },
-      { label: 'Adaptation', value: 'Continuous' },
+      { label: 'Platform', value: 'Android foldables' },
+      { label: 'Hook', value: 'useFoldingState' },
+      { label: 'Layout', value: 'rightComponent' },
     ],
-    principles: ['접힘/펼침 상태 감지', '넓은 화면에 맞는 전개', '기기 변화에도 유지되는 경험'],
+    principles: ['폴딩 상태 감지', '양면 레이아웃 지원', '넓은 화면에 자연스럽게 대응'],
     icon: TabletSmartphone,
   },
   {
@@ -86,32 +86,32 @@ const scenes: Scene[] = [
     eyebrow: 'Capability 04',
     title: '기본 UI 세트',
     description:
-      'Text, View, TextField, Switch, Skeleton 등 기본 UI가 테마와 함께 움직입니다.',
-    detail: '자주 쓰는 화면 부품이 같은 규칙 안에 있으면 시각적 일관성과 구현 속도를 동시에 가져갈 수 있습니다.',
-    accent: 'Core building blocks that already understand the system they live in.',
+      '자주 쓰는 기본 UI를 같은 테마 규칙으로 제공합니다.',
+    detail: '텍스트, 뷰, 입력, 버튼을 같은 기준으로 조합할 수 있습니다.',
+    accent: 'Core UI primitives with shared theme behavior.',
     auraLabel: 'System primitives',
     stats: [
-      { label: 'Components', value: 'Core essentials' },
-      { label: 'Theme', value: 'Shared behavior' },
-      { label: 'Speed', value: 'Ready to compose' },
+      { label: 'Primitives', value: 'Text · View · Input' },
+      { label: 'Actions', value: 'Pressable · Button' },
+      { label: 'Theme', value: 'Palette-aware' },
     ],
-    principles: ['테마와 함께 움직이는 기본 컴포넌트', '반복 구현을 줄이는 시작점', '제품 전체의 톤을 지키는 기반'],
+    principles: ['테마 기반 기본 컴포넌트', '공통 스타일 규칙', '빠른 화면 조합'],
     icon: BookOpen,
   },
   {
     word: '공통 화면 구조',
     eyebrow: 'Capability 05',
     title: '공통 화면 구조',
-    description: 'SafeArea, 스크롤, 상태바, 키보드 대응을 같은 화면 패턴으로 유지합니다.',
-    detail: '입력과 스크롤, 상태바와 안전 영역이 한 구조 안에서 정리되기 때문에 화면마다 다른 예외 처리를 줄일 수 있습니다.',
-    accent: 'A shared screen foundation for safe areas, keyboard movement, and scrolling rhythm.',
+    description: 'ZSContainer가 SafeArea, 스크롤, 상태바, 키보드 대응을 함께 제공합니다.',
+    detail: '입력 화면과 일반 화면을 같은 패턴으로 구성할 수 있습니다.',
+    accent: 'One container for common screen structure.',
     auraLabel: 'Screen foundation',
     stats: [
-      { label: 'SafeArea', value: 'Built in' },
-      { label: 'Keyboard', value: 'Tracked flow' },
-      { label: 'Scroll', value: 'Consistent pattern' },
+      { label: 'Root', value: 'ZSContainer' },
+      { label: 'Keyboard', value: 'Auto scroll' },
+      { label: 'Layout', value: 'Header / Footer / Foldable' },
     ],
-    principles: ['화면 기본 구조를 한 패턴으로 통일', '상태바와 키보드 대응 정리', '반복적인 레이아웃 결정 최소화'],
+    principles: ['공통 화면 패턴', '키보드 대응 내장', '레이아웃 반복 감소'],
     icon: Layers3,
   },
 ];
@@ -221,7 +221,7 @@ const LandingPage = () => {
                       <ArrowUpRight size={18} strokeWidth={2.2} />
                     </span>
                   </Link>
-                  <p className={styles.centerDockCaption}>중앙의 액션은 유지하고, 스크롤에는 배경과 철학만 담았습니다.</p>
+                  <p className={styles.centerDockCaption}></p>
                 </div>
               </div>
             </div>
