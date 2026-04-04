@@ -48,15 +48,6 @@ showModality(props: ModalityProps): void
 
 ## 예제
 
-- **부드러운 애니메이션**: 배경 화면이 축소되고 새 화면이 슬라이드됩니다
-- **전체 화면**: 모달 컴포넌트는 전체 화면 높이를 차지합니다
-- **SafeArea 지원**: iOS의 SafeArea를 자동으로 고려합니다
-- **폴더블 디바이스 지원**: 폴더블 디바이스에서도 올바르게 동작합니다
-
-## 예제
-
-### 기본 사용
-
 ```tsx
 import { useOverlay, ZSContainer, ZSText, ZSPressable } from '@0610studio/zs-ui';
 
@@ -77,75 +68,12 @@ function MyModalContent() {
 function MyComponent() {
   const { showModality } = useOverlay();
 
-  const handleOpenModal = () => {
-    showModality({
-      component: <MyModalContent />,
-    });
-  };
-
-  return <Button title="모달 열기" onPress={handleOpenModal} />;
-}
-```
-
-### 폴더블 디바이스 지원
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-const { showModality } = useOverlay();
-
-showModality({
-  component: <MyModalContent />,
-  foldableSingleScreen: true,
-});
-```
-
-### Modality 닫기
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-const { hideOverlay } = useOverlay();
-
-hideOverlay('modal');
-```
-
-### 전체 화면 모달 예제
-
-```tsx
-import { useOverlay, ZSContainer, ZSText, ZSPressable } from '@0610studio/zs-ui';
-import { View } from 'react-native';
-
-function FullScreenModal() {
-  const { hideOverlay } = useOverlay();
-
   return (
-    <ZSContainer>
-      <View style={{ padding: 20 }}>
-        <ZSText typo="heading.1">전체 화면 모달</ZSText>
-        <ZSText typo="body.2" style={{ marginTop: 20 }}>
-          이 모달은 전체 화면을 차지합니다.
-        </ZSText>
-        <ZSPressable
-          onPress={() => hideOverlay('modal')}
-          style={{ marginTop: 40 }}
-        >
-          <ZSText typo="body.1">닫기</ZSText>
-        </ZSPressable>
-      </View>
-    </ZSContainer>
+    <ZSPressable
+      onPress={() => showModality({ component: <MyModalContent /> })}
+    >
+      <ZSText typo="body.2">모달 열기</ZSText>
+    </ZSPressable>
   );
-}
-
-function MyComponent() {
-  const { showModality } = useOverlay();
-
-  const handleOpenModal = () => {
-    showModality({
-      component: <FullScreenModal />,
-    });
-  };
-
-  return <Button title="모달 열기" onPress={handleOpenModal} />;
 }
 ```

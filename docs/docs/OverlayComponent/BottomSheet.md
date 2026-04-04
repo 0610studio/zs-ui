@@ -55,7 +55,8 @@ showBottomSheet(props: ShowBottomSheetProps): void
 | `isBackgroundTouchClose` | `boolean` | `true` | 배경을 터치하면 닫을지 여부 |
 | `marginHorizontal` | `number` | `10` | 시트의 좌우 여백 |
 | `marginBottom` | `number` | `10` | 시트의 하단 여백 |
-| `height` | `number` | Required | 시트의 높이 |
+| `height` | `number \| 'auto'` | `300` | 시트의 높이 (`'auto'` 지정 시 컨텐츠 크기에 맞춤) |
+| `maxHeight` | `number` | `화면 높이` | 시트의 최대 높이 제한 |
 | `padding` | `number` | `14` | 시트 내부 패딩 |
 | `foldableSingleScreen` | `boolean` | `false` | 폴더블 디바이스에서 단일 화면 모드 사용 여부 |
 | `type` | `'floating' \| 'fixed'` | `'floating'` | 시트 타입 (`floating`: 떠있는 형태, `fixed`: 화면 하단에 고정) |
@@ -217,27 +218,5 @@ function MyBottomSheetContent() {
       </ZSPressable>
     </View>
   );
-}
-```
-
-### 폴더블 디바이스 지원
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 400,
-        foldableSingleScreen: true,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
 }
 ```

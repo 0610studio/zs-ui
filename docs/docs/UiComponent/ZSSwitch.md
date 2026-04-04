@@ -49,34 +49,7 @@ function MyComponent() {
 
 ## 예제
 
-- **부드러운 애니메이션**: 200ms 동안 부드럽게 전환됩니다
-- **반응형 크기**: 높이는 너비의 60%로 자동 계산됩니다
-- **접근성 지원**: `accessibilityState`가 자동으로 설정됩니다
-
-## 예제
-
-### 기본 사용
-
-```tsx
-const [enabled, setEnabled] = useState(false);
-
-<ZSSwitch
-  isActive={enabled}
-  onToggle={() => setEnabled(!enabled)}
-/>
-```
-
-### 커스텀 크기
-
-```tsx
-<ZSSwitch
-  isActive={isActive}
-  onToggle={() => setIsActive(!isActive)}
-  width={60}
-/>
-```
-
-### 커스텀 색상
+커스텀 색상을 적용한 예시입니다.
 
 ```tsx
 <ZSSwitch
@@ -86,49 +59,5 @@ const [enabled, setEnabled] = useState(false);
   trackColorActive="#4CAF50"
   thumbColor="#ffffff"
 />
-```
-
-### 테마 색상 사용
-
-```tsx
-import { useTheme } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { palette } = useTheme();
-  const [isActive, setIsActive] = useState(false);
-
-  return (
-    <ZSSwitch
-      isActive={isActive}
-      onToggle={() => setIsActive(!isActive)}
-      trackColorActive={palette.success.main}
-      trackColorInactive={palette.grey[30]}
-    />
-  );
-}
-```
-
-### 스타일 적용
-
-```tsx
-<ZSSwitch
-  isActive={isActive}
-  onToggle={() => setIsActive(!isActive)}
-  style={{ margin: 20 }}
-/>
-```
-
-### 라벨과 함께 사용
-
-```tsx
-<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-  <ZSText typo="body.2" style={{ marginRight: 10 }}>
-    알림 받기
-  </ZSText>
-  <ZSSwitch
-    isActive={notificationsEnabled}
-    onToggle={() => setNotificationsEnabled(!notificationsEnabled)}
-  />
-</View>
 ```
 

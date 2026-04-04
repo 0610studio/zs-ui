@@ -5,8 +5,8 @@ import LandingPage  from '@site/src/components/LandingPage';
 export default function Home(): JSX.Element {
   return (
     <Layout
-      title={`Expo - UI Toolkit 👋`}
-      description="ReactNative Expo - UI Toolkit">
+      title="ZS-ui · React Native Expo UI Toolkit"
+      description="Declarative overlays, consistent screen containers, theme customization, and foldable-ready UI components for Expo apps.">
         <LandingPage />
     </Layout>
   );

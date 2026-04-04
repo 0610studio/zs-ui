@@ -144,36 +144,3 @@ const { hideOverlay } = useOverlay();
 
 hideOverlay('popOver');
 ```
-
-### 프로그래밍 방식으로 열기
-
-`useOverlay` 훅의 `showPopOverMenu` 함수를 직접 사용할 수도 있습니다:
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showPopOverMenu } = useOverlay();
-  const buttonRef = useRef<View>(null);
-
-  const handlePress = () => {
-    buttonRef.current?.measure((fx, fy, width, height, pageX, pageY) => {
-      if (pageX !== undefined && pageY !== undefined) {
-        showPopOverMenu({
-          px: pageX + width,
-          py: pageY + height,
-          component: <MyMenu />,
-        });
-      }
-    });
-  };
-
-  return (
-    <ZSPressable onPress={handlePress}>
-      <View ref={buttonRef}>
-        <Icon name="more" />
-      </View>
-    </ZSPressable>
-  );
-}
-```

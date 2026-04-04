@@ -57,138 +57,17 @@ hideOverlay(option: HideOption): void
 
 ## 예제
 
-- **전체 화면 오버레이**: 화면 전체를 덮어 다른 상호작용을 차단합니다
-- **커스터마이징 가능**: `OverlayProvider`에서 커스텀 로더 컴포넌트를 사용할 수 있습니다
-
-## 예제
-
-### 기본 사용
+비동기 작업과 함께 사용하는 기본 패턴입니다.
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+const { showLoader, hideOverlay } = useOverlay();
 
-function MyComponent() {
-  const { showLoader, hideOverlay } = useOverlay();
-
-  const handleAsyncOperation = async () => {
-    showLoader();
-    
-    try {
-      await performLongOperation();
-    } finally {
-      hideOverlay('loader');
-    }
-  };
-
-  return <Button title="작업 시작" onPress={handleAsyncOperation} />;
-}
-```
-
-### 네트워크 요청과 함께 사용
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showLoader, hideOverlay } = useOverlay();
-
-  const handleFetchData = async () => {
-    showLoader();
-    
-    try {
-      const response = await fetch('/api/data');
-      const data = await response.json();
-      // 데이터 처리
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      hideOverlay('loader');
-    }
-  };
-
-  return <Button title="데이터 가져오기" onPress={handleFetchData} />;
-}
-```
-
-### 커스텀 Loader 컴포넌트
-
-기본 Loader 컴포넌트 대신 커스텀 Loader 컴포넌트를 사용하려면, `OverlayProvider`에 `loaderComponent` prop을 전달합니다.
-
-```tsx
-import { OverlayProvider } from '@0610studio/zs-ui';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-
-function CustomLoader() {
-  return (
-    <View style={styles.overlay}>
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <ZSText typo="body.2" style={{ marginTop: 20 }}>
-          로딩 중...
-        </ZSText>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    backgroundColor: '#fff',
-    padding: 30,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-});
-
-function App() {
-  return (
-    <OverlayProvider loaderComponent={CustomLoader}>
-      {/* 앱 내용 */}
-    </OverlayProvider>
-  );
-}
-```
-
-### Lottie 애니메이션 사용
-
-```tsx
-import LottieView from 'lottie-react-native';
-
-function LottieLoader() {
-  return (
-    <View style={styles.overlay}>
-      <LottieView
-        source={require('./loading.json')}
-        autoPlay
-        loop
-        style={{ width: 200, height: 200 }}
-      />
-    </View>
-  );
-}
-
-<OverlayProvider loaderComponent={LottieLoader}>
-  {/* 앱 내용 */}
-</OverlayProvider>
-```
-
-### 모든 오버레이 닫기
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-const { hideOverlay } = useOverlay();
-
-// 모든 오버레이(Loader 포함) 닫기
-hideOverlay('all');
+const handleAsyncOperation = async () => {
+  showLoader();
+  try {
+    await performLongOperation();
+  } finally {
+    hideOverlay('loader');
+  }
+};
 ```

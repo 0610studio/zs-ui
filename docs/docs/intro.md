@@ -4,63 +4,37 @@ sidebar_position: 1
 
 # 개요
 
-`ZS-ui`는 React Native Expo를 위한 UI 컴포넌트 라이브러리입니다. 현재 배포 버전은 **0.13.n**이며, Expo 환경에서 손쉽게 테마와 공통 UI 컴포넌트를 사용할 수 있도록 도와줍니다.
+`@0610studio/zs-ui`는 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
 
-다크 모드, 테마 시스템, 타이포그래피, Overlay 컴포넌트(Alert, BottomSheet, Snackbar) 등의 주요 UI 요소가 기본 제공되며, 일관된 사용자 인터페이스를 빠르게 구축할 수 있습니다.
+## 설계 철학
 
+### 1. Declarative Overlay
 
-<div style={{
-  display: 'flex',
-  overflowX: 'auto',
-  gap: '20px',
-  padding: '0 10px 0 0'
-}}>
-  <div style={{
-    minWidth: '300px',
-    flexShrink: 0
-  }}>
-    <video controls width="300">
-      <source src="/zs-ui/video/theme.mp4" type="video/mp4" />
-    </video>
-    <p>Theme</p>
-  </div>
-  <div style={{
-    minWidth: '300px',
-    flexShrink: 0
-  }}>
-    <video controls width="300">
-      <source src="/zs-ui/video/layout.mp4" type="video/mp4" />
-    </video>
-    <p>Layout</p>
-  </div>
-  <div style={{
-    minWidth: '300px',
-    flexShrink: 0
-  }}>
-    <video controls width="300">
-      <source src="/zs-ui/video/overlay.mp4" type="video/mp4" />
-    </video>
-    <p>Overlay</p>
-  </div>
-</div>
+화면마다 모달의 `isOpen` 상태를 따로 만들고 관리할 필요가 없습니다. 이것이 기본 원칙입니다. `useOverlay` 훅에서 `showAlert`, `showBottomSheet`, `showSnackBar`를 호출하면 끝입니다. 숨기고 싶을 때는 `hideOverlay`로 한 번에 처리합니다. 내부 컨텍스트는 `OverlayProvider` 하나가 모두 담당합니다.
 
-## 주요 특징
+```tsx
+const { showAlert, showSnackBar, hideOverlay } = useOverlay();
 
-### 테마 시스템
+showAlert({ title: '확인', informative: '저장되었습니다.' });
+showSnackBar({ message: '성공', type: 'success' });
+hideOverlay('all');
+```
 
-다크 모드, 커스터마이징 가능한 색상 팔레트, 일관된 타이포그래피 시스템을 제공합니다. `themeFactory`를 통해 브랜드 색상을 쉽게 적용할 수 있습니다.
+### 2. Consistent Container
 
-### UI 컴포넌트
+`ZSContainer`가 `SafeAreaView`, `ScrollView`, `StatusBar`를 하나로 묶어 제공합니다. 모든 스크린에 동일한 구조를 적용하면 SafeArea, 키보드, 폴더블 처리가 자동으로 따라옵니다.
 
-Text, View, Container 등 기본 컴포넌트부터 TextField, RadioGroup, Switch 등 입력 컴포넌트, Pressable 등 인터랙션 컴포넌트까지 다양한 컴포넌트를 제공합니다.
+```tsx
+<ZSContainer edges={['bottom']} topComponent={<Header />}>
+  {/* 스크린 내용 */}
+</ZSContainer>
+```
 
-### Overlay 시스템
+### 3. Input Scroll Tracking
 
-Alert, BottomSheet, Snackbar, Modality, PopOver, Loader 등 다양한 오버레이 컴포넌트를 제공하여 사용자 알림과 상호작용을 쉽게 구현할 수 있습니다.
+키보드가 올라오면 `ZSContainer`가 현재 포커스된 입력 필드를 자동으로 스크롤해서 보여줍니다. 별도 플래그를 관리하거나 `KeyboardAvoidingView`를 수동으로 배치할 필요가 없습니다.
 
-### 플랫폼 최적화
-
-iOS와 Android의 네이티브 스타일을 자동으로 적용하며, 폴더블 디바이스 지원과 키보드 처리, SafeArea 자동 처리를 포함합니다.
+---
 
 ## 설치
 
@@ -68,53 +42,19 @@ iOS와 Android의 네이티브 스타일을 자동으로 적용하며, 폴더블
 npx expo install @0610studio/zs-ui
 ```
 
-## 빠른 시작
+## 문서 범위
 
-### 기본 설정
-
-```tsx
-import { ThemeProvider, OverlayProvider } from '@0610studio/zs-ui';
-
-export default function App() {
-  return (
-    <ThemeProvider>
-      <OverlayProvider>
-        {/* 앱 내용 */}
-      </OverlayProvider>
-    </ThemeProvider>
-  );
-}
-```
-
-자세한 설정 방법은 [Provider 구성](/docs/Provider/start) 문서를 참조하세요.
-
-### 첫 번째 컴포넌트 사용
-
-```tsx
-import { ZSText, ZSView } from '@0610studio/zs-ui';
-
-export default function MyScreen() {
-  return (
-    <ZSView elevationLevel={2} style={{ padding: 20 }}>
-      <ZSText typo="heading.1" color="base">
-        안녕하세요!
-      </ZSText>
-      <ZSText typo="body.2" color="secondary">
-        ZS-ui를 사용해보세요
-      </ZSText>
-    </ZSView>
-  );
-}
-```
+이 문서는 `src/index.ts`에서 export하는 공개 API만 다룹니다. 내부 구현이나 미지원 동작은 포함하지 않습니다.
 
 ## 문서 구조
 
-- **[Provider 구성](/docs/Provider/start)**: 앱의 기본 설정과 Provider 구성 방법
-- **[Theme](/docs/Theme/start)**: 테마 시스템과 스타일링
-- **[UI 컴포넌트](/docs/UiComponent/ZSText)**: 기본 UI 컴포넌트 사용법
-- **[Overlay 컴포넌트](/docs/OverlayComponent/start)**: 오버레이 컴포넌트 사용법
+- **[시작하기](/docs/Provider/start)**: Provider 설정과 첫 컴포넌트 사용
+- **[Theme](/docs/Theme/start)**: 테마 시스템과 `useStyleSheetCreate`
+- **[UI 컴포넌트](/docs/UiComponent/ZSText)**: ZSText, ZSView, ZSContainer 등
+- **[폴더블 기기 지원](/docs/FoldableDevice)**: 분할 화면/힌지 대응 가이드
+- **[Overlay 컴포넌트](/docs/OverlayComponent/start)**: Alert, BottomSheet, Snackbar 등
 
 ## 추가 리소스
 
 - **Playground**: [Expo Snack](https://snack.expo.dev/@studio0610/zs-ui_13_playground)에서 라이브 예제 확인
-- **GitHub**: [소스 코드](https://github.com/0610studio/zs-ui) 확인
+- **GitHub**: [소스 코드](https://github.com/0610studio/zs-ui)

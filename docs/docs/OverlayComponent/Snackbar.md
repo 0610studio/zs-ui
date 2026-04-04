@@ -44,7 +44,7 @@ showSnackBar(props: ShowSnackBarProps): void
 | `message` | `string` | Required | Snackbar에 표시할 메시지 |
 | `type` | `SnackType` | `'success'` | Snackbar의 유형 (`'success'`, `'error'`, `''`) |
 | `index` | `number` | `Date.now()` | Snackbar의 고유 식별자 |
-| `snackbarDuration` | `number` | `3000` | Snackbar가 표시될 지속 시간 (밀리초) |
+| `snackbarDuration` | `number` | `3500` | Snackbar가 표시될 지속 시간 (밀리초) |
 
 ### `SnackType` 타입
 
@@ -189,28 +189,17 @@ function App() {
 ### Snackbar 닫기
 
 ```tsx
-import { useOverlay, useSnackbar } from '@0610studio/zs-ui';
+import { useOverlay } from '@0610studio/zs-ui';
 
 function MyComponent() {
   const { hideOverlay } = useOverlay();
-  const { hideSnackBar } = useSnackbar();
 
   // 모든 Snackbar 닫기
   const closeAll = () => {
     hideOverlay('snack');
   };
 
-  // 특정 Snackbar 닫기
-  const closeSpecific = (index: number) => {
-    hideSnackBar(index);
-  };
-
-  return (
-    <>
-      <Button title="모두 닫기" onPress={closeAll} />
-      <Button title="특정 닫기" onPress={() => closeSpecific(12345)} />
-    </>
-  );
+  return <Button title="모두 닫기" onPress={closeAll} />;
 }
 ```
 
