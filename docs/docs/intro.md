@@ -6,7 +6,7 @@ sidebar_position: 1
 
 `@0610studio/zs-ui`는 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
 
-## 설계 철학
+## 개발자 경험
 
 ### 1. Declarative Overlay
 
@@ -41,10 +41,6 @@ hideOverlay('all');
 ```bash
 npx expo install @0610studio/zs-ui
 ```
-
-## 문서 범위
-
-이 문서는 `src/index.ts`에서 export하는 공개 API만 다룹니다. 내부 구현이나 미지원 동작은 포함하지 않습니다.
 
 ## 문서 구조
 
