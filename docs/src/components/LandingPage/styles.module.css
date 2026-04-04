@@ -67,6 +67,17 @@
   --landing-accent-soft: rgba(255, 139, 84, 0.24);
 }
 
+.theme4 {
+  --landing-bg: #eef4f2;
+  --landing-bg-secondary: #fbfffd;
+  --landing-bg-tertiary: rgba(255, 255, 255, 0.48);
+  --landing-text: #12201a;
+  --landing-text-soft: rgba(18, 32, 26, 0.82);
+  --landing-text-muted: rgba(18, 32, 26, 0.66);
+  --landing-accent: #33b07a;
+  --landing-accent-soft: rgba(51, 176, 122, 0.22);
+}
+
 .experience {
   position: relative;
 }

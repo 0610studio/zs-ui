@@ -29,6 +29,22 @@ type Scene = {
   icon: LucideIcon;
 };
 
+type HeroScene = {
+  eyebrow: string;
+  title: string;
+  accent: string;
+  auraLabel: string;
+  icon: LucideIcon;
+};
+
+const introHero: HeroScene = {
+  eyebrow: 'React Native UI Toolkit',
+  title: 'ZS-UI',
+  accent: 'UI toolkit for Expo.',
+  auraLabel: 'Overview',
+  icon: Waves,
+};
+
 const scenes: Scene[] = [
   {
     word: '오버레이 컴포넌트',
@@ -118,7 +134,7 @@ const scenes: Scene[] = [
 
 const LandingPage = () => {
   const { siteConfig } = useDocusaurusContext();
-  const [activeScene, setActiveScene] = useState(0);
+  const [activeScene, setActiveScene] = useState<number | null>(null);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
   useEffect(() => {
@@ -128,6 +144,17 @@ const LandingPage = () => {
       frameId = 0;
 
       const viewportCenter = window.innerHeight * 0.5;
+      const firstStep = stepRefs.current[0];
+
+      if (firstStep) {
+        const firstRect = firstStep.getBoundingClientRect();
+
+        if (firstRect.top > viewportCenter) {
+          setActiveScene((current) => (current === null ? current : null));
+          return;
+        }
+      }
+
       let closestIndex = 0;
       let closestDistance = Number.POSITIVE_INFINITY;
 
@@ -171,11 +198,12 @@ const LandingPage = () => {
     };
   }, []);
 
-  const scene = scenes[activeScene];
+  const scene = activeScene === null ? introHero : (scenes[activeScene] ?? introHero);
   const SceneIcon = scene.icon;
+  const themeIndex = activeScene ?? 0;
 
   return (
-    <main className={`${styles.root} ${styles[`theme${activeScene}`]}`}>
+    <main className={`${styles.root} ${styles[`theme${themeIndex}`]}`}>
       <section className={styles.experience}>
         <div className={styles.stickyViewport}>
           <div className={styles.backdrop} aria-hidden="true">
@@ -203,11 +231,11 @@ const LandingPage = () => {
             <div className={styles.centerpiece}>
               <div className={styles.heroWordWrap}>
                 <span className={styles.heroEyebrow}>{scene.eyebrow}</span>
-                <strong key={scene.word} className={styles.heroWord}>
-                  {scene.word}
-                </strong>
-                <p key={scene.accent} className={styles.heroAccent}>
-                  {scene.accent}
+                 <strong key={scene.title} className={styles.heroWord}>
+                   {scene.title}
+                 </strong>
+                 <p key={scene.accent} className={styles.heroAccent}>
+                   {scene.accent}
                 </p>
               </div>
 
