@@ -37,11 +37,24 @@
 }
 
 .navbar {
-  backdrop-filter: blur(18px);
+  background-color: color-mix(in srgb, var(--ifm-navbar-background-color) 86%, transparent);
   box-shadow: 0 1px 0 rgba(18, 41, 58, 0.08);
 }
 
+.navbar--fixed-top {
+  z-index: 300;
+}
+
+.navbar-sidebar__backdrop {
+  z-index: 301;
+}
+
+.navbar-sidebar {
+  z-index: 302;
+}
+
 [data-theme='dark'] .navbar {
+  background-color: color-mix(in srgb, var(--ifm-navbar-background-color) 82%, transparent);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
