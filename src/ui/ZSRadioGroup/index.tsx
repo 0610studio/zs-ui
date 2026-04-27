@@ -15,8 +15,9 @@ function ZSRadioGroup({
   valueStyle,
   disabled = false,
   selectStyle,
+  selectLabel = '선택',
   rowCount = 1,
-  ...accessibilityProps
+  ...props
 }: {
   options: RadioOption[];
   value?: RadioOption;
@@ -24,6 +25,7 @@ function ZSRadioGroup({
   containerStyle?: ViewProps;
   valueStyle?: ZSTextProps;
   selectStyle?: ZSTextProps;
+  selectLabel?: string;
   disabled?: boolean;
   rowCount?: 1 | 2 | 3;
 } & ViewProps) {
@@ -43,10 +45,8 @@ function ZSRadioGroup({
         flexWrap: isFullWidth ? 'nowrap' : 'wrap',
         width: '100%',
       }}
-      accessibilityRole="radiogroup"
-      accessibilityState={{ disabled }}
       {...containerStyle}
-      {...accessibilityProps}
+      {...props}
     >
       {options.map((option, index) => {
         const isSelected = value?.index === option.index;
@@ -71,19 +71,6 @@ function ZSRadioGroup({
               onPress={() => handleSelect(option)}
               pressedBackgroundColor="transparent"
               fullWidth
-              accessibilityRole="radio"
-              accessibilityState={{
-                checked: isSelected,
-                disabled: disabled,
-              }}
-              accessibilityLabel={option.value}
-              accessibilityHint={
-                disabled
-                  ? '비활성화됨'
-                  : isSelected
-                    ? '선택됨'
-                    : '탭하여 선택'
-              }
             >
               <ViewAtom
                 style={{
@@ -146,7 +133,7 @@ function ZSRadioGroup({
                         <SvgCheck size={18} />
                       ) : (
                         <ZSText typo="body.5" {...selectStyle}>
-                          선택
+                          {selectLabel}
                         </ZSText>
                       )}
                     </ViewAtom>

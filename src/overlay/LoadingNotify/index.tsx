@@ -20,8 +20,6 @@ function LoadingNotify({
       <ActivityIndicator
         size="large"
         color="#fff"
-        accessibilityLabel="로딩 중"
-        accessibilityLiveRegion="polite"
       />
     );
   }, [loaderComponent]);
@@ -33,7 +31,6 @@ function LoadingNotify({
       zIndex={Z_INDEX_VALUE.LOADING}
       key={loaderVisible ? 'visibleln' : 'hiddenln'}
       modalBgColor={palette.modalBgColor}
-      accessibilityViewIsModal={true}
     >
       {renderLoader()}
     </ModalBackground>

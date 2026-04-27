@@ -27,7 +27,7 @@ function ZSSwitch({
   trackColorInactive,
   trackColorActive,
   thumbColor = '#ffffff',
-  ...accessibilityProps
+  ...props
 }: ZSSwitchProps) {
   const [toggledWidth, setToggledWidth] = useState(0);
   const { palette } = useTheme();
@@ -85,11 +85,10 @@ function ZSSwitch({
   };
 
   return (
-    <Pressable onPress={onToggle} style={style} {...accessibilityProps}>
+    <Pressable onPress={onToggle} style={style} {...props}>
       <Animated.View
         style={[colorAnimation, toggleStyle]}
         onLayout={e => setToggledWidth(e.nativeEvent.layout.width)}
-        accessibilityState={{ selected: isActive }}
       >
         <Animated.View style={[togglePositionAnimation, thumbStyle, { backgroundColor: thumbColor }]} />
       </Animated.View>
