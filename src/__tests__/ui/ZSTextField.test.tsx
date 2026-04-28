@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { TextInput, Text } from 'react-native';
+import { TextInput } from 'react-native';
 import ZSTextField from '../../ui/ZSTextField';
 
 jest.mock('../../context/ThemeContext', () => {
@@ -88,6 +88,7 @@ jest.mock('react-native-reanimated', () => {
     useSharedValue,
     useAnimatedStyle,
     interpolate,
+    ReduceMotion: { System: 'system' },
     FadeInDown: makeAnim(),
   };
 });
@@ -237,4 +238,3 @@ describe('ZSTextField', () => {
     expect(getByPlaceholderText('Custom placeholder')).toBeTruthy();
   });
 });
-

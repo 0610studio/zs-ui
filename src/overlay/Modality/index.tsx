@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StatusBar, StyleSheet, type ViewProps } from 'react-native';
+import { Dimensions, StatusBar, StyleSheet } from 'react-native';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
@@ -12,11 +12,10 @@ const windowHeight = Dimensions.get('window').height;
 function Modality({
   foldableSingleScreen,
   modalityComponent,
-  ...accessibilityProps
 }: {
   modalityComponent: React.ReactNode;
   foldableSingleScreen: boolean;
-} & ViewProps) {
+}) {
   const { palette } = useTheme();
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useModality();
@@ -99,8 +98,6 @@ function Modality({
           { backgroundColor: palette.background.neutral },
           backgroundAnimatedStyle
         ]}
-        accessibilityViewIsModal={true}
-        {...accessibilityProps}
       >
         <StatusBar backgroundColor={modalityVisible ? palette.background.neutral : palette.background.base} />
 

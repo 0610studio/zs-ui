@@ -51,7 +51,6 @@ function BottomSheetOverlay({
   headerComponent,
   component,
   options = {},
-  ...accessibilityProps
 }: ShowBottomSheetProps) {
   const {
     foldableSingleScreen = false,
@@ -296,8 +295,6 @@ function BottomSheetOverlay({
       key={localVisible ? 'visiblebs' : 'hiddenbs'}
       modalBgColor={palette.modalBgColor}
       onPress={handleBackgroundPress}
-      accessibilityViewIsModal={true}
-      {...accessibilityProps}
     >
       <Animated.View style={containerStyle} onLayout={handleSheetLayout}>
         <View style={pressableViewStyle}>

@@ -27,7 +27,7 @@ function ZSAboveKeyboard({
   handleLayoutHeight,
   showOnlyKeyboardVisible = false,
   backgroundColor,
-  ...accessibilityProps
+  ...props
 }: Props) {
   const { bottom } = useSafeAreaInsets();
   const componentHeightRef = useRef(0);
@@ -46,7 +46,7 @@ function ZSAboveKeyboard({
   const isVisible = showOnlyKeyboardVisible ? isKeyboardVisible : true;
 
   return (
-    <View style={[styles.container, { bottom: !isVisible ? HIDDEN_BOTTOM_OFFSET : 0 }]} onLayout={handleLayout} {...accessibilityProps}>
+    <View style={[styles.container, { bottom: !isVisible ? HIDDEN_BOTTOM_OFFSET : 0 }]} onLayout={handleLayout} {...props}>
       <View style={{ width: "100%", backgroundColor, paddingBottom: keyboardVisiblePadding }}>
         {children}
       </View>

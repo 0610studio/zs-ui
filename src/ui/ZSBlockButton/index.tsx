@@ -17,7 +17,7 @@ type Props = ViewProps & {
   disabled?: boolean;
 };
 
-function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false, ...accessibilityProps }: Props) {
+function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false, ...props }: Props) {
   const { palette } = useTheme();
   const size = typo.split('.')[1];
 
@@ -102,7 +102,7 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
   const textColorValue = getTextColorValue();
 
   return (
-    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled} {...accessibilityProps}>
+    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled} {...props}>
       <ZSView
         style={{
           paddingHorizontal,

@@ -12,7 +12,7 @@ interface ZSSkeletonProps extends ViewProps {
     overlayColor?: string;
 }
 
-function ZSSkeleton({ isFetching, style, children, overlayColor, ...accessibilityProps }: ZSSkeletonProps) {
+function ZSSkeleton({ isFetching, style, children, overlayColor, ...props }: ZSSkeletonProps) {
     const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
     const { palette } = useTheme();
     const effectColor = overlayColor || palette.background.base;
@@ -38,7 +38,7 @@ function ZSSkeleton({ isFetching, style, children, overlayColor, ...accessibilit
     });
 
     return isFetching ? (
-        <View style={[style, { overflow: "hidden" }]} {...accessibilityProps}>
+        <View style={[style, { overflow: "hidden" }]} {...props}>
             <View style={styles.container}>
                 {children}
 

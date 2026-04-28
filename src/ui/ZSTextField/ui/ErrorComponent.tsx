@@ -6,13 +6,13 @@ import { type ViewProps } from "react-native";
 const ErrorComponent = ({
   errorMessage,
   errorColor,
-  ...accessibilityProps
+  ...props
 }: {
   errorMessage: string;
   errorColor: string;
 } & ViewProps) => {
   return (
-    <Animated.View entering={FadeInDown} style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingLeft: 5, paddingTop: 9 }} {...accessibilityProps}>
+    <Animated.View entering={FadeInDown} style={{ width: '100%', flexDirection: 'row', alignItems: 'center', paddingLeft: 5, paddingTop: 9 }} {...props}>
       <SvgExclamation
         size={16}
         backgroundColor={errorColor}

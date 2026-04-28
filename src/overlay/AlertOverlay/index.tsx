@@ -41,14 +41,11 @@ function AlertOverlay({
         key={alertVisible ? 'visibleao' : 'hiddenao'}
         modalBgColor={modalBgColor}
         onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
-        accessibilityViewIsModal={true}
       >
         <Animated.View
           entering={FadeInDown.duration(300)}
           exiting={FadeOutDown.duration(100)}
           style={[styles.contentContainer, { width: modalWidth }]}
-          accessibilityRole="alert"
-          accessibilityLiveRegion="polite"
         >
           {title && (
             <ZSText typo='subTitle.1' style={[styles.title, titleStyle]}>{title}</ZSText>
@@ -67,8 +64,6 @@ function AlertOverlay({
                       secondaryButtonStyle
                     ]}
                     onPress={handleButtonPress(secondary?.onPress)}
-                    accessibilityRole="button"
-                    accessibilityLabel={secondary?.label}
                   >
                     <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
                   </TouchableOpacity>
@@ -76,8 +71,6 @@ function AlertOverlay({
                   <TouchableOpacity
                     style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                     onPress={handleButtonPress(primary?.onPress)}
-                    accessibilityRole="button"
-                    accessibilityLabel={primary?.label || '확인'}
                   >
                     <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                   </TouchableOpacity>
@@ -86,8 +79,6 @@ function AlertOverlay({
                 <TouchableOpacity
                   style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
                   onPress={handleButtonPress(primary?.onPress)}
-                  accessibilityRole="button"
-                  accessibilityLabel={primary?.label || '확인'}
                 >
                   <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
                 </TouchableOpacity>
@@ -140,4 +131,3 @@ const createStyles = ({ background }: { background: ThemeBackground; }) =>
       paddingHorizontal: 20,
     },
   });
-
