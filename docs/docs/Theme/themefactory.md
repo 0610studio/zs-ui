@@ -207,24 +207,3 @@ function App() {
   );
 }
 ```
-
-### 접근성 고려한 색상
-
-```tsx
-// WCAG 가이드라인을 따르는 고대비 색상
-const accessiblePalette = themeFactory({
-  light: {
-    primary: {
-      main: '#0052CC', // 고대비 블루
-    },
-    danger: {
-      main: '#DE350B', // 고대비 레드
-    },
-  },
-  dark: {
-    primary: {
-      main: '#4C9AFF', // 다크 모드용 밝은 블루
-    },
-  },
-});
-```

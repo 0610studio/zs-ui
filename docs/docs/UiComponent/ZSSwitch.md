@@ -44,7 +44,6 @@ function MyComponent() {
 
 - **부드러운 애니메이션**: 200ms 동안 부드럽게 전환됩니다
 - **반응형 크기**: 높이는 너비의 60%로 자동 계산됩니다
-- **접근성 지원**: `accessibilityState`가 자동으로 설정됩니다
 - **테마 통합**: 테마 색상을 사용하여 일관된 디자인 유지
 
 ## 예제
@@ -60,4 +59,3 @@ function MyComponent() {
   thumbColor="#ffffff"
 />
 ```
-

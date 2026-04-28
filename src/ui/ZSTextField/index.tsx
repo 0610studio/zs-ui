@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState, forwardRef, useEffect } from 'react';
 import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, withDelay, ReduceMotion } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, ReduceMotion } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
 import ErrorComponent from './ui/ErrorComponent';
 import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme/types';
@@ -12,7 +12,7 @@ export type BoxStyle = 'outline' | 'underline' | 'inbox';
 
 const iosOffset = Platform.OS === 'ios' ? 8 : 4;
 const ANIM_DURATION = 150;
-const KEYBOARD_SETTLE_DELAY = Platform.OS === 'ios' ? 50 : 0;
+const TIMING_CONFIG = { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System };
 
 interface TextFieldProps {
   typo?: TypoOptions;
@@ -80,13 +80,14 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   const boxHeightValue = useSharedValue(0);
   
   const isError = status === 'error';
+  const hasValue = value !== '';
 
   useEffect(() => {
-    labelProgress.value = withTiming(value !== '' ? 1 : 0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
-  }, [value]);
+    labelProgress.value = withTiming(hasValue ? 1 : 0, TIMING_CONFIG);
+  }, [hasValue]);
 
   useEffect(() => {
-    errorProgress.value = withTiming(isError ? 1 : 0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
+    errorProgress.value = withTiming(isError ? 1 : 0, TIMING_CONFIG);
   }, [isError]);
 
   const animationConstants = useMemo(() => ({
@@ -101,26 +102,30 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     
     const progress = Math.max(labelProgress.value, focusProgress.value);
     
-    const labelFontSize = interpolate(
-      progress,
-      [0, 1],
-      [animationConstants.baseFontSize, animationConstants.targetFontSize],
-      'clamp'
-    );
-
-    const labelTop = interpolate(
+    const labelTranslateY = interpolate(
       progress,
       [0, 1],
       [
-        animationConstants.baseTop,
-        isTextArea ? -12 : -(boxHeightValue.value / 2) - 1 + animationConstants.targetTopOffset,
+        0,
+        isTextArea ? -24 : -(boxHeightValue.value / 2) - 1 + animationConstants.targetTopOffset - animationConstants.baseTop,
       ],
       'clamp'
     );
 
+    const labelScale = interpolate(
+      progress,
+      [0, 1],
+      [1, animationConstants.targetFontSize / animationConstants.baseFontSize],
+      'clamp'
+    );
+
     return {
-      top: labelTop,
-      fontSize: labelFontSize,
+      top: animationConstants.baseTop,
+      transformOrigin: 'left center',
+      transform: [
+        { translateY: labelTranslateY },
+        { scale: labelScale },
+      ],
     };
   }, [animationConstants, isTextArea]);
 
@@ -130,13 +135,12 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   }, []);
 
   const handleFocus = useCallback(() => {
-    const timing = withTiming(1, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
-    focusProgress.value = KEYBOARD_SETTLE_DELAY > 0 ? withDelay(KEYBOARD_SETTLE_DELAY, timing) : timing;
+    focusProgress.value = withTiming(1, TIMING_CONFIG);
     setIsFocusedForUI(true);
   }, []);
 
   const handleBlur = useCallback(() => {
-    focusProgress.value = withTiming(0, { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System });
+    focusProgress.value = withTiming(0, TIMING_CONFIG);
     setIsFocusedForUI(false);
   }, []);
 

@@ -14,7 +14,7 @@ interface ZSSkeletonBoxProps extends ViewProps {
     color?: ViewColorOptions;
 }
 
-function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral', ...accessibilityProps }: ZSSkeletonBoxProps) {
+function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral', ...props }: ZSSkeletonBoxProps) {
     const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
     const { palette } = useTheme();
     const effectColor = overlayColor || palette.background.layer1;
@@ -35,7 +35,7 @@ function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral', ...acce
     });
 
     return (
-        <View style={[{ width: '100%' }, style, { height, overflow: "hidden" }]} {...accessibilityProps}>
+        <View style={[{ width: '100%' }, style, { height, overflow: "hidden" }]} {...props}>
             <ZSView
                 style={[
                     styles.container,
