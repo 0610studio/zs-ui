@@ -6,6 +6,43 @@ sidebar_position: 1
 
 `@0610studio/zs-ui`는 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
 
+## 데모
+
+<div style={{
+  display: 'flex',
+  overflowX: 'auto',
+  gap: '20px',
+  padding: '0 10px 0 0'
+}}>
+  <div style={{
+    minWidth: '300px',
+    flexShrink: 0
+  }}>
+    <video controls width="300">
+      <source src="/zs-ui/video/theme.mp4" type="video/mp4" />
+    </video>
+    <p>Theme</p>
+  </div>
+  <div style={{
+    minWidth: '300px',
+    flexShrink: 0
+  }}>
+    <video controls width="300">
+      <source src="/zs-ui/video/layout.mp4" type="video/mp4" />
+    </video>
+    <p>Layout</p>
+  </div>
+  <div style={{
+    minWidth: '300px',
+    flexShrink: 0
+  }}>
+    <video controls width="300">
+      <source src="/zs-ui/video/overlay.mp4" type="video/mp4" />
+    </video>
+    <p>Overlay</p>
+  </div>
+</div>
+
 ## 개발자 경험
 
 ### 1. Declarative Overlay

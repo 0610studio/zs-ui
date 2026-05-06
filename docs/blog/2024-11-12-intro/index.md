@@ -17,9 +17,7 @@ tags: [zsUi, barabom]
 
 바라봄 앱에 대한 자세한 정보는 아래에서 확인 가능합니다.
 
-<div style={{ textAlign: 'left' }}>
-    <img src="https://barabom.me/assets/img_orimage.jpg" style={{ width: 500, height: 250 }} />
-</div>
+![바라봄 앱 소개 이미지](./barabom-og.png)
   
 
 - **홈페이지**: [https://barabom.me](https://barabom.me)
