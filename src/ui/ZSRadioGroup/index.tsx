@@ -109,34 +109,35 @@ function ZSRadioGroup({
                   </ViewAtom>
                 )}
                 {/* 옵션 텍스트 표시 */}
-                <ZSText style={{ paddingLeft: 10, paddingRight: 12 }} {...valueStyle}>
-                  {option.value}
-                </ZSText>
+                <ViewAtom style={{ flex: 1, paddingLeft: 10, paddingRight: 12, minWidth: 0 }}>
+                  <ZSText {...valueStyle}>
+                    {option.value}
+                  </ZSText>
+                </ViewAtom>
 
                 {/* fullWidth가 true일 때 우측에 선택 버튼 표시 */}
                 {isFullWidth && (
-                  <ViewAtom style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                    <ViewAtom
-                      style={{
-                        backgroundColor: isSelected
-                          ? palette.primary.main
-                          : palette.background.layer2,
-                        paddingHorizontal: 10,
-                        borderRadius: 100,
-                        minWidth: 42,
-                        minHeight: 24,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      {isSelected ? (
-                        <SvgCheck size={18} />
-                      ) : (
-                        <ZSText typo="body.5" {...selectStyle}>
-                          {selectLabel}
-                        </ZSText>
-                      )}
-                    </ViewAtom>
+                  <ViewAtom
+                    style={{
+                      backgroundColor: isSelected
+                        ? palette.primary.main
+                        : palette.background.layer2,
+                      paddingHorizontal: 10,
+                      borderRadius: 100,
+                      minWidth: 42,
+                      minHeight: 24,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {isSelected ? (
+                      <SvgCheck size={18} />
+                    ) : (
+                      <ZSText typo="body.5" numberOfLines={1} {...selectStyle}>
+                        {selectLabel}
+                      </ZSText>
+                    )}
                   </ViewAtom>
                 )}
               </ViewAtom>
