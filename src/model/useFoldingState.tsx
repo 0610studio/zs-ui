@@ -10,21 +10,40 @@ export function useFoldingState(): FoldingStateInfo {
   });
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      const fetchFoldingState = async () => {
-        try {
-          const result = await ZsUiModule.getFoldingFeature() as NativeFoldingStateInfo;
-          if (result.width) setFoldingStateInfo({
-            foldingState: result.foldingFeature ? FoldingState.UNFOLDED : FoldingState.FOLDED,
-            width: result.width
-          });
-        } catch (error) {
-          console.error('getFoldingFeature 호출 실패:', error);
-        }
-      };
+    let isMounted = true;
 
-      fetchFoldingState();
-    }
+    const updateFoldingState = async (fallbackWidth = Dimensions.get('window').width) => {
+      if (Platform.OS !== 'android') {
+        setFoldingStateInfo({
+          foldingState: FoldingState.FOLDED,
+          width: fallbackWidth,
+        });
+        return;
+      }
+
+      try {
+        const result = await ZsUiModule.getFoldingFeature() as NativeFoldingStateInfo;
+        if (!isMounted) return;
+
+        setFoldingStateInfo({
+          foldingState: result.foldingFeature ? FoldingState.UNFOLDED : FoldingState.FOLDED,
+          width: result.width || fallbackWidth,
+        });
+      } catch (error) {
+        console.error('getFoldingFeature 호출 실패:', error);
+      }
+    };
+
+    updateFoldingState();
+
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      updateFoldingState(window.width);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
   }, []);
 
   return foldingStateInfo;
