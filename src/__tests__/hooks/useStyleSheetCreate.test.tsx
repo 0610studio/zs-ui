@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook } from "@testing-library/react-native";
 import { useStyleSheetCreate } from "../../model/useStyleSheetCreate";
 
 jest.mock("../../context/ThemeContext", () => {
@@ -19,6 +19,5 @@ describe("useStyleSheetCreate", () => {
     expect(result.current).toEqual({ color: "#000000" });
   });
 });
-
 
 

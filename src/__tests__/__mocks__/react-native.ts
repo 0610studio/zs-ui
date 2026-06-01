@@ -22,6 +22,7 @@ export const TouchableOpacity = (props: any) => React.createElement('TouchableOp
 export const Dimensions = {
   get: (_: string) => ({ width: 390, height: 844 }),
 };
+export const useWindowDimensions = () => Dimensions.get('window');
 export const Keyboard = {
   dismiss: () => {},
   addListener: (_event: string, _cb: any) => ({ remove: () => {} }),
@@ -34,6 +35,5 @@ export const TextInput = React.forwardRef((props: any, ref: any) =>
   React.createElement('TextInput', { ...props, ref }, props.children)
 );
 
-export default { Platform, StyleSheet, View, Text, StatusBar, Pressable, TouchableOpacity, Dimensions, Keyboard, PanResponder, ScrollView, TextInput };
-
+export default { Platform, StyleSheet, View, Text, StatusBar, Pressable, TouchableOpacity, Dimensions, useWindowDimensions, Keyboard, PanResponder, ScrollView, TextInput };
 

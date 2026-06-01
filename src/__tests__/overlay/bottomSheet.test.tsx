@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render } from '@testing-library/react-native';
+import { act, render } from '@testing-library/react-native';
 import { Text, View } from 'react-native';
 import BottomSheetOverlay from '../../overlay/BottomSheetOverlay';
 import type { BottomSheetContextProps } from '../../model/types';
@@ -44,7 +44,9 @@ describe('BottomSheetOverlay', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
     jest.clearAllMocks();
     mockUseBottomSheet.mockReset();
@@ -91,7 +93,7 @@ describe('BottomSheetOverlay', () => {
     expect(sheetContainer).toBeDefined();
 
     act(() => {
-      fireEvent(sheetContainer!, 'layout', {
+      sheetContainer!.props.onLayout({
         nativeEvent: { layout: { height: 280 } },
       });
     });
@@ -112,7 +114,7 @@ describe('BottomSheetOverlay', () => {
     expect(withTimingSpy).toHaveBeenLastCalledWith(380, { duration: 150 });
 
     act(() => {
-      fireEvent(sheetContainer!, 'layout', {
+      sheetContainer!.props.onLayout({
         nativeEvent: { layout: { height: 420 } },
       });
     });

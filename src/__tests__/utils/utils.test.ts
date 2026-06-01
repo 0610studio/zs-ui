@@ -16,6 +16,10 @@ describe("extractStyle", () => {
     const style = [{ color: "red" }];
     expect(extractStyle(style, "fontWeight")).toBeUndefined();
   });
+
+  it("스타일이 비어 있으면 undefined를 반환한다", () => {
+    expect(extractStyle(undefined, "fontSize")).toBeUndefined();
+  });
 });
 
 describe("constants", () => {
@@ -29,6 +33,5 @@ describe("constants", () => {
     expect(MAX_FOLDABLE_SINGLE_WIDTH).toBeGreaterThan(0);
   });
 });
-
 
 

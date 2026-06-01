@@ -163,6 +163,14 @@ function BottomSheetOverlay({
   const handleSheetLayout = useCallback((event: LayoutChangeEvent) => {
     const nextHeight = Math.round(event.nativeEvent.layout.height);
 
+    if (nextHeight > 0) {
+      const nextCloseOffset = nextHeight + 100;
+      latestCloseOffsetRef.current = nextCloseOffset;
+      if (bottomSheetVisible) {
+        closingOffsetRef.current = nextCloseOffset;
+      }
+    }
+
     setSheetHeight((prevHeight) => {
       if (Math.abs(prevHeight - nextHeight) <= 1) {
         return prevHeight;
@@ -170,7 +178,7 @@ function BottomSheetOverlay({
 
       return nextHeight;
     });
-  }, []);
+  }, [bottomSheetVisible]);
 
   const handlePanResponderGrant = useCallback(() => {
     dismissKeyboard();

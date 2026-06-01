@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import PopOverButton from '../../overlay/PopOver/PopOverButton';
 import PopOverMenu from '../../overlay/PopOver/PopOverMenu';
 
@@ -126,4 +126,3 @@ describe('PopOverMenu', () => {
     expect(getByText('Menu Content')).toBeTruthy();
   });
 });
-
