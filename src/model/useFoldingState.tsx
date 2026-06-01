@@ -10,24 +10,18 @@ export function useFoldingState(): FoldingStateInfo {
   });
 
   useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
     let isMounted = true;
 
     const updateFoldingState = async (fallbackWidth = Dimensions.get('window').width) => {
-      if (Platform.OS !== 'android') {
-        setFoldingStateInfo({
-          foldingState: FoldingState.FOLDED,
-          width: fallbackWidth,
-        });
-        return;
-      }
-
       try {
-        const result = await ZsUiModule.getFoldingFeature() as NativeFoldingStateInfo;
+        const result = await ZsUiModule.getFoldingFeature() as NativeFoldingStateInfo | null;
         if (!isMounted) return;
 
         setFoldingStateInfo({
-          foldingState: result.foldingFeature ? FoldingState.UNFOLDED : FoldingState.FOLDED,
-          width: result.width || fallbackWidth,
+          foldingState: result?.foldingFeature ? FoldingState.UNFOLDED : FoldingState.FOLDED,
+          width: result?.width || fallbackWidth,
         });
       } catch (error) {
         console.error('getFoldingFeature 호출 실패:', error);

@@ -1,12 +1,16 @@
 import { Image, type ImageSourcePropType, type StyleProp, type ViewStyle, type ViewProps } from 'react-native';
-import { ColorPalette, ThemeTextType, TypoColorOptions, TypoOptions, ViewColorOptions, IntentOptions } from '../../theme/types';
+import { ColorPalette, ThemeTextType, TypoColorOptions, TypoOptions, ViewColorOptions, IntentOptions, ThemeBackground } from '../../theme/types';
 import { useTheme } from '../../context/ThemeContext';
 import ZSPressable from '../ZSPressable';
 import ZSView from '../ZSView';
 import ZSText from '../ZSText';
 
 type SemanticPaletteKey = 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey';
-type PaletteShade = Exclude<keyof ColorPalette, 'main'>;
+type PaletteShade = keyof ColorPalette;
+
+function isColorMap(value: unknown): value is Record<string, string> {
+  return typeof value === 'object' && value !== null;
+}
 
 type Props = ViewProps & {
   onPress: () => void;
@@ -95,9 +99,13 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
               : 8;
 
   const getTextColorValue = () => {
-    const [c01, c02] = colors.textColor.split('.') as [keyof ThemeTextType | SemanticPaletteKey, string | undefined];
+    const [c01, c02] = colors.textColor.split('.') as [string, string | undefined];
     if (c02) {
-      return palette[c01 as SemanticPaletteKey][Number(c02) as PaletteShade];
+      if (c01 === 'text') return palette.text[c02 as keyof ThemeTextType];
+      if (c01 === 'background') return palette.background[c02 as keyof ThemeBackground];
+
+      const semanticPalette = palette[c01 as SemanticPaletteKey];
+      return isColorMap(semanticPalette) ? semanticPalette[c02 as PaletteShade] : undefined;
     }
     return palette.text[c01 as keyof ThemeTextType];
   };

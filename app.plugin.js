@@ -26,6 +26,7 @@ function withZsUiAndroidManifest(config) {
   return withAndroidManifest(config, (config) => {
     const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
 
+    mainActivity.$ = mainActivity.$ || {};
     mainActivity.$['android:launchMode'] = 'singleTask';
     mainActivity.$['android:configChanges'] = mergeConfigChanges(
       mainActivity.$['android:configChanges']
