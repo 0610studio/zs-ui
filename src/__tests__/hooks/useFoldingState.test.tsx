@@ -1,6 +1,6 @@
-import React from "react";
-import { renderHook, act } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react-native";
 import useFoldingState from "../../model/useFoldingState";
+import ZsUiModule from "../../ZsUiModule";
 
 jest.mock("react-native", () => {
   return {
@@ -27,7 +27,20 @@ describe("useFoldingState", () => {
     expect(result.current.width).toBe(700);
     expect(result.current.foldingState).toBe("unfolded");
   });
+
+  it("네이티브 폴딩 정보 호출 실패를 기록한다", async () => {
+    const error = new Error("native failure");
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    (ZsUiModule.getFoldingFeature as jest.Mock).mockRejectedValueOnce(error);
+
+    renderHook(() => useFoldingState());
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith("getFoldingFeature 호출 실패:", error);
+    consoleSpy.mockRestore();
+  });
 });
-
-
 

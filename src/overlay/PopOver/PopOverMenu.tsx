@@ -14,7 +14,7 @@ function PopOverMenu({
   px,
   py,
   component
-}: PopOverMenuProps): JSX.Element | null {
+}: PopOverMenuProps): React.ReactElement | null {
   const { palette } = useTheme();
   const [isContentVisible, setIsContentVisible] = useState<boolean>(false);
   const [contentWidth, setContentWidth] = useState<number>(0);

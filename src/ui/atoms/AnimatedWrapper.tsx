@@ -2,13 +2,14 @@ import React, { useMemo } from 'react';
 import { View, ViewProps, Platform } from 'react-native';
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, withTiming, useSharedValue, useDerivedValue } from 'react-native-reanimated';
 import { useTheme } from '../../context/ThemeContext';
-import { ShadowLevel } from '../../theme/types';
+import { ColorPalette, ShadowLevel, SubColorOptions, ThemeBackground, ViewColor, ViewColorOptions } from '../../theme/types';
 import { IOS_SHADOW } from '../../theme/elevation';
-import { SubColorOptions, ViewColor, ViewColorOptions } from '../../theme/types';
 
 const DEFAULT_DURATION = 200 as const;
 const SHADOW_DURATION = 50 as const;
 const IS_IOS = Platform.OS === 'ios';
+type SemanticPaletteKey = 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey';
+type PaletteShade = Exclude<keyof ColorPalette, 'main'>;
 
 interface AnimatedWrapperProps extends ViewProps {
   isAnimation: boolean;
@@ -40,9 +41,9 @@ function AnimatedWrapper({
       return elevationLevel ? palette.background.base : undefined;
     }
     
-    const [c01, c02] = color.split('.') as [ViewColor, SubColorOptions];
-    if (c02) return palette[c01][c02];
-    if (c01) return palette.background[c01];
+    const [c01, c02] = color.split('.') as [ViewColor | SemanticPaletteKey, SubColorOptions];
+    if (c02) return palette[c01 as SemanticPaletteKey][Number(c02) as PaletteShade];
+    if (c01) return palette.background[c01 as keyof ThemeBackground];
     if (elevationLevel) return palette.background.base;
     return undefined;
   }, [color, palette, elevationLevel]);

@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { Text } from 'react-native';
 import ZSRadioGroup from '../../ui/ZSRadioGroup';
 
 jest.mock('../../context/ThemeContext', () => {
@@ -163,4 +162,3 @@ describe('ZSRadioGroup', () => {
     expect(getByText('Option 1')).toBeTruthy();
   });
 });
-

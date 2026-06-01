@@ -6,7 +6,7 @@ describe('palette()', () => {
     expect(theme.mode).toBe('light');
     expect(theme.mainColor.primary).toBe('#ffa20d');
     expect(theme.text.white).toBe('#FFFFFF');
-    expect(theme.background.base).toBe('#ffffff');
+    expect(theme.background.base).toBe('#FFFFFF');
   });
 
   it('다크 모드 팔레트를 생성한다', () => {
@@ -53,6 +53,19 @@ describe('themeFactory()', () => {
     expect(theme.background.primary).toBe('#DEF123');
   });
 
+  it('palette()에서 themeColors를 병합한다', () => {
+    const theme = palette({
+      mode: 'light',
+      themeColors: {
+        light: {
+          modalBgColor: '#ABCDEF',
+        } as any,
+      },
+    });
+
+    expect(theme.modalBgColor).toBe('#ABCDEF');
+  });
+
   it('dark.grey.main을 재정의하면 mainColor도 자동으로 반영된다', () => {
     const createPalette = themeFactory({
       dark: {
@@ -84,6 +97,4 @@ describe('themeFactory()', () => {
     expect(theme.mainColor.grey).toBe('#999999');
   });
 });
-
-
 

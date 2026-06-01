@@ -1,9 +1,12 @@
 import { Image, type ImageSourcePropType, type StyleProp, type ViewStyle, type ViewProps } from 'react-native';
-import { TypoColorOptions, TypoOptions, ViewColorOptions, IntentOptions } from '../../theme/types';
+import { ColorPalette, ThemeTextType, TypoColorOptions, TypoOptions, ViewColorOptions, IntentOptions } from '../../theme/types';
 import { useTheme } from '../../context/ThemeContext';
 import ZSPressable from '../ZSPressable';
 import ZSView from '../ZSView';
 import ZSText from '../ZSText';
+
+type SemanticPaletteKey = 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey';
+type PaletteShade = Exclude<keyof ColorPalette, 'main'>;
 
 type Props = ViewProps & {
   onPress: () => void;
@@ -92,11 +95,11 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
               : 8;
 
   const getTextColorValue = () => {
-    const [c01, c02] = colors.textColor.split('.');
+    const [c01, c02] = colors.textColor.split('.') as [keyof ThemeTextType | SemanticPaletteKey, string | undefined];
     if (c02) {
-      return palette[c01][c02];
+      return palette[c01 as SemanticPaletteKey][Number(c02) as PaletteShade];
     }
-    return palette.text[c01];
+    return palette.text[c01 as keyof ThemeTextType];
   };
 
   const textColorValue = getTextColorValue();

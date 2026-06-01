@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { Text, ScrollView, Dimensions } from 'react-native';
+import { Text, ScrollView } from 'react-native';
 import ZSContainer from '../../ui/ZSContainer';
 
 jest.mock('../../context/ThemeContext', () => {
@@ -258,4 +258,3 @@ describe('ZSContainer', () => {
     expect(getByText('Test')).toBeTruthy();
   });
 });
-

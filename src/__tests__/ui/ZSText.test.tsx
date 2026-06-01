@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import { createElement } from 'react';
 import { render } from '@testing-library/react-native';
 import ZSText from '../../ui/ZSText';
 
@@ -19,6 +19,5 @@ describe('ZSText', () => {
     getByText('hello-zs');
   });
 });
-
 
 
