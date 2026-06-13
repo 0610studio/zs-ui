@@ -31,7 +31,6 @@ function ZSSkeleton({ isFetching, style, children, overlayColor, ...props }: ZSS
     }, [isFetching]);
 
     const animatedStyle = useAnimatedStyle(() => {
-        "worklet";
         return {
             transform: [{ translateX: translateX.value }],
         };

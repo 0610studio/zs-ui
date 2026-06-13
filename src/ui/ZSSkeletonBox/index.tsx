@@ -28,7 +28,6 @@ function ZSSkeletonBox({ height, style, overlayColor, color = 'neutral', ...prop
     }, []);
 
     const animatedStyle = useAnimatedStyle(() => {
-        "worklet";
         return {
             transform: [{ translateX: translateX.value }],
         };

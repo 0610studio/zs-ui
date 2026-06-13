@@ -142,7 +142,6 @@ function BottomSheetOverlay({
   }, [bottomSheetVisible]);
 
   const animatedStyles = useAnimatedStyle(() => {
-    'worklet';
     return {
       transform: [
         { translateY: translateY.value },

@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, forwardRef, useEffect } from 'react';
+import { useMemo, useCallback, useState, forwardRef, useEffect, useRef } from 'react';
 import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming, ReduceMotion } from 'react-native-reanimated';
 import ButtonClose from './ui/ButtonClose';
@@ -72,23 +72,23 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
 
   const fontSize = extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
   const fontFamily = extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
-
-  const labelProgress = useSharedValue(value !== '' ? 1 : 0);
-  const focusProgress = useSharedValue(0);
-  const errorProgress = useSharedValue(0);
+  const floatProgress = useSharedValue(value !== '' ? 1 : 0);
   const [isFocusedForUI, setIsFocusedForUI] = useState<boolean>(false);
   const boxHeightValue = useSharedValue(0);
-  
+
   const isError = status === 'error';
   const hasValue = value !== '';
 
-  useEffect(() => {
-    labelProgress.value = withTiming(hasValue ? 1 : 0, TIMING_CONFIG);
-  }, [hasValue]);
+  const isFocusedRef = useRef(false);
+  const hasValueRef = useRef(hasValue);
+  hasValueRef.current = hasValue;
 
   useEffect(() => {
-    errorProgress.value = withTiming(isError ? 1 : 0, TIMING_CONFIG);
-  }, [isError]);
+    const target = hasValue ? 1 : 0;
+    if (!isFocusedRef.current && floatProgress.value !== target) {
+      floatProgress.value = withTiming(target, TIMING_CONFIG);
+    }
+  }, [hasValue]);
 
   const animationConstants = useMemo(() => ({
     baseFontSize: fontSize + (boxStyle === 'inbox' ? 1 : 0),
@@ -98,10 +98,8 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   }), [fontSize, boxStyle, isTextArea]);
 
   const animatedLabelStyle = useAnimatedStyle(() => {
-    'worklet';
-    
-    const progress = Math.max(labelProgress.value, focusProgress.value);
-    
+    const progress = floatProgress.value;
+
     const labelTranslateY = interpolate(
       progress,
       [0, 1],
@@ -120,8 +118,6 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     );
 
     return {
-      top: animationConstants.baseTop,
-      transformOrigin: 'left center',
       transform: [
         { translateY: labelTranslateY },
         { scale: labelScale },
@@ -135,12 +131,19 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   }, []);
 
   const handleFocus = useCallback(() => {
-    focusProgress.value = withTiming(1, TIMING_CONFIG);
+    isFocusedRef.current = true;
+    if (floatProgress.value !== 1) {
+      floatProgress.value = withTiming(1, TIMING_CONFIG);
+    }
     setIsFocusedForUI(true);
   }, []);
 
   const handleBlur = useCallback(() => {
-    focusProgress.value = withTiming(0, TIMING_CONFIG);
+    isFocusedRef.current = false;
+    const target = hasValueRef.current ? 1 : 0;
+    if (floatProgress.value !== target) {
+      floatProgress.value = withTiming(target, TIMING_CONFIG);
+    }
     setIsFocusedForUI(false);
   }, []);
 
@@ -152,37 +155,19 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     errorColor: fErrorColor,
   }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor, fErrorColor]);
 
-  const animatedColorStyle = useAnimatedStyle(() => {
-    'worklet';
-    
-    const borderColor = errorProgress.value > 0 
-      ? colorConfig.errorColor
-      : focusProgress.value > 0
-        ? colorConfig.primaryColor
-        : colorConfig.defaultBorderColor;
-    
-    return {
-      borderColor,
-    };
-  }, [colorConfig]);
+  const currentBorderColor = isError
+    ? colorConfig.errorColor
+    : isFocusedForUI
+      ? colorConfig.primaryColor
+      : colorConfig.defaultBorderColor;
 
-  const animatedLabelColorStyle = useAnimatedStyle(() => {
-    'worklet';
-    
-    const floatProgress = Math.max(labelProgress.value, focusProgress.value);
-    
-    const labelColor = errorProgress.value > 0
-      ? colorConfig.errorColor
-      : focusProgress.value > 0
-        ? colorConfig.primaryColor
-        : floatProgress > 0
-          ? colorConfig.defaultLabelColor
-          : colorConfig.placeholderColor;
-    
-    return {
-      color: labelColor,
-    };
-  }, [colorConfig]);
+  const currentLabelColor = isError
+    ? colorConfig.errorColor
+    : isFocusedForUI
+      ? colorConfig.primaryColor
+      : hasValue
+        ? colorConfig.defaultLabelColor
+        : colorConfig.placeholderColor;
 
   const styleConfig = useMemo(() => {
     const baseStyle = {
@@ -205,65 +190,67 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     // innerBoxStyle에 따른 스타일 설정
     let innerStyle = {};
     if (innerBoxStyle === 'top') {
-      innerStyle = { 
-        borderBottomLeftRadius: 0, 
-        borderBottomRightRadius: 0, 
-        borderBottomWidth: borderWidth / 2 
+      innerStyle = {
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        borderBottomWidth: borderWidth / 2
       };
     } else if (innerBoxStyle === 'middle') {
-      innerStyle = { 
-        borderRadius: 0, 
-        borderTopWidth: borderWidth / 2, 
-        borderBottomWidth: borderWidth / 2 
+      innerStyle = {
+        borderRadius: 0,
+        borderTopWidth: borderWidth / 2,
+        borderBottomWidth: borderWidth / 2
       };
     } else if (innerBoxStyle === 'bottom') {
-      innerStyle = { 
-        borderTopLeftRadius: 0, 
-        borderTopRightRadius: 0, 
-        borderTopWidth: borderWidth / 2 
+      innerStyle = {
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        borderTopWidth: borderWidth / 2
       };
     }
 
     return { ...baseStyle, ...borderStyle, ...innerStyle };
   }, [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, palette.background.base]);
 
-  const labelTextStyle: StyleProp<TextStyle> = {
+  const labelTextStyle: StyleProp<TextStyle> = useMemo(() => ({
     fontSize,
+    top: animationConstants.baseTop,
     left: paddingHorizontal,
+    transformOrigin: 'left center',
     backgroundColor: labelBgColor || palette.background.base,
     paddingHorizontal: boxStyle === 'outline' ? 5 : 0,
     paddingVertical: 2,
-    textAlignVertical: 'center',
+    textAlignVertical: 'center' as const,
     fontFamily,
     borderRadius: boxStyle === 'outline' ? 5 : 0,
-    overflow: 'hidden',
-  };
+    ...(Platform.OS === 'android' ? { overflow: 'hidden' as const } : {}),
+  }), [fontSize, animationConstants.baseTop, paddingHorizontal, labelBgColor, palette.background.base, boxStyle, fontFamily]);
 
   const handleTextChange = (text: string) => {
     if (onChangeText) onChangeText(text);
   };
 
-  const textInputStyle = [
-    { 
-      paddingTop: 7 + iosOffset, 
-      paddingBottom: 5 + iosOffset, 
+  const textInputStyle = useMemo(() => [
+    {
+      paddingTop: 7 + iosOffset,
+      paddingBottom: 5 + iosOffset,
       color: palette.text.base,
-      fontSize, 
-      width: '100%' as const, 
-      paddingRight: 25, 
+      fontSize,
+      width: '100%' as const,
+      paddingRight: 25,
       fontFamily,
       ...(Platform.OS === 'web' ? { outline: 'none' } : {}),
     },
     textInputProps?.style,
-  ];
+  ], [palette.text.base, fontSize, fontFamily, textInputProps?.style]);
 
   const shouldShowCloseButton = value && isFocusedForUI;
   const shouldShowError = status === 'error' && errorMessage;
 
   return (
     <ViewAtom style={{ alignSelf: 'stretch', width: '100%' }}>
-      <Animated.View
-        style={[styleConfig, animatedColorStyle]}
+      <ViewAtom
+        style={[styleConfig, { borderColor: currentBorderColor }]}
         onLayout={handleLayout}
         pointerEvents={disabled ? 'none' : 'auto'}
       >
@@ -282,7 +269,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
         />
 
         <ViewAtom pointerEvents="none" style={{ position: 'absolute' }}>
-          <Animated.Text allowFontScaling={allowFontScaling} style={[animatedLabelStyle, labelTextStyle, animatedLabelColorStyle]}>
+          <Animated.Text allowFontScaling={allowFontScaling} style={[labelTextStyle, { color: currentLabelColor }, animatedLabelStyle]}>
             {label}
           </Animated.Text>
         </ViewAtom>
@@ -290,7 +277,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
         {shouldShowCloseButton && (
           <ButtonClose marginTop={isTextArea ? 13 : undefined} onChangeText={onChangeText} />
         )}
-      </Animated.View>
+      </ViewAtom>
 
       {shouldShowError && (
         <ErrorComponent errorMessage={errorMessage} errorColor={fErrorColor} />

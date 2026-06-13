@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { type StyleProp, type ViewStyle, Pressable, type ViewProps } from "react-native";
-import Animated, {
-  interpolate,
-  interpolateColor,
-  useAnimatedStyle,
-  withTiming,
-  useDerivedValue,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
+
+const SWITCH_TRANSITION_DURATION = 200;
+const SWITCH_TRANSITION = {
+  transitionDuration: SWITCH_TRANSITION_DURATION,
+  transitionTimingFunction: 'ease-in-out',
+} as const;
 
 interface ZSSwitchProps extends ViewProps {
   isActive: boolean;
@@ -29,7 +29,6 @@ function ZSSwitch({
   thumbColor = '#ffffff',
   ...props
 }: ZSSwitchProps) {
-  const [toggledWidth, setToggledWidth] = useState(0);
   const { palette } = useTheme();
   const height = width * 0.6;
   const padding = width * 0.04;
@@ -39,35 +38,7 @@ function ZSSwitch({
 
   const inactiveColor = trackColorInactive ?? palette.grey[30];
   const activeColor = trackColorActive ?? palette.primary.main;
-
-  const toggleProgress = useDerivedValue(() => {
-    return withTiming(isActive ? 1 : 0, { duration: 200 });
-  }, [isActive]);
-
-  const colorAnimation = useAnimatedStyle(() => {
-    'worklet';
-    const color = interpolateColor(
-      toggleProgress.value,
-      [0, 1],
-      [inactiveColor, activeColor],
-    );
-
-    return { backgroundColor: color };
-  }, [inactiveColor, activeColor]);
-
-  const togglePositionAnimation = useAnimatedStyle(() => {
-    'worklet';
-    const positionStyle = interpolate(
-      toggleProgress.value,
-      [0, 1],
-      [0, toggledWidth - thumbSize - padding * 2],
-      'clamp',
-    );
-
-    return {
-      transform: [{ translateX: positionStyle }],
-    };
-  }, [toggledWidth, thumbSize, padding]);
+  const thumbTranslateX = isActive ? width - thumbSize - padding * 2 : 0;
 
   const toggleStyle = {
     width,
@@ -75,6 +46,9 @@ function ZSSwitch({
     borderRadius: toggleBorderRadius,
     padding,
     justifyContent: "center" as const,
+    backgroundColor: isActive ? activeColor : inactiveColor,
+    transitionProperty: 'backgroundColor' as const,
+    ...SWITCH_TRANSITION,
   };
 
   const thumbStyle = {
@@ -82,15 +56,16 @@ function ZSSwitch({
     height: thumbSize,
     borderRadius: thumbBorderRadius,
     justifyContent: "center" as const,
+    backgroundColor: thumbColor,
+    transform: [{ translateX: thumbTranslateX }],
+    transitionProperty: 'transform' as const,
+    ...SWITCH_TRANSITION,
   };
 
   return (
     <Pressable onPress={onToggle} style={style} {...props}>
-      <Animated.View
-        style={[colorAnimation, toggleStyle]}
-        onLayout={e => setToggledWidth(e.nativeEvent.layout.width)}
-      >
-        <Animated.View style={[togglePositionAnimation, thumbStyle, { backgroundColor: thumbColor }]} />
+      <Animated.View style={toggleStyle}>
+        <Animated.View style={thumbStyle} />
       </Animated.View>
     </Pressable>
   );

@@ -56,7 +56,6 @@ function ZSPressable({
   // ------------------------------------------------------------
 
   const boxAnimation = useAnimatedStyle(() => {
-    'worklet';
     const scale = interpolate(
       isButtonPress.value,
       [0, 1],

@@ -69,7 +69,6 @@ function AnimatedWrapper({
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
-    'worklet';
     const shadowValue = shadowProgress.value;
     
     if (staticConfig.isIOS) {

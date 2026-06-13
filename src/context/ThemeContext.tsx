@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useMemo, useReducer, useEffect, useCallback } from 'react';
 import { Platform, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -28,6 +28,45 @@ export interface Palette extends Theme {
 }
 
 const ThemeContext = createContext<ThemeProps | null>(null);
+type ThemeMode = 'light' | 'dark';
+
+type ThemeState = {
+  mode: ThemeMode;
+  isUsingSystemColorScheme: boolean;
+};
+
+type ThemeAction =
+  | { type: 'HYDRATE'; state: ThemeState }
+  | { type: 'SYNC_SYSTEM_MODE'; systemMode: ThemeMode }
+  | { type: 'SET_USE_SYSTEM_COLOR_SCHEME'; useSystem: boolean; systemMode: ThemeMode }
+  | { type: 'TOGGLE_THEME' };
+
+const getSystemMode = (systemColorScheme: ReturnType<typeof useColorScheme>): ThemeMode =>
+  systemColorScheme === 'dark' ? 'dark' : 'light';
+
+function themeReducer(state: ThemeState, action: ThemeAction): ThemeState {
+  switch (action.type) {
+    case 'HYDRATE':
+      return action.state;
+    case 'SYNC_SYSTEM_MODE':
+      return state.isUsingSystemColorScheme
+        ? { ...state, mode: action.systemMode }
+        : state;
+    case 'SET_USE_SYSTEM_COLOR_SCHEME':
+      return {
+        ...state,
+        isUsingSystemColorScheme: action.useSystem,
+        mode: action.useSystem ? action.systemMode : state.mode,
+      };
+    case 'TOGGLE_THEME':
+      return {
+        isUsingSystemColorScheme: false,
+        mode: state.mode === 'light' ? 'dark' : 'light',
+      };
+    default:
+      return state;
+  }
+}
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
@@ -39,8 +78,15 @@ export const useTheme = () => {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, customPalette }) => {
   const systemColorScheme = useColorScheme(); // 시스템 다크 모드 감지
-  const [isUsingSystemColorScheme, setUseSystemColorScheme] = useState(isDarkModeEnabled ? true : false);
-  const [mode, setMode] = useState<'light' | 'dark'>(isDarkModeEnabled ? (systemColorScheme === 'dark' ? 'dark' : 'light') : 'light');
+  const systemMode = getSystemMode(systemColorScheme);
+  const [themeState, dispatchTheme] = useReducer(
+    themeReducer,
+    {
+      isUsingSystemColorScheme: isDarkModeEnabled,
+      mode: isDarkModeEnabled ? systemMode : 'light',
+    }
+  );
+  const { isUsingSystemColorScheme, mode } = themeState;
 
   // AsyncStorage에서 시스템 모드 사용 설정 값 로드
   useEffect(() => {
@@ -50,23 +96,34 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       try {
         if (!isMounted) return;
         
-        if (isDarkModeEnabled) {
-          const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
-          const storedMode = await AsyncStorage.getItem('themeMode');
-
-          if (!isMounted) return;
-
-          if (storedUseSystemColorScheme !== null) {
-            setUseSystemColorScheme(storedUseSystemColorScheme === 'true');
-          }
-          if (storedMode) {
-            setMode(storedMode === 'dark' ? 'dark' : 'light');
-          } else {
-            setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
-          }
-        } else {
-          setMode('light');
+        if (!isDarkModeEnabled) {
+          dispatchTheme({
+            type: 'HYDRATE',
+            state: {
+              isUsingSystemColorScheme: false,
+              mode: 'light',
+            },
+          });
+          return;
         }
+
+        const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
+        const storedMode = await AsyncStorage.getItem('themeMode');
+
+        if (!isMounted) return;
+
+        const isUsingSystemColorScheme = storedUseSystemColorScheme === null
+          ? true
+          : storedUseSystemColorScheme === 'true';
+        const savedMode = storedMode === 'dark' || storedMode === 'light' ? storedMode : undefined;
+
+        dispatchTheme({
+          type: 'HYDRATE',
+          state: {
+            isUsingSystemColorScheme,
+            mode: isUsingSystemColorScheme ? systemMode : savedMode ?? systemMode,
+          },
+        });
       } catch (error) {
         console.error('Failed to load theme settings', error);
       }
@@ -77,14 +134,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
     return () => {
       isMounted = false;
     };
-  }, [isDarkModeEnabled, systemColorScheme]);
+  }, [isDarkModeEnabled, systemMode]);
 
   // 시스템 다크 모드 변경에 따른 효과 적용
   useEffect(() => {
-    if (isUsingSystemColorScheme) {
-      setMode(systemColorScheme === 'dark' ? 'dark' : 'light');
-    }
-  }, [isUsingSystemColorScheme, systemColorScheme]);
+    dispatchTheme({ type: 'SYNC_SYSTEM_MODE', systemMode });
+  }, [systemMode]);
 
   // 안드로이드 하단 제스쳐 영역 스타일
   useEffect(() => {
@@ -97,19 +152,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
 
   // 테마 토글 함수
   const toggleTheme = useCallback(async () => {
-    setUseSystemColorScheme(false); // 사용자 지정 모드로 전환
-    setMode((prevMode) => {
-      const newMode = prevMode === 'light' ? 'dark' : 'light';
-      AsyncStorage.setItem('themeMode', newMode); // 로컬스토리지에 저장
-      return newMode;
-    });
-  }, []);
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    dispatchTheme({ type: 'TOGGLE_THEME' }); // 사용자 지정 모드로 전환
+    await AsyncStorage.multiSet([
+      ['useSystemColorScheme', 'false'],
+      ['themeMode', newMode],
+    ]);
+  }, [mode]);
 
   // 시스템 모드 사용 설정 변경 함수
   const handleSetUseSystemColorScheme = useCallback(async (useSystem: boolean) => {
-    setUseSystemColorScheme(useSystem);
+    dispatchTheme({ type: 'SET_USE_SYSTEM_COLOR_SCHEME', useSystem, systemMode });
     await AsyncStorage.setItem('useSystemColorScheme', useSystem.toString());
-  }, []);
+  }, [systemMode]);
 
   const themeValue = useMemo(() => {
     const currentPalette = customPalette ? customPalette({ mode }) : palette({ mode });
@@ -123,7 +178,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       typography: typography({ themeFonts }),
       elevation: elevation(currentPalette)
     };
-  }, [mode, isUsingSystemColorScheme, typography, themeFonts, customPalette]);
+  }, [mode, isUsingSystemColorScheme, themeFonts, customPalette, handleSetUseSystemColorScheme, toggleTheme]);
 
   return (
     <ThemeContext.Provider value={themeValue}>
