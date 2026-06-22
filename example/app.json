@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -15,7 +14,6 @@
       "bundleIdentifier": "kr.co.studio0610.zsui.example"
     },
     "android": {
-      "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -50,13 +48,16 @@
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "static"
+            "useFrameworks": "static",
+            "deploymentTarget": "16.4"
           },
           "android": {
             "usesCleartextTraffic": true
           }
         }
-      ]
+      ],
+      "expo-status-bar",
+      "expo-localization"
     ],
     "scheme": "zs-ui-example"
   }

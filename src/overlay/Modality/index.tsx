@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     zIndex: Z_INDEX_VALUE.MODAL4,
   },
   animatedBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: Z_INDEX_VALUE.MODAL1,
     alignSelf: 'center',
   },

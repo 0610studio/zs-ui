@@ -144,11 +144,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   // 안드로이드 하단 제스쳐 영역 스타일
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setButtonStyleAsync(mode);
-      const currentPalette = customPalette ? customPalette({ mode }) : palette({ mode });
-      NavigationBar.setBackgroundColorAsync(currentPalette.background.base)
+      NavigationBar.setStyle(mode);
     }
-  }, [mode, customPalette])
+  }, [mode])
 
   // 테마 토글 함수
   const toggleTheme = useCallback(async () => {
