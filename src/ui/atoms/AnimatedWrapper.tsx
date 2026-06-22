@@ -36,7 +36,7 @@ function AnimatedWrapper({
   
   const staticConfig = useMemo(() => ({
     isIOS: IS_IOS,
-    maxShadowOpacity: IS_IOS ? IOS_SHADOW[elevationLevel].shadowOpacity : 0,
+    maxShadowOpacity: IS_IOS ? (IOS_SHADOW[elevationLevel]?.shadowOpacity ?? 0) : 0,
     maxElevation: IS_IOS ? 0 : elevationLevel,
   }), [elevationLevel]);
   

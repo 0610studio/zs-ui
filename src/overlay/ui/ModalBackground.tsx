@@ -35,12 +35,12 @@ const createStyles = (modalBgColor: string) =>
   StyleSheet.create({
     modalBg: {
       backgroundColor: modalBgColor,
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     fullScreen: {
       width: '100%',
       height: '100%',
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
   });
 

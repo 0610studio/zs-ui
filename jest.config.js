@@ -1,4 +1,7 @@
-const createJestPreset = require('expo-module-scripts/createJestPreset');
+const path = require('path');
+
+const expoModuleScriptsDir = path.dirname(require.resolve('expo-module-scripts/package.json'));
+const createJestPreset = require(path.join(expoModuleScriptsDir, 'createJestPreset.cjs'));
 
 const IGNORE_PATTERNS = [
   '/node_modules/',
