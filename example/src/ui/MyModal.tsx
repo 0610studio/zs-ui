@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Button, ScrollView, StyleSheet, View } from 'react-native';
 import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField, ZSAboveKeyboard, ThemeBackground, ColorPalette } from 'zs-ui';
 import MyBottomSheet from './MyBottomSheet';
@@ -10,7 +10,7 @@ interface MyModalProps {
 
 function MyModal({ onConfirm }: MyModalProps) {
   const { hideOverlay, showBottomSheet, showAlert } = useOverlay();
-  const { palette: { background, primary, divider } } = useTheme();
+  const { palette: { background, primary, grey } } = useTheme();
   const [search, setSearch] = useState<string>('');
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
 
@@ -33,7 +33,7 @@ function MyModal({ onConfirm }: MyModalProps) {
         </ZSPressable>
       </View>
 
-      <View style={{ width: '100%', height: 1, backgroundColor: divider }} />
+      <View style={{ width: '100%', height: 1, backgroundColor: grey[10] }} />
 
       <View style={styles.contents}>
         <ZSTextField

@@ -132,7 +132,7 @@ export interface AboveKeyboardOptions {
 }
 
 export enum FoldingState {
-  FOLDED = 'folded', // 폴딩, 일반 기기
+  FOLDED = 'folded',
   UNFOLDED = 'unfolded',
 }
 
@@ -150,7 +150,7 @@ export interface FoldingFeatureData {
 
 export interface NativeFoldingStateInfo {
   foldingFeature: FoldingFeatureData | null;
-  width: number; // PT 단위
+  width: number;
 }
 
 export interface FoldingStateInfo {

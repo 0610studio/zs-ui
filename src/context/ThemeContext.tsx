@@ -7,17 +7,27 @@ import { Theme, ThemeFonts, TypographyVariantsProps } from '../theme/types';
 import typography from '../theme/typography';
 import elevation, { ElevationStyles } from '../theme/elevation';
 
+export interface FoldableConfig {
+  /**
+   * 언폴딩 상태에서 rightComponent가 없을 때(단일 화면) 콘텐츠 최대 가로 길이(px).
+   * 미주입(undefined) 또는 false면 전폭으로 늘린다. 폭을 제한하려면 반드시 값을 주입해야 한다.
+   */
+  unfoldedSinglePaneMaxWidth?: number | false;
+}
+
 export interface ThemeProviderProps {
   themeFonts?: ThemeFonts;
   children: React.ReactNode;
   isDarkModeEnabled?: boolean;
   customPalette?: (config: { mode?: 'light' | 'dark'; themeColors?: { light?: Theme; dark?: Theme } }) => Theme;
+  foldable?: FoldableConfig;
 }
 
 export interface ThemeProps {
   palette: Palette;
   typography: TypographyVariantsProps;
   elevation: ElevationStyles;
+  foldable: FoldableConfig;
 }
 
 export interface Palette extends Theme {
@@ -76,8 +86,8 @@ export const useTheme = () => {
   return context;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, customPalette }) => {
-  const systemColorScheme = useColorScheme(); // 시스템 다크 모드 감지
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, customPalette, foldable }) => {
+  const systemColorScheme = useColorScheme();
   const systemMode = getSystemMode(systemColorScheme);
   const [themeState, dispatchTheme] = useReducer(
     themeReducer,
@@ -88,7 +98,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   );
   const { isUsingSystemColorScheme, mode } = themeState;
 
-  // AsyncStorage에서 시스템 모드 사용 설정 값 로드
   useEffect(() => {
     let isMounted = true;
 
@@ -136,33 +145,31 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
     };
   }, [isDarkModeEnabled, systemMode]);
 
-  // 시스템 다크 모드 변경에 따른 효과 적용
   useEffect(() => {
     dispatchTheme({ type: 'SYNC_SYSTEM_MODE', systemMode });
   }, [systemMode]);
 
-  // 안드로이드 하단 제스쳐 영역 스타일
   useEffect(() => {
     if (Platform.OS === 'android') {
       NavigationBar.setStyle(mode);
     }
   }, [mode])
 
-  // 테마 토글 함수
   const toggleTheme = useCallback(async () => {
     const newMode = mode === 'light' ? 'dark' : 'light';
-    dispatchTheme({ type: 'TOGGLE_THEME' }); // 사용자 지정 모드로 전환
+    dispatchTheme({ type: 'TOGGLE_THEME' });
     await AsyncStorage.multiSet([
       ['useSystemColorScheme', 'false'],
       ['themeMode', newMode],
     ]);
   }, [mode]);
 
-  // 시스템 모드 사용 설정 변경 함수
   const handleSetUseSystemColorScheme = useCallback(async (useSystem: boolean) => {
     dispatchTheme({ type: 'SET_USE_SYSTEM_COLOR_SCHEME', useSystem, systemMode });
     await AsyncStorage.setItem('useSystemColorScheme', useSystem.toString());
   }, [systemMode]);
+
+  const unfoldedSinglePaneMaxWidth = foldable?.unfoldedSinglePaneMaxWidth;
 
   const themeValue = useMemo(() => {
     const currentPalette = customPalette ? customPalette({ mode }) : palette({ mode });
@@ -171,12 +178,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
         isUsingSystemColorScheme,
         setUseSystemColorScheme: handleSetUseSystemColorScheme,
         toggleTheme,
-        ...currentPalette, // 선택된 모드에 따른 팔레트 적용
+        ...currentPalette,
       },
       typography: typography({ themeFonts }),
-      elevation: elevation(currentPalette)
+      elevation: elevation(currentPalette),
+      foldable: { unfoldedSinglePaneMaxWidth },
     };
-  }, [mode, isUsingSystemColorScheme, themeFonts, customPalette, handleSetUseSystemColorScheme, toggleTheme]);
+  }, [mode, isUsingSystemColorScheme, themeFonts, customPalette, handleSetUseSystemColorScheme, toggleTheme, unfoldedSinglePaneMaxWidth]);
 
   return (
     <ThemeContext.Provider value={themeValue}>

@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { ViewProps, StyleSheet } from 'react-native';
-import { useTheme } from '../../context/ThemeContext';
+import React from 'react';
+import { StyleSheet, ViewProps } from 'react-native';
+import { useStyleSheetCreate } from '../../model/useStyleSheetCreate';
 import AnimatedWrapper from '../atoms/AnimatedWrapper';
 import { ViewColorOptions, ShadowLevel } from '../../theme/types';
 
@@ -10,17 +10,13 @@ type Props = ViewProps & {
   color?: ViewColorOptions;
 };
 
-const ZSView: React.FC<Props> = ({ isAnimation = false, elevationLevel = 0, style, children, color, ...rest }) => {
-  const { palette } = useTheme();
-
-  const styles = useMemo(
-    () =>
-      StyleSheet.create({
-        container: {
-          backgroundColor: palette.background.base,
-        },
-      }),
-    [palette.background.base],
+function ZSView({ isAnimation = false, elevationLevel = 0, style, children, color, ...rest }: Props) {
+  const styles = useStyleSheetCreate((palette) =>
+    StyleSheet.create({
+      container: {
+        backgroundColor: palette.background.base,
+      },
+    }),
   );
 
   return (
@@ -28,6 +24,6 @@ const ZSView: React.FC<Props> = ({ isAnimation = false, elevationLevel = 0, styl
       {children}
     </AnimatedWrapper>
   );
-};
+}
 
-export default ZSView;
+export default React.memo(ZSView);

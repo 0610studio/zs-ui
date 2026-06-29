@@ -1,10 +1,7 @@
 import React from 'react';
 import { Text, TextProps } from 'react-native';
 
-type TextAtomProps = TextProps & {
-};
-
-function TextAtom({ children, ...props }: TextAtomProps) {
+function TextAtom({ children, ...props }: TextProps) {
   return (
     <Text {...props}>
       {children}

@@ -12,7 +12,6 @@ const SvgExclamation = ({
       height={size}
       viewBox="0 0 24 24"
     >
-      {/* 배경 원 */}
       <Circle
         cx="12"
         cy="12"
@@ -20,7 +19,6 @@ const SvgExclamation = ({
         fill={backgroundColor}
       />
       
-      {/* 느낌표 표시 */}
       <Path
         d="M12 6.5v6"
         stroke={exclamationColor}

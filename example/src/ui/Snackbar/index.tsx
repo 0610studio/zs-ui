@@ -1,36 +1,10 @@
-import { StyleSheet, View, Platform, Image } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { StyleSheet, View, Image } from 'react-native';
 import { CustomSnackbarProps, ZSText } from 'zs-ui';
-
-type SnackType = 'success' | 'error' | 'info';
-
-interface SnackBarConfig {
-  icon: string;
-  color: string;
-}
-
-const SNACK_CONFIG: Record<SnackType, SnackBarConfig> = {
-  success: {
-    icon: '✓',
-    color: 'rgba(52, 199, 89, 0.9)'
-  },
-  error: {
-    icon: '!',
-    color: 'rgba(255, 59, 48, 0.9)'
-  },
-  info: {
-    icon: 'i',
-    color: 'rgba(142, 142, 147, 0.9)'
-  }
-};
 
 function SnackBar({
   snackType = 'success',
   snackMessage
 }: CustomSnackbarProps) {
-  const config = SNACK_CONFIG[snackType as SnackType];
-  const isAndroid = Platform.OS === 'android';
-
   const SnackContent = () => (
     <View style={styles.snackbar}>
       <View style={styles.container}>
@@ -49,29 +23,17 @@ function SnackBar({
   );
 
   return (
-    <View style={styles.werapper}>
-      <BlurView
-        intensity={80}
-        tint="dark"
-        style={styles.blurContainer}
-        {...(isAndroid && {
-          experimentalBlurMethod: "dimezisBlurView",
-          blurReductionFactor: 8
-        })}
-      >
-        <SnackContent />
-      </BlurView>
+    <View style={styles.surface}>
+      <SnackContent />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  werapper: {
-    borderRadius: 16
-  },
-  blurContainer: {
+  surface: {
     borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
   snackbar: {
     width: '100%',

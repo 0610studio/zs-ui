@@ -6,75 +6,75 @@ import { useTheme } from "../../context/ThemeContext";
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
 interface ZSSkeletonProps extends ViewProps {
-    isFetching?: boolean;
-    style?: StyleProp<ViewStyle>;
-    children?: React.ReactNode;
-    overlayColor?: string;
+  isFetching?: boolean;
+  style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+  overlayColor?: string;
 }
 
 function ZSSkeleton({ isFetching, style, children, overlayColor, ...props }: ZSSkeletonProps) {
-    const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
-    const { palette } = useTheme();
-    const effectColor = overlayColor || palette.background.base;
+  const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
+  const { palette } = useTheme();
+  const effectColor = overlayColor || palette.background.base;
 
-    useEffect(() => {
-        if (isFetching) {
-            translateX.value = withRepeat(withTiming(DEVICE_WIDTH * 1.2, { duration: 800 }), -1, false);
-        } else {
-            cancelAnimation(translateX);
-            translateX.value = -DEVICE_WIDTH * 1.2;
-        }
+  useEffect(() => {
+    if (isFetching) {
+      translateX.value = withRepeat(withTiming(DEVICE_WIDTH * 1.2, { duration: 800 }), -1, false);
+    } else {
+      cancelAnimation(translateX);
+      translateX.value = -DEVICE_WIDTH * 1.2;
+    }
 
-        return () => {
-            cancelAnimation(translateX);
-        };
-    }, [isFetching]);
+    return () => {
+      cancelAnimation(translateX);
+    };
+  }, [isFetching]);
 
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ translateX: translateX.value }],
-        };
-    });
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateX.value }],
+    };
+  });
 
-    return isFetching ? (
-        <View style={[style, { overflow: "hidden" }]} {...props}>
-            <View style={styles.container}>
-                {children}
+  return isFetching ? (
+    <View style={[style, { overflow: "hidden" }]} {...props}>
+      <View style={styles.container}>
+        {children}
 
-                <Animated.View style={[styles.shimmer, animatedStyle]}>
-                    <View style={[styles.shimmerSub, { backgroundColor: effectColor }]} />
-                    <View style={[styles.shimmerCenter, { backgroundColor: effectColor }]} />
-                    <View style={[styles.shimmerSub, { backgroundColor: effectColor }]} />
-                </Animated.View>
-            </View>
-        </View>
-    ) : (
-        children
-    );
+        <Animated.View style={[styles.shimmer, animatedStyle]}>
+          <View style={[styles.shimmerSub, { backgroundColor: effectColor }]} />
+          <View style={[styles.shimmerCenter, { backgroundColor: effectColor }]} />
+          <View style={[styles.shimmerSub, { backgroundColor: effectColor }]} />
+        </Animated.View>
+      </View>
+    </View>
+  ) : (
+    children
+  );
 }
 
-export default ZSSkeleton;
+export default React.memo(ZSSkeleton);
 
 const styles = StyleSheet.create({
-    container: {
-        overflow: "hidden",
-        opacity: 0.6,
-        width: "100%",
-    },
-    shimmer: {
-        width: "100%",
-        height: "100%",
-        position: "absolute",
-        flexDirection: "row",
-    },
-    shimmerSub: {
-        height: "100%",
-        opacity: 0.3,
-        width: DEVICE_WIDTH * 0.3,
-    },
-    shimmerCenter: {
-        height: "100%",
-        opacity: 0.6,
-        width: DEVICE_WIDTH * 0.4,
-    },
+  container: {
+    overflow: "hidden",
+    opacity: 0.6,
+    width: "100%",
+  },
+  shimmer: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    flexDirection: "row",
+  },
+  shimmerSub: {
+    height: "100%",
+    opacity: 0.3,
+    width: DEVICE_WIDTH * 0.3,
+  },
+  shimmerCenter: {
+    height: "100%",
+    opacity: 0.6,
+    width: DEVICE_WIDTH * 0.4,
+  },
 });

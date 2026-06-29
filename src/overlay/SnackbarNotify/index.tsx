@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, memo, useMemo } from "react";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, View } from "react-native";
 import { CustomSnackbarProps } from "../../model/types";
@@ -13,13 +13,12 @@ const SnackbarNotify = ({
 }) => {
   const { snackItemStack, hideSnackBar } = useSnackbar();
   const { top } = useSafeAreaInsets();
+  const containerStyle = useMemo(() => [styles.container, { paddingTop: top }], [top]);
 
-  // ----------------------------------------------------------------
-
-  if (!snackItemStack) return null;
+  if (!snackItemStack?.length) return null;
 
   return (
-    <View style={[styles.container, { paddingTop: top }]}>
+    <View style={containerStyle}>
       {
         snackItemStack.map((snackItem) => {
           return (
@@ -45,4 +44,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SnackbarNotify;
+export default memo(SnackbarNotify);

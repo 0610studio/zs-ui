@@ -1,16 +1,34 @@
+import React from 'react';
 import { Image, type ImageSourcePropType, type StyleProp, type ViewStyle, type ViewProps } from 'react-native';
-import { ColorPalette, ThemeTextType, TypoColorOptions, TypoOptions, ViewColorOptions, IntentOptions, ThemeBackground } from '../../theme/types';
+import { TypoColorOptions, TypoOptions, TypoSubStyle, ViewColorOptions, IntentOptions } from '../../theme/types';
 import { useTheme } from '../../context/ThemeContext';
+import { resolveTextColor } from '../../theme/resolveColor';
 import ZSPressable from '../ZSPressable';
 import ZSView from '../ZSView';
 import ZSText from '../ZSText';
 
-type SemanticPaletteKey = 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey';
-type PaletteShade = keyof ColorPalette;
+// variant 별 텍스트 색상 토큰 (intent 단위 예외값 포함)
+const PASTEL_TEXT_COLOR: Record<IntentOptions, TypoColorOptions> = {
+  primary: 'primary.60',
+  danger: 'danger.60',
+  information: 'information.60',
+  success: 'success.60',
+  warning: 'warning.60',
+  grey: 'grey.70',
+};
 
-function isColorMap(value: unknown): value is Record<string, string> {
-  return typeof value === 'object' && value !== null;
-}
+const STROKE_TEXT_COLOR: Record<IntentOptions, TypoColorOptions> = {
+  primary: 'primary.50',
+  danger: 'danger.50',
+  information: 'information.50',
+  success: 'success.50',
+  warning: 'warning.60',
+  grey: 'grey.60',
+};
+
+// typo 크기(subStyle)별 패딩
+const PADDING_HORIZONTAL: Record<TypoSubStyle, number> = { '1': 11, '2': 11, '3': 10, '4': 8, '5': 7, '6': 5 };
+const PADDING_VERTICAL: Record<TypoSubStyle, number> = { '1': 9, '2': 9, '3': 8, '4': 6, '5': 5, '6': 4 };
 
 type Props = ViewProps & {
   onPress: () => void;
@@ -26,91 +44,22 @@ type Props = ViewProps & {
 
 function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false, ...props }: Props) {
   const { palette } = useTheme();
-  const size = typo.split('.')[1];
+  const size = typo.split('.')[1] as TypoSubStyle;
 
-  const getColors = (): {
+  const colors: {
     backgroundColor: ViewColorOptions | 'transparent';
     textColor: TypoColorOptions;
     borderColor?: string;
     borderWidth: number;
-  } => {
-    const baseColor = intent === 'danger' ? 'danger'
-      : intent === 'primary' ? 'primary'
-        : intent === 'information' ? 'information'
-          : intent === 'success' ? 'success'
-            : intent === 'warning' ? 'warning'
-              : 'grey';
+  } = variant === 'solid'
+    ? { backgroundColor: `${intent}.50` as ViewColorOptions, textColor: 'white', borderColor: undefined, borderWidth: 0 }
+    : variant === 'pastel'
+      ? { backgroundColor: `${intent}.10` as ViewColorOptions, textColor: PASTEL_TEXT_COLOR[intent], borderColor: undefined, borderWidth: 0 }
+      : { backgroundColor: 'transparent', textColor: STROKE_TEXT_COLOR[intent], borderColor: palette[intent][50], borderWidth: 1 };
 
-    if (variant === 'solid') {
-      return {
-        backgroundColor: `${baseColor}.50` as ViewColorOptions,
-        textColor: 'white' as TypoColorOptions,
-        borderColor: undefined,
-        borderWidth: 0,
-      };
-    } else if (variant === 'pastel') {
-      return {
-        backgroundColor: `${baseColor}.10` as ViewColorOptions,
-        textColor: (intent === 'danger' ? 'danger.60'
-          : intent === 'primary' ? 'primary.60'
-            : intent === 'information' ? 'information.60'
-              : intent === 'success' ? 'success.60'
-                : intent === 'warning' ? 'warning.60'
-                  : 'grey.70') as TypoColorOptions,
-        borderColor: undefined,
-        borderWidth: 0,
-      };
-    } else { // stroke
-      return {
-        backgroundColor: 'transparent',
-        textColor: (intent === 'danger' ? 'danger.50'
-          : intent === 'primary' ? 'primary.50'
-            : intent === 'information' ? 'information.50'
-              : intent === 'success' ? 'success.50'
-                : intent === 'warning' ? 'warning.60'
-                  : 'grey.60') as TypoColorOptions,
-        borderColor: intent === 'danger' ? palette.danger[50]
-          : intent === 'primary' ? palette.primary[50]
-            : intent === 'information' ? palette.information[50]
-              : intent === 'success' ? palette.success[50]
-                : intent === 'warning' ? palette.warning[50]
-                  : palette.grey[50],
-        borderWidth: 1,
-      };
-    }
-  };
-
-  const colors = getColors();
-
-  const paddingHorizontal = size === '1' ? 11
-    : size === '2' ? 11
-      : size === '3' ? 10
-        : size === '4' ? 8
-          : size === '5' ? 7
-            : size === '6' ? 5
-              : 10;
-
-  const paddingVertical = size === '1' ? 9
-    : size === '2' ? 9
-      : size === '3' ? 8
-        : size === '4' ? 6
-          : size === '5' ? 5
-            : size === '6' ? 4
-              : 8;
-
-  const getTextColorValue = () => {
-    const [c01, c02] = colors.textColor.split('.') as [string, string | undefined];
-    if (c02) {
-      if (c01 === 'text') return palette.text[c02 as keyof ThemeTextType];
-      if (c01 === 'background') return palette.background[c02 as keyof ThemeBackground];
-
-      const semanticPalette = palette[c01 as SemanticPaletteKey];
-      return isColorMap(semanticPalette) ? semanticPalette[c02 as PaletteShade] : undefined;
-    }
-    return palette.text[c01 as keyof ThemeTextType];
-  };
-
-  const textColorValue = getTextColorValue();
+  const paddingHorizontal = PADDING_HORIZONTAL[size] ?? 10;
+  const paddingVertical = PADDING_VERTICAL[size] ?? 8;
+  const textColorValue = resolveTextColor(palette, colors.textColor);
 
   return (
     <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled} {...props}>
@@ -142,4 +91,4 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
   );
 }
 
-export default ZSBlockButton;
+export default React.memo(ZSBlockButton);

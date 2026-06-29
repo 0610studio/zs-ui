@@ -46,6 +46,7 @@ module.exports = {
   FadeOutDown: makeAnim(),
   FadeInUp: makeAnim(),
   FadeOutUp: makeAnim(),
+  LinearTransition: makeAnim(),
   useSharedValue,
   useAnimatedStyle,
   useDerivedValue,

@@ -85,6 +85,9 @@ export default function RootLayout() {
         themeFonts={themeFonts}
         isDarkModeEnabled={true}
         customPalette={customPalette}
+        foldable={{
+          unfoldedSinglePaneMaxWidth: 600
+        }}
       >
         <OverlayProvider customSnackbar={SnackBar}>
           <Stack

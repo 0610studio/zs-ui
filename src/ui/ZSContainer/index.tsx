@@ -1,13 +1,11 @@
 import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, useState, useCallback, useMemo } from 'react';
-import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, View, Dimensions } from 'react-native';
+import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 import { FoldingState } from '../../model/types';
-import { MAX_FOLDABLE_SINGLE_WIDTH } from '../../model/utils';
 
-const windowHeight = Dimensions.get('window').height;
 const KEYBOARD_ANIMATION_DELAY = 50;
 const SCROLL_VIEW_OPTIONS = {
   bounces: false,
@@ -33,6 +31,11 @@ export type ZSContainerProps = ViewProps & {
   scrollToFocusedInput?: boolean;
   foldableSingleScreen?: boolean;
   dividerLineComponent?: ReactNode;
+  /**
+   * 언폴딩 상태에서 rightComponent가 없을 때(단일 화면) 콘텐츠 최대 가로 길이(px).
+   * 전폭으로 늘리려면 false. 미지정 시 ThemeProvider의 foldable 설정값을 따른다.
+   */
+  unfoldedSinglePaneMaxWidth?: number | false;
 };
 
 export type ZSContainerRef = ScrollView;
@@ -51,16 +54,16 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     translucent,
     scrollEventThrottle = 16,
     scrollToFocusedInput = true,
-    // foldable device
     foldableSingleScreen,
     dividerLineComponent,
     rightComponent,
-    // ---
+    unfoldedSinglePaneMaxWidth,
     ...props
   },
   forwardedRef
 ) {
-  const { palette } = useTheme();
+  const { palette, foldable } = useTheme();
+  const { height: windowHeight } = useWindowDimensions();
   const { foldingState, width } = useFoldingState();
   const positionRef = useRef<number | null>(0);
   const position2Ref = useRef<number | null>(0);
@@ -81,14 +84,12 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       const safeAreaBottom = 0;
       const availableScreenHeight = windowHeight - keyboardHeight - safeAreaBottom;
 
-      // 현재 스크롤 위치 참조
       const currentScrollPosition = touchPositionRef.current === 1
         ? positionRef.current || 0
         : position2Ref.current || 0;
 
       const touchPosition = lastTouchY.current || 0;
 
-      // 현재 터치 위치와 스크롤 위치를 기반으로 새로운 스크롤 위치 계산
       const scrollOffset = touchPosition - availableScreenHeight + keyboardScrollExtraOffset;
 
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
@@ -107,7 +108,7 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
         scrollTimeoutRef.current = null;
       }, KEYBOARD_ANIMATION_DELAY);
     }
-  }, [scrollToFocusedInput, keyboardScrollExtraOffset]);
+  }, [scrollToFocusedInput, keyboardScrollExtraOffset, windowHeight]);
 
   const handleKeyboardHide = useCallback(() => {
     setKeyboardHeight(0);
@@ -118,7 +119,6 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     handleKeyboardHide,
   });
 
-  // 클린업
   useEffect(() => {
     return () => {
       positionRef.current = null;
@@ -130,7 +130,6 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     };
   }, []);
   
-  // 에러 로그 출력
   useEffect(() => {
     if (foldableSingleScreen && (rightComponent || dividerLineComponent)) {
       console.error('[ZSContainer] foldableSingleScreen일 때는 rightComponent/dividerLineComponent를 사용할 수 없습니다.');
@@ -169,6 +168,29 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     props.style
   ], [props.style]);
 
+  // prop > ThemeProvider foldable 설정 순으로 적용. 기본값(폴백) 없음 — 미주입(undefined)이거나 false면 전폭으로 채움
+  const effectiveUnfoldedMaxWidth = unfoldedSinglePaneMaxWidth ?? foldable?.unfoldedSinglePaneMaxWidth;
+  const hasRightComponent = !!rightComponent;
+
+  const innerMaxWidth = useMemo(() => {
+    // foldableSingleScreen 이거나, 언폴딩 + rightComponent 미지원인 단일 화면일 때 폭 제한 대상
+    const isSinglePane = foldableSingleScreen || (foldingState === FoldingState.UNFOLDED && !hasRightComponent);
+    // 주입된 폭(number)이 있을 때만 제한, 없으면 전폭으로 채움
+    if (isSinglePane && typeof effectiveUnfoldedMaxWidth === 'number') {
+      return Math.min(width, effectiveUnfoldedMaxWidth);
+    }
+    return '100%' as const;
+  }, [foldableSingleScreen, foldingState, hasRightComponent, effectiveUnfoldedMaxWidth, width]);
+
+  const innerContainerStyle = useMemo(() => [
+    styles.w100,
+    {
+      maxWidth: innerMaxWidth,
+      alignSelf: 'center' as const,
+      backgroundColor: palette.background.base,
+    },
+  ], [innerMaxWidth, palette.background.base]);
+
   const shouldShowStatusBar = useMemo(() =>
     Boolean(barStyle || statusBarColor || translucent),
     [barStyle, statusBarColor, translucent]
@@ -179,10 +201,10 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       style={safeAreaStyle}
       edges={edges}
     >
-      <View style={[styles.w100, { backgroundColor: "#00000009" }]}>
-        <View style={[styles.w100, { maxWidth: foldableSingleScreen ? Math.min(width, MAX_FOLDABLE_SINGLE_WIDTH) : '100%', alignSelf: 'center', backgroundColor: palette.background.base }]}>
+      <View style={styles.outerLayer}>
+        <View style={innerContainerStyle}>
           {topComponent}
-          <View style={[styles.w100, { flexDirection: 'row' }]}>
+          <View style={styles.row}>
             <View style={styles.flex1}>
               {scrollViewDisabled ? (
                 <View style={[styles.flex1, containerStyle]}>
@@ -197,7 +219,6 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
                   scrollEventThrottle={scrollEventThrottle}
                   onScroll={(event) => { handleScroll(event, 1); }}
                   onTouchStart={(evt) => handleTouch(evt, 1)}
-                  // ---
                   {...SCROLL_VIEW_OPTIONS}
                 >
                   <View style={[styles.flex1, containerStyle]}>
@@ -223,7 +244,6 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
                       scrollEventThrottle={scrollEventThrottle}
                       onScroll={(event) => { handleScroll(event, 2); }}
                       onTouchStart={(evt) => handleTouch(evt, 2)}
-                      // ---
                       {...SCROLL_VIEW_OPTIONS}
                     >
                       <View style={[styles.flex1, containerStyle]}>
@@ -254,6 +274,8 @@ export const styles = StyleSheet.create({
   flex1: { flex: 1 },
   w100: { flex: 1, width: '100%' },
   scrollContainerStyle: { alignItems: 'center', width: '100%', flexGrow: 1 },
+  outerLayer: { flex: 1, width: '100%', backgroundColor: '#00000009' },
+  row: { flex: 1, width: '100%', flexDirection: 'row' },
 });
 
 export default ZSContainer;
