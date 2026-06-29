@@ -1,6 +1,6 @@
-import React, { ReactNode, useEffect, useCallback } from "react";
+import React, { ReactNode, memo, useEffect, useCallback } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import { CustomSnackbarProps, SnackItem } from "../../../model/types";
 import ViewAtom from "../../../ui/atoms/ViewAtom";
 import { useTheme } from "../../../context/ThemeContext";
@@ -25,13 +25,14 @@ const Snackbar = ({
   useEffect(() => {
     const closeTimeout = setTimeout(closeSnackbar, snackbarDuration);
     return () => clearTimeout(closeTimeout);
-  }, []);
+  }, [closeSnackbar, snackbarDuration]);
 
   return (
     <Animated.View
       style={[styles.snackbarWrapper]}
-      entering={FadeInUp}
-      exiting={FadeOutUp}
+      entering={FadeInUp.duration(250)}
+      exiting={FadeOutUp.duration(250)}
+      layout={LinearTransition.duration(250)}
     >
       <TouchableOpacity
         style={[styles.container]}
@@ -81,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Snackbar;
+export default memo(Snackbar);

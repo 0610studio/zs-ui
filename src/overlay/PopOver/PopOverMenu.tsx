@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, LayoutChangeEvent, Pressable } from "react-native";
+import { LayoutChangeEvent, Pressable, useWindowDimensions } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { usePopOver } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
@@ -8,7 +8,6 @@ import { useTheme } from "../../context/ThemeContext";
 import { Z_INDEX_VALUE } from "../../model/utils";
 
 const MINIMUM_OFFSET = 10;
-const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 function PopOverMenu({
   px,
@@ -16,6 +15,7 @@ function PopOverMenu({
   component
 }: PopOverMenuProps): React.ReactElement | null {
   const { palette } = useTheme();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const [isContentVisible, setIsContentVisible] = useState<boolean>(false);
   const [contentWidth, setContentWidth] = useState<number>(0);
   const [contentHeight, setContentHeight] = useState<number>(0);
@@ -48,12 +48,10 @@ function PopOverMenu({
     setContentHeight(event.nativeEvent.layout.height || 0);
   }, []);
 
-  // 화면 경계를 벗어나는지 확인하고 위치 조정
   const getAdjustedPosition = () => {
     let adjustedX = px - contentWidth;
     let adjustedY = py;
 
-    // 수평 방향 조정
     if (adjustedX > windowWidth) {
       adjustedX = windowWidth - MINIMUM_OFFSET;
     }
@@ -61,9 +59,8 @@ function PopOverMenu({
       adjustedX = MINIMUM_OFFSET;
     }
 
-    // 수직 방향 조정
     if (py + contentHeight > windowHeight) {
-      adjustedY = py - (contentHeight * 1.5); // 위쪽으로 표시
+      adjustedY = py - (contentHeight * 1.5);
     }
     if (adjustedY < 0) {
       adjustedY = MINIMUM_OFFSET;

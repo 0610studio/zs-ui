@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect } from 'react';
+import { StyleSheet } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { Z_INDEX_VALUE } from '../../model/utils';
 
@@ -18,7 +19,6 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
 
   const registerPortal = useCallback((id: string, element: ReactNode) => {
     setPortals(prev => {
-      // 동일한 요소가 이미 등록되어 있다면 업데이트하지 않음
       if (prev.get(id) === element) {
         return prev;
       }
@@ -30,7 +30,6 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
 
   const unregisterPortal = useCallback((id: string) => {
     setPortals(prev => {
-      // 해당 ID가 존재하지 않으면 상태를 변경하지 않음
       if (!prev.has(id)) {
         return prev;
       }
@@ -40,11 +39,16 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
     });
   }, []);
 
+  const contextValue = useMemo(
+    () => ({ registerPortal, unregisterPortal }),
+    [registerPortal, unregisterPortal]
+  );
+
   return (
-    <PortalContext.Provider value={{ registerPortal, unregisterPortal }}>
+    <PortalContext.Provider value={contextValue}>
       {children}
       {Array.from(portals.entries()).map(([id, element]) => (
-        <Animated.View entering={FadeInDown} exiting={FadeOutDown} key={id} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'box-none', zIndex: Z_INDEX_VALUE.ABOVE_KEYBOARD }}>
+        <Animated.View entering={FadeInDown} exiting={FadeOutDown} key={id} style={styles.portalLayer}>
           {element}
         </Animated.View>
       ))}
@@ -52,7 +56,17 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
   );
 };
 
-// ------------------------------------------------------------------------------------------------
+const styles = StyleSheet.create({
+  portalLayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    pointerEvents: 'box-none',
+    zIndex: Z_INDEX_VALUE.ABOVE_KEYBOARD,
+  },
+});
 
 interface PortalProps {
   children: ReactNode;

@@ -2,7 +2,7 @@ import { BLACK, PRIMITIVE_BLUE, PRIMITIVE_GREEN, PRIMITIVE_GREY, PRIMITIVE_GREY_
 import { Theme, ColorPalette, ColorPaletteExtend } from "./types";
 
 export const transparency = {
-  '0%': '00',   // 완전 투명
+  '0%': '00',
   '2%': '05',
   '4%': '0A',
   '6%': '0F',
@@ -52,7 +52,7 @@ export const transparency = {
   '94%': 'F0',
   '96%': 'F5',
   '98%': 'FA',
-  '100%': 'FF'  // 완전 불투명
+  '100%': 'FF'
 };
 
 const MODAL_BG_COLOR = {
@@ -251,7 +251,6 @@ const SEMANTIC_BACKGROUND_COLORS = {
   },
 };
 
-// ThemeFactory 타입 정의
 export interface ThemeFactoryColors {
   primary?: Partial<ColorPaletteExtend>;
   secondary?: Partial<ColorPalette>;
@@ -267,13 +266,8 @@ export interface ThemeFactoryConfig {
   dark?: ThemeFactoryColors;
 }
 
-/**
- * 테마 팩토리 함수 - SEMANTIC_LIGHT_COLORS와 SEMANTIC_DARK_COLORS를 재정의할 수 있는 기능을 제공합니다.
- * @param config - 라이트/다크 모드별로 색상을 재정의할 수 있는 설정 객체
- * @returns 재정의된 SEMANTIC_LIGHT_COLORS와 SEMANTIC_DARK_COLORS를 포함한 팩토리 함수
- */
+/** 라이트/다크 시맨틱 색상을 재정의해 커스텀 팔레트 함수를 생성한다. */
 export function themeFactory(config: ThemeFactoryConfig = {}) {
-  // 기본 색상들을 깊은 복사로 생성
   const createCustomLightColors = (): typeof SEMANTIC_LIGHT_COLORS => {
     const customColors = { ...SEMANTIC_LIGHT_COLORS };
     
@@ -313,7 +307,6 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
   const customLightColors = createCustomLightColors();
   const customDarkColors = createCustomDarkColors();
 
-  // 재정의된 색상으로 새로운 팔레트 함수 반환
   return function createPalette({
     mode = 'light',
     themeColors = {},
@@ -323,7 +316,6 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
   } = {}): Theme {
     const colors = mode === 'light' ? customLightColors : customDarkColors;
 
-    // 재정의된 색상을 기반으로 동적으로 색상 매핑 생성
     const customTextColors = {
       light: {
         primary: colors.primary.main,
@@ -407,7 +399,6 @@ export function themeFactory(config: ThemeFactoryConfig = {}) {
       mainColor: customMainColors[mode]
     };
 
-    // 사용자 정의 테마 컬러가 있을 경우 병합
     if (themeColors?.[mode]) {
       return {
         ...theme,
@@ -438,7 +429,6 @@ export default function palette({
     mainColor: MAIN_COLORS[mode]
   };
 
-  // 사용자 정의 테마 컬러가 있을 경우 병합
   if (themeColors?.[mode]) {
     return {
       ...theme,

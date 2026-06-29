@@ -29,7 +29,6 @@ export {
   ThemeProvider,
   OverlayProvider,
   themeFactory,
-  // ---
   ZSView,
   AnimatedWrapper,
   TextAtom,
@@ -44,7 +43,6 @@ export {
   ZSBlockButton,
   ZSSkeleton,
   ZSSkeletonBox,
-  // ---
   AlertOverlay,
   BottomSheetOverlay,
   SnackbarNotify,
@@ -52,14 +50,11 @@ export {
   PopOverButton,
   PopOverMenu,
   ZSPortal,
-  // Global overlay functions
   GlobalOverlay,
   useStyleSheetCreate,
 };
 
-// ------------------------------------------------------
-
-import type { ThemeProviderProps, ThemeProps, Palette } from "./context/ThemeContext";
+import type { ThemeProviderProps, ThemeProps, Palette, FoldableConfig } from "./context/ThemeContext";
 import {
   ColorPalette,
   ColorPaletteExtend,
@@ -100,6 +95,7 @@ export type {
   ThemeProviderProps,
   ThemeProps,
   Palette,
+  FoldableConfig,
   ZSTextProps,
   BoxStyle,
   ZSTextFieldRef,

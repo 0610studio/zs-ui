@@ -1,4 +1,4 @@
-import { extractStyle, Z_INDEX_VALUE, MAX_FOLDABLE_SINGLE_WIDTH } from "../../model/utils";
+import { extractStyle, Z_INDEX_VALUE, OVERLAY_FOLDABLE_SINGLE_WIDTH } from "../../model/utils";
 
 describe("extractStyle", () => {
   it("배열 스타일에서 지정 속성을 추출한다", () => {
@@ -29,8 +29,8 @@ describe("constants", () => {
     expect(Z_INDEX_VALUE.LOADING).toBe(8999);
   });
 
-  it("MAX_FOLDABLE_SINGLE_WIDTH가 정의된다", () => {
-    expect(MAX_FOLDABLE_SINGLE_WIDTH).toBeGreaterThan(0);
+  it("OVERLAY_FOLDABLE_SINGLE_WIDTH가 정의된다", () => {
+    expect(OVERLAY_FOLDABLE_SINGLE_WIDTH).toBeGreaterThan(0);
   });
 });
 

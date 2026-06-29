@@ -6,7 +6,7 @@ import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
-import { MAX_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 
@@ -23,6 +23,13 @@ const ANIMATION_CONFIG = {
     mass: 0.7,
     velocity: 100,
     restDisplacementThreshold: 0.2,
+  },
+  restore: {
+    damping: 26,
+    stiffness: 260,
+    mass: 0.85,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 2,
   },
   close: { duration: 150 },
   scale: { duration: 200 },
@@ -41,7 +48,7 @@ const GESTURE_CONSTANTS = {
   closeDistanceRatio: 1 / 3,
   minimumCloseDistance: 80,
   hideDelay: 200,
-  moveThreshold: 10, // 드래그로 인식하기 위한 최소 이동 거리 (px)
+  moveThreshold: 10,
 } as const;
 
 const getSafeFiniteNumber = (value: number, fallback: number) =>
@@ -118,13 +125,13 @@ function BottomSheetOverlay({
     handleKeyboardHide,
   });
 
-  // BottomSheet 표시/숨김 애니메이션 처리
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     if (bottomSheetVisible) {
       closingOffsetRef.current = latestCloseOffsetRef.current;
       Keyboard.dismiss();
+      translateY.value = latestCloseOffsetRef.current;
       setLocalVisible(true);
       translateY.value = withSpring(0, ANIMATION_CONFIG.spring);
     } else {
@@ -201,7 +208,9 @@ function BottomSheetOverlay({
 
   const handlePanResponderRelease = useCallback((_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
     isGesturing.value = false;
-    translateX.value = withTiming(0, { duration: 100 });
+
+    const xVelocity = (gestureState.vx / GESTURE_CONSTANTS.horizontalDamping) * 1000;
+    translateX.value = withSpring(0, { ...ANIMATION_CONFIG.restore, velocity: xVelocity });
 
     const dismissThresholdHeight = sheetHeight > 0 ? sheetHeight : constrainedMaxHeight;
     const dismissDistanceThreshold = Math.max(
@@ -217,7 +226,11 @@ function BottomSheetOverlay({
       translateY.value = withTiming(targetCloseOffset, ANIMATION_CONFIG.close);
       closeBottomSheet();
     } else {
-      translateY.value = withTiming(0, ANIMATION_CONFIG.close);
+      const yDamping = translateY.value >= 0
+        ? GESTURE_CONSTANTS.verticalDownDamping
+        : GESTURE_CONSTANTS.verticalUpDamping;
+      const yVelocity = (gestureState.vy / yDamping) * 1000;
+      translateY.value = withSpring(0, { ...ANIMATION_CONFIG.restore, velocity: yVelocity });
     }
 
     scale.value = withSpring(1, ANIMATION_CONFIG.scaleRestore);
@@ -228,7 +241,6 @@ function BottomSheetOverlay({
       onStartShouldSetPanResponder: () => false,
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        // 일정 거리 이상 이동했을 때만 PanResponder가 응답 (탭과 드래그 구분)
         const { dx, dy } = gestureState;
         return Math.abs(dx) > GESTURE_CONSTANTS.moveThreshold || Math.abs(dy) > GESTURE_CONSTANTS.moveThreshold;
       },
@@ -240,7 +252,6 @@ function BottomSheetOverlay({
     [handlePanResponderGrant, handlePanResponderMove, handlePanResponderRelease]
   );
 
-  // 배경 터치 핸들러
   const handleBackgroundPress = useCallback(() => {
     if (isBackgroundTouchClose) setBottomSheetVisible(false);
   }, [isBackgroundTouchClose, setBottomSheetVisible]);
@@ -261,7 +272,7 @@ function BottomSheetOverlay({
     containerHeightStyle,
     {
       width: options.type === 'fixed' ? '100%' : windowWidth - marginHorizontal * 2,
-      maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%',
+      maxWidth: foldableSingleScreen ? OVERLAY_FOLDABLE_SINGLE_WIDTH : '100%',
       marginHorizontal: options.type === 'fixed' ? 0 : marginHorizontal,
       bottom: options.type === 'fixed' ? 0 : marginBottom + bottomInsets,
       paddingBottom: options.type === 'fixed' ? bottomInsets : 0,

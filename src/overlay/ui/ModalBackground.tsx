@@ -6,7 +6,7 @@ import { Z_INDEX_VALUE } from '../../model/utils';
 interface ModalBackgroundProps {
   zIndex?: number;
   modalBgColor: string;
-  position?: 'center' | 'left' | 'right' | 'pop'; // TODO: 'left' | 'right' 미구현
+  position?: 'center' | 'left' | 'right' | 'pop';
   children: React.ReactNode;
   onPress?: () => void;
 }

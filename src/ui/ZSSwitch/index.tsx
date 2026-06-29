@@ -69,6 +69,6 @@ function ZSSwitch({
       </Animated.View>
     </Pressable>
   );
-};
+}
 
-export default ZSSwitch;
+export default React.memo(ZSSwitch);

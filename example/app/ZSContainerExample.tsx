@@ -20,7 +20,7 @@ function ZSContainerExample() {
             // ---
             primaryButtonText='CTA 버튼'
             onPrimaryButtonPress={() => {
-              router.push('/404')
+              console.log('CTA 버튼 클릭');
             }}
             // ---
             secondaryButtonText='취소'

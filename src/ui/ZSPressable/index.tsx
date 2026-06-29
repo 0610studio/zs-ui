@@ -37,8 +37,6 @@ function ZSPressable({
   const isButtonPress = useSharedValue(0);
   const lastClickTime = useRef<number>(0);
 
-  // ------------------------------------------------------------
-
   const createPressHandler = (callback?: () => void) => {
     return () => {
       const now = Date.now();
@@ -52,8 +50,6 @@ function ZSPressable({
 
   const handlePress = createPressHandler(onPress);
   const handleLongPress = createPressHandler(onLongPress);
-
-  // ------------------------------------------------------------
 
   const boxAnimation = useAnimatedStyle(() => {
     const scale = interpolate(

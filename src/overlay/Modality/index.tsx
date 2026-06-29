@@ -3,7 +3,7 @@ import { Dimensions, StatusBar, StyleSheet } from 'react-native';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
-import { MAX_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import ZSView from '../../ui/ZSView';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -29,12 +29,10 @@ function Modality({
   const mainScreenMargin = insets.top;
   const mainScrrenPadding = (initialWindowMetrics?.insets.bottom || insets.bottom);
 
-  // 애니메이션 트리거
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
     
     if (modalityVisible) {
-      // 모달이 열리는 애니메이션
       setLocalVisible(true);
       backScale.value = withDelay(100, withTiming(0.92, { duration: 200 }));
       backTranslateY.value = withDelay(300, withTiming(insets.top, { duration: 200 }));
@@ -42,7 +40,6 @@ function Modality({
       mainTranslateY.value = withDelay(200, withTiming(overrideMargin + insets.top, { duration: 200 }));
       backgroundOpacity.value = withTiming(1, { duration: 500 });
     } else {
-      // 모달이 닫히는 애니메이션 (역순)
       backScale.value = withTiming(1, { duration: 100 });
       backTranslateY.value = withTiming(0, { duration: 100 });
       backBorderRadius.value = withTiming(0, { duration: 100 });
@@ -58,7 +55,6 @@ function Modality({
     };
   }, [modalityVisible, insets.top]);
 
-  // 부모 스크린
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -70,7 +66,6 @@ function Modality({
     };
   });
 
-  // 아래에서 등장하는 Modality 화면
   const mainScreenAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -79,7 +74,6 @@ function Modality({
     };
   });
 
-  // 배경 불투명도 스타일
   const backgroundAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: backgroundOpacity.value
@@ -102,7 +96,7 @@ function Modality({
           exiting={FadeOut.duration(300)}
           style={[
             styles.backScreen,
-            { backgroundColor: palette.background.layer2, width: '100%', height: windowHeight, maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%' },
+            { backgroundColor: palette.background.layer2, width: '100%', height: windowHeight, maxWidth: foldableSingleScreen ? OVERLAY_FOLDABLE_SINGLE_WIDTH : '100%' },
             backScreenAnimatedStyle
           ]}
         />
@@ -114,7 +108,7 @@ function Modality({
               paddingBottom: mainScrrenPadding,
               backgroundColor: palette.background.base,
               width: '100%',
-              maxWidth: foldableSingleScreen ? MAX_FOLDABLE_SINGLE_WIDTH : '100%',
+              maxWidth: foldableSingleScreen ? OVERLAY_FOLDABLE_SINGLE_WIDTH : '100%',
               alignSelf: 'center',
             },
             styles.mainScreen,

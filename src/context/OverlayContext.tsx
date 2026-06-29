@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BackHandler, Dimensions, Keyboard, TextProps, TouchableOpacityProps } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { BackHandler, Keyboard, TextProps, TouchableOpacityProps, useWindowDimensions } from 'react-native';
 import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from '../model/useOverlay';
 import { AlertActions, BottomSheetHeight, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from '../model/types';
 import AlertOverlay from '../overlay/AlertOverlay';
@@ -11,15 +12,22 @@ import Modality from '../overlay/Modality';
 import { PortalProvider } from '../overlay/ZSPortal';
 import { setGlobalOverlayRef } from '../model/globalOverlay';
 
+const MemoizedAlertOverlay = memo(AlertOverlay);
+const MemoizedSnackbarNotify = memo(SnackbarNotify);
+const MemoizedBottomSheetOverlay = memo(BottomSheetOverlay);
+const MemoizedLoadingNotify = memo(LoadingNotify);
+const MemoizedPopOverMenu = memo(PopOverMenu);
+const MemoizedModality = memo(Modality);
+const EMPTY_ALERT_ACTIONS = {} as AlertActions;
+
 export function OverlayProvider({
   customSnackbar,
   maxSnackbarCount = 3,
   loaderComponent,
   children
 }: OverlayProviderProps) {
-  const defaultBottomSheetMaxHeight = Dimensions.get('window').height;
+  const { height: defaultBottomSheetMaxHeight } = useWindowDimensions();
 
-  // Alert
   const [title, setTitle] = useState<string>('');
   const [informative, setInformative] = useState<string>('');
   const [alertVisible, setAlertVisible] = useState<boolean>(false);
@@ -31,28 +39,23 @@ export function OverlayProvider({
   const [primaryButtonStyle, setPrimaryButtonStyle] = useState<TouchableOpacityProps['style']>();
   const [secondaryButtonTextStyle, setSecondaryButtonTextStyle] = useState<TextProps['style']>();
 
-  // Snackbar
   const [snackItemStack, setSnackItemStack] = useState<SnackItem[]>([]);
 
-  // BottomSheet
   const [bottomSheetVisible, setBottomSheetVisible] = useState<boolean>(false);
-  const [bottomSheetComponent, setBottomSheetComponent] = useState<React.ReactNode>(null);
-  const [bottomSheetHeader, setBottomSheetHeader] = useState<React.ReactNode>(null);
+  const [bottomSheetComponent, setBottomSheetComponent] = useState<ReactNode>(null);
+  const [bottomSheetHeader, setBottomSheetHeader] = useState<ReactNode>(null);
   const [bottomSheetOptions, setBottomSheetOptions] = useState<BottomSheetOptions>();
   const [bottomSheetHeight, setBottomSheetHeight] = useState<BottomSheetHeight>(300);
   const [bottomSheetMaxHeight, setBottomSheetMaxHeight] = useState<number>(defaultBottomSheetMaxHeight);
 
-  // Loading
   const [loaderVisible, setLoaderVisible] = useState<boolean>(false);
 
-  // PopOver
   const [popOverVisible, setPopOverVisible] = useState<boolean>(false);
   const [popOverLocation, setPopOverLocation] = useState<{ px: PopOverMenuProps['px'], py: PopOverMenuProps['py'] }>({ px: 0, py: 0 });
-  const [popOverComponent, setPopOverComponent] = useState<React.ReactNode>(false);
+  const [popOverComponent, setPopOverComponent] = useState<ReactNode>(false);
 
-  // Modality
   const [modalityVisible, setModalityVisible] = useState<boolean>(false);
-  const [modalityComponent, setModalityComponent] = useState<React.ReactNode>(false);
+  const [modalityComponent, setModalityComponent] = useState<ReactNode>(false);
   const [modalityFoldableSingleScreen, setModalityFoldableSingleScreen] = useState<boolean>(false);
 
   const showAlert = useCallback(({
@@ -169,7 +172,6 @@ export function OverlayProvider({
     };
   }, []);
 
-  // 안드로이드 뒤로가기 버튼 제어
   const backPressHandler = useCallback(() => {
     if (loaderVisible) {
       return true;
@@ -186,8 +188,6 @@ export function OverlayProvider({
     return () => backHandler.remove();
   }, [backPressHandler]);
 
-  // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
   const overlayContextValue = useMemo(() => ({
     hideOverlay,
     showAlert,
@@ -198,11 +198,9 @@ export function OverlayProvider({
     showLoader,
   }), [hideOverlay, showAlert, showSnackBar, showBottomSheet, showPopOverMenu, showModality, showLoader]);
 
-  // Global overlay reference 업데이트
   useEffect(() => {
     setGlobalOverlayRef(overlayContextValue);
 
-    // Cleanup 시 global reference 제거
     return () => {
       setGlobalOverlayRef(null);
     };
@@ -273,24 +271,24 @@ export function OverlayProvider({
                   <PortalProvider>
                     {children}
 
-                    <Modality modalityComponent={modalityComponent} foldableSingleScreen={modalityFoldableSingleScreen} />
+                    <MemoizedModality modalityComponent={modalityComponent} foldableSingleScreen={modalityFoldableSingleScreen} />
 
-                    <BottomSheetOverlay
+                    <MemoizedBottomSheetOverlay
                       headerComponent={bottomSheetHeader}
                       component={bottomSheetComponent}
                       options={bottomSheetOptions}
                     />
 
-                    <PopOverMenu
+                    <MemoizedPopOverMenu
                       px={popOverLocation?.px}
                       py={popOverLocation?.py}
                       component={popOverComponent}
                     />
 
-                    <AlertOverlay
+                    <MemoizedAlertOverlay
                       title={title}
                       informative={informative}
-                      actions={actions || {} as AlertActions}
+                      actions={actions || EMPTY_ALERT_ACTIONS}
                       isBackgroundTouchClose={isBackgroundTouchClose}
                       titleStyle={titleStyle}
                       informativeStyle={informativeStyle}
@@ -299,11 +297,11 @@ export function OverlayProvider({
                       secondaryButtonTextStyle={secondaryButtonTextStyle}
                     />
 
-                    <SnackbarNotify
+                    <MemoizedSnackbarNotify
                       customSnackbar={customSnackbar}
                     />
 
-                    <LoadingNotify
+                    <MemoizedLoadingNotify
                       loaderComponent={loaderComponent}
                     />
                   </PortalProvider>

@@ -1,10 +1,7 @@
 import React from 'react';
 import { View, ViewProps } from 'react-native';
 
-type ViewAtomProps = ViewProps & {
-};
-
-function ViewAtom({ children, ...props }: ViewAtomProps) {
+function ViewAtom({ children, ...props }: ViewProps) {
   return (
     <View {...props}>
       {children}

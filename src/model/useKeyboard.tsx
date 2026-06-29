@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Keyboard, Platform, type KeyboardEvent } from 'react-native';
 
 interface UseKeyboardReturn {
@@ -21,17 +21,22 @@ const useKeyboard = ({
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
+  const handleKeyboardShowRef = useRef(handleKeyboardShow);
+  const handleKeyboardHideRef = useRef(handleKeyboardHide);
+  handleKeyboardShowRef.current = handleKeyboardShow;
+  handleKeyboardHideRef.current = handleKeyboardHide;
+
   useEffect(() => {
     const showListener = (event: KeyboardEvent) => {
       setIsKeyboardVisible(true);
       setKeyboardHeight(event.endCoordinates.height);
-      handleKeyboardShow?.(event);
+      handleKeyboardShowRef.current?.(event);
     };
 
     const hideListener = () => {
       setIsKeyboardVisible(false);
       setKeyboardHeight(0);
-      handleKeyboardHide?.();
+      handleKeyboardHideRef.current?.();
     };
 
     const keyboardShowSubscription = Keyboard.addListener(showEvent, showListener);
@@ -41,7 +46,7 @@ const useKeyboard = ({
       keyboardShowSubscription.remove();
       keyboardHideSubscription.remove();
     };
-  }, [handleKeyboardShow, handleKeyboardHide]);
+  }, []);
 
   return {
     isKeyboardVisible,
