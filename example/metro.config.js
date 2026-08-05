@@ -16,6 +16,7 @@ config.resolver.blockList = [
   ...Array.from(config.resolver.blockList ?? []),
   blockRootPackage('react'),
   blockRootPackage('react-native'),
+  blockRootPackage('react-native-safe-area-context'),
 ];
 
 config.resolver.nodeModulesPaths = [
