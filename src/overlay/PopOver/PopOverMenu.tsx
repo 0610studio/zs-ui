@@ -52,15 +52,17 @@ function PopOverMenu({
     let adjustedX = px - contentWidth;
     let adjustedY = py;
 
-    if (adjustedX > windowWidth) {
-      adjustedX = windowWidth - MINIMUM_OFFSET;
+    // 오른쪽 화면 이탈 시 메뉴 오른쪽 끝을 화면 안으로 클램프
+    if (adjustedX + contentWidth > windowWidth - MINIMUM_OFFSET) {
+      adjustedX = windowWidth - contentWidth - MINIMUM_OFFSET;
     }
     if (adjustedX < 0) {
       adjustedX = MINIMUM_OFFSET;
     }
 
+    // 아래쪽 화면 이탈 시 앵커 위쪽으로 플립
     if (py + contentHeight > windowHeight) {
-      adjustedY = py - (contentHeight * 1.5);
+      adjustedY = py - contentHeight - MINIMUM_OFFSET;
     }
     if (adjustedY < 0) {
       adjustedY = MINIMUM_OFFSET;

@@ -1,9 +1,10 @@
-import React, { ReactNode, memo, useEffect, useCallback } from "react";
+import { ReactNode, memo, useEffect, useCallback } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import Animated, { FadeInUp, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import { CustomSnackbarProps, SnackItem } from "../../../model/types";
 import ViewAtom from "../../../ui/atoms/ViewAtom";
 import { useTheme } from "../../../context/ThemeContext";
+import { DURATION, RADIUS } from "../../../theme/tokens";
 import ZSText from "../../../ui/ZSText";
 
 const Snackbar = ({
@@ -30,9 +31,9 @@ const Snackbar = ({
   return (
     <Animated.View
       style={[styles.snackbarWrapper]}
-      entering={FadeInUp.duration(250)}
-      exiting={FadeOutUp.duration(250)}
-      layout={LinearTransition.duration(250)}
+      entering={FadeInUp.duration(DURATION.slow)}
+      exiting={FadeOutUp.duration(DURATION.slow)}
+      layout={LinearTransition.duration(DURATION.slow)}
     >
       <TouchableOpacity
         style={[styles.container]}
@@ -60,7 +61,7 @@ const Snackbar = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 16,
+    borderRadius: RADIUS.xl,
     width: "100%",
   },
   snackbarWrapper: {
@@ -68,8 +69,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   snackBar: {
-    borderRadius: 16,
-    paddingHorizontal: 10,
+    borderRadius: RADIUS.xl,
+    paddingHorizontal: 16,
     paddingVertical: 18,
     flexDirection: "row",
     alignItems: "center",
@@ -78,7 +79,6 @@ const styles = StyleSheet.create({
   messageContainer: {
     flex: 1,
     flexDirection: "column",
-    marginLeft: 10,
   },
 });
 

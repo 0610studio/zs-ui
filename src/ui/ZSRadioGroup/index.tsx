@@ -1,10 +1,11 @@
-import React, { useCallback, memo } from 'react';
+import { useCallback, memo } from 'react';
 import { StyleSheet, ViewProps } from 'react-native';
 import { RadioOption } from '../types';
 import ViewAtom from '../atoms/ViewAtom';
 import ZSText, { ZSTextProps } from '../ZSText';
 import ZSPressable from '../ZSPressable';
 import { useTheme } from '../../context/ThemeContext';
+import { DISABLED_OPACITY, RADIUS } from '../../theme/tokens';
 import { SvgCheck } from '../../assets/SvgCheck';
 
 const ROW_WIDTH: Record<1 | 2 | 3, '100%' | '50%' | '33.33%'> = {
@@ -59,7 +60,13 @@ const RadioRow = memo(function RadioRow({
         },
       ]}
     >
-      <ZSPressable onPress={() => onSelect(option)} pressedBackgroundColor="transparent" fullWidth>
+      <ZSPressable
+        onPress={() => onSelect(option)}
+        pressedBackgroundColor="transparent"
+        fullWidth
+        accessibilityRole='radio'
+        accessibilityState={{ checked: isSelected }}
+      >
         <ViewAtom style={[styles.row, { borderColor: setColor, backgroundColor: innerColor }]}>
           {!isFullWidth && (
             <ViewAtom style={[styles.radioOuter, { borderColor: setColor }]}>
@@ -123,7 +130,14 @@ function ZSRadioGroup({
 
   return (
     <ViewAtom
-      style={[styles.container, { flexDirection: isFullWidth ? 'column' : 'row', flexWrap: isFullWidth ? 'nowrap' : 'wrap' }]}
+      style={[
+        styles.container,
+        {
+          flexDirection: isFullWidth ? 'column' : 'row',
+          flexWrap: isFullWidth ? 'nowrap' : 'wrap',
+          opacity: disabled ? DISABLED_OPACITY : 1,
+        },
+      ]}
       {...containerStyle}
       {...props}
     >
@@ -166,7 +180,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 10,
     paddingRight: 15,
-    borderRadius: 100,
+    borderRadius: RADIUS.pill,
   },
   radioOuter: {
     width: 20,
@@ -189,7 +203,7 @@ const styles = StyleSheet.create({
   },
   selectButton: {
     paddingHorizontal: 10,
-    borderRadius: 100,
+    borderRadius: RADIUS.pill,
     minWidth: 42,
     minHeight: 24,
     justifyContent: 'center',

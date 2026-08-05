@@ -1,0 +1,48 @@
+import { StyleSheet, View } from 'react-native';
+import { ZSPressable, ZSText, useTheme } from 'zs-ui';
+
+type Props = {
+  title: string;
+  caption: string;
+  dotColor: string;
+  onPress: () => void;
+};
+
+/** 오버레이류 데모 호출 리스트 행 — 컬러 도트 + 제목/설명 + 화살표 */
+export default function DemoRow({ title, caption, dotColor, onPress }: Props) {
+  const { palette } = useTheme();
+
+  return (
+    <ZSPressable fullWidth onPress={onPress}>
+      <View style={[styles.row, { borderBottomColor: palette.grey[20] }]}>
+        <View style={[styles.dot, { backgroundColor: dotColor }]} />
+        <View style={styles.textWrap}>
+          <ZSText typo="subTitle.2">{title}</ZSText>
+          <ZSText typo="caption.1" color="secondary">{caption}</ZSText>
+        </View>
+        <ZSText typo="heading.6" style={{ color: palette.grey[50] }}>›</ZSText>
+      </View>
+    </ZSPressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    flexShrink: 0,
+  },
+  textWrap: {
+    flex: 1,
+    gap: 2,
+  },
+});

@@ -3,28 +3,11 @@ import { Image, type ImageSourcePropType, type StyleProp, type ViewStyle, type V
 import { TypoColorOptions, TypoOptions, TypoSubStyle, ViewColorOptions, IntentOptions } from '../../theme/types';
 import { useTheme } from '../../context/ThemeContext';
 import { resolveTextColor } from '../../theme/resolveColor';
+import { PASTEL_TEXT_COLOR, SOLID_TEXT_COLOR, STROKE_TEXT_COLOR } from '../../theme/intentColors';
+import { RADIUS } from '../../theme/tokens';
 import ZSPressable from '../ZSPressable';
 import ZSView from '../ZSView';
 import ZSText from '../ZSText';
-
-// variant 별 텍스트 색상 토큰 (intent 단위 예외값 포함)
-const PASTEL_TEXT_COLOR: Record<IntentOptions, TypoColorOptions> = {
-  primary: 'primary.60',
-  danger: 'danger.60',
-  information: 'information.60',
-  success: 'success.60',
-  warning: 'warning.60',
-  grey: 'grey.70',
-};
-
-const STROKE_TEXT_COLOR: Record<IntentOptions, TypoColorOptions> = {
-  primary: 'primary.50',
-  danger: 'danger.50',
-  information: 'information.50',
-  success: 'success.50',
-  warning: 'warning.60',
-  grey: 'grey.60',
-};
 
 // typo 크기(subStyle)별 패딩
 const PADDING_HORIZONTAL: Record<TypoSubStyle, number> = { '1': 11, '2': 11, '3': 10, '4': 8, '5': 7, '6': 5 };
@@ -52,7 +35,7 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
     borderColor?: string;
     borderWidth: number;
   } = variant === 'solid'
-    ? { backgroundColor: `${intent}.50` as ViewColorOptions, textColor: 'white', borderColor: undefined, borderWidth: 0 }
+    ? { backgroundColor: `${intent}.50` as ViewColorOptions, textColor: SOLID_TEXT_COLOR[intent], borderColor: undefined, borderWidth: 0 }
     : variant === 'pastel'
       ? { backgroundColor: `${intent}.10` as ViewColorOptions, textColor: PASTEL_TEXT_COLOR[intent], borderColor: undefined, borderWidth: 0 }
       : { backgroundColor: 'transparent', textColor: STROKE_TEXT_COLOR[intent], borderColor: palette[intent][50], borderWidth: 1 };
@@ -67,7 +50,7 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
         style={{
           paddingHorizontal,
           paddingVertical,
-          borderRadius: 6,
+          borderRadius: RADIUS.sm,
           justifyContent: 'center',
           alignItems: 'center',
           flexDirection: 'row',

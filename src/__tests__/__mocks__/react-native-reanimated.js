@@ -1,9 +1,15 @@
 const React = require('react');
 const { Text, View } = require('react-native');
 
+const createAnimatedComponent = (Component) =>
+  React.forwardRef(({ animatedProps, ...props }, ref) =>
+    React.createElement(Component, { ...props, ...(animatedProps || {}), ref }, props.children)
+  );
+
 const Animated = {
   View: React.forwardRef((props, ref) => React.createElement(View, { ...props, ref }, props.children)),
   Text: React.forwardRef((props, ref) => React.createElement(Text, { ...props, ref }, props.children)),
+  createAnimatedComponent,
 };
 
 const makeAnim = () => {
@@ -22,6 +28,14 @@ const makeAnim = () => {
 };
 const useSharedValue = (v) => ({ value: v });
 const useAnimatedStyle = (fn) => fn() || {};
+const useAnimatedProps = (fn) => fn() || {};
+const Easing = {
+  linear: (t) => t,
+  ease: (t) => t,
+  inOut: (fn) => fn,
+  out: (fn) => fn,
+  in: (fn) => fn,
+};
 const useDerivedValue = (fn) => ({ value: fn() });
 const withTiming = (v, _cfg) => v;
 const withSpring = (v, _cfg) => v;
@@ -49,7 +63,10 @@ module.exports = {
   LinearTransition: makeAnim(),
   useSharedValue,
   useAnimatedStyle,
+  useAnimatedProps,
   useDerivedValue,
+  Easing,
+  createAnimatedComponent,
   withTiming,
   withSpring,
   withDelay,

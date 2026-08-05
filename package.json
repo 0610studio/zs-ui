@@ -1,6 +1,6 @@
 {
   "name": "@0610studio/zs-ui",
-  "version": "0.18.1",
+  "version": "0.19.0",
   "private": false,
   "description": "EXPO ZS-UI",
   "type": "commonjs",
@@ -42,6 +42,7 @@
   "homepage": "https://github.com/0610studio/zs-ui",
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@shopify/react-native-skia": "2.6.6",
     "@babel/plugin-transform-modules-commonjs": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
@@ -75,6 +76,7 @@
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "*",
+    "@shopify/react-native-skia": ">=2.0.0",
     "expo": ">=56.0.0",
     "expo-navigation-bar": ">=56.0.0",
     "expo-router": "*",
@@ -87,6 +89,9 @@
   },
   "peerDependenciesMeta": {
     "@react-native-async-storage/async-storage": {
+      "optional": false
+    },
+    "@shopify/react-native-skia": {
       "optional": false
     },
     "expo-navigation-bar": {

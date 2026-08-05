@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
@@ -8,6 +8,7 @@ import { ThemeBackground } from '../../theme/types';
 import ModalBackground from '../ui/ModalBackground';
 import ViewAtom from '../../ui/atoms/ViewAtom';
 import { Z_INDEX_VALUE } from '../../model/utils';
+import { DURATION, RADIUS } from '../../theme/tokens';
 import ZSText from '../../ui/ZSText';
 
 function AlertOverlay({
@@ -20,6 +21,7 @@ function AlertOverlay({
   secondaryButtonStyle,
   primaryButtonStyle,
   secondaryButtonTextStyle,
+  primaryButtonTextStyle,
 }: ShowAlertProps) {
   const { alertVisible, setAlertVisible } = useAlert();
   const { palette: { background, primary: primaryColor, modalBgColor } } = useTheme();
@@ -42,8 +44,8 @@ function AlertOverlay({
         onPress={() => { if (isBackgroundTouchClose) setAlertVisible(false); }}
       >
         <Animated.View
-          entering={FadeInDown.duration(300)}
-          exiting={FadeOutDown.duration(100)}
+          entering={FadeInDown.duration(DURATION.enter)}
+          exiting={FadeOutDown.duration(DURATION.press)}
           style={[styles.contentContainer, { width: modalWidth }]}
         >
           {title && (
@@ -54,34 +56,24 @@ function AlertOverlay({
           )}
           {actions && (
             <ViewAtom style={styles.buttonContainer}>
-              {secondary ? (
-                <>
-                  <TouchableOpacity
-                    style={[
-                      styles.button,
-                      { backgroundColor: background.neutral, marginRight: 8 },
-                      secondaryButtonStyle
-                    ]}
-                    onPress={handleButtonPress(secondary?.onPress)}
-                  >
-                    <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
-                    onPress={handleButtonPress(primary?.onPress)}
-                  >
-                    <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
-                  </TouchableOpacity>
-                </>
-              ) : (
+              {secondary && (
                 <TouchableOpacity
-                  style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
-                  onPress={handleButtonPress(primary?.onPress)}
+                  style={[
+                    styles.button,
+                    { backgroundColor: background.neutral },
+                    secondaryButtonStyle
+                  ]}
+                  onPress={handleButtonPress(secondary?.onPress)}
                 >
-                  <ZSText typo='label.2' color='white' style={[secondaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+                  <ZSText typo='label.2' style={[secondaryButtonTextStyle]}>{secondary.label}</ZSText>
                 </TouchableOpacity>
               )}
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: primaryColor.main }, primaryButtonStyle]}
+                onPress={handleButtonPress(primary?.onPress)}
+              >
+                <ZSText typo='label.2' color='white' style={[primaryButtonTextStyle]}>{primary?.label || '확인'}</ZSText>
+              </TouchableOpacity>
             </ViewAtom>
           )}
         </Animated.View>
@@ -109,13 +101,14 @@ const createStyles = ({ background }: { background: ThemeBackground; }) =>
       marginTop: 24,
       alignItems: 'center',
       justifyContent: 'flex-end',
+      gap: 8,
     },
     button: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: 14,
-      borderRadius: 12,
+      borderRadius: RADIUS.md,
     },
     avoidingView: {
       flex: 1,
@@ -124,7 +117,7 @@ const createStyles = ({ background }: { background: ThemeBackground; }) =>
     contentContainer: {
       alignItems: 'center',
       backgroundColor: background.base,
-      borderRadius: 22,
+      borderRadius: RADIUS.xxl,
       paddingBottom: 18,
       paddingTop: 24,
       paddingHorizontal: 20,

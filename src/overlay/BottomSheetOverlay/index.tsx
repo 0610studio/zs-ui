@@ -7,6 +7,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
 import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
+import { RADIUS } from '../../theme/tokens';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 
@@ -277,7 +278,7 @@ function BottomSheetOverlay({
       bottom: options.type === 'fixed' ? 0 : marginBottom + bottomInsets,
       paddingBottom: options.type === 'fixed' ? bottomInsets : 0,
       backgroundColor: palette.background.base,
-      ... (options.type === 'fixed' ? { borderTopLeftRadius: 26, borderTopRightRadius: 26, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : { borderRadius: 26 }),
+      ... (options.type === 'fixed' ? { borderTopLeftRadius: RADIUS.sheet, borderTopRightRadius: RADIUS.sheet, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : { borderRadius: RADIUS.sheet }),
     },
     animatedStyles,
   ] as ViewStyle[];
@@ -335,7 +336,7 @@ function BottomSheetOverlay({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    borderRadius: 26,
+    borderRadius: RADIUS.sheet,
     overflow: 'hidden',
     zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,
   },
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
   gestureBar: {
     width: 45,
     height: 3,
-    borderRadius: 2,
+    borderRadius: 1.5,
   },
 });
 
