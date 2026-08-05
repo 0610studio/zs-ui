@@ -1,5 +1,5 @@
 import { ActivityIndicator } from "react-native";
-import React, { ReactNode, useCallback } from "react";
+import { ReactNode, useCallback } from "react";
 import { useLoader } from "../../model/useOverlay";
 import ModalBackground from "../ui/ModalBackground";
 import { useTheme } from "../../context/ThemeContext";
@@ -19,10 +19,10 @@ function LoadingNotify({
     ) : (
       <ActivityIndicator
         size="large"
-        color="#fff"
+        color={palette.text.white}
       />
     );
-  }, [loaderComponent]);
+  }, [loaderComponent, palette.text.white]);
 
   if (!loaderVisible) return null;
 

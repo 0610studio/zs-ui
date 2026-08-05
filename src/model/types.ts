@@ -82,6 +82,7 @@ export interface ShowAlertProps {
   secondaryButtonStyle?: TouchableOpacityProps['style'];
   primaryButtonStyle?: TouchableOpacityProps['style'];
   secondaryButtonTextStyle?: TextProps['style'];
+  primaryButtonTextStyle?: TextProps['style'];
 }
 
 export interface AlertActions {

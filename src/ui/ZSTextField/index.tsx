@@ -6,12 +6,13 @@ import ErrorComponent from './ui/ErrorComponent';
 import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme/types';
 import { extractStyle } from '../../model/utils';
 import { useTheme } from '../../context/ThemeContext';
+import { DISABLED_OPACITY, DURATION, RADIUS } from '../../theme/tokens';
 import ViewAtom from '../atoms/ViewAtom';
 
 export type BoxStyle = 'outline' | 'underline' | 'inbox';
 
 const iosOffset = Platform.OS === 'ios' ? 8 : 4;
-const ANIM_DURATION = 150;
+const ANIM_DURATION = DURATION.fast;
 const TIMING_CONFIG = { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System };
 
 interface TextFieldProps {
@@ -56,7 +57,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
   borderColor,
   focusColor,
   errorColor,
-  borderRadius = 14,
+  borderRadius = RADIUS.lg,
   paddingHorizontal = 15,
   errorMessage,
   textInputProps,
@@ -166,7 +167,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     }
   }, []);
 
-  const handleFocus = useCallback(() => {
+  const handleFocus = useCallback<NonNullable<TextInputProps['onFocus']>>((event) => {
     isFocusedRef.current = true;
     if (floatProgress.value !== 1) {
       floatProgress.value = withTiming(1, TIMING_CONFIG);
@@ -175,9 +176,10 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
       focusProgress.value = withTiming(1, TIMING_CONFIG);
     }
     setIsFocusedForUI(true);
-  }, []);
+    textInputProps?.onFocus?.(event);
+  }, [textInputProps?.onFocus]);
 
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback<NonNullable<TextInputProps['onBlur']>>((event) => {
     isFocusedRef.current = false;
     const target = hasValueRef.current ? 1 : 0;
     if (floatProgress.value !== target) {
@@ -187,7 +189,8 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
       focusProgress.value = withTiming(0, TIMING_CONFIG);
     }
     setIsFocusedForUI(false);
-  }, []);
+    textInputProps?.onBlur?.(event);
+  }, [textInputProps?.onBlur]);
 
   const styleConfig = useMemo(() => {
     const baseStyle = {
@@ -254,9 +257,10 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     [labelTextStyle, animatedLabelStyle]
   );
 
-  const handleTextChange = (text: string) => {
-    if (onChangeText) onChangeText(text);
-  };
+  const handleTextChange = useCallback((text: string) => {
+    onChangeText?.(text);
+    textInputProps?.onChangeText?.(text);
+  }, [onChangeText, textInputProps?.onChangeText]);
 
   const textInputStyle = useMemo(() => [
     {
@@ -272,11 +276,12 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     textInputProps?.style,
   ], [palette.text.base, fontSize, fontFamily, textInputProps?.style]);
 
-  const shouldShowCloseButton = value && isFocusedForUI;
-  const shouldShowError = status === 'error' && errorMessage;
+  // 빈 문자열이 View 자식으로 렌더되지 않도록 boolean 으로 강제 (web 'Unexpected text node' 경고 방지)
+  const shouldShowCloseButton = Boolean(value) && isFocusedForUI;
+  const shouldShowError = status === 'error' && errorMessage !== undefined && errorMessage !== '';
 
   return (
-    <ViewAtom style={{ alignSelf: 'stretch', width: '100%' }}>
+    <ViewAtom style={{ alignSelf: 'stretch', width: '100%', opacity: disabled ? DISABLED_OPACITY : 1 }}>
       <Animated.View
         style={boxStyleArray}
         onLayout={handleLayout}

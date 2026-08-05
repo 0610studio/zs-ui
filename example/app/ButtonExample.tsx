@@ -1,283 +1,151 @@
-import React, { useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { ZSText, ZSContainer, ZSPressable, ZSSwitch, useTheme, ZSBlockButton } from 'zs-ui';
-import TitleCard from '../src/ui/TitleCard';
-import type { Theme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui';
+import { useCallback, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Stack } from 'expo-router';
+import { ZSBlockButton, ZSContainer, ZSPressable, ZSText, useTheme } from 'zs-ui';
+import type { TypoOptions } from 'zs-ui';
+import Section from '../src/ui/kit/Section';
+import CodeBlock from '../src/ui/kit/CodeBlock';
 
-function ButtonExample(): React.JSX.Element {
+type Intent = 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey';
+type Variant = 'solid' | 'pastel' | 'stroke';
+
+const INTENTS: Exclude<Intent, 'secondary'>[] = ['primary', 'danger', 'information', 'success', 'warning', 'grey'];
+const VARIANTS: Variant[] = ['solid', 'pastel', 'stroke'];
+const SIZE_TYPOS: TypoOptions[] = ['label.1', 'label.2', 'label.3', 'label.4'];
+
+export default function ButtonExample() {
   const { palette } = useTheme();
-  const styles = useStyleSheetCreate(createStyles);
-  const [switch1Active, setSwitch1Active] = useState(false);
-  const [switch2Active, setSwitch2Active] = useState(true);
-  const [switch3Active, setSwitch3Active] = useState(false);
+  const [intent, setIntent] = useState<Exclude<Intent, 'secondary'>>('primary');
 
   const handleSubmit = useCallback(async () => {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('완료');
-      }, 500);
+      setTimeout(() => resolve('완료'), 500);
     });
   }, []);
 
   return (
-    <ZSContainer
-      keyboardScrollExtraOffset={130}
-      style={styles.container}
-    >
-      <TitleCard title='ZSPressable' flexDirection='column'>
-        <ZSPressable
-          style={[styles.buttonStyle, { backgroundColor: palette.primary[50] }]}
-          fullWidth
-          onPress={useCallback(() => { console.log('Primary FullWidth'); }, [])}
-        >
-          <ZSText typo="subTitle.1" color='white'>Primary FullWidth 버튼</ZSText>
-        </ZSPressable>
-        <ZSPressable
-          style={[styles.buttonStyle, { backgroundColor: palette.danger[50] }]}
-          fullWidth
-          onPress={useCallback(() => { console.log('Danger FullWidth'); }, [])}
-        >
-          <ZSText typo="body.1" color='white'>Danger FullWidth 버튼</ZSText>
-        </ZSPressable>
-        <ZSPressable
-          style={[styles.buttonStyle, { backgroundColor: palette.primary[50] }]}
-          fullWidth
-          isLoading={true}
-          onPress={useCallback(() => { console.log('Primary FullWidth'); }, [])}
-        >
-          <ZSText typo="subTitle.1" color='white'>Primary FullWidth (Loading)</ZSText>
-        </ZSPressable>
-      </TitleCard>
+    <>
+      <Stack.Screen options={{ title: 'Button' }} />
+      <ZSContainer keyboardScrollExtraOffset={130} style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
+        <Section label="ZSPressable" gap={10}>
+          <ZSPressable
+            style={[styles.fullButton, { backgroundColor: palette.primary[50] }]}
+            fullWidth
+            onPress={() => console.log('Primary FullWidth')}
+          >
+            <ZSText typo="subTitle.1" color="white">Primary FullWidth 버튼</ZSText>
+          </ZSPressable>
+          <ZSPressable
+            style={[styles.fullButton, { backgroundColor: palette.danger[50] }]}
+            fullWidth
+            onPress={() => console.log('Danger FullWidth')}
+          >
+            <ZSText typo="body.1" color="white">Danger FullWidth 버튼</ZSText>
+          </ZSPressable>
+          <ZSPressable
+            style={[styles.fullButton, { backgroundColor: palette.primary[50] }]}
+            fullWidth
+            isLoading
+            onPress={handleSubmit}
+          >
+            <ZSText typo="subTitle.1" color="white">Primary FullWidth (Loading)</ZSText>
+          </ZSPressable>
+        </Section>
 
-      <TitleCard title='BlockButton' flexDirection='column'>
-        <View style={styles.buttonGroup}>
-          <ZSText typo="body.1" style={styles.sectionTitle}>Primary</ZSText>
-          <View style={styles.buttonRow}>
-            <ZSBlockButton
-              onPress={() => { console.log('Primary Solid'); }}
-              title='Solid'
-              intent='primary'
-              variant='solid'
-              typo='label.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Primary Pastel'); }}
-              title='Pastel'
-              intent='primary'
-              variant='pastel'
-              typo='label.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Primary Stroke'); }}
-              title='Stroke'
-              intent='primary'
-              variant='stroke'
-              typo='label.1'
-            />
+        <Section label="ZSBlockButton" gap={14}>
+          {/* intent 선택 칩 */}
+          <View style={styles.chipRow}>
+            {INTENTS.map((name) => {
+              const active = name === intent;
+              return (
+                <Pressable
+                  key={name}
+                  onPress={() => setIntent(name)}
+                  style={[
+                    styles.chip,
+                    { backgroundColor: active ? palette.grey[80] : palette.background.layer2 },
+                  ]}
+                >
+                  <ZSText typo="label.4" style={{ color: active ? palette.background.base : palette.text.secondary }}>
+                    {name}
+                  </ZSText>
+                </Pressable>
+              );
+            })}
           </View>
-        </View>
 
-        <View style={styles.buttonGroup}>
-          <ZSText typo="body.1" style={styles.sectionTitle}>Danger</ZSText>
+          {/* 선택된 intent 의 variant 3종 */}
           <View style={styles.buttonRow}>
-            <ZSBlockButton
-              onPress={() => { console.log('Danger Solid'); }}
-              title='Solid'
-              intent='danger'
-              variant='solid'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Danger Pastel'); }}
-              title='Pastel'
-              intent='danger'
-              variant='pastel'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Danger Stroke'); }}
-              title='Stroke'
-              intent='danger'
-              variant='stroke'
-              typo='subTitle.1'
-            />
+            {VARIANTS.map((variant) => (
+              <ZSBlockButton
+                key={variant}
+                onPress={() => console.log(`${intent} ${variant}`)}
+                title={variant}
+                intent={intent}
+                variant={variant}
+                typo="label.1"
+              />
+            ))}
           </View>
-        </View>
 
-        <View style={styles.buttonGroup}>
-          <ZSText typo="body.1" style={styles.sectionTitle}>Information</ZSText>
+          {/* typo 크기별 패딩 스케일 */}
           <View style={styles.buttonRow}>
-            <ZSBlockButton
-              onPress={() => { console.log('Information Solid'); }}
-              title='Solid'
-              intent='information'
-              variant='solid'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Information Pastel'); }}
-              title='Pastel'
-              intent='information'
-              variant='pastel'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Information Stroke'); }}
-              title='Stroke'
-              intent='information'
-              variant='stroke'
-              typo='subTitle.1'
-            />
+            {SIZE_TYPOS.map((typo) => (
+              <ZSBlockButton
+                key={typo}
+                onPress={() => console.log(typo)}
+                title={typo}
+                intent={intent}
+                variant="solid"
+                typo={typo}
+              />
+            ))}
           </View>
-        </View>
+        </Section>
 
-        <View style={styles.buttonGroup}>
-          <ZSText typo="body.1" style={styles.sectionTitle}>Success</ZSText>
-          <View style={styles.buttonRow}>
-            <ZSBlockButton
-              onPress={() => { console.log('Success Solid'); }}
-              title='Solid'
-              intent='success'
-              variant='solid'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Success Pastel'); }}
-              title='Pastel'
-              intent='success'
-              variant='pastel'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Success Stroke'); }}
-              title='Stroke'
-              intent='success'
-              variant='stroke'
-              typo='subTitle.1'
-            />
-          </View>
-        </View>
-
-        <View style={styles.buttonGroup}>
-          <ZSText typo="body.1" style={styles.sectionTitle}>Warning</ZSText>
-          <View style={styles.buttonRow}>
-            <ZSBlockButton
-              onPress={() => { console.log('Warning Solid'); }}
-              title='Solid'
-              intent='warning'
-              variant='solid'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Warning Pastel'); }}
-              title='Pastel'
-              intent='warning'
-              variant='pastel'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Warning Stroke'); }}
-              title='Stroke'
-              intent='warning'
-              variant='stroke'
-              typo='subTitle.1'
-            />
-          </View>
-        </View>
-
-        <View style={styles.buttonGroup}>
-          <ZSText typo="body.1" style={styles.sectionTitle}>Grey</ZSText>
-          <View style={styles.buttonRow}>
-            <ZSBlockButton
-              onPress={() => { console.log('Grey Solid'); }}
-              title='Solid'
-              intent='grey'
-              variant='solid'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Grey Pastel'); }}
-              title='Pastel'
-              intent='grey'
-              variant='pastel'
-              typo='subTitle.1'
-            />
-            <ZSBlockButton
-              onPress={() => { console.log('Grey Stroke'); }}
-              title='Stroke'
-              intent='grey'
-              variant='stroke'
-              typo='subTitle.1'
-            />
-          </View>
-        </View>
-      </TitleCard>
-
-      <TitleCard title='ZSSwitch' flexDirection='column'>
-        <View style={styles.switchContainer}>
-          <ZSText typo="body.1">커스텀 색상</ZSText>
-          <ZSSwitch
-            isActive={switch1Active}
-            onToggle={() => setSwitch1Active(!switch1Active)}
-            trackColorInactive="#ffcccc"
-            trackColorActive="#ff6b6b"
-            thumbColor="#ffffff"
-          />
-        </View>
-        <View style={styles.switchContainer}>
-          <ZSText typo="body.1">크기 100</ZSText>
-          <ZSSwitch
-            isActive={switch2Active}
-            onToggle={() => setSwitch2Active(!switch2Active)}
-            width={100}
-          />
-        </View>
-        <View style={styles.switchContainer}>
-          <ZSText typo="body.1">크기 10</ZSText>
-          <ZSSwitch
-            isActive={switch3Active}
-            onToggle={() => setSwitch3Active(!switch3Active)}
-            width={30}
-          />
-        </View>
-      </TitleCard>
-    </ZSContainer>
+        <CodeBlock
+          code={`<ZSBlockButton
+  title="solid"
+  intent="${intent}"
+  variant="solid"
+  typo="label.1"
+  onPress={...}
+/>`}
+        />
+      </ZSContainer>
+    </>
   );
 }
 
-const createStyles = (palette: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    gap: 30,
-    paddingTop: 40,
-    backgroundColor: palette.background.layer2,
-    paddingHorizontal: 15,
+    gap: 20,
+    paddingTop: 24,
     paddingBottom: 90,
+    paddingHorizontal: 20,
   },
-  buttonStyle: {
-    padding: 12,
+  fullButton: {
+    padding: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 12,
   },
-  switchContainer: {
+  chipRow: {
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
+    flexWrap: 'wrap',
+    gap: 6,
   },
-  buttonGroup: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    marginBottom: 8,
-    fontWeight: '600',
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 100,
   },
   buttonRow: {
+    width: '100%',
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     flexWrap: 'wrap',
   },
 });
-
-export default ButtonExample;

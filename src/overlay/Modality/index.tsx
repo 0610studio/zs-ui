@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StatusBar, StyleSheet } from 'react-native';
+import { StatusBar, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
 import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import ZSView from '../../ui/ZSView';
 import { useTheme } from '../../context/ThemeContext';
-
-const windowHeight = Dimensions.get('window').height;
 
 function Modality({
   foldableSingleScreen,
@@ -17,6 +15,7 @@ function Modality({
   foldableSingleScreen: boolean;
 }) {
   const { palette } = useTheme();
+  const { height: windowHeight } = useWindowDimensions();
   const [localVisible, setLocalVisible] = useState(false);
   const { modalityVisible } = useModality();
   const insets = useSafeAreaInsets();
@@ -53,7 +52,7 @@ function Modality({
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [modalityVisible, insets.top]);
+  }, [modalityVisible, insets.top, windowHeight]);
 
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
     return {

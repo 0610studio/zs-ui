@@ -1,80 +1,50 @@
-import React, { useEffect } from "react";
-import { Dimensions, type StyleProp, StyleSheet, View, type ViewStyle, type ViewProps } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, cancelAnimation } from "react-native-reanimated";
+import React from "react";
+import { type StyleProp, StyleSheet, View, type ViewStyle, type ViewProps } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import SkiaShimmer from "./SkiaShimmer";
 
-const DEVICE_WIDTH = Dimensions.get("window").width;
-
-interface ZSSkeletonProps extends ViewProps {
+export interface ZSSkeletonProps extends ViewProps {
   isFetching?: boolean;
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
+  /** shimmer 하이라이트 색상 (기본: palette.background.base) */
   overlayColor?: string;
+  /** shimmer 밴드 중심의 최대 불투명도 0~1 (기본 0.6) */
+  overlayOpacity?: number;
+  /** shimmer 한 사이클(ms) */
+  duration?: number;
 }
 
-function ZSSkeleton({ isFetching, style, children, overlayColor, ...props }: ZSSkeletonProps) {
-  const translateX = useSharedValue(-DEVICE_WIDTH * 1.2);
+function ZSSkeleton({
+  isFetching,
+  style,
+  children,
+  overlayColor,
+  overlayOpacity = 0.6,
+  duration = 1100,
+  ...props
+}: ZSSkeletonProps) {
   const { palette } = useTheme();
-  const effectColor = overlayColor || palette.background.base;
+  const highlightColor = overlayColor || palette.background.base;
 
-  useEffect(() => {
-    if (isFetching) {
-      translateX.value = withRepeat(withTiming(DEVICE_WIDTH * 1.2, { duration: 800 }), -1, false);
-    } else {
-      cancelAnimation(translateX);
-      translateX.value = -DEVICE_WIDTH * 1.2;
-    }
+  if (!isFetching) return <>{children}</>;
 
-    return () => {
-      cancelAnimation(translateX);
-    };
-  }, [isFetching]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
-
-  return isFetching ? (
-    <View style={[style, { overflow: "hidden" }]} {...props}>
-      <View style={styles.container}>
-        {children}
-
-        <Animated.View style={[styles.shimmer, animatedStyle]}>
-          <View style={[styles.shimmerSub, { backgroundColor: effectColor }]} />
-          <View style={[styles.shimmerCenter, { backgroundColor: effectColor }]} />
-          <View style={[styles.shimmerSub, { backgroundColor: effectColor }]} />
-        </Animated.View>
-      </View>
+  return (
+    <View style={[style, styles.host]} {...props}>
+      <View style={styles.content}>{children}</View>
+      <SkiaShimmer color={highlightColor} opacity={overlayOpacity} duration={duration} />
     </View>
-  ) : (
-    children
   );
 }
 
 export default React.memo(ZSSkeleton);
 
 const styles = StyleSheet.create({
-  container: {
+  host: {
     overflow: "hidden",
-    opacity: 0.6,
+  },
+  content: {
     width: "100%",
-  },
-  shimmer: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-    flexDirection: "row",
-  },
-  shimmerSub: {
-    height: "100%",
-    opacity: 0.3,
-    width: DEVICE_WIDTH * 0.3,
-  },
-  shimmerCenter: {
-    height: "100%",
-    opacity: 0.6,
-    width: DEVICE_WIDTH * 0.4,
+    opacity: 0.5,
   },
 });

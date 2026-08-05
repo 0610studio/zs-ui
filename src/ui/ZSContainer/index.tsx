@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useImperativeHandle, forwardRef, useRef, u
 import { ViewProps, StatusBar, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
+import { transparency } from '../../theme/palette';
 import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 import { FoldingState } from '../../model/types';
@@ -201,7 +202,8 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
       style={safeAreaStyle}
       edges={edges}
     >
-      <View style={styles.outerLayer}>
+      {/* 테마 대응 딤 레이어 (light: 검정 4% · dark: 흰색 4%) */}
+      <View style={[styles.outerLayer, { backgroundColor: palette.grey[100] + transparency['4%'] }]}>
         <View style={innerContainerStyle}>
           {topComponent}
           <View style={styles.row}>
@@ -274,7 +276,7 @@ export const styles = StyleSheet.create({
   flex1: { flex: 1 },
   w100: { flex: 1, width: '100%' },
   scrollContainerStyle: { alignItems: 'center', width: '100%', flexGrow: 1 },
-  outerLayer: { flex: 1, width: '100%', backgroundColor: '#00000009' },
+  outerLayer: { flex: 1, width: '100%' },
   row: { flex: 1, width: '100%', flexDirection: 'row' },
 });
 

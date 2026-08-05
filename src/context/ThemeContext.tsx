@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useMemo, useReducer, useEffect, useCallback, useRef } from 'react';
 import { Platform, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -98,13 +98,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   );
   const { isUsingSystemColorScheme, mode } = themeState;
 
+  // hydrate 는 마운트(또는 isDarkModeEnabled 변경) 시 1회만 수행한다.
+  // 이후 시스템 모드 동기화는 아래 SYNC_SYSTEM_MODE effect 가 담당하므로,
+  // systemMode 변경마다 AsyncStorage 를 다시 읽지 않도록 ref 로 최신 값만 참조한다.
+  const systemModeRef = useRef(systemMode);
+  systemModeRef.current = systemMode;
+
   useEffect(() => {
     let isMounted = true;
 
     const loadSettings = async () => {
       try {
         if (!isMounted) return;
-        
+
         if (!isDarkModeEnabled) {
           dispatchTheme({
             type: 'HYDRATE',
@@ -130,7 +136,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
           type: 'HYDRATE',
           state: {
             isUsingSystemColorScheme,
-            mode: isUsingSystemColorScheme ? systemMode : savedMode ?? systemMode,
+            mode: isUsingSystemColorScheme ? systemModeRef.current : savedMode ?? systemModeRef.current,
           },
         });
       } catch (error) {
@@ -143,7 +149,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
     return () => {
       isMounted = false;
     };
-  }, [isDarkModeEnabled, systemMode]);
+  }, [isDarkModeEnabled]);
 
   useEffect(() => {
     dispatchTheme({ type: 'SYNC_SYSTEM_MODE', systemMode });
@@ -171,8 +177,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
 
   const unfoldedSinglePaneMaxWidth = foldable?.unfoldedSinglePaneMaxWidth;
 
+  // customPalette 를 인라인 함수로 넘겨도 컨텍스트 값이 매 렌더 재생성되어
+  // useTheme 구독 컴포넌트 전체가 리렌더되지 않도록, 함수 identity 대신 ref 로 최신 함수를 참조한다.
+  // (함수 identity 변경만으로는 재계산되지 않고, mode 등 다른 의존성 변경 시 최신 함수가 반영된다)
+  const customPaletteRef = useRef(customPalette);
+  customPaletteRef.current = customPalette;
+  const hasCustomPalette = Boolean(customPalette);
+
   const themeValue = useMemo(() => {
-    const currentPalette = customPalette ? customPalette({ mode }) : palette({ mode });
+    const paletteFactory = customPaletteRef.current;
+    const currentPalette = paletteFactory ? paletteFactory({ mode }) : palette({ mode });
     return {
       palette: {
         isUsingSystemColorScheme,
@@ -184,7 +198,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       elevation: elevation(currentPalette),
       foldable: { unfoldedSinglePaneMaxWidth },
     };
-  }, [mode, isUsingSystemColorScheme, themeFonts, customPalette, handleSetUseSystemColorScheme, toggleTheme, unfoldedSinglePaneMaxWidth]);
+  }, [mode, isUsingSystemColorScheme, themeFonts, hasCustomPalette, handleSetUseSystemColorScheme, toggleTheme, unfoldedSinglePaneMaxWidth]);
 
   return (
     <ThemeContext.Provider value={themeValue}>

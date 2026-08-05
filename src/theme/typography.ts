@@ -8,193 +8,157 @@ export default function typography({ themeFonts }: { themeFonts?: ThemeFonts }):
         heading: {
             1: {
                 fontSize: baseSize + 36,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             2: {
                 fontSize: baseSize + 32,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             3: {
                 fontSize: baseSize + 28,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             4: {
                 fontSize: baseSize + 24,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             5: {
                 fontSize: baseSize + 20,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             6: {
                 fontSize: baseSize + 18,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             }
         },
         title: {
             1: {
                 fontSize: baseSize + 16,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             2: {
                 fontSize: baseSize + 14,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             3: {
                 fontSize: baseSize + 13,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             4: {
                 fontSize: baseSize + 12,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             5: {
                 fontSize: baseSize + 11,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             },
             6: {
                 fontSize: baseSize + 10,
-                fontFamily: themeFonts?.[700],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[700]
             }
         },
         subTitle: {
             1: {
                 fontSize: baseSize + 16,
-                fontFamily: themeFonts?.[600],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[600]
             },
             2: {
                 fontSize: baseSize + 14,
-                fontFamily: themeFonts?.[600],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[600]
             },
             3: {
                 fontSize: baseSize + 13,
-                fontFamily: themeFonts?.[600],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[600]
             },
             4: {
                 fontSize: baseSize + 12,
-                fontFamily: themeFonts?.[600],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[600]
             },
             5: {
                 fontSize: baseSize + 11,
-                fontFamily: themeFonts?.[600],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[600]
             },
             6: {
                 fontSize: baseSize + 10,
-                fontFamily: themeFonts?.[600],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[600]
             }
         },
         label: {
             1: {
                 fontSize: baseSize + 16,
-                fontFamily: themeFonts?.[500],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[500]
             },
             2: {
                 fontSize: baseSize + 14,
-                fontFamily: themeFonts?.[500],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[500]
             },
             3: {
                 fontSize: baseSize + 13,
-                fontFamily: themeFonts?.[500],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[500]
             },
             4: {
                 fontSize: baseSize + 12,
-                fontFamily: themeFonts?.[500],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[500]
             },
             5: {
                 fontSize: baseSize + 11,
-                fontFamily: themeFonts?.[500],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[500]
             },
             6: {
                 fontSize: baseSize + 10,
-                fontFamily: themeFonts?.[500],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[500]
             }
         },
         body: {
             1: {
                 fontSize: baseSize + 16,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             2: {
                 fontSize: baseSize + 14,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             3: {
                 fontSize: baseSize + 13,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             4: {
                 fontSize: baseSize + 12,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             5: {
                 fontSize: baseSize + 11,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             6: {
                 fontSize: baseSize + 10,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             }
         },
         caption: {
             1: {
                 fontSize: baseSize + 12,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             2: {
                 fontSize: baseSize + 11,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             3: {
                 fontSize: baseSize + 10,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             4: {
                 fontSize: baseSize + 9,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             5: {
                 fontSize: baseSize + 8,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             },
             6: {
                 fontSize: baseSize + 7,
-                fontFamily: themeFonts?.[400],
-                letterSpacing: 1
+                fontFamily: themeFonts?.[400]
             }
         },
     }

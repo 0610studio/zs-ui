@@ -1,85 +1,89 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { ZSTextField, ZSContainer, useTheme, ErrorComponent } from 'zs-ui';
-import TitleCard from '../src/ui/TitleCard';
-import type { Theme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui';
+import { Stack } from 'expo-router';
+import { ErrorComponent, ZSContainer, ZSTextField, useTheme } from 'zs-ui';
+import Section from '../src/ui/kit/Section';
+import CodeBlock from '../src/ui/kit/CodeBlock';
 
-function ZSTextFieldExample(): React.JSX.Element {
+export default function ZSTextFieldExample() {
   const [nick, setNick] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [userId, serUserId] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
   const { palette } = useTheme();
-  const styles = useStyleSheetCreate(createStyles);
 
   return (
-    <ZSContainer
-      keyboardScrollExtraOffset={130}
-      style={styles.container}
-    >
-      <TitleCard title='ZSTextField' gap={20} flexDirection='column'>
-        <ZSTextField
-          boxStyle="underline"
-          label="닉네임"
-          value={nick}
-          inputBgColor={palette.background.base}
-          labelBgColor={palette.background.base}
-          focusColor={palette.primary.darker}
-          onChangeText={setNick}
-          textInputProps={{
-            multiline: false,
-            style: { color: palette.text.primary },
-          }}
-          status={nick ? 'default' : 'error'}
-          errorMessage='닉네임을 입력해주세요'
-        />
+    <>
+      <Stack.Screen options={{ title: 'ZSTextField' }} />
+      <ZSContainer keyboardScrollExtraOffset={130} style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
+        <Section label="boxStyle · status" gap={22}>
+          <ZSTextField
+            boxStyle="underline"
+            label="닉네임 (underline · error)"
+            value={nick}
+            inputBgColor={palette.background.base}
+            labelBgColor={palette.background.base}
+            focusColor={palette.primary.darker}
+            onChangeText={setNick}
+            textInputProps={{
+              multiline: false,
+              style: { color: palette.text.primary },
+            }}
+            status={nick ? 'default' : 'error'}
+            errorMessage="닉네임을 입력해주세요"
+          />
 
-        <ZSTextField
-          boxStyle="outline"
-          label="아이디"
-          value={userId}
-          onChangeText={serUserId}
-          focusColor={'red'}
-        />
+          <ZSTextField
+            boxStyle="outline"
+            label="아이디 (outline)"
+            value={userId}
+            onChangeText={serUserId}
+          />
 
-        <ZSTextField
-          boxStyle="inbox"
-          label="이메일"
-          value={email}
-          onChangeText={setEmail}
-          textInputProps={{ maxLength: 5 }}
-        />
+          <ZSTextField
+            boxStyle="inbox"
+            label="이메일 (inbox · maxLength 5)"
+            value={email}
+            onChangeText={setEmail}
+            textInputProps={{ maxLength: 5 }}
+          />
 
-        <ZSTextField
-          label="메모"
-          value={memo}
-          onChangeText={setMemo}
-          textInputProps={{
-            multiline: true,
-            style: { minHeight: 150, textAlignVertical: 'top' },
-          }}
-          isTextArea
+          <ZSTextField
+            label="메모 (isTextArea)"
+            value={memo}
+            onChangeText={setMemo}
+            textInputProps={{
+              multiline: true,
+              style: { minHeight: 150, textAlignVertical: 'top' },
+            }}
+            isTextArea
+          />
+        </Section>
+
+        <Section label="ErrorComponent" gap={10}>
+          <ErrorComponent errorMessage="에러메시지" errorColor={palette.danger.main} />
+        </Section>
+
+        <CodeBlock
+          code={`<ZSTextField
+  boxStyle="outline"
+  label="아이디"
+  value={userId}
+  onChangeText={setUserId}
+  status="error"
+  errorMessage="..."
+/>`}
         />
-      </TitleCard>
-      <TitleCard title='에러' flexDirection='column'>
-        <ErrorComponent
-          errorMessage='에러메시지'
-          errorColor={palette.danger.main}
-        />
-      </TitleCard>
-    </ZSContainer>
+      </ZSContainer>
+    </>
   );
 }
 
-const createStyles = (palette: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    gap: 30,
-    paddingTop: 40,
-    backgroundColor: palette.background.layer2,
-    paddingHorizontal: 15,
+    gap: 20,
+    paddingTop: 24,
     paddingBottom: 90,
+    paddingHorizontal: 20,
   },
 });
-
-export default ZSTextFieldExample;

@@ -1,43 +1,69 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import { ZSText, ZSContainer, ZSSkeleton, ZSSkeletonBox } from 'zs-ui';
-import TitleCard from '../src/ui/TitleCard';
-import type { Theme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Stack } from 'expo-router';
+import { ZSContainer, ZSSkeleton, ZSSkeletonBox, ZSSwitch, ZSText, useTheme } from 'zs-ui';
+import Section from '../src/ui/kit/Section';
+import CodeBlock from '../src/ui/kit/CodeBlock';
 
-function ZSSkeletonExample(): React.JSX.Element {
-  const styles = useStyleSheetCreate(createStyles);
+export default function ZSSkeletonExample() {
+  const [isFetching, setIsFetching] = useState(true);
+  const { palette } = useTheme();
 
   return (
-    <ZSContainer style={styles.container}>
-      <TitleCard title='Text Skeleton' flexDirection='column'>
-        <ZSSkeleton isFetching={true}>
-          <ZSText typo="heading.1">fetching DATA</ZSText>
-        </ZSSkeleton>
-        <ZSSkeleton isFetching={true}>
-          <ZSText typo="heading.3">fetching DATA</ZSText>
-        </ZSSkeleton>
-        <ZSSkeleton isFetching={true}>
-          <ZSText typo="heading.6">fetching DATA</ZSText>
-        </ZSSkeleton>
-      </TitleCard>
-      <TitleCard title='Box Skeleton' flexDirection='column'>
-        <ZSSkeletonBox height={100} style={{ borderRadius: 10 }} />
-        <ZSSkeletonBox height={50} style={{ borderRadius: 25 }} />
-        <ZSSkeletonBox height={80} style={{ borderRadius: 40, width: 80 }} />
-      </TitleCard>
-    </ZSContainer>
+    <>
+      <Stack.Screen options={{ title: 'ZSSkeleton' }} />
+      <ZSContainer style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
+        <Section gap={0}>
+          <View style={styles.toggleRow}>
+            <View style={{ gap: 2 }}>
+              <ZSText typo="subTitle.2">isFetching</ZSText>
+              <ZSText typo="caption.1" color="secondary">끄면 실제 콘텐츠가 표시됩니다</ZSText>
+            </View>
+            <ZSSwitch isActive={isFetching} onToggle={() => setIsFetching(!isFetching)} />
+          </View>
+        </Section>
+
+        <Section label="Text Skeleton" gap={12}>
+          <ZSSkeleton isFetching={isFetching}>
+            <ZSText typo="heading.1" color='danger.100'>fetching DATA</ZSText>
+          </ZSSkeleton>
+          <ZSSkeleton isFetching={isFetching}>
+            <ZSText typo="heading.3" color='primary'>fetching DATA</ZSText>
+          </ZSSkeleton>
+          <ZSSkeleton isFetching={isFetching}>
+            <ZSText typo="heading.6">fetching DATA</ZSText>
+          </ZSSkeleton>
+        </Section>
+
+        <Section label="Box Skeleton" gap={12}>
+          <ZSSkeletonBox height={100} style={{ borderRadius: 10 }} />
+          <ZSSkeletonBox height={50} style={{ borderRadius: 25 }} />
+          <ZSSkeletonBox height={80} style={{ borderRadius: 40, width: 80 }} />
+        </Section>
+
+        <CodeBlock
+          code={`<ZSSkeleton isFetching={isFetching}>
+  <ZSText typo="heading.1">fetching DATA</ZSText>
+</ZSSkeleton>
+
+<ZSSkeletonBox height={100} style={{ borderRadius: 10 }} />`}
+        />
+      </ZSContainer>
+    </>
   );
 }
 
-const createStyles = (palette: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    gap: 30,
-    paddingTop: 40,
-    backgroundColor: palette.background.layer2,
-    paddingHorizontal: 15,
-    paddingBottom: 90,
+    gap: 20,
+    paddingTop: 24,
+    paddingBottom: 48,
+    paddingHorizontal: 20,
+  },
+  toggleRow: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
-
-export default ZSSkeletonExample;

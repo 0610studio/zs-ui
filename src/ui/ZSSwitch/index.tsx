@@ -2,8 +2,10 @@ import React from "react";
 import { type StyleProp, type ViewStyle, Pressable, type ViewProps } from "react-native";
 import Animated from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
+import { WHITE } from "../../theme/primitive";
+import { DISABLED_OPACITY, DURATION } from "../../theme/tokens";
 
-const SWITCH_TRANSITION_DURATION = 200;
+const SWITCH_TRANSITION_DURATION = DURATION.base;
 const SWITCH_TRANSITION = {
   transitionDuration: SWITCH_TRANSITION_DURATION,
   transitionTimingFunction: 'ease-in-out',
@@ -17,6 +19,7 @@ interface ZSSwitchProps extends ViewProps {
   trackColorInactive?: string;
   trackColorActive?: string;
   thumbColor?: string;
+  disabled?: boolean;
 }
 
 function ZSSwitch({
@@ -26,14 +29,15 @@ function ZSSwitch({
   width = 50,
   trackColorInactive,
   trackColorActive,
-  thumbColor = '#ffffff',
+  thumbColor = WHITE,
+  disabled = false,
   ...props
 }: ZSSwitchProps) {
   const { palette } = useTheme();
   const height = width * 0.6;
   const padding = width * 0.04;
   const thumbSize = height - padding * 2;
-  const toggleBorderRadius = height * 1.2;
+  const toggleBorderRadius = height / 2;
   const thumbBorderRadius = thumbSize / 2;
 
   const inactiveColor = trackColorInactive ?? palette.grey[30];
@@ -63,7 +67,14 @@ function ZSSwitch({
   };
 
   return (
-    <Pressable onPress={onToggle} style={style} {...props}>
+    <Pressable
+      onPress={onToggle}
+      style={[style, disabled && { opacity: DISABLED_OPACITY }]}
+      disabled={disabled}
+      accessibilityRole='switch'
+      accessibilityState={{ checked: isActive, disabled }}
+      {...props}
+    >
       <Animated.View style={toggleStyle}>
         <Animated.View style={thumbStyle} />
       </Animated.View>
