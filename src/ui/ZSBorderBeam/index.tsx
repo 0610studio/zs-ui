@@ -228,6 +228,10 @@ function ZSBorderBeam({
 
   return (
     <View style={[styles.container, style]} {...props}>
+      <View onLayout={handleLayout} style={[styles.content, { borderRadius }]}>
+        {children}
+      </View>
+
       {active && hasLayout && (
         <Canvas
           pointerEvents="none"
@@ -238,6 +242,7 @@ function ZSBorderBeam({
               height: canvasHeight,
               top: -glowPadding,
               left: -glowPadding,
+              zIndex: 1,
             },
           ]}
         >
@@ -285,10 +290,6 @@ function ZSBorderBeam({
           </RoundedRect>
         </Canvas>
       )}
-
-      <View onLayout={handleLayout} style={[styles.content, { borderRadius }]}>
-        {children}
-      </View>
     </View>
   );
 }
