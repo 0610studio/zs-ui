@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { AlertActions, ShowAlertProps } from '../../model/types';
 import { useAlert } from '../../model/useOverlay';
+import { BackPriority, useBackHandler } from '../../context/BackHandlerContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ThemeBackground } from '../../theme/types';
 import ModalBackground from '../ui/ModalBackground';
@@ -34,6 +35,14 @@ function AlertOverlay({
     if (onPressFunction) onPressFunction();
     setAlertVisible(false);
   }, [setAlertVisible]);
+
+  useBackHandler(
+    () => {
+      setAlertVisible(false);
+      return true;
+    },
+    { enabled: alertVisible, priority: BackPriority.OVERLAY }
+  );
 
   return (
     !alertVisible ? null :

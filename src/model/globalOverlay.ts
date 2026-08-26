@@ -10,74 +10,25 @@ export const getGlobalOverlayRef = (): OverlayContextProps | null => {
   return globalOverlayRef;
 };
 
-const getOverlayNotAvailableError = () => {
-  throw new Error(
-    'Overlay functions are not available. Please make sure OverlayProvider is properly set up in your app root.'
-  );
-};
-
-const showAlert: OverlayContextProps['showAlert'] = (props) => {
+const requireRef = (): OverlayContextProps => {
   if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
+    throw new Error(
+      'Overlay functions are not available. Please make sure OverlayProvider is properly set up in your app root.'
+    );
   }
-  globalOverlayRef.showAlert(props);
+  return globalOverlayRef;
 };
 
-const showSnackBar: OverlayContextProps['showSnackBar'] = (props) => {
-  if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
-  }
-  globalOverlayRef.showSnackBar(props);
-};
-
-const showBottomSheet: OverlayContextProps['showBottomSheet'] = (props) => {
-  if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
-  }
-  globalOverlayRef.showBottomSheet(props);
-};
-
-const showPopOverMenu: OverlayContextProps['showPopOverMenu'] = (props) => {
-  if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
-  }
-  globalOverlayRef.showPopOverMenu(props);
-};
-
-const showModality: OverlayContextProps['showModality'] = (props) => {
-  if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
-  }
-  globalOverlayRef.showModality(props);
-};
-
-const showLoader: OverlayContextProps['showLoader'] = () => {
-  if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
-  }
-  globalOverlayRef.showLoader();
-};
-
-const hideOverlay: OverlayContextProps['hideOverlay'] = (option) => {
-  if (!globalOverlayRef) {
-    getOverlayNotAvailableError();
-    return;
-  }
-  globalOverlayRef.hideOverlay(option);
-};
-
-export const GlobalOverlay = {
-  showAlert,
-  showSnackBar,
-  showBottomSheet,
-  showPopOverMenu,
-  showModality,
-  showLoader,
-  hideOverlay,
+/** React 밖(이벤트 핸들러, API 에러 처리 등)에서도 호출 가능한 명령형 오버레이 API. */
+export const GlobalOverlay: Pick<
+  OverlayContextProps,
+  'showAlert' | 'showSnackBar' | 'showBottomSheet' | 'showPopOverMenu' | 'showModality' | 'showLoader' | 'hideOverlay'
+> = {
+  showAlert: (props) => requireRef().showAlert(props),
+  showSnackBar: (props) => requireRef().showSnackBar(props),
+  showBottomSheet: (props) => requireRef().showBottomSheet(props),
+  showPopOverMenu: (props) => requireRef().showPopOverMenu(props),
+  showModality: (props) => requireRef().showModality(props),
+  showLoader: () => requireRef().showLoader(),
+  hideOverlay: (option) => requireRef().hideOverlay(option),
 };

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, useWindowDimensions } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { usePopOver } from "../../model/useOverlay";
+import { BackPriority, useBackHandler } from "../../context/BackHandlerContext";
 import ModalBackground from "../ui/ModalBackground";
 import { PopOverMenuProps } from "../../model/types";
 import { useTheme } from "../../context/ThemeContext";
@@ -47,6 +48,14 @@ function PopOverMenu({
     setContentWidth(event.nativeEvent.layout.width || 0);
     setContentHeight(event.nativeEvent.layout.height || 0);
   }, []);
+
+  useBackHandler(
+    () => {
+      setPopOverVisible(false);
+      return true;
+    },
+    { enabled: popOverVisible, priority: BackPriority.OVERLAY }
+  );
 
   const getAdjustedPosition = () => {
     let adjustedX = px - contentWidth;

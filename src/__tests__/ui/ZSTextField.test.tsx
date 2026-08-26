@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { TextInput } from 'react-native';
+import { StyleSheet, TextInput } from 'react-native';
 import ZSTextField from '../../ui/ZSTextField';
 
 jest.mock('../../context/ThemeContext', () => {
@@ -172,6 +172,32 @@ describe('ZSTextField', () => {
     );
 
     expect(getByText('Label')).toBeTruthy();
+  });
+
+  it('inbox 는 기본 배경이 layer1, outline 은 base 다', () => {
+    const palette = require('../../theme/palette').default({ mode: 'light' });
+
+    const readBoxBackground = (boxStyle: 'outline' | 'inbox') => {
+      const { UNSAFE_getByType } = render(
+        <ZSTextField value="" onChangeText={() => {}} label="Label" boxStyle={boxStyle} />
+      );
+      const box = UNSAFE_getByType(TextInput).parent;
+      return StyleSheet.flatten(box?.props.style)?.backgroundColor;
+    };
+
+    // 값이 비었을 때 두 boxStyle 이 시각적으로 구분되어야 한다
+    expect(readBoxBackground('inbox')).toBe(palette.background.layer1);
+    expect(readBoxBackground('outline')).toBe(palette.background.base);
+    expect(readBoxBackground('inbox')).not.toBe(readBoxBackground('outline'));
+  });
+
+  it('inputBgColor 를 넘기면 inbox 기본 배경보다 우선한다', () => {
+    const { UNSAFE_getByType } = render(
+      <ZSTextField value="" onChangeText={() => {}} label="Label" boxStyle="inbox" inputBgColor="#123456" />
+    );
+
+    const box = UNSAFE_getByType(TextInput).parent;
+    expect(StyleSheet.flatten(box?.props.style)?.backgroundColor).toBe('#123456');
   });
 
   it('innerBoxStyle prop을 받는다', () => {

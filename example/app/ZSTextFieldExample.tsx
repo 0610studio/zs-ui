@@ -2,61 +2,112 @@ import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { ErrorComponent, ZSContainer, ZSTextField, useTheme } from 'zs-ui';
+import type { BoxStyle } from 'zs-ui';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
 
-export default function ZSTextFieldExample() {
-  const [nick, setNick] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [userId, serUserId] = useState<string>('');
+/** boxStyle 하나당 기본 · 값 입력 · error · disabled 상태를 한 번에 나열하는 섹션 */
+function StateSection({ boxStyle }: { boxStyle: BoxStyle }) {
+  const [value, setValue] = useState<string>('');
+
+  return (
+    <Section label={`boxStyle · ${boxStyle}`} gap={22}>
+      <ZSTextField
+        boxStyle={boxStyle}
+        label="기본 (직접 입력)"
+        value={value}
+        onChangeText={setValue}
+      />
+      <ZSTextField
+        boxStyle={boxStyle}
+        label="값 입력됨"
+        value="입력된 값"
+      />
+      <ZSTextField
+        boxStyle={boxStyle}
+        label="에러 (status=error)"
+        value=""
+        status="error"
+        errorMessage="필수 입력 항목입니다"
+      />
+      <ZSTextField
+        boxStyle={boxStyle}
+        label="비활성화 (disabled)"
+        value=""
+        disabled
+      />
+      <ZSTextField
+        boxStyle={boxStyle}
+        label="비활성화 + 값"
+        value="수정 불가 값"
+        disabled
+      />
+    </Section>
+  );
+}
+
+/** isTextArea 상태 나열 — multiline 스타일이 필요해 별도 섹션으로 분리 */
+function TextAreaSection() {
   const [memo, setMemo] = useState<string>('');
+  const textAreaInputProps = {
+    multiline: true,
+    style: { minHeight: 120, textAlignVertical: 'top' as const },
+  };
+
+  return (
+    <Section label="isTextArea" gap={22}>
+      <ZSTextField
+        label="기본 (직접 입력)"
+        value={memo}
+        onChangeText={setMemo}
+        textInputProps={textAreaInputProps}
+        isTextArea
+      />
+      <ZSTextField
+        label="에러 (status=error)"
+        value=""
+        status="error"
+        errorMessage="내용을 입력해주세요"
+        textInputProps={textAreaInputProps}
+        isTextArea
+      />
+      <ZSTextField
+        label="비활성화 + 값"
+        value="수정할 수 없는 메모입니다"
+        disabled
+        textInputProps={textAreaInputProps}
+        isTextArea
+      />
+    </Section>
+  );
+}
+
+export default function ZSTextFieldExample() {
+  const [email, setEmail] = useState<string>('');
   const { palette } = useTheme();
 
   return (
     <>
       <Stack.Screen options={{ title: 'ZSTextField' }} />
       <ZSContainer keyboardScrollExtraOffset={130} style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <Section label="boxStyle · status" gap={22}>
-          <ZSTextField
-            boxStyle="underline"
-            label="닉네임 (underline · error)"
-            value={nick}
-            inputBgColor={palette.background.base}
-            labelBgColor={palette.background.base}
-            focusColor={palette.primary.darker}
-            onChangeText={setNick}
-            textInputProps={{
-              multiline: false,
-              style: { color: palette.text.primary },
-            }}
-            status={nick ? 'default' : 'error'}
-            errorMessage="닉네임을 입력해주세요"
-          />
+        <StateSection boxStyle="outline" />
+        <StateSection boxStyle="underline" />
+        <StateSection boxStyle="inbox" />
+        <TextAreaSection />
 
+        <Section label="기타 옵션" gap={22}>
           <ZSTextField
             boxStyle="outline"
-            label="아이디 (outline)"
-            value={userId}
-            onChangeText={serUserId}
-          />
-
-          <ZSTextField
-            boxStyle="inbox"
-            label="이메일 (inbox · maxLength 5)"
+            label="maxLength 5"
             value={email}
             onChangeText={setEmail}
             textInputProps={{ maxLength: 5 }}
           />
-
           <ZSTextField
-            label="메모 (isTextArea)"
-            value={memo}
-            onChangeText={setMemo}
-            textInputProps={{
-              multiline: true,
-              style: { minHeight: 150, textAlignVertical: 'top' },
-            }}
-            isTextArea
+            boxStyle="outline"
+            label="focusColor 커스텀"
+            value=""
+            focusColor={palette.primary.darker}
           />
         </Section>
 
@@ -66,12 +117,13 @@ export default function ZSTextFieldExample() {
 
         <CodeBlock
           code={`<ZSTextField
-  boxStyle="outline"
+  boxStyle="outline"   // 'outline' | 'underline' | 'inbox'
   label="아이디"
   value={userId}
   onChangeText={setUserId}
-  status="error"
+  status="error"       // 'default' | 'error'
   errorMessage="..."
+  disabled             // 반투명 처리 + 입력 차단
 />`}
         />
       </ZSContainer>

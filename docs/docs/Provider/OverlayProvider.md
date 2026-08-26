@@ -106,3 +106,27 @@ function App() {
   {/* 앱 내용 */}
 </OverlayProvider>
 ```
+
+## 뒤로가기(back) 처리 — 우선순위 기반
+
+오버레이가 열려 있을 때 Android back 키는 **최상위 오버레이 하나만** 닫습니다
+(로더 > Alert/PopOver/Modal > BottomSheet 순). 이전처럼 모든 오버레이가 한 번에 닫히지 않습니다.
+로더가 표시 중이면 back은 무시(소비)되고, `dismissable: false` 바텀시트는 back을 소비만 하고 유지됩니다.
+
+앱 화면도 같은 체계에 참여할 수 있습니다:
+
+```tsx
+import { useBackHandler, BackPriority } from '@0610studio/zs-ui';
+
+function MyScreen() {
+  useBackHandler(
+    () => {
+      // true를 반환하면 back 이벤트를 소비합니다
+      return handleCustomBack();
+    },
+    { enabled: isEditing, priority: BackPriority.SCREEN },
+  );
+}
+```
+
+`hideOverlay()`는 인자를 생략하면 `'all'`로 동작해 모든 오버레이를 닫습니다.

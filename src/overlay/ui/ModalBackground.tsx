@@ -1,28 +1,69 @@
 import React, { useMemo } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import Animated, { FadeIn, FadeOut, type AnimatedStyle } from 'react-native-reanimated';
 import { Z_INDEX_VALUE } from '../../model/utils';
 
 interface ModalBackgroundProps {
   zIndex?: number;
   modalBgColor: string;
-  position?: 'center' | 'left' | 'right' | 'pop';
+  position?: 'center' | 'left' | 'right' | 'pop' | 'bottom';
   children: React.ReactNode;
   onPress?: () => void;
+  /**
+   * 전달하면 기본 FadeIn/FadeOut(50ms) 대신 주입된 opacity 스타일이 배경 레이어만 페이드한다.
+   * 자식은 배경과 분리된 형제 노드로 렌더되어 페이드 영향을 받지 않으므로,
+   * 오버레이가 자신의 등장·퇴장 애니메이션과 배경 페이드를 동기화할 때 사용한다.
+   */
+  backdropAnimatedStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
+  backdropAccessibilityLabel?: string;
 }
 
-function ModalBackground({ modalBgColor, position = 'center', children, onPress, zIndex = Z_INDEX_VALUE.DEFAULT }: ModalBackgroundProps) {
+const POSITION_STYLE: Partial<Record<NonNullable<ModalBackgroundProps['position']>, ViewStyle>> = {
+  center: { justifyContent: 'center', alignItems: 'center' },
+  left: { justifyContent: 'flex-start', alignItems: 'center' },
+  right: { justifyContent: 'flex-end', alignItems: 'center' },
+  bottom: { justifyContent: 'flex-end' },
+};
+
+const NOOP = () => { };
+
+function ModalBackground({
+  modalBgColor,
+  position = 'center',
+  children,
+  onPress,
+  zIndex = Z_INDEX_VALUE.DEFAULT,
+  backdropAnimatedStyle,
+  backdropAccessibilityLabel,
+}: ModalBackgroundProps) {
   const styles = useMemo(() => createStyles(modalBgColor), [modalBgColor]);
+
+  if (backdropAnimatedStyle) {
+    return (
+      <View style={[styles.host, { zIndex }, POSITION_STYLE[position]]}>
+        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
+          <Pressable
+            style={styles.fullScreen}
+            onPress={onPress ?? NOOP}
+            accessibilityRole="button"
+            accessibilityLabel={backdropAccessibilityLabel}
+          />
+        </Animated.View>
+
+        {children}
+      </View>
+    );
+  }
 
   return (
     <Animated.View
-      style={[styles.modalBg, { zIndex }, position === 'center' && { justifyContent: 'center', alignItems: 'center' }, position === 'left' && { justifyContent: 'flex-start', alignItems: 'center' }, position === 'right' && { justifyContent: 'flex-end', alignItems: 'center' }]}
+      style={[styles.modalBg, { zIndex }, POSITION_STYLE[position]]}
       entering={FadeIn.duration(50)}
       exiting={FadeOut.duration(50)}
     >
       <Pressable
         style={styles.fullScreen}
-        onPress={onPress ?? (() => { })}
+        onPress={onPress ?? NOOP}
       >
       </Pressable>
 
@@ -33,6 +74,13 @@ function ModalBackground({ modalBgColor, position = 'center', children, onPress,
 
 const createStyles = (modalBgColor: string) =>
   StyleSheet.create({
+    host: {
+      ...StyleSheet.absoluteFill,
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFill,
+      backgroundColor: modalBgColor,
+    },
     modalBg: {
       backgroundColor: modalBgColor,
       ...StyleSheet.absoluteFill,

@@ -52,7 +52,9 @@ showBottomSheet(props: ShowBottomSheetProps): void
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `isBackgroundTouchClose` | `boolean` | `true` | 배경을 터치하면 닫을지 여부 |
+| `dismissable` | `boolean` | `true` | 배경 터치·아래로 끌기 제스처로 닫을 수 있는지 여부. `false`여도 `hideOverlay('bottomSheet')` 호출로는 닫힙니다 |
+| `onClose` | `() => void` | `undefined` | 시트가 어떤 경로(버튼·배경 터치·드래그·뒤로가기)로 닫히든 정확히 1회 호출되는 콜백 |
+| `isBackgroundTouchClose` | `boolean` | `true` | **Deprecated** — `dismissable`을 사용하세요. `dismissable` 미지정 시에만 참조되며, 이제 배경 터치뿐 아니라 제스처 닫힘까지 함께 제어합니다 |
 | `marginHorizontal` | `number` | `10` | 시트의 좌우 여백 |
 | `marginBottom` | `number` | `10` | 시트의 하단 여백 |
 | `height` | `number \| 'auto'` | `300` | 시트의 높이 (`'auto'` 지정 시 컨텐츠 크기에 맞춤) |
@@ -180,7 +182,9 @@ function MyComponent() {
 }
 ```
 
-### 배경 터치로 닫기 비활성화
+### 배경 터치·제스처로 닫기 비활성화
+
+`dismissable: false`를 지정하면 배경 터치와 아래로 끌기 제스처 모두 무시됩니다. 사용자가 반드시 시트 내부 동작(버튼 등)으로만 닫아야 할 때 사용하세요.
 
 ```tsx
 import { useOverlay } from '@0610studio/zs-ui';
@@ -193,7 +197,7 @@ function MyComponent() {
       component: <MyBottomSheetContent />,
       options: {
         height: 300,
-        isBackgroundTouchClose: false,
+        dismissable: false,
       },
     });
   };

@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { ZSAboveKeyboard, ZSContainer, ZSText, useTheme } from 'zs-ui';
 import CtaButton from '../src/ui/CtaButton';
 import { TextFieldExample } from '../src/ui/TextFieldExample';
+import CodeBlock from '../src/ui/kit/CodeBlock';
 
 export default function ZSContainerExample() {
   const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
@@ -37,6 +38,20 @@ export default function ZSContainerExample() {
         </View>
 
         <TextFieldExample title="foldableSingleScreen" />
+
+        <CodeBlock
+          code={`<ZSContainer
+  keyboardScrollExtraOffset={190}
+  foldableSingleScreen
+  bottomComponent={
+    <ZSAboveKeyboard handleLayoutHeight={setCtaHeight}>
+      <CtaButton ... />
+    </ZSAboveKeyboard>
+  }
+>
+  {children}
+</ZSContainer>`}
+        />
       </ZSContainer>
     </>
   );

@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { ZSAboveKeyboard, ZSContainer, ZSText, useTheme } from 'zs-ui';
 import CtaButton from '../src/ui/CtaButton';
 import { TextFieldExample } from '../src/ui/TextFieldExample';
+import CodeBlock from '../src/ui/kit/CodeBlock';
 
 export default function FoldableExample() {
   const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
@@ -15,7 +16,7 @@ export default function FoldableExample() {
       <ZSContainer
         keyboardScrollExtraOffset={190}
         style={[styles.container, { paddingBottom: 30 + ctaLayoutHeight }]}
-        rightComponent={<TextFieldExample title="right" />}
+        rightComponent={<TextFieldExample title="right" gap={48} />}
         bottomComponent={
           <ZSAboveKeyboard handleLayoutHeight={setCtaLayoutHeight}>
             <CtaButton
@@ -36,7 +37,18 @@ export default function FoldableExample() {
           </ZSText>
         </View>
 
-        <TextFieldExample title="left" />
+        <TextFieldExample title="left" gap={48} />
+
+        <CodeBlock
+          code={`<ZSContainer
+  rightComponent={<RightPane />}
+  dividerLineComponent={<View style={{ width: 3 }} />}
+>
+  <LeftPane />
+</ZSContainer>
+
+// 언폴딩 시에만 rightComponent 가 우측 pane 으로 분리된다`}
+        />
       </ZSContainer>
     </>
   );

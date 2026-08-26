@@ -1,6 +1,7 @@
 import { ActivityIndicator } from "react-native";
 import { ReactNode, useCallback } from "react";
 import { useLoader } from "../../model/useOverlay";
+import { BackPriority, useBackHandler } from "../../context/BackHandlerContext";
 import ModalBackground from "../ui/ModalBackground";
 import { useTheme } from "../../context/ThemeContext";
 import { Z_INDEX_VALUE } from "../../model/utils";
@@ -12,6 +13,9 @@ function LoadingNotify({
 }) {
   const { loaderVisible } = useLoader();
   const { palette } = useTheme();
+
+  // 로딩 중에는 back을 소비만 한다 (아무것도 닫지 않고 차단).
+  useBackHandler(() => true, { enabled: loaderVisible, priority: BackPriority.LOADER });
 
   const renderLoader = useCallback(() => {
     return loaderComponent ? (

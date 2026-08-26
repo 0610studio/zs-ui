@@ -8,7 +8,7 @@ interface MyBottomSheetProps {
 }
 
 function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
-  const { hideOverlay } = useOverlay();
+  const { hideOverlay, showAlert } = useOverlay();
   const { palette: { background, primary } } = useTheme();
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
   const [nick, setNick] = useState<string>('');
@@ -21,7 +21,13 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
 
   const handleConfirmPress = useCallback(() => {
     onConfirm?.();
-  }, [onConfirm]);
+    // 시트 위 Alert 스택 데모 — back 우선순위(Alert 먼저 닫힘) 검증용
+    showAlert({
+      title: '시트 위 알럿',
+      informative: 'back 키는 이 알럿만 닫아야 합니다.',
+      actions: { primary: { label: '확인' } },
+    });
+  }, [onConfirm, showAlert]);
 
   const handleClosePress = useCallback(() => {
     hideOverlay('bottomSheet');
@@ -45,12 +51,16 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
       </ScrollView>
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <ZSPressable fullWidth style={styles.confirm} onPress={handleConfirmPress}>
-          <ZSText>확인</ZSText>
-        </ZSPressable>
-        <ZSPressable fullWidth style={styles.button} onPress={handleClosePress}>
-          <ZSText>닫기</ZSText>
-        </ZSPressable>
+        <View style={{ flex: 1 }}>
+          <ZSPressable fullWidth style={styles.confirm} onPress={handleConfirmPress}>
+            <ZSText>확인</ZSText>
+          </ZSPressable>
+        </View>
+        <View style={{ flex: 1 }}>
+          <ZSPressable fullWidth style={styles.button} onPress={handleClosePress}>
+            <ZSText>닫기</ZSText>
+          </ZSPressable>
+        </View>
       </View>
     </ZSView>
   );

@@ -69,6 +69,7 @@ export default function GlobalOverlayExample() {
             title="showSnackBar"
             caption="success 스낵바"
             dotColor={palette.success.main}
+            isLast
             onPress={() => GlobalOverlay.showSnackBar({ message: 'SnackBar 표시', type: 'success' })}
           />
         </Section>

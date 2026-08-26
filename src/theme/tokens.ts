@@ -33,4 +33,4 @@ export const DURATION = {
 } as const;
 
 /** disabled 상태 공통 투명도 */
-export const DISABLED_OPACITY = 0.5;
+export const DISABLED_OPACITY = 0.7;
