@@ -113,9 +113,10 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     primaryColor: focusColor || palette.primary.main,
     defaultBorderColor: borderColor || palette.grey[30],
     defaultLabelColor: labelColor || palette.text.secondary,
-    placeholderColor: placeHolderColor || palette.grey[40],
+    // disabled 시 DISABLED_OPACITY 가 전체에 곱해지므로 기본 플레이스홀더색을 진하게 보정
+    placeholderColor: placeHolderColor || (disabled ? palette.grey[70] : palette.grey[40]),
     errorColor: fErrorColor,
-  }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor, fErrorColor]);
+  }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor, fErrorColor, disabled]);
 
   const nonFocusLabelColor = useMemo(
     () => (hasValue ? colorConfig.defaultLabelColor : colorConfig.placeholderColor),
@@ -192,13 +193,22 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     textInputProps?.onBlur?.(event);
   }, [textInputProps?.onBlur]);
 
+  /**
+   * inbox 는 "채워진 박스" 스타일이므로 기본 배경을 layer1 로 둔다.
+   * base 로 두면 값이 비었을 때 outline 과 시각적으로 완전히 동일해져 boxStyle 구분이 사라진다.
+   * inputBgColor / labelBgColor 를 넘긴 경우에는 그 값이 우선한다.
+   */
+  const defaultFieldBgColor = boxStyle === 'inbox'
+    ? palette.background.layer1
+    : palette.background.base;
+
   const styleConfig = useMemo(() => {
     const baseStyle = {
       width: '100%' as const,
       justifyContent: isTextArea ? 'flex-start' as const : 'center' as const,
       borderRadius,
       paddingHorizontal,
-      backgroundColor: inputBgColor || palette.background.base,
+      backgroundColor: inputBgColor || defaultFieldBgColor,
       paddingTop: boxStyle === 'inbox' ? 13 : 0,
     };
 
@@ -231,21 +241,21 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     }
 
     return { ...baseStyle, ...borderStyle, ...innerStyle };
-  }, [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, palette.background.base]);
+  }, [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, defaultFieldBgColor]);
 
   const labelTextStyle: StyleProp<TextStyle> = useMemo(() => ({
     fontSize,
     top: animationConstants.baseTop,
     left: paddingHorizontal,
     transformOrigin: 'left center',
-    backgroundColor: labelBgColor || palette.background.base,
+    backgroundColor: labelBgColor || defaultFieldBgColor,
     paddingHorizontal: boxStyle === 'outline' ? 5 : 0,
     paddingVertical: 2,
     textAlignVertical: 'center' as const,
     fontFamily,
     borderRadius: boxStyle === 'outline' ? 5 : 0,
     ...(Platform.OS === 'android' ? { overflow: 'hidden' as const } : {}),
-  }), [fontSize, animationConstants.baseTop, paddingHorizontal, labelBgColor, palette.background.base, boxStyle, fontFamily]);
+  }), [fontSize, animationConstants.baseTop, paddingHorizontal, labelBgColor, defaultFieldBgColor, boxStyle, fontFamily]);
 
   const boxStyleArray = useMemo(
     () => [styleConfig, animatedBorderStyle],
@@ -266,7 +276,8 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     {
       paddingTop: 7 + iosOffset,
       paddingBottom: 5 + iosOffset,
-      color: palette.text.base,
+      // disabled 시 DISABLED_OPACITY 가 전체에 곱해지므로 값 텍스트색을 최대 대비로 보정
+      color: disabled ? palette.grey[90] : palette.text.base,
       fontSize,
       width: '100%' as const,
       paddingRight: 25,
@@ -274,7 +285,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
       ...(Platform.OS === 'web' ? { outline: 'none' } : {}),
     },
     textInputProps?.style,
-  ], [palette.text.base, fontSize, fontFamily, textInputProps?.style]);
+  ], [disabled, palette.grey, palette.text.base, fontSize, fontFamily, textInputProps?.style]);
 
   // 빈 문자열이 View 자식으로 렌더되지 않도록 boolean 으로 강제 (web 'Unexpected text node' 경고 방지)
   const shouldShowCloseButton = Boolean(value) && isFocusedForUI;

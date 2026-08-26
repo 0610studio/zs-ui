@@ -3,6 +3,7 @@ import { StatusBar, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import Animated, { FadeOut, useAnimatedStyle, withTiming, withDelay, useSharedValue } from 'react-native-reanimated';
 import { useModality } from '../../model/useOverlay';
+import { BackPriority, useBackHandler } from '../../context/BackHandlerContext';
 import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import ZSView from '../../ui/ZSView';
 import { useTheme } from '../../context/ThemeContext';
@@ -17,7 +18,15 @@ function Modality({
   const { palette } = useTheme();
   const { height: windowHeight } = useWindowDimensions();
   const [localVisible, setLocalVisible] = useState(false);
-  const { modalityVisible } = useModality();
+  const { modalityVisible, setModalityVisible } = useModality();
+
+  useBackHandler(
+    () => {
+      setModalityVisible(false);
+      return true;
+    },
+    { enabled: modalityVisible, priority: BackPriority.OVERLAY }
+  );
   const insets = useSafeAreaInsets();
   const backScale = useSharedValue(1);
   const backTranslateY = useSharedValue(0);

@@ -26,7 +26,8 @@ const makeAnim = () => {
 
   return animation;
 };
-const useSharedValue = (v) => ({ value: v });
+// 실제 reanimated처럼 렌더 간 안정된 참조를 반환한다 (effect deps로 쓰이는 경우 재실행 방지).
+const useSharedValue = (v) => React.useRef({ value: v }).current;
 const useAnimatedStyle = (fn) => fn() || {};
 const useAnimatedProps = (fn) => fn() || {};
 const Easing = {
@@ -37,8 +38,21 @@ const Easing = {
   in: (fn) => fn,
 };
 const useDerivedValue = (fn) => ({ value: fn() });
-const withTiming = (v, _cfg) => v;
-const withSpring = (v, _cfg) => v;
+// 완료 콜백은 실제 동작처럼 duration 이후 비동기로 호출한다 (fake timer로 제어 가능).
+const withTiming = (v, cfg, callback) => {
+  if (typeof callback === 'function') {
+    setTimeout(() => callback(true), (cfg && cfg.duration) || 0);
+  }
+  return v;
+};
+const withSpring = (v, cfg, callback) => {
+  if (typeof callback === 'function') {
+    setTimeout(() => callback(true), 0);
+  }
+  return v;
+};
+const runOnJS = (fn) => fn;
+const useReducedMotion = () => false;
 const withDelay = (delay, anim) => anim;
 const withRepeat = (anim) => anim;
 const cancelAnimation = () => {};
@@ -69,6 +83,8 @@ module.exports = {
   createAnimatedComponent,
   withTiming,
   withSpring,
+  runOnJS,
+  useReducedMotion,
   withDelay,
   withRepeat,
   cancelAnimation,

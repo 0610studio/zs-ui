@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { ZSContainer, ZSText, useOverlay, useTheme } from 'zs-ui';
 import MyBottomSheet from '../src/ui/MyBottomSheet';
@@ -81,9 +81,38 @@ export default function OverlayExample() {
             }
           />
           <DemoRow
+            title="showBottomSheet · dismissable false"
+            caption="배경 터치·제스처로 닫히지 않음 (버튼으로만 닫기)"
+            dotColor={palette.information.main}
+            onPress={() =>
+              showBottomSheet({
+                options: {
+                  height: 'auto',
+                  dismissable: false,
+                  onClose: () => showSnackBar({ message: 'onClose 발화', type: 'success' }),
+                },
+                headerComponent: (
+                  <ZSText style={{ textAlign: 'center', paddingBottom: 8 }}>고정 시트 헤더</ZSText>
+                ),
+                component: (
+                  <View style={{ gap: 16, paddingVertical: 12 }}>
+                    <ZSText style={{ textAlign: 'center' }}>dismissable false 시트</ZSText>
+                    <TouchableOpacity
+                      style={{ backgroundColor: palette.primary.main, borderRadius: 12, padding: 14, alignItems: 'center' }}
+                      onPress={() => hideOverlay('bottomSheet')}
+                    >
+                      <ZSText style={{ color: '#ffffff' }}>시트 닫기</ZSText>
+                    </TouchableOpacity>
+                  </View>
+                ),
+              })
+            }
+          />
+          <DemoRow
             title="showModality"
             caption="중앙 모달 컴포넌트"
             dotColor={palette.warning.main}
+            isLast
             onPress={() =>
               showModality({
                 component: (

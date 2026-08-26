@@ -1,55 +1,42 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, View, PanResponder, Keyboard, Platform, type KeyboardEvent, type LayoutChangeEvent, type PanResponderGestureState, type GestureResponderEvent, useWindowDimensions, type ViewStyle } from 'react-native';
 import { useBottomSheet } from '../../model/useOverlay';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { ReduceMotion, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import ModalBackground from '../ui/ModalBackground';
 import { useTheme } from '../../context/ThemeContext';
+import { BackPriority, useBackHandler } from '../../context/BackHandlerContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShowBottomSheetProps } from '../../model/types';
 import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import { RADIUS } from '../../theme/tokens';
-import useKeyboard from '../../model/useKeyboard';
 import useFoldingState from '../../model/useFoldingState';
 
 const IS_IOS = Platform.OS === 'ios';
+const KEYBOARD_SHOW_EVENT = IS_IOS ? 'keyboardWillShow' : 'keyboardDidShow';
+const KEYBOARD_HIDE_EVENT = IS_IOS ? 'keyboardWillHide' : 'keyboardDidHide';
+
+// 닫힐 때 시트를 화면 밖으로 완전히 밀어내기 위한 추가 이동 거리.
+const CLOSE_SLACK = 100;
 
 const ANIMATION_CONFIG = {
-  keyboard: {
-    show: { duration: 250 },
-    hide: { duration: 150 },
-  },
-  spring: {
-    damping: 50,
-    stiffness: 300,
-    mass: 0.7,
-    velocity: 100,
-    restDisplacementThreshold: 0.2,
-  },
-  restore: {
-    damping: 26,
-    stiffness: 260,
-    mass: 0.85,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 2,
-  },
-  close: { duration: 150 },
-  scale: { duration: 200 },
-  scaleRestore: {
-    damping: 15,
-    stiffness: 300,
-  },
+  open: { damping: 24, stiffness: 260, mass: 0.9, restDisplacementThreshold: 0.2, reduceMotion: ReduceMotion.System },
+  restore: { damping: 22, stiffness: 240, mass: 0.85, restDisplacementThreshold: 0.1, restSpeedThreshold: 2, reduceMotion: ReduceMotion.System },
+  close: { duration: 200, reduceMotion: ReduceMotion.System },
+  backdropShow: { duration: 200, reduceMotion: ReduceMotion.System },
+  backdropHide: { duration: 150, reduceMotion: ReduceMotion.System },
+  scale: { duration: 180, reduceMotion: ReduceMotion.System },
+  keyboardShow: { duration: 250, reduceMotion: ReduceMotion.System },
+  keyboardHide: { duration: 150, reduceMotion: ReduceMotion.System },
 } as const;
 
 const GESTURE_CONSTANTS = {
-  scaleAmount: 0.985,
-  horizontalDamping: 18,
-  verticalUpDamping: 18,
-  verticalDownDamping: 1.5,
+  scaleAmount: 0.99,
+  dragUpDamping: 3,
   closeVelocityThreshold: 0.5,
-  closeDistanceRatio: 1 / 3,
+  closeDistanceRatio: 0.28,
   minimumCloseDistance: 80,
-  hideDelay: 200,
-  moveThreshold: 10,
+  moveThreshold: 8,
 } as const;
 
 const getSafeFiniteNumber = (value: number, fallback: number) =>
@@ -62,11 +49,14 @@ function BottomSheetOverlay({
 }: ShowBottomSheetProps) {
   const {
     foldableSingleScreen = false,
-    isBackgroundTouchClose = true,
     marginHorizontal = 10,
     marginBottom = 10,
     padding = 14,
   } = options;
+  // dismissable 미지정 시 isBackgroundTouchClose(deprecated)를 승계한다.
+  const dismissable = options.dismissable ?? options.isBackgroundTouchClose ?? true;
+  const isFixed = options.type === 'fixed';
+
   const { height: windowHeight } = useWindowDimensions();
   const { width: windowWidth } = useFoldingState();
   const { palette } = useTheme();
@@ -94,74 +84,88 @@ function BottomSheetOverlay({
   }, [height, isAutoHeight, maxHeight, viewportMaxHeight]);
 
   const translateY = useSharedValue(0);
-  const translateX = useSharedValue(0);
+  const keyboardOffset = useSharedValue(0);
+  const backdropOpacity = useSharedValue(0);
   const scale = useSharedValue(1);
-  const startX = useSharedValue(0);
-  const startY = useSharedValue(0);
   const isGesturing = useSharedValue(false);
 
   const [localVisible, setLocalVisible] = useState(false);
-  const latestCloseOffsetRef = useRef(constrainedMaxHeight + 100);
-  const closingOffsetRef = useRef(constrainedMaxHeight + 100);
+
+  // 시트 바닥부터 화면 바닥까지의 간격 — 닫힘 시 화면 밖으로 밀어낼 거리 계산에 쓴다.
+  const bottomSpace = isFixed ? bottomInsets : marginBottom + bottomInsets;
+  const closeOffsetRef = useRef(0);
 
   useEffect(() => {
-    latestCloseOffsetRef.current = sheetHeight > 0 ? sheetHeight + 100 : constrainedMaxHeight + 100;
-  }, [constrainedMaxHeight, sheetHeight]);
+    const measured = sheetHeight > 0 ? sheetHeight : constrainedMaxHeight;
+    closeOffsetRef.current = measured + bottomSpace + CLOSE_SLACK;
+  }, [bottomSpace, constrainedMaxHeight, sheetHeight]);
 
-  const handleKeyboardShow = useCallback((event: KeyboardEvent) => {
-    if (!isGesturing.value) {
-      const targetY = -event.endCoordinates.height + (IS_IOS ? bottomInsets : 0);
-      translateY.value = withTiming(targetY, ANIMATION_CONFIG.keyboard.show);
-    }
-  }, [bottomInsets]);
-
-  const handleKeyboardHide = useCallback(() => {
-    if (!isGesturing.value) {
-      translateY.value = withTiming(0, ANIMATION_CONFIG.keyboard.hide);
-    }
+  const hideSheet = useCallback(() => {
+    setLocalVisible(false);
   }, []);
 
-  useKeyboard({
-    handleKeyboardShow,
-    handleKeyboardHide,
-  });
+  // 초기 마운트(한 번도 열린 적 없음)에서는 close 애니메이션을 돌릴 필요가 없다.
+  const hasOpenedRef = useRef(false);
 
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-
     if (bottomSheetVisible) {
-      closingOffsetRef.current = latestCloseOffsetRef.current;
+      hasOpenedRef.current = true;
       Keyboard.dismiss();
-      translateY.value = latestCloseOffsetRef.current;
+      keyboardOffset.value = 0;
+      scale.value = 1;
+      translateY.value = closeOffsetRef.current;
+      translateY.value = withSpring(0, ANIMATION_CONFIG.open);
+      backdropOpacity.value = withTiming(1, ANIMATION_CONFIG.backdropShow);
       setLocalVisible(true);
-      translateY.value = withSpring(0, ANIMATION_CONFIG.spring);
-    } else {
-      const targetCloseOffset = closingOffsetRef.current || latestCloseOffsetRef.current;
-      closingOffsetRef.current = targetCloseOffset;
-      translateY.value = withTiming(targetCloseOffset, ANIMATION_CONFIG.close);
-      timeoutId = setTimeout(() => {
-        setLocalVisible(false);
-      }, GESTURE_CONSTANTS.hideDelay);
+      return;
     }
+    if (!hasOpenedRef.current) {
+      return;
+    }
+    // 닫힘 애니메이션이 실제로 끝난 시점에 언마운트한다 (setTimeout 매직넘버 커플링 제거).
+    translateY.value = withTiming(closeOffsetRef.current, ANIMATION_CONFIG.close, (finished) => {
+      if (finished) scheduleOnRN(hideSheet);
+    });
+    backdropOpacity.value = withTiming(0, ANIMATION_CONFIG.backdropHide);
+  }, [backdropOpacity, bottomSheetVisible, hideSheet, isGesturing, keyboardOffset, scale, translateY]);
 
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+  // 키보드 회피는 translateY와 분리된 keyboardOffset으로 덧셈 합성한다.
+  // 시트가 보일 때만 구독해, 닫힌 시트가 앱 전역 키보드 이벤트에 반응하지 않게 한다.
+  useEffect(() => {
+    if (!localVisible) {
+      return;
+    }
+    const handleKeyboardShow = (event: KeyboardEvent) => {
+      if (isGesturing.value) {
+        return;
+      }
+      const target = -Math.max(event.endCoordinates.height - (IS_IOS ? bottomInsets : 0), 0);
+      keyboardOffset.value = withTiming(target, ANIMATION_CONFIG.keyboardShow);
     };
-  }, [bottomSheetVisible]);
+    const handleKeyboardHide = () => {
+      if (isGesturing.value) {
+        return;
+      }
+      keyboardOffset.value = withTiming(0, ANIMATION_CONFIG.keyboardHide);
+    };
+    const showSubscription = Keyboard.addListener(KEYBOARD_SHOW_EVENT, handleKeyboardShow);
+    const hideSubscription = Keyboard.addListener(KEYBOARD_HIDE_EVENT, handleKeyboardHide);
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, [bottomInsets, isGesturing, keyboardOffset, localVisible]);
 
-  const animatedStyles = useAnimatedStyle(() => {
+  const animatedSheetStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateY: translateY.value },
-        { translateX: translateX.value },
-        { scale: scale.value }
+        { translateY: translateY.value + keyboardOffset.value },
+        { scale: scale.value },
       ],
     };
   });
 
-  const dismissKeyboard = useCallback(() => {
-    Keyboard.dismiss();
-  }, []);
+  const animatedBackdropStyle = useAnimatedStyle(() => ({ opacity: backdropOpacity.value }));
 
   const closeBottomSheet = useCallback(() => {
     setBottomSheetVisible(false);
@@ -170,14 +174,6 @@ function BottomSheetOverlay({
   const handleSheetLayout = useCallback((event: LayoutChangeEvent) => {
     const nextHeight = Math.round(event.nativeEvent.layout.height);
 
-    if (nextHeight > 0) {
-      const nextCloseOffset = nextHeight + 100;
-      latestCloseOffsetRef.current = nextCloseOffset;
-      if (bottomSheetVisible) {
-        closingOffsetRef.current = nextCloseOffset;
-      }
-    }
-
     setSheetHeight((prevHeight) => {
       if (Math.abs(prevHeight - nextHeight) <= 1) {
         return prevHeight;
@@ -185,77 +181,61 @@ function BottomSheetOverlay({
 
       return nextHeight;
     });
-  }, [bottomSheetVisible]);
-
-  const handlePanResponderGrant = useCallback(() => {
-    dismissKeyboard();
-    isGesturing.value = true;
-    startX.value = translateX.value;
-    startY.value = translateY.value;
-    scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
-  }, [dismissKeyboard]);
-
-  const handlePanResponderMove = useCallback((_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    const newTranslateX = (startX.value + gestureState.dx) / GESTURE_CONSTANTS.horizontalDamping;
-    translateX.value = newTranslateX;
-
-    const newTranslateY = startY.value + gestureState.dy;
-    if (newTranslateY < 0) {
-      translateY.value = newTranslateY / GESTURE_CONSTANTS.verticalUpDamping;
-    } else {
-      translateY.value = newTranslateY / GESTURE_CONSTANTS.verticalDownDamping;
-    }
   }, []);
-
-  const handlePanResponderRelease = useCallback((_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    isGesturing.value = false;
-
-    const xVelocity = (gestureState.vx / GESTURE_CONSTANTS.horizontalDamping) * 1000;
-    translateX.value = withSpring(0, { ...ANIMATION_CONFIG.restore, velocity: xVelocity });
-
-    const dismissThresholdHeight = sheetHeight > 0 ? sheetHeight : constrainedMaxHeight;
-    const dismissDistanceThreshold = Math.max(
-      dismissThresholdHeight * GESTURE_CONSTANTS.closeDistanceRatio,
-      GESTURE_CONSTANTS.minimumCloseDistance
-    );
-    const shouldClose = gestureState.vy > GESTURE_CONSTANTS.closeVelocityThreshold ||
-      translateY.value > dismissDistanceThreshold;
-
-    if (shouldClose) {
-      const targetCloseOffset = latestCloseOffsetRef.current;
-      closingOffsetRef.current = targetCloseOffset;
-      translateY.value = withTiming(targetCloseOffset, ANIMATION_CONFIG.close);
-      closeBottomSheet();
-    } else {
-      const yDamping = translateY.value >= 0
-        ? GESTURE_CONSTANTS.verticalDownDamping
-        : GESTURE_CONSTANTS.verticalUpDamping;
-      const yVelocity = (gestureState.vy / yDamping) * 1000;
-      translateY.value = withSpring(0, { ...ANIMATION_CONFIG.restore, velocity: yVelocity });
-    }
-
-    scale.value = withSpring(1, ANIMATION_CONFIG.scaleRestore);
-  }, [closeBottomSheet, constrainedMaxHeight, sheetHeight]);
 
   const panResponder = useMemo(
     () => PanResponder.create({
       onStartShouldSetPanResponder: () => false,
-      onStartShouldSetPanResponderCapture: () => false,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        const { dx, dy } = gestureState;
-        return Math.abs(dx) > GESTURE_CONSTANTS.moveThreshold || Math.abs(dy) > GESTURE_CONSTANTS.moveThreshold;
+      // 닫힘 애니메이션 중 잡으면 완료 콜백이 취소돼 언마운트가 막히므로, 열려 있을 때만 응답한다.
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        bottomSheetVisible && Math.abs(gestureState.dy) > GESTURE_CONSTANTS.moveThreshold,
+      onPanResponderGrant: () => {
+        Keyboard.dismiss();
+        isGesturing.value = true;
+        scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
       },
-      onMoveShouldSetPanResponderCapture: () => false,
-      onPanResponderGrant: handlePanResponderGrant,
-      onPanResponderMove: handlePanResponderMove,
-      onPanResponderRelease: handlePanResponderRelease,
+      onPanResponderMove: (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        translateY.value = gestureState.dy < 0
+          ? gestureState.dy / GESTURE_CONSTANTS.dragUpDamping
+          : gestureState.dy;
+      },
+      onPanResponderRelease: (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        isGesturing.value = false;
+        scale.value = withSpring(1, ANIMATION_CONFIG.restore);
+
+        const dismissThresholdHeight = sheetHeight > 0 ? sheetHeight : constrainedMaxHeight;
+        const dismissDistanceThreshold = Math.max(
+          dismissThresholdHeight * GESTURE_CONSTANTS.closeDistanceRatio,
+          GESTURE_CONSTANTS.minimumCloseDistance
+        );
+        const shouldClose = dismissable && (
+          gestureState.vy > GESTURE_CONSTANTS.closeVelocityThreshold ||
+          translateY.value > dismissDistanceThreshold
+        );
+
+        if (shouldClose) {
+          closeBottomSheet();
+          return;
+        }
+
+        translateY.value = withSpring(0, { ...ANIMATION_CONFIG.restore, velocity: gestureState.vy * 1000 });
+      },
     }),
-    [handlePanResponderGrant, handlePanResponderMove, handlePanResponderRelease]
+    [bottomSheetVisible, closeBottomSheet, constrainedMaxHeight, dismissable, isGesturing, scale, sheetHeight, translateY]
   );
 
   const handleBackgroundPress = useCallback(() => {
-    if (isBackgroundTouchClose) setBottomSheetVisible(false);
-  }, [isBackgroundTouchClose, setBottomSheetVisible]);
+    if (dismissable) closeBottomSheet();
+  }, [closeBottomSheet, dismissable]);
+
+  // dismissable=false여도 true를 반환해 back을 소비 — 시트 밑 화면으로 내비게이션이 새는 것을 막는다.
+  useBackHandler(
+    () => {
+      if (dismissable) closeBottomSheet();
+      return true;
+    },
+    { enabled: localVisible, priority: BackPriority.SHEET }
+  );
 
   const containerHeightStyle = useMemo<ViewStyle>(() => {
     if (isAutoHeight) {
@@ -272,15 +252,21 @@ function BottomSheetOverlay({
     styles.container,
     containerHeightStyle,
     {
-      width: options.type === 'fixed' ? '100%' : windowWidth - marginHorizontal * 2,
-      maxWidth: foldableSingleScreen ? OVERLAY_FOLDABLE_SINGLE_WIDTH : '100%',
-      marginHorizontal: options.type === 'fixed' ? 0 : marginHorizontal,
-      bottom: options.type === 'fixed' ? 0 : marginBottom + bottomInsets,
-      paddingBottom: options.type === 'fixed' ? bottomInsets : 0,
+      marginHorizontal: isFixed || foldableSingleScreen ? 0 : marginHorizontal,
+      marginBottom: isFixed ? 0 : marginBottom + bottomInsets,
+      paddingBottom: isFixed ? bottomInsets : 0,
       backgroundColor: palette.background.base,
-      ... (options.type === 'fixed' ? { borderTopLeftRadius: RADIUS.sheet, borderTopRightRadius: RADIUS.sheet, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : { borderRadius: RADIUS.sheet }),
+      ...(isFixed
+        ? { borderTopLeftRadius: RADIUS.sheet, borderTopRightRadius: RADIUS.sheet, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
+        : { borderRadius: RADIUS.sheet }),
+      ...(foldableSingleScreen
+        ? {
+          alignSelf: 'center' as const,
+          width: Math.min(windowWidth - (isFixed ? 0 : marginHorizontal * 2), OVERLAY_FOLDABLE_SINGLE_WIDTH),
+        }
+        : null),
     },
-    animatedStyles,
+    animatedSheetStyle,
   ] as ViewStyle[];
 
   const pressableViewStyle = [
@@ -301,7 +287,7 @@ function BottomSheetOverlay({
 
   const gestureBarStyle = [
     styles.gestureBar,
-    { backgroundColor: palette.grey[60] }
+    { backgroundColor: palette.grey[20] }
   ];
 
   if (!localVisible) {
@@ -311,11 +297,17 @@ function BottomSheetOverlay({
   return (
     <ModalBackground
       zIndex={Z_INDEX_VALUE.BOTTOM_SHEET1}
-      key={localVisible ? 'visiblebs' : 'hiddenbs'}
+      position="bottom"
       modalBgColor={palette.modalBgColor}
       onPress={handleBackgroundPress}
+      backdropAnimatedStyle={animatedBackdropStyle}
+      backdropAccessibilityLabel="닫기"
     >
-      <Animated.View style={containerStyle} onLayout={handleSheetLayout}>
+      <Animated.View
+        style={containerStyle}
+        onLayout={handleSheetLayout}
+        accessibilityViewIsModal
+      >
         <View style={pressableViewStyle}>
           <View {...panResponder.panHandlers}>
             <View style={gestureBarContainerStyle}>
@@ -335,7 +327,7 @@ function BottomSheetOverlay({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    alignSelf: 'stretch',
     borderRadius: RADIUS.sheet,
     overflow: 'hidden',
     zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,

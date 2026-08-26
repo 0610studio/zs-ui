@@ -1,6 +1,6 @@
 import React from 'react';
-import { act, render } from '@testing-library/react-native';
-import { Text, View } from 'react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
+import { Keyboard, Pressable, Text, View } from 'react-native';
 import BottomSheetOverlay from '../../overlay/BottomSheetOverlay';
 import type { BottomSheetContextProps } from '../../model/types';
 import * as Reanimated from 'react-native-reanimated';
@@ -38,6 +38,13 @@ jest.mock('../../model/useFoldingState', () => ({
   default: () => ({ width: 390 })
 }));
 
+// 닫힘 오프셋 = 시트높이 + bottomSpace(marginBottom 10 + inset 0) + slack 100
+const closeOffsetFor = (sheetHeight: number) => sheetHeight + 10 + 100;
+
+// translateY 닫힘 호출만 골라낸다 (backdrop 0/1, scale, keyboard 호출과 구분).
+const closeCallsOf = (spy: jest.SpyInstance) =>
+  spy.mock.calls.filter(([target]) => typeof target === 'number' && target > 100);
+
 describe('BottomSheetOverlay', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -49,6 +56,7 @@ describe('BottomSheetOverlay', () => {
     });
     jest.useRealTimers();
     jest.clearAllMocks();
+    jest.restoreAllMocks();
     mockUseBottomSheet.mockReset();
     mockUseBottomSheet.mockReturnValue(createBottomSheetContext());
   });
@@ -81,7 +89,7 @@ describe('BottomSheetOverlay', () => {
   it('닫히는 동안 layout 변경이 발생해도 close 애니메이션을 다시 시작하지 않는다', () => {
     const withTimingSpy = jest.spyOn(Reanimated, 'withTiming');
 
-    const { getByText, rerender, UNSAFE_getAllByType } = render(
+    const { getByText, queryByText, rerender, UNSAFE_getAllByType } = render(
       <BottomSheetOverlay
         headerComponent={<Text>header</Text>}
         component={<Text>content</Text>}
@@ -109,9 +117,12 @@ describe('BottomSheetOverlay', () => {
       );
     });
 
+    // 닫힘 애니메이션이 도는 동안에는 아직 마운트되어 있다.
     expect(getByText('content')).toBeTruthy();
-    expect(withTimingSpy).toHaveBeenCalledTimes(1);
-    expect(withTimingSpy).toHaveBeenLastCalledWith(380, { duration: 150 });
+
+    expect(closeCallsOf(withTimingSpy)).toHaveLength(1);
+    expect(closeCallsOf(withTimingSpy)[0][0]).toBe(closeOffsetFor(280));
+    expect(closeCallsOf(withTimingSpy)[0][1]).toEqual(expect.objectContaining({ duration: 200 }));
 
     act(() => {
       sheetContainer!.props.onLayout({
@@ -119,6 +130,88 @@ describe('BottomSheetOverlay', () => {
       });
     });
 
-    expect(withTimingSpy).toHaveBeenCalledTimes(1);
+    expect(closeCallsOf(withTimingSpy)).toHaveLength(1);
+
+    // 닫힘 timing 완료 콜백이 실행되면 언마운트된다 (setTimeout 지연이 아니라 애니메이션 완료 기준).
+    act(() => {
+      jest.advanceTimersByTime(250);
+    });
+    expect(queryByText('content')).toBeNull();
+  });
+
+  it('dismissable: false면 배경 터치로 닫히지 않는다', () => {
+    const setBottomSheetVisible = jest.fn();
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ setBottomSheetVisible }));
+
+    const { UNSAFE_getAllByType } = render(
+      <BottomSheetOverlay
+        component={<Text>content</Text>}
+        options={{ dismissable: false }}
+      />
+    );
+
+    const backdropPressable = UNSAFE_getAllByType(Pressable)[0];
+    fireEvent.press(backdropPressable);
+
+    expect(setBottomSheetVisible).not.toHaveBeenCalled();
+  });
+
+  it('dismissable 미지정 시 isBackgroundTouchClose(deprecated)를 승계한다', () => {
+    const setBottomSheetVisible = jest.fn();
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ setBottomSheetVisible }));
+
+    const { UNSAFE_getAllByType } = render(
+      <BottomSheetOverlay
+        component={<Text>content</Text>}
+        options={{ isBackgroundTouchClose: false }}
+      />
+    );
+
+    fireEvent.press(UNSAFE_getAllByType(Pressable)[0]);
+    expect(setBottomSheetVisible).not.toHaveBeenCalled();
+  });
+
+  it('기본값은 dismissable: true — 배경 터치로 닫힌다', () => {
+    const setBottomSheetVisible = jest.fn();
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ setBottomSheetVisible }));
+
+    const { UNSAFE_getAllByType } = render(
+      <BottomSheetOverlay component={<Text>content</Text>} />
+    );
+
+    fireEvent.press(UNSAFE_getAllByType(Pressable)[0]);
+    expect(setBottomSheetVisible).toHaveBeenCalledWith(false);
+  });
+
+  it('키보드 이벤트는 translateY가 아닌 별도 keyboardOffset을 움직인다', () => {
+    const listeners: Record<string, (event?: any) => void> = {};
+    jest.spyOn(Keyboard, 'addListener').mockImplementation(((event: string, cb: any) => {
+      listeners[event] = cb;
+      return { remove: jest.fn() };
+    }) as any);
+    const withTimingSpy = jest.spyOn(Reanimated, 'withTiming');
+
+    render(<BottomSheetOverlay component={<Text>content</Text>} />);
+
+    expect(listeners.keyboardWillShow).toBeDefined();
+
+    act(() => {
+      listeners.keyboardWillShow({ endCoordinates: { height: 300 } });
+    });
+
+    // keyboardOffset 목표값 -300 (insets 0), duration 250 — translateY 닫힘 timing과 무관.
+    const keyboardCall = withTimingSpy.mock.calls.find(([target]) => target === -300);
+    expect(keyboardCall).toBeDefined();
+    expect(keyboardCall![1]).toEqual(expect.objectContaining({ duration: 250 }));
+    expect(closeCallsOf(withTimingSpy)).toHaveLength(0);
+  });
+
+  it('시트가 보이지 않을 때는 키보드 리스너를 등록하지 않는다', () => {
+    const addListenerSpy = jest.spyOn(Keyboard, 'addListener');
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ bottomSheetVisible: false }));
+
+    render(<BottomSheetOverlay component={<Text>content</Text>} />);
+
+    expect(addListenerSpy).not.toHaveBeenCalled();
   });
 });

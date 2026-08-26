@@ -1,6 +1,7 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { BackHandler, Keyboard, TextProps, TouchableOpacityProps, useWindowDimensions } from 'react-native';
+import { Keyboard, TextProps, TouchableOpacityProps, useWindowDimensions } from 'react-native';
+import { BackHandlerProvider } from './BackHandlerContext';
 import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from '../model/useOverlay';
 import { AlertActions, BottomSheetHeight, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from '../model/types';
 import AlertOverlay from '../overlay/AlertOverlay';
@@ -83,12 +84,16 @@ export function OverlayProvider({
     setSecondaryButtonTextStyle(secondaryButtonTextStyle);
   }, []);
 
+  // onClose는 어떤 경로(버튼·배경·드래그·백버튼)로 닫히든 한 번만 발화하도록 ref로 보관한다.
+  const bottomSheetCloseRef = useRef<(() => void) | undefined>(undefined);
+
   const showBottomSheet = useCallback(({
     headerComponent,
     component,
     options,
   }: ShowBottomSheetProps) => {
     Keyboard.dismiss();
+    bottomSheetCloseRef.current = options?.onClose;
     setBottomSheetComponent(component);
     setBottomSheetHeader(headerComponent);
     setBottomSheetOptions(options);
@@ -96,6 +101,22 @@ export function OverlayProvider({
     setBottomSheetMaxHeight(options?.maxHeight ?? defaultBottomSheetMaxHeight);
     setBottomSheetVisible(true);
   }, [defaultBottomSheetMaxHeight]);
+
+  const dismissBottomSheet = useCallback(() => {
+    const onClose = bottomSheetCloseRef.current;
+    bottomSheetCloseRef.current = undefined;
+    setBottomSheetVisible(false);
+    onClose?.();
+  }, []);
+
+  // 컨텍스트로 내려주는 setter — 닫힘은 전부 dismissBottomSheet를 타서 onClose가 1회 발화된다.
+  const setBottomSheetVisibleGuarded = useCallback((visible: boolean) => {
+    if (visible) {
+      setBottomSheetVisible(true);
+      return;
+    }
+    dismissBottomSheet();
+  }, [dismissBottomSheet]);
 
   const showLoader = useCallback(() => {
     setLoaderVisible(true);
@@ -138,7 +159,7 @@ export function OverlayProvider({
     setSnackItemStack((prev) => prev.filter((item) => item.index !== index));
   }, []);
 
-  const hideOverlay = useCallback((option: HideOption) => {
+  const hideOverlay = useCallback((option: HideOption = 'all') => {
     Keyboard.dismiss();
     switch (option) {
       case 'alert':
@@ -151,7 +172,7 @@ export function OverlayProvider({
         setSnackItemStack([]);
         break;
       case 'bottomSheet':
-        setBottomSheetVisible(false);
+        dismissBottomSheet();
         break;
       case 'loader':
         setLoaderVisible(false);
@@ -165,28 +186,15 @@ export function OverlayProvider({
         setSnackItemStack([]);
         setLoaderVisible(false);
         setPopOverVisible(false);
-        setBottomSheetVisible(false);
+        dismissBottomSheet();
         break;
       default:
         break;
     };
-  }, []);
+  }, [dismissBottomSheet]);
 
-  const backPressHandler = useCallback(() => {
-    if (loaderVisible) {
-      return true;
-    }
-    if (alertVisible || modalityVisible || popOverVisible || bottomSheetVisible) {
-      hideOverlay('all');
-      return true;
-    }
-    return false;
-  }, [alertVisible, loaderVisible, modalityVisible, popOverVisible, bottomSheetVisible, hideOverlay]);
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backPressHandler);
-    return () => backHandler.remove();
-  }, [backPressHandler]);
+  // 뒤로가기는 각 오버레이 컴포넌트가 BackHandlerContext에 우선순위로 등록한다
+  // (LOADER 30 > OVERLAY 20 > SHEET 10) — back 한 번에 최상위 오버레이 하나만 닫힌다.
 
   const overlayContextValue = useMemo(() => ({
     hideOverlay,
@@ -224,13 +232,13 @@ export function OverlayProvider({
 
   const bottomSheetContextValue = useMemo(() => ({
     bottomSheetVisible,
-    setBottomSheetVisible,
+    setBottomSheetVisible: setBottomSheetVisibleGuarded,
     height: bottomSheetHeight,
     setHeight: setBottomSheetHeight,
     maxHeight: bottomSheetMaxHeight,
   }), [
     bottomSheetVisible,
-    setBottomSheetVisible,
+    setBottomSheetVisibleGuarded,
     bottomSheetHeight,
     setBottomSheetHeight,
     bottomSheetMaxHeight,
@@ -262,6 +270,7 @@ export function OverlayProvider({
 
   return (
     <OverlayContext.Provider value={overlayContextValue}>
+      <BackHandlerProvider>
       <AlertContext.Provider value={alertContextValue}>
         <SnackbarContext.Provider value={snackbarContextValue}>
           <BottomSheetContext.Provider value={bottomSheetContextValue}>
@@ -311,6 +320,7 @@ export function OverlayProvider({
           </BottomSheetContext.Provider>
         </SnackbarContext.Provider>
       </AlertContext.Provider>
+      </BackHandlerProvider>
     </OverlayContext.Provider>
   );
 }

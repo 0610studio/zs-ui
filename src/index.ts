@@ -1,6 +1,7 @@
 import { GlobalOverlay } from './model/globalOverlay'
 import { useStyleSheetCreate } from './model/useStyleSheetCreate'
 import { OverlayProvider } from "./context/OverlayContext";
+import { BackPriority, useBackHandler } from "./context/BackHandlerContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { useFoldingState } from './model/useFoldingState'
 import { themeFactory } from './theme/palette';
@@ -66,6 +67,8 @@ export {
   ZSPortal,
   GlobalOverlay,
   useStyleSheetCreate,
+  BackPriority,
+  useBackHandler,
 };
 
 import type { ThemeProviderProps, ThemeProps, Palette, FoldableConfig } from "./context/ThemeContext";
