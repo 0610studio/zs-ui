@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { ZSPressable, ZSText, useTheme } from 'zs-ui';
+import { ZSPressable, ZSText, useTheme } from '@0610studio/zs-ui';
 
 type Props = {
   title: string;

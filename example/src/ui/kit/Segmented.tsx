@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-import { ZSText, useTheme } from 'zs-ui';
+import { ZSText, useTheme } from '@0610studio/zs-ui';
 
 type Props<T extends string> = {
   options: readonly T[];

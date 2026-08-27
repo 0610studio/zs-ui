@@ -22,10 +22,12 @@ type Props = ViewProps & {
   typo: TypoOptions;
   prefixIcon?: ImageSourcePropType;
   isLoading?: boolean;
+  /** true면 2초 잠금으로 중복 실행을 막는다 (결제·제출 등) */
+  preventDoublePress?: boolean;
   disabled?: boolean;
 };
 
-function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, disabled = false, ...props }: Props) {
+function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefixIcon, variant = 'solid', isLoading = false, preventDoublePress = false, disabled = false, ...props }: Props) {
   const { palette } = useTheme();
   const size = typo.split('.')[1] as TypoSubStyle;
 
@@ -45,7 +47,7 @@ function ZSBlockButton({ onPress, style, title, intent = 'primary', typo, prefix
   const textColorValue = resolveTextColor(palette, colors.textColor);
 
   return (
-    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} disabled={disabled} {...props}>
+    <ZSPressable onPress={onPress} style={style} isLoading={isLoading} preventDoublePress={preventDoublePress} disabled={disabled} {...props}>
       <ZSView
         style={{
           paddingHorizontal,

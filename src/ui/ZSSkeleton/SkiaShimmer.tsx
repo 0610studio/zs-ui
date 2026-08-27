@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View, type LayoutChangeEvent } from "react-native";
 import { Canvas, LinearGradient, Rect, vec } from "@shopify/react-native-skia";
+import { IS_WEB, warnWebUnsupported } from "../../model/webUnsupported";
 import {
   Easing,
   cancelAnimation,
@@ -71,7 +72,11 @@ function SkiaShimmer({ color, opacity = 0.6, duration = 1100 }: SkiaShimmerProps
   }, [color, opacity]);
 
   useEffect(() => {
-    if (size.width === 0) return;
+    if (IS_WEB) warnWebUnsupported("ZSSkeleton · ZSSkeletonBox");
+  }, []);
+
+  useEffect(() => {
+    if (IS_WEB || size.width === 0) return;
 
     progress.value = 0;
     progress.value = withRepeat(
@@ -96,6 +101,10 @@ function SkiaShimmer({ color, opacity = 0.6, duration = 1100 }: SkiaShimmerProps
     const { width, height } = event.nativeEvent.layout;
     setSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }));
   };
+
+  // 웹 미지원: CanvasKit 미로딩 환경에서 Skia Canvas가 크래시하므로 shimmer만 생략한다.
+  // (rules-of-hooks 준수를 위해 분기는 모든 hook 호출 이후에 둔다)
+  if (IS_WEB) return null;
 
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill} onLayout={handleLayout}>

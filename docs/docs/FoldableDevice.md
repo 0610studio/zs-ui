@@ -15,8 +15,7 @@ sidebar_position: 6
 ## 기본 사용법
 
 ```tsx
-import { ZSContainer, useFoldingState } from '@0610studio/zs-ui';
-import { FoldingState } from '@0610studio/zs-ui/model/types';
+import { ZSContainer, useFoldingState, FoldingState } from '@0610studio/zs-ui';
 
 function FoldableScreen() {
   const { foldingState } = useFoldingState();
@@ -46,8 +45,7 @@ function FoldableScreen() {
 폴더블 기기의 현재 상태를 감지하는 Hook입니다.
 
 ```tsx
-import { useFoldingState } from '@0610studio/zs-ui';
-import { FoldingState } from '@0610studio/zs-ui/model/types';
+import { useFoldingState, FoldingState } from '@0610studio/zs-ui';
 
 function MyComponent() {
   const { foldingState, width } = useFoldingState();
@@ -65,10 +63,12 @@ function MyComponent() {
 
 ```tsx
 export enum FoldingState {
-  FOLDED = 'FOLDED',     // 접힘 상태 (일반 스마트폰 모드)
-  UNFOLDED = 'UNFOLDED'  // 펼침 상태 (태블릿 모드)
+  FOLDED = 'folded',     // 접힘 상태 (일반 스마트폰 모드)
+  UNFOLDED = 'unfolded'  // 펼침 상태 (태블릿 모드)
 }
 ```
+
+`useFoldingState()` 는 `{ foldingState, width }` 를 반환합니다. 상태 비교는 문자열 리터럴 대신 `FoldingState` enum 으로 하세요.
 
 ## ZSContainer 폴더블 지원
 
@@ -78,6 +78,8 @@ export enum FoldingState {
 |--------|------|--------|------|
 | `dividerLineComponent` | `ReactNode` | `undefined` | 두 화면 사이의 구분선 컴포넌트 |
 | `rightComponent` | `ReactNode` | `undefined` | 펼침 상태에서 오른쪽 화면에 표시할 컴포넌트 |
+| `foldableSingleScreen` | `boolean` | `false` | 펼침 상태에서도 분할하지 않고 단일 화면으로 유지 |
+| `unfoldedSinglePaneMaxWidth` | `number \| false` | `ThemeProvider` 의 `foldable` 설정 | 펼침 + 단일 화면일 때 콘텐츠 최대 가로 길이(px). `false`면 전폭 |
 
 ### 동작 방식
 

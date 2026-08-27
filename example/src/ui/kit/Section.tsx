@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { ZSText, ZSView } from 'zs-ui';
+import { ZSText, ZSView } from '@0610studio/zs-ui';
 
 type Props = {
   label?: string;

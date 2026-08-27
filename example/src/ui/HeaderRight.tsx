@@ -1,12 +1,15 @@
-import { Text, TouchableOpacity } from "react-native";
-import { useTheme } from "zs-ui";
+import { Text, TouchableOpacity } from 'react-native';
+import { useTheme } from '@0610studio/zs-ui';
 
 function HeaderRight() {
   const { palette: { toggleTheme, mode } } = useTheme();
 
   return (
     <TouchableOpacity
-      onPressOut={() => {
+      accessibilityRole="button"
+      accessibilityLabel={mode === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+      testID="theme-toggle"
+      onPress={() => {
         toggleTheme();
       }}
       style={{

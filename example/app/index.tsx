@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { ZSContainer, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
+import { ZSContainer, ZSPressable, ZSText, ZSView, useTheme } from '@0610studio/zs-ui';
 import HeaderRight from '../src/ui/HeaderRight';
 
-const LIB_VERSION: string = require('../../package.json').version;
+const LIB_VERSION: string = require('@0610studio/zs-ui/package.json').version;
 
 /** 아이콘 타일용 미니 도형들 — 외부 아이콘 없이 팔레트 색으로만 구성 */
 function ThemeGlyph() {
@@ -73,6 +73,29 @@ function SegmentGlyph({ active, track }: { active: string; track: string }) {
   );
 }
 
+function TabGlyph({ active, idle }: { active: string; idle: string }) {
+  return (
+    <View style={{ gap: 3 }}>
+      <View style={{ flexDirection: 'row', gap: 6 }}>
+        <View style={{ width: 12, height: 3, borderRadius: 2, backgroundColor: active }} />
+        <View style={{ width: 12, height: 3, borderRadius: 2, backgroundColor: idle }} />
+      </View>
+      <View style={{ flexDirection: 'row', gap: 6 }}>
+        <View style={{ width: 12, height: 2, borderRadius: 1, backgroundColor: active }} />
+        <View style={{ width: 12, height: 2, borderRadius: 1 }} />
+      </View>
+    </View>
+  );
+}
+
+function DropdownGlyph({ color }: { color: string }) {
+  return (
+    <View style={{ width: 20, height: 14, borderWidth: 2, borderColor: color, borderRadius: 4, alignItems: 'flex-end', justifyContent: 'center', paddingRight: 2 }}>
+      <View style={{ width: 0, height: 0, borderLeftWidth: 3, borderRightWidth: 3, borderTopWidth: 4, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: color }} />
+    </View>
+  );
+}
+
 function ChipGlyph({ border, fill }: { border: string; fill: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 4, borderRadius: 10, borderWidth: 2, borderColor: border, backgroundColor: fill }}>
@@ -89,6 +112,18 @@ function TooltipGlyph({ bubble, dot }: { bubble: string; dot: string }) {
         <View style={{ width: 10, height: 2, borderRadius: 1, backgroundColor: dot }} />
       </View>
       <View style={{ marginLeft: 5, width: 0, height: 0, borderLeftWidth: 3, borderRightWidth: 3, borderTopWidth: 4, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: bubble }} />
+    </View>
+  );
+}
+
+function MessageGlyph({ accent, line }: { accent: string; line: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+      <View style={{ width: 9, height: 9, borderRadius: 5, borderWidth: 2, borderColor: accent }} />
+      <View style={{ gap: 3 }}>
+        <View style={{ width: 15, height: 3, borderRadius: 2, backgroundColor: accent }} />
+        <View style={{ width: 10, height: 3, borderRadius: 2, backgroundColor: line }} />
+      </View>
     </View>
   );
 }
@@ -118,16 +153,23 @@ function SectionLabel({ children }: { children: string }) {
   );
 }
 
-function RowCard({ title, caption, tileColor, glyph, href }: {
+function RowCard({ title, caption, tileColor, glyph, href, testID }: {
   title: string;
   caption: string;
   tileColor: string;
   glyph: React.ReactNode;
   href: string;
+  testID?: string;
 }) {
   const { palette } = useTheme();
   return (
-    <ZSPressable fullWidth onPress={() => router.push(href)}>
+    <ZSPressable
+      fullWidth
+      onPress={() => router.push(href)}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}: ${caption}`}
+    >
       <ZSView color="base" elevationLevel={1} style={styles.rowCard}>
         <View style={[styles.tile, { backgroundColor: tileColor }]}>{glyph}</View>
         <View style={styles.rowCardText}>
@@ -140,16 +182,23 @@ function RowCard({ title, caption, tileColor, glyph, href }: {
   );
 }
 
-function GridCard({ title, caption, tileColor, glyph, href }: {
+function GridCard({ title, caption, tileColor, glyph, href, testID }: {
   title: string;
   caption: string;
   tileColor: string;
   glyph: React.ReactNode;
   href: string;
+  testID?: string;
 }) {
   return (
     <View style={styles.gridSlot}>
-      <ZSPressable fullWidth onPress={() => router.push(href)}>
+      <ZSPressable
+        fullWidth
+        onPress={() => router.push(href)}
+        testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={`${title}: ${caption}`}
+      >
         <ZSView color="base" elevationLevel={1} style={styles.gridCard}>
           <View style={[styles.tile, styles.gridTile, { backgroundColor: tileColor }]}>{glyph}</View>
           <View style={{ gap: 2 }}>
@@ -194,6 +243,16 @@ export default function Home() {
           href="/ThemeExample"
         />
 
+        <SectionLabel>웹 검증</SectionLabel>
+        <RowCard
+          title="Web Example"
+          caption="로컬 소스 · 반응형 · E2E 검증"
+          tileColor={palette.success[10]}
+          glyph={<ZSText typo="subTitle.4" style={{ color: palette.success[90] }}>WEB</ZSText>}
+          href="/WebExample"
+          testID="web-example-card"
+        />
+
         <SectionLabel>레이아웃</SectionLabel>
         <View style={styles.gridRow}>
           <GridCard title="ZSContainer" caption="키보드 · 스크롤 대응" tileColor={palette.information[10]} glyph={<BoxGlyph color={palette.information[50]} />} href="/ZSContainerExample" />
@@ -212,9 +271,20 @@ export default function Home() {
           <GridCard title="ZSChip" caption="필터 · 선택 토글" tileColor={palette.primary[10]} glyph={<ChipGlyph border={palette.primary[60]} fill={palette.primary[10]} />} href="/ZSChipExample" />
         </View>
         <View style={styles.gridRow}>
+          <GridCard title="ZSTab" caption="하단 인디케이터 탭" tileColor={palette.primary[10]} glyph={<TabGlyph active={palette.primary[50]} idle={palette.grey[40]} />} href="/ZSTabExample" />
+          <GridCard title="ZSDropdown" caption="선택형 입력 · 시트 트리거" tileColor={palette.information[10]} glyph={<DropdownGlyph color={palette.information[60]} />} href="/ZSDropdownExample" />
+        </View>
+        <View style={styles.gridRow}>
           <GridCard title="ZSSwitch" caption="토글 스위치 · 커스텀 색상" tileColor={palette.success[10]} glyph={<SwitchGlyph track={palette.success[50]} thumb={palette.background.base} />} href="/SwitchExample" />
           <GridCard title="ZSTooltip" caption="말풍선 · 플로팅 안내" tileColor={palette.information[10]} glyph={<TooltipGlyph bubble={palette.information[60]} dot={palette.information[10]} />} href="/TooltipExample" />
         </View>
+        <RowCard
+          title="ZSMessageBar"
+          caption="인라인 상태 메시지 · 액션 · 닫기"
+          tileColor={palette.warning[10]}
+          glyph={<MessageGlyph accent={palette.warning[60]} line={palette.warning[30]} />}
+          href="/ZSMessageBarExample"
+        />
 
         <SectionLabel>오버레이</SectionLabel>
         <View style={styles.gridRow}>

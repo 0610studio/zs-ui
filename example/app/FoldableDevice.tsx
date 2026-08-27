@@ -1,7 +1,6 @@
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSBlockButton, ZSContainer, ZSText, useFoldingState, useOverlay, useTheme } from 'zs-ui';
-import { FoldingState } from 'zs-ui/model/types';
+import { FoldingState, ZSBlockButton, ZSContainer, ZSText, useFoldingState, useOverlay, useTheme } from '@0610studio/zs-ui';
 import MyModal from '../src/ui/MyModal';
 import MyBottomSheet from '../src/ui/MyBottomSheet';
 import Section from '../src/ui/kit/Section';

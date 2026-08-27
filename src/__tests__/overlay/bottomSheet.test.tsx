@@ -206,6 +206,75 @@ describe('BottomSheetOverlay', () => {
     expect(closeCallsOf(withTimingSpy)).toHaveLength(0);
   });
 
+  it('fixed 시트는 위로 드래그해도 translateY가 0에 고정된다 (바닥 유지)', () => {
+    const { PanResponder } = require('react-native');
+    const createSpy = jest.spyOn(PanResponder, 'create');
+    const sharedValueSpy = jest.spyOn(Reanimated, 'useSharedValue');
+
+    render(
+      <BottomSheetOverlay component={<Text>content</Text>} options={{ type: 'fixed' }} />
+    );
+
+    // useSharedValue 생성 순서: translateY → keyboardOffset → backdropOpacity → scale → isGesturing
+    const translateY = sharedValueSpy.mock.results[0].value;
+    const config = createSpy.mock.calls[createSpy.mock.calls.length - 1][0];
+
+    act(() => {
+      config.onPanResponderMove({} as any, { dy: -60 } as any);
+    });
+    expect(translateY.value).toBe(0);
+
+    // 아래 방향 드래그는 그대로 따라간다.
+    act(() => {
+      config.onPanResponderMove({} as any, { dy: 40 } as any);
+    });
+    expect(translateY.value).toBe(40);
+  });
+
+  it('floating 시트는 위로 드래그 시 감쇠 이동을 유지한다', () => {
+    const { PanResponder } = require('react-native');
+    const createSpy = jest.spyOn(PanResponder, 'create');
+    const sharedValueSpy = jest.spyOn(Reanimated, 'useSharedValue');
+
+    render(<BottomSheetOverlay component={<Text>content</Text>} />);
+
+    const translateY = sharedValueSpy.mock.results[0].value;
+    const config = createSpy.mock.calls[createSpy.mock.calls.length - 1][0];
+
+    act(() => {
+      config.onPanResponderMove({} as any, { dy: -60 } as any);
+    });
+    expect(translateY.value).toBe(-20);
+  });
+
+  it('fixed 시트는 드래그 중 scale 축소를 걸지 않고, 복귀 스프링에 overshootClamping을 준다', () => {
+    const { PanResponder } = require('react-native');
+    const createSpy = jest.spyOn(PanResponder, 'create');
+    const withTimingSpy = jest.spyOn(Reanimated, 'withTiming');
+    const withSpringSpy = jest.spyOn(Reanimated, 'withSpring');
+
+    render(
+      <BottomSheetOverlay component={<Text>content</Text>} options={{ type: 'fixed' }} />
+    );
+
+    const config = createSpy.mock.calls[createSpy.mock.calls.length - 1][0];
+    withTimingSpy.mockClear();
+
+    act(() => {
+      config.onPanResponderGrant({} as any, {} as any);
+    });
+    // grant 시 scale 0.99 timing이 없어야 한다.
+    expect(withTimingSpy.mock.calls.find(([target]) => target === 0.99)).toBeUndefined();
+
+    act(() => {
+      config.onPanResponderRelease({} as any, { dy: 20, vy: 0 } as any);
+    });
+    const restoreCall = withSpringSpy.mock.calls.find(
+      ([target, springConfig]) => target === 0 && (springConfig as any)?.overshootClamping === true
+    );
+    expect(restoreCall).toBeDefined();
+  });
+
   it('시트가 보이지 않을 때는 키보드 리스너를 등록하지 않는다', () => {
     const addListenerSpy = jest.spyOn(Keyboard, 'addListener');
     mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ bottomSheetVisible: false }));

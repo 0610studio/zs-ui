@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSContainer, ZSText, useOverlay, useTheme } from 'zs-ui';
+import { ZSContainer, ZSText, useOverlay, useTheme } from '@0610studio/zs-ui';
 import MyBottomSheet from '../src/ui/MyBottomSheet';
 import MyModal from '../src/ui/MyModal';
 import Section from '../src/ui/kit/Section';
@@ -15,11 +15,12 @@ export default function OverlayExample() {
     <>
       <Stack.Screen options={{ title: 'Overlay' }} />
       <ZSContainer style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <Section label="useOverlay()" gap={0}>
+        <Section label="Alert · 확인 대화상자" gap={0}>
           <DemoRow
             title="showAlert"
             caption="타이틀 · informative · primary/secondary 액션"
             dotColor={palette.primary.main}
+            isLast
             onPress={() =>
               showAlert({
                 title: '타이틀 테스트 길어지면 줄바꿈이 될 수 있습니다.',
@@ -32,6 +33,9 @@ export default function OverlayExample() {
               })
             }
           />
+        </Section>
+
+        <Section label="SnackBar · 상단 알림" gap={0}>
           <DemoRow
             title="showSnackBar · success"
             caption="상단 스낵바 알림"
@@ -42,6 +46,7 @@ export default function OverlayExample() {
             title="showSnackBar · error"
             caption="긴 메시지 줄바꿈 테스트"
             dotColor={palette.danger.main}
+            isLast
             onPress={() =>
               showSnackBar({
                 message: Date.now().toString() + ' 길~~~~~~어진 스낵바 테스트 입니다아아아아아',
@@ -49,6 +54,9 @@ export default function OverlayExample() {
               })
             }
           />
+        </Section>
+
+        <Section label="BottomSheet · 시트" gap={0}>
           <DemoRow
             title="showBottomSheet · floating auto"
             caption="height: 'auto' + 헤더 컴포넌트"
@@ -84,6 +92,7 @@ export default function OverlayExample() {
             title="showBottomSheet · dismissable false"
             caption="배경 터치·제스처로 닫히지 않음 (버튼으로만 닫기)"
             dotColor={palette.information.main}
+            isLast
             onPress={() =>
               showBottomSheet({
                 options: {
@@ -108,9 +117,12 @@ export default function OverlayExample() {
               })
             }
           />
+        </Section>
+
+        <Section label="Modality · 전체화면 모달" gap={0}>
           <DemoRow
             title="showModality"
-            caption="중앙 모달 컴포넌트"
+            caption="화면 전체를 덮는 페이지시트 · 뒤 화면 축소 전환"
             dotColor={palette.warning.main}
             isLast
             onPress={() =>

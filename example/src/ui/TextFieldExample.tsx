@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { View } from "react-native";
-import { ZSText, ZSTextField } from "zs-ui";
-import { ZSTextFieldRef } from "zs-ui";
+import { ZSText, ZSTextField } from "@0610studio/zs-ui";
+import { ZSTextFieldRef } from "@0610studio/zs-ui";
 
 /**
  * ZSContainer · FoldableExample 공용 입력 데모.

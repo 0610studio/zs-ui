@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSBlockButton, ZSContainer, ZSPressable, ZSText, useTheme } from 'zs-ui';
-import type { TypoOptions } from 'zs-ui';
+import { ZSBlockButton, ZSContainer, ZSPressable, ZSText, useTheme } from '@0610studio/zs-ui';
+import type { TypoOptions } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
 

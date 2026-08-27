@@ -1,5 +1,5 @@
 import { StyleSheet, View, Image } from 'react-native';
-import { CustomSnackbarProps, ZSText } from 'zs-ui';
+import { CustomSnackbarProps, ZSText } from '@0610studio/zs-ui';
 
 function SnackBar({
   snackType = 'success',
