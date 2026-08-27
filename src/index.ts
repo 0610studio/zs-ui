@@ -4,8 +4,11 @@ import { OverlayProvider } from "./context/OverlayContext";
 import { BackPriority, useBackHandler } from "./context/BackHandlerContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { useFoldingState } from './model/useFoldingState'
+import { usePreventDoublePress, PREVENT_DOUBLE_PRESS_INTERVAL } from './model/usePreventDoublePress';
 import { themeFactory } from './theme/palette';
+import { createShadow } from './theme/elevation';
 import { RADIUS, DURATION, DISABLED_OPACITY } from './theme/tokens';
+import { FoldingState } from './model/types';
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
 import ZSContainer from './ui/ZSContainer';
 import ZSPressable from './ui/ZSPressable';
@@ -29,16 +32,23 @@ import ZSBorderBeam from './ui/ZSBorderBeam';
 import ZSSegmented from './ui/ZSSegmented';
 import ZSChip from './ui/ZSChip';
 import ZSCheckBox from './ui/ZSCheckBox';
+import ZSMessageBar from './ui/ZSMessageBar';
+import ZSTab from './ui/ZSTab';
+import ZSDropdown from './ui/ZSDropdown';
 
 export {
   useTheme,
   useFoldingState,
+  usePreventDoublePress,
+  PREVENT_DOUBLE_PRESS_INTERVAL,
+  createShadow,
   ThemeProvider,
   OverlayProvider,
   themeFactory,
   RADIUS,
   DURATION,
   DISABLED_OPACITY,
+  FoldingState,
   ZSView,
   AnimatedWrapper,
   TextAtom,
@@ -57,6 +67,9 @@ export {
   ZSSegmented,
   ZSCheckBox,
   ZSChip,
+  ZSMessageBar,
+  ZSTab,
+  ZSDropdown,
   ZSTooltip,
   AlertOverlay,
   BottomSheetOverlay,
@@ -110,6 +123,9 @@ import { RadioOption } from "./ui/types";
 import { ZSBorderBeamProps, ZSBorderBeamGlowConfig } from "./ui/ZSBorderBeam";
 import { ZSSegmentedProps, ZSSegmentedTextSize } from "./ui/ZSSegmented";
 import { ZSChipProps, ZSChipVariant } from "./ui/ZSChip";
+import { ZSMessageBarProps, ZSMessageBarVariant } from "./ui/ZSMessageBar";
+import { ZSTabProps, ZSTabItem, ZSTabLayout } from "./ui/ZSTab";
+import { ZSDropdownProps } from "./ui/ZSDropdown";
 import { ZSSkeletonProps } from "./ui/ZSSkeleton";
 import { ZSSkeletonBoxProps } from "./ui/ZSSkeletonBox";
 import { ZSCheckBoxProps } from "./ui/ZSCheckBox";
@@ -162,6 +178,12 @@ export type {
   ZSSegmentedTextSize,
   ZSChipProps,
   ZSChipVariant,
+  ZSMessageBarProps,
+  ZSMessageBarVariant,
+  ZSTabProps,
+  ZSTabItem,
+  ZSTabLayout,
+  ZSDropdownProps,
   ZSSkeletonProps,
   ZSSkeletonBoxProps,
   ZSCheckBoxProps,

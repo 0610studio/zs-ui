@@ -1,14 +1,20 @@
 ---
-sidebar_position: 12
+sidebar_position: 16
 ---
 
 import ExpoSnack from '@site/src/components/ExpoSnack';
 
 # ZSSkeleton & ZSSkeletonBox
 
-로딩 상태를 시각적으로 표현하기 위한 스켈레톤 UI 컴포넌트입니다. `ZSSkeleton`은 기존 컴포넌트에 shimmer 효과를 적용하는 래퍼 컴포넌트이고, `ZSSkeletonBox`는 고정 높이의 박스 형태 스켈레톤 컴포넌트입니다. React Native Reanimated를 사용하여 부드러운 애니메이션 효과를 제공합니다.
+로딩 상태를 시각적으로 표현하기 위한 스켈레톤 UI 컴포넌트입니다. `ZSSkeleton`은 기존 컴포넌트에 shimmer 효과를 적용하는 래퍼 컴포넌트이고, `ZSSkeletonBox`는 고정 높이의 박스 형태 스켈레톤 컴포넌트입니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_zsskeleton" />
+shimmer 밴드는 `@shopify/react-native-skia` 캔버스에 그리고 Reanimated 로 반복 이동시킵니다. 두 컴포넌트 모두 peer 로 `@shopify/react-native-skia` 가 필요합니다.
+
+:::warning 웹 미지원
+shimmer 효과는 iOS·Android 전용입니다. 웹에서는 효과 없이 정적으로 렌더링됩니다 — `ZSSkeleton` 은 자식을 반투명하게만 표시하고, `ZSSkeletonBox` 는 배경색 박스만 표시합니다. 아래 미리보기도 Android 탭에서 확인하세요.
+:::
+
+<ExpoSnack id="@studio0610/zs-ui_13_zsskeleton" platform="android" />
 
 ## ZSSkeleton
 
@@ -35,12 +41,15 @@ export default function App() {
 | `isFetching` | `boolean` | `undefined` | 로딩 상태 여부. `true`일 때 shimmer 효과가 적용됩니다 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너의 추가 스타일 |
 | `children` | `React.ReactNode` | `undefined` | 스켈레톤 효과를 적용할 자식 컴포넌트 |
-| `overlayColor` | `string` | 테마 `background.base` | shimmer 효과의 오버레이 색상 |
+| `overlayColor` | `string` | 테마 `background.base` | shimmer 하이라이트 색상 |
+| `overlayOpacity` | `number` | `0.6` | shimmer 밴드 중심의 최대 불투명도 (0~1) |
+| `duration` | `number` | `1100` | shimmer 밴드가 한 번 지나가는 시간 (ms) |
+| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
 
 ### 특징
 
 - **조건부 렌더링**: `isFetching`이 `false`일 때는 자식 컴포넌트를 그대로 렌더링합니다
-- **Shimmer 애니메이션**: 로딩 중일 때 좌우로 이동하는 shimmer 효과가 적용됩니다
+- **Shimmer 애니메이션**: 로딩 중일 때 좌우로 이동하는 shimmer 효과가 적용되고, 자식은 50% 불투명도로 비칩니다
 - **테마 통합**: 테마 시스템과 통합되어 기본 색상이 자동으로 적용됩니다
 - **유연한 사용**: 어떤 컴포넌트든 감싸서 스켈레톤 효과를 적용할 수 있습니다
 
@@ -66,8 +75,11 @@ export default function App() {
 |------|------|---------|-------------|
 | `height` | `number` | Required | 스켈레톤 박스의 높이 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 박스의 추가 스타일 |
-| `overlayColor` | `string` | 테마 `background.layer1` | shimmer 효과의 오버레이 색상 |
+| `overlayColor` | `string` | 테마 `background.layer1` | shimmer 하이라이트 색상 |
+| `overlayOpacity` | `number` | `0.7` | shimmer 밴드 중심의 최대 불투명도 (0~1) |
+| `duration` | `number` | `1100` | shimmer 밴드가 한 번 지나가는 시간 (ms) |
 | `color` | `ViewColorOptions` | `'neutral'` | 박스의 배경색 (테마 팔레트 기반) |
+| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
 
 ### 배경색 옵션 (ViewColorOptions)
 
@@ -150,6 +162,17 @@ function DataComponent({ data, isLoading }) {
 </ZSSkeleton>
 ```
 
+### shimmer 속도·세기 조절
+
+```tsx
+{/* 느리고 옅은 shimmer */}
+<ZSSkeleton isFetching duration={1800} overlayOpacity={0.35}>
+  <ZSText typo="body.2">천천히 반짝이는 스켈레톤</ZSText>
+</ZSSkeleton>
+
+<ZSSkeletonBox height={80} duration={1800} overlayOpacity={0.4} />
+```
+
 ### ZSSkeletonBox 기본 사용
 
 ```tsx
@@ -177,7 +200,7 @@ import { ZSSkeletonBox } from '@0610studio/zs-ui';
 
 ```tsx
 <ZSSkeletonBox height={100} color="layer1" />
-<ZSSkeletonBox height={100} color="primary.main" />
+<ZSSkeletonBox height={100} color="primary.10" />
 <ZSSkeletonBox height={100} color="grey.20" />
 ```
 

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 9
 ---
 
 import ExpoSnack from '@site/src/components/ExpoSnack';
@@ -45,8 +45,10 @@ function MyComponent() {
 | `containerStyle` | `ViewProps` | `undefined` | 최상위 컨테이너 스타일 |
 | `valueStyle` | `ZSTextProps` | `undefined` | 옵션 텍스트 스타일 |
 | `selectStyle` | `ZSTextProps` | `undefined` | fullWidth 모드에서 선택 버튼 텍스트 스타일 |
+| `selectLabel` | `string` | `'선택'` | `rowCount={1}` 일 때 우측 선택 버튼에 표시할 라벨 |
 | `disabled` | `boolean` | `false` | 전체 비활성화 여부 |
 | `rowCount` | `1 \| 2 \| 3` | `1` | 한 행에 표시할 옵션 개수 |
+| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 
@@ -140,6 +142,19 @@ const options: RadioOption[] = [
   onSelect={setSelected}
   valueStyle={{ typo: 'body.1', color: 'primary' }}
   selectStyle={{ typo: 'caption.1', color: 'white' }}
+/>
+```
+
+### 선택 버튼 라벨 변경
+
+`rowCount={1}` 에서 각 행 우측에 표시되는 버튼의 문구를 바꿉니다.
+
+```tsx
+<ZSRadioGroup
+  options={options}
+  value={selected}
+  onSelect={setSelected}
+  selectLabel="적용"
 />
 ```
 

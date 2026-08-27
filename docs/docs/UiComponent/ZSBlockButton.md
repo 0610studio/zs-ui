@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 7
 ---
 
 import ExpoSnack from '@site/src/components/ExpoSnack';
@@ -35,8 +35,12 @@ export default function App() {
 | `typo` | `TypoOptions` | Required | 버튼 텍스트의 타이포그래피 스타일 |
 | `intent` | `IntentOptions` | `'primary'` | 버튼의 의도/색상 테마 |
 | `variant` | `'solid' \| 'pastel' \| 'stroke'` | `'solid'` | 버튼의 스타일 변형 |
-| `prefixIcon` | `ImageSourcePropType` | `undefined` | 버튼 텍스트 앞에 표시될 아이콘 |
+| `prefixIcon` | `ImageSourcePropType` | `undefined` | 버튼 텍스트 앞에 표시될 아이콘 (12×12, 텍스트 색으로 tint) |
+| `isLoading` | `boolean` | `false` | `true`일 때 클릭이 비활성화되고 버튼이 흐리게 표시됩니다 |
+| `preventDoublePress` | `boolean` | `false` | `true`일 때 2초 잠금으로 중복 실행을 막습니다 (결제·제출 등) |
+| `disabled` | `boolean` | `false` | 버튼 비활성화 여부 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 버튼 컨테이너의 추가 스타일 |
+| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
 
 ## Intent 옵션
 
@@ -57,7 +61,7 @@ export default function App() {
 
 ### solid (기본값)
 
-배경색이 채워진 형태의 버튼입니다. 텍스트는 흰색으로 표시됩니다.
+배경색이 채워진 형태의 버튼입니다. 텍스트는 흰색으로 표시되며, `warning` 만 노란 배경 위 대비를 위해 검은색을 사용합니다.
 
 ```tsx
 <ZSBlockButton
@@ -105,6 +109,7 @@ export default function App() {
 - **아이콘 지원**: prefixIcon을 통해 버튼 앞에 아이콘 추가 가능
 - **타이포그래피 통합**: TypoOptions를 통해 버튼 크기와 스타일 제어
 - **자동 패딩**: typo 크기에 따라 자동으로 패딩이 조정됩니다
+- **연타 방어**: 내부적으로 `ZSPressable` 을 사용하므로 300ms 디바운스가 기본 적용되고, `preventDoublePress` 로 2초 잠금까지 올릴 수 있습니다
 
 ## 예제
 

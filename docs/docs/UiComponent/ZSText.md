@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 import ExpoSnack from '@site/src/components/ExpoSnack';
@@ -74,7 +74,7 @@ export default function App() {
 
 ### CommonColorOptions
 
-팔레트 색상도 사용할 수 있습니다:
+팔레트 색상도 사용할 수 있습니다. 단계는 `5`~`100` 이며 `main`·`light` 같은 별칭은 `color` prop 에서 지원하지 않습니다 (필요하면 `useTheme().palette.primary.main` 을 `style` 로 직접 넘깁니다):
 
 - `primary`, `primary.5`, `primary.10`, ..., `primary.100`
 - `danger`, `danger.5`, `danger.10`, ..., `danger.100`
@@ -109,7 +109,7 @@ import { ZSText } from '@0610studio/zs-ui';
 
 <ZSText typo="body.2" color="primary">Primary 색상</ZSText>
 <ZSText typo="body.2" color="danger">Danger 색상</ZSText>
-<ZSText typo="body.2" color="primary.main">Primary Main 색상</ZSText>
+<ZSText typo="body.2" color="primary.60">Primary 60 단계 색상</ZSText>
 ```
 
 ### React Native Text 속성 사용

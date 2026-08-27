@@ -1,6 +1,7 @@
 import { fireEvent, render } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import ZSBorderBeam from '../../ui/ZSBorderBeam';
+// jest(jest-expo node preset)는 web.tsx를 우선 해석하므로 네이티브 구현을 명시 import
+import ZSBorderBeam from '../../ui/ZSBorderBeam/ZSBorderBeam';
 
 jest.mock('../../context/ThemeContext', () => {
   const paletteFn = require('../../theme/palette').default;

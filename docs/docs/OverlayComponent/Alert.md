@@ -62,6 +62,7 @@ showAlert(props: ShowAlertProps): void
 | `secondaryButtonStyle` | `TouchableOpacityProps['style']` | `undefined` | 보조 버튼의 커스텀 스타일 |
 | `primaryButtonStyle` | `TouchableOpacityProps['style']` | `undefined` | 기본 버튼의 커스텀 스타일 |
 | `secondaryButtonTextStyle` | `TextProps['style']` | `undefined` | 보조 버튼 텍스트의 커스텀 스타일 |
+| `primaryButtonTextStyle` | `TextProps['style']` | `undefined` | 기본 버튼 텍스트의 커스텀 스타일 |
 
 ### `AlertActions` 인터페이스
 

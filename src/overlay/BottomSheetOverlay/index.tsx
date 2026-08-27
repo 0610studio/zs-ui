@@ -192,16 +192,24 @@ function BottomSheetOverlay({
       onPanResponderGrant: () => {
         Keyboard.dismiss();
         isGesturing.value = true;
-        scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
+        // fixed 시트는 바닥이 화면에 붙어 있어야 하므로 scale 축소(바닥이 들림)를 걸지 않는다.
+        if (!isFixed) {
+          scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
+        }
       },
       onPanResponderMove: (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-        translateY.value = gestureState.dy < 0
-          ? gestureState.dy / GESTURE_CONSTANTS.dragUpDamping
-          : gestureState.dy;
+        if (gestureState.dy < 0) {
+          // fixed 시트는 위로 끌어도 바닥이 떨어지지 않게 이동을 막는다. floating은 감쇠 이동 유지.
+          translateY.value = isFixed ? 0 : gestureState.dy / GESTURE_CONSTANTS.dragUpDamping;
+          return;
+        }
+        translateY.value = gestureState.dy;
       },
       onPanResponderRelease: (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
         isGesturing.value = false;
-        scale.value = withSpring(1, ANIMATION_CONFIG.restore);
+        if (!isFixed) {
+          scale.value = withSpring(1, ANIMATION_CONFIG.restore);
+        }
 
         const dismissThresholdHeight = sheetHeight > 0 ? sheetHeight : constrainedMaxHeight;
         const dismissDistanceThreshold = Math.max(
@@ -218,10 +226,15 @@ function BottomSheetOverlay({
           return;
         }
 
-        translateY.value = withSpring(0, { ...ANIMATION_CONFIG.restore, velocity: gestureState.vy * 1000 });
+        translateY.value = withSpring(0, {
+          ...ANIMATION_CONFIG.restore,
+          velocity: gestureState.vy * 1000,
+          // fixed 시트는 복귀 스프링이 0을 넘겨(위로 튀어) 바닥이 떨어지는 것도 막는다.
+          overshootClamping: isFixed,
+        });
       },
     }),
-    [bottomSheetVisible, closeBottomSheet, constrainedMaxHeight, dismissable, isGesturing, scale, sheetHeight, translateY]
+    [bottomSheetVisible, closeBottomSheet, constrainedMaxHeight, dismissable, isFixed, isGesturing, scale, sheetHeight, translateY]
   );
 
   const handleBackgroundPress = useCallback(() => {

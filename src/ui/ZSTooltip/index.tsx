@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native";
 import Animated, {
   cancelAnimation,
@@ -15,10 +15,11 @@ import Animated, {
 } from "react-native-reanimated";
 import ZSText from "../ZSText";
 import { useTheme } from "../../context/ThemeContext";
+import { createShadow } from "../../theme/elevation";
 import { DURATION, RADIUS } from "../../theme/tokens";
 import { SvgX } from "../../assets/SvgX";
 import { SvgTooltipTail } from "../../assets/SvgTooltipTail";
-import type { TypoOptions } from "../../theme/types";
+import type { ShadowStyle, TypoOptions } from "../../theme/types";
 
 const FLOATING_START_DELAY = 220;
 const FLOATING_ANIMATION_DURATION = 1100;
@@ -26,6 +27,13 @@ const FLOATING_OFFSET = 2;
 const TAIL_WIDTH = 12;
 const TAIL_HEIGHT = 7;
 const CLOSE_HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+
+/** 말풍선을 배경에서 띄우는 그림자. boxShadow 로 변환해 iOS·Android 가 동일하게 렌더된다. */
+const BUBBLE_SHADOW: ShadowStyle = {
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.16,
+  shadowRadius: 8,
+};
 
 export type ZSTooltipPlacement = 'top' | 'bottom';
 export type ZSTooltipTailAlign = 'start' | 'center' | 'end';
@@ -79,6 +87,8 @@ function ZSTooltip({
   ...props
 }: ZSTooltipProps) {
   const { palette } = useTheme();
+  // 다크 모드에서는 밝은 그림자로 말풍선을 구분한다.
+  const bubbleShadow = useMemo(() => createShadow(BUBBLE_SHADOW, palette.grey[100]), [palette.grey]);
   const [internalVisible, setInternalVisible] = useState(initialVisible);
   const isVisible = visible ?? internalVisible;
   const floatingTranslateY = useSharedValue(0);
@@ -143,7 +153,7 @@ function ZSTooltip({
       entering={(isTop ? FadeInUp : FadeInDown).duration(DURATION.fast).easing(Easing.out(Easing.quad))}
       exiting={(isTop ? FadeOutDown : FadeOutUp).duration(DURATION.fast).easing(Easing.in(Easing.quad))}
       pointerEvents='box-none'
-      style={[styles.container, { shadowColor: palette.grey[100] }, style]}
+      style={[styles.container, { boxShadow: bubbleShadow }, style]}
       {...props}
     >
       <Animated.View style={floatingStyle}>
@@ -181,10 +191,6 @@ const styles = StyleSheet.create({
   container: {
     alignSelf: 'flex-start',
     maxWidth: '100%',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.16,
-    shadowRadius: 8,
-    elevation: 6,
   },
   bubble: {
     borderRadius: RADIUS.lg,

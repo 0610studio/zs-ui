@@ -73,6 +73,29 @@ function SegmentGlyph({ active, track }: { active: string; track: string }) {
   );
 }
 
+function TabGlyph({ active, idle }: { active: string; idle: string }) {
+  return (
+    <View style={{ gap: 3 }}>
+      <View style={{ flexDirection: 'row', gap: 6 }}>
+        <View style={{ width: 12, height: 3, borderRadius: 2, backgroundColor: active }} />
+        <View style={{ width: 12, height: 3, borderRadius: 2, backgroundColor: idle }} />
+      </View>
+      <View style={{ flexDirection: 'row', gap: 6 }}>
+        <View style={{ width: 12, height: 2, borderRadius: 1, backgroundColor: active }} />
+        <View style={{ width: 12, height: 2, borderRadius: 1 }} />
+      </View>
+    </View>
+  );
+}
+
+function DropdownGlyph({ color }: { color: string }) {
+  return (
+    <View style={{ width: 20, height: 14, borderWidth: 2, borderColor: color, borderRadius: 4, alignItems: 'flex-end', justifyContent: 'center', paddingRight: 2 }}>
+      <View style={{ width: 0, height: 0, borderLeftWidth: 3, borderRightWidth: 3, borderTopWidth: 4, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: color }} />
+    </View>
+  );
+}
+
 function ChipGlyph({ border, fill }: { border: string; fill: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 4, borderRadius: 10, borderWidth: 2, borderColor: border, backgroundColor: fill }}>
@@ -89,6 +112,18 @@ function TooltipGlyph({ bubble, dot }: { bubble: string; dot: string }) {
         <View style={{ width: 10, height: 2, borderRadius: 1, backgroundColor: dot }} />
       </View>
       <View style={{ marginLeft: 5, width: 0, height: 0, borderLeftWidth: 3, borderRightWidth: 3, borderTopWidth: 4, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: bubble }} />
+    </View>
+  );
+}
+
+function MessageGlyph({ accent, line }: { accent: string; line: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+      <View style={{ width: 9, height: 9, borderRadius: 5, borderWidth: 2, borderColor: accent }} />
+      <View style={{ gap: 3 }}>
+        <View style={{ width: 15, height: 3, borderRadius: 2, backgroundColor: accent }} />
+        <View style={{ width: 10, height: 3, borderRadius: 2, backgroundColor: line }} />
+      </View>
     </View>
   );
 }
@@ -212,9 +247,20 @@ export default function Home() {
           <GridCard title="ZSChip" caption="필터 · 선택 토글" tileColor={palette.primary[10]} glyph={<ChipGlyph border={palette.primary[60]} fill={palette.primary[10]} />} href="/ZSChipExample" />
         </View>
         <View style={styles.gridRow}>
+          <GridCard title="ZSTab" caption="하단 인디케이터 탭" tileColor={palette.primary[10]} glyph={<TabGlyph active={palette.primary[50]} idle={palette.grey[40]} />} href="/ZSTabExample" />
+          <GridCard title="ZSDropdown" caption="선택형 입력 · 시트 트리거" tileColor={palette.information[10]} glyph={<DropdownGlyph color={palette.information[60]} />} href="/ZSDropdownExample" />
+        </View>
+        <View style={styles.gridRow}>
           <GridCard title="ZSSwitch" caption="토글 스위치 · 커스텀 색상" tileColor={palette.success[10]} glyph={<SwitchGlyph track={palette.success[50]} thumb={palette.background.base} />} href="/SwitchExample" />
           <GridCard title="ZSTooltip" caption="말풍선 · 플로팅 안내" tileColor={palette.information[10]} glyph={<TooltipGlyph bubble={palette.information[60]} dot={palette.information[10]} />} href="/TooltipExample" />
         </View>
+        <RowCard
+          title="ZSMessageBar"
+          caption="인라인 상태 메시지 · 액션 · 닫기"
+          tileColor={palette.warning[10]}
+          glyph={<MessageGlyph accent={palette.warning[60]} line={palette.warning[30]} />}
+          href="/ZSMessageBarExample"
+        />
 
         <SectionLabel>오버레이</SectionLabel>
         <View style={styles.gridRow}>

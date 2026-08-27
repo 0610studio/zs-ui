@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import ZSText from "../ZSText";
 import { useTheme } from "../../context/ThemeContext";
+import { createShadow } from "../../theme/elevation";
 import { DISABLED_OPACITY, DURATION } from "../../theme/tokens";
+import type { ShadowStyle } from "../../theme/types";
 
 const ANIMATION_DURATION = DURATION.slow;
 const CONTAINER_INSET = 3;
 const SEGMENT_HORIZONTAL_PADDING = 14;
+
+/** thumb 를 트랙에서 띄우는 그림자. boxShadow 로 변환해 iOS·Android 가 동일하게 렌더된다. */
+const THUMB_SHADOW: ShadowStyle = {
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+};
 
 export type ZSSegmentedTextSize = '1' | '2' | '3' | '4' | '5' | '6';
 
@@ -47,6 +56,8 @@ function ZSSegmented({
   ...props
 }: ZSSegmentedProps) {
   const { palette } = useTheme();
+  // 다크 모드에서는 밝은 그림자로 thumb 를 구분한다.
+  const thumbShadow = useMemo(() => createShadow(THUMB_SHADOW, palette.grey[100]), [palette.grey]);
   const [internalIndex, setInternalIndex] = useState(initialIndex);
   const [trackWidth, setTrackWidth] = useState(0);
   const [labelWidths, setLabelWidths] = useState<number[]>([]);
@@ -143,8 +154,7 @@ function ZSSegmented({
               height: containerHeight - CONTAINER_INSET * 2,
               borderRadius: (containerHeight - CONTAINER_INSET * 2) / 2,
               backgroundColor: thumbColor ?? palette.background.base,
-              // 다크 모드에서는 밝은 그림자로 thumb 를 구분
-              shadowColor: palette.grey[100],
+              boxShadow: thumbShadow,
             },
             thumbAnimatedStyle,
           ]}
@@ -204,10 +214,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: CONTAINER_INSET,
     left: CONTAINER_INSET,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   segment: {
     zIndex: 1,

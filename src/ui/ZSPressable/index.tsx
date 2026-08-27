@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { useCallback } from "react";
 import { Pressable, View, ViewProps } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import AnimatedWrapper from "../atoms/AnimatedWrapper";
 import { useTheme } from "../../context/ThemeContext";
+import { PREVENT_DOUBLE_PRESS_INTERVAL, usePreventDoublePress } from "../../model/usePreventDoublePress";
 import { transparency } from "../../theme/palette";
 import { DISABLED_OPACITY, DURATION, RADIUS } from "../../theme/tokens";
 import type { ShadowLevel, ViewColorOptions } from "../../theme/types";
@@ -21,6 +22,8 @@ interface ZSPressableProps extends ViewProps {
   fullWidth?: boolean;
   color?: ViewColorOptions;
   isLoading?: boolean;
+  /** true면 기본 디바운스(300ms) 대신 2초 잠금을 걸어 결제·제출의 중복 실행을 막는다 */
+  preventDoublePress?: boolean;
   disabled?: boolean;
 }
 
@@ -34,27 +37,27 @@ function ZSPressable({
   fullWidth = false,
   color,
   isLoading = false,
+  preventDoublePress = false,
   disabled = false,
   ...props
 }: ZSPressableProps) {
   const { palette } = useTheme();
   const isButtonPress = useSharedValue(0);
-  const lastClickTime = useRef<number>(0);
   const pressedBgColor = pressedBackgroundColor ?? palette.grey[50] + transparency['10%'];
 
-  const createPressHandler = (callback?: () => void) => {
-    return () => {
-      const now = Date.now();
-      if (now - lastClickTime.current < DEBOUNCE_TIME) return;
-      if (isLoading || disabled) return;
-      lastClickTime.current = now;
+  const debounceTime = preventDoublePress ? PREVENT_DOUBLE_PRESS_INTERVAL : DEBOUNCE_TIME;
 
-      callback?.();
-    };
-  };
+  const dispatchPress = useCallback((kind: 'press' | 'longPress') => {
+    if (isLoading || disabled) return;
+    if (kind === 'press') onPress?.();
+    else onLongPress?.();
+  }, [isLoading, disabled, onPress, onLongPress]);
 
-  const handlePress = createPressHandler(onPress);
-  const handleLongPress = createPressHandler(onLongPress);
+  // press·longPress 가 하나의 잠금을 공유하도록 훅을 한 번만 쓰고 종류만 라우팅한다
+  const guardedPress = usePreventDoublePress(dispatchPress, debounceTime);
+
+  const handlePress = () => guardedPress?.('press');
+  const handleLongPress = () => guardedPress?.('longPress');
 
   const boxAnimation = useAnimatedStyle(() => {
     const scale = interpolate(

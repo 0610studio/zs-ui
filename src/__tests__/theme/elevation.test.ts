@@ -3,6 +3,7 @@ import elevation, {
   IOS_SHADOW,
   parseColorChannels,
   createBoxShadow,
+  createShadow,
 } from '../../theme/elevation';
 
 describe('parseColorChannels()', () => {
@@ -26,6 +27,52 @@ describe('parseColorChannels()', () => {
 
   it('alpha 값이 숫자가 아니면 1로 폴백한다', () => {
     expect(parseColorChannels('rgba(0, 0, 0, abc)')).toEqual({ r: 0, g: 0, b: 0, a: 1 });
+  });
+
+  it('#RRGGBB hex 를 파싱한다', () => {
+    expect(parseColorChannels('#000000')).toEqual({ r: 0, g: 0, b: 0, a: 1 });
+    expect(parseColorChannels('#FFFFFF')).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+    expect(parseColorChannels('#637381')).toEqual({ r: 99, g: 115, b: 129, a: 1 });
+  });
+
+  it('#RGB 축약형은 각 채널을 두 번 반복해 해석한다', () => {
+    expect(parseColorChannels('#fff')).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+    expect(parseColorChannels('#0AF')).toEqual({ r: 0, g: 170, b: 255, a: 1 });
+  });
+
+  it('alpha 를 포함한 hex(#RRGGBBAA · #RGBA)를 파싱한다', () => {
+    expect(parseColorChannels('#00000080')).toEqual({ r: 0, g: 0, b: 0, a: 128 / 255 });
+    expect(parseColorChannels('#000F')).toEqual({ r: 0, g: 0, b: 0, a: 1 });
+  });
+
+  it('길이·문자가 잘못된 hex 는 불투명 검정으로 폴백한다', () => {
+    expect(parseColorChannels('#12345')).toEqual({ r: 0, g: 0, b: 0, a: 1 });
+    expect(parseColorChannels('#GGGGGG')).toEqual({ r: 0, g: 0, b: 0, a: 1 });
+  });
+});
+
+describe('createShadow()', () => {
+  const shadow = { shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 };
+
+  it('임의의 offset·blur 와 색상을 boxShadow 로 합친다', () => {
+    expect(createShadow(shadow, 'rgba(0, 0, 0, 1)')).toEqual([
+      {
+        offsetX: 0,
+        offsetY: 2,
+        blurRadius: 4,
+        spreadDistance: 0,
+        color: 'rgba(0, 0, 0, 0.1)',
+      },
+    ]);
+  });
+
+  it('palette 의 hex 색상도 그대로 받는다', () => {
+    const [result] = createShadow(shadow, '#FFFFFF');
+    expect(result?.color).toBe('rgba(255, 255, 255, 0.1)');
+  });
+
+  it('최종 불투명도가 0 이하면 빈 배열을 반환한다', () => {
+    expect(createShadow({ ...shadow, shadowOpacity: 0 }, '#000000')).toEqual([]);
   });
 });
 
@@ -76,5 +123,11 @@ describe('elevation()', () => {
 
   it('IOS_SHADOW는 11개 레벨을 정의한다', () => {
     expect(IOS_SHADOW).toHaveLength(11);
+  });
+
+  it('createBoxShadow 는 레벨 기하값으로 createShadow 를 호출한 것과 같다', () => {
+    expect(createBoxShadow(5, 'rgba(0, 0, 0, 0.27)')).toEqual(
+      createShadow(IOS_SHADOW[5], 'rgba(0, 0, 0, 0.27)')
+    );
   });
 });

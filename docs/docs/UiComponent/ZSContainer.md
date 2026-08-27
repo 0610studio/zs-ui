@@ -60,6 +60,7 @@ function MyScreen() {
 | `scrollEventThrottle` | `number` | `16` | 스크롤 이벤트 스로틀 (ms) |
 | `foldableSingleScreen` | `boolean` | `false` | 폴더블 펼침 상태에서도 단일 화면 모드 |
 | `dividerLineComponent` | `ReactNode` | `undefined` | 폴더블 좌우 화면 사이 구분선 |
+| `unfoldedSinglePaneMaxWidth` | `number \| false` | `ThemeProvider` 의 `foldable` 설정 | 폴더블 펼침 + `rightComponent` 없음(단일 화면)일 때 콘텐츠 최대 가로 길이(px). `false`면 전폭 |
 | `...props` | `ViewProps` | - | React Native `View` 기본 속성 |
 
 ## 주요 기능
