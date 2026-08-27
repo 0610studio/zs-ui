@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { PopOverButton, ZSContainer, ZSText, ZSView, Theme, useTheme } from 'zs-ui';
-import { useStyleSheetCreate } from 'zs-ui';
+import { PopOverButton, ZSContainer, ZSText, ZSView, Theme, useTheme } from '@0610studio/zs-ui';
+import { useStyleSheetCreate } from '@0610studio/zs-ui';
 import RenderPopOverMenu from '../src/ui/RenderPopOverMenu';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';

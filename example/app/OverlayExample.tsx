@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSContainer, ZSText, useOverlay, useTheme } from 'zs-ui';
+import { ZSContainer, ZSText, useOverlay, useTheme } from '@0610studio/zs-ui';
 import MyBottomSheet from '../src/ui/MyBottomSheet';
 import MyModal from '../src/ui/MyModal';
 import Section from '../src/ui/kit/Section';

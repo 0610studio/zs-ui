@@ -1,5 +1,5 @@
 import { ViewProps } from "react-native";
-import { ZSText, ZSView } from "zs-ui";
+import { ZSText, ZSView } from "@0610studio/zs-ui";
 
 type Props = ViewProps & {
   title?: string;

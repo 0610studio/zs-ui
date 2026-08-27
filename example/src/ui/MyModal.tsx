@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Button, ScrollView, StyleSheet, View } from 'react-native';
-import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField, ZSAboveKeyboard, ThemeBackground, ColorPalette } from 'zs-ui';
+import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField, ZSAboveKeyboard, ThemeBackground, ColorPalette } from '@0610studio/zs-ui';
 import MyBottomSheet from './MyBottomSheet';
 import CtaButton from './CtaButton';
 

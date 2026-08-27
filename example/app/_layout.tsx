@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig } from 'zs-ui';
+import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig } from '@0610studio/zs-ui';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import SnackBar from '../src/ui/Snackbar';

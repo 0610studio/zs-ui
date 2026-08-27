@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSContainer, ZSText, ZSView, useTheme } from 'zs-ui';
+import { ZSContainer, ZSText, ZSView, useTheme } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
 import Segmented from '../src/ui/kit/Segmented';
 import CodeBlock from '../src/ui/kit/CodeBlock';

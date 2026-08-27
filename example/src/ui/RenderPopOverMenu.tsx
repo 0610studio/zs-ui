@@ -1,20 +1,19 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { ZSText, ZSView } from "zs-ui";
-import ViewAtom from "zs-ui/ui/atoms/ViewAtom";
+import { StyleSheet, View } from 'react-native';
+import { ZSText, ZSView } from '@0610studio/zs-ui';
 
-function PopOverMenu(): JSX.Element {
+function PopOverMenu() {
   return (
     <ZSView style={styles.container}>
       {/* 삭제하기 항목 */}
-      <ViewAtom style={styles.menuItem}>
+      <View style={styles.menuItem}>
         <ZSText color="danger">삭제하기</ZSText>
-      </ViewAtom>
+      </View>
 
       {/* 수정하기 항목 */}
-      <ViewAtom style={styles.menuItem}>
+      <View style={styles.menuItem}>
         <ZSText color="information">수정하기</ZSText>
-      </ViewAtom>
+      </View>
     </ZSView>
   );
 }

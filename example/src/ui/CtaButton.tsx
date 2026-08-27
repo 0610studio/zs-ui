@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
-import { useTheme, ZSPressable, ZSText } from 'zs-ui';
+import { useTheme, ZSPressable, ZSText } from '@0610studio/zs-ui';
 
 interface CtaButtonProps {
   primaryButtonText: string;

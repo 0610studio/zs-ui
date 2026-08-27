@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { ZSContainer, ZSPressable, ZSText, ZSView, useTheme } from 'zs-ui';
+import { ZSContainer, ZSPressable, ZSText, ZSView, useTheme } from '@0610studio/zs-ui';
 import HeaderRight from '../src/ui/HeaderRight';
 
-const LIB_VERSION: string = require('../../package.json').version;
+const LIB_VERSION: string = require('@0610studio/zs-ui/package.json').version;
 
 /** 아이콘 타일용 미니 도형들 — 외부 아이콘 없이 팔레트 색으로만 구성 */
 function ThemeGlyph() {
@@ -153,16 +153,23 @@ function SectionLabel({ children }: { children: string }) {
   );
 }
 
-function RowCard({ title, caption, tileColor, glyph, href }: {
+function RowCard({ title, caption, tileColor, glyph, href, testID }: {
   title: string;
   caption: string;
   tileColor: string;
   glyph: React.ReactNode;
   href: string;
+  testID?: string;
 }) {
   const { palette } = useTheme();
   return (
-    <ZSPressable fullWidth onPress={() => router.push(href)}>
+    <ZSPressable
+      fullWidth
+      onPress={() => router.push(href)}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}: ${caption}`}
+    >
       <ZSView color="base" elevationLevel={1} style={styles.rowCard}>
         <View style={[styles.tile, { backgroundColor: tileColor }]}>{glyph}</View>
         <View style={styles.rowCardText}>
@@ -175,16 +182,23 @@ function RowCard({ title, caption, tileColor, glyph, href }: {
   );
 }
 
-function GridCard({ title, caption, tileColor, glyph, href }: {
+function GridCard({ title, caption, tileColor, glyph, href, testID }: {
   title: string;
   caption: string;
   tileColor: string;
   glyph: React.ReactNode;
   href: string;
+  testID?: string;
 }) {
   return (
     <View style={styles.gridSlot}>
-      <ZSPressable fullWidth onPress={() => router.push(href)}>
+      <ZSPressable
+        fullWidth
+        onPress={() => router.push(href)}
+        testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={`${title}: ${caption}`}
+      >
         <ZSView color="base" elevationLevel={1} style={styles.gridCard}>
           <View style={[styles.tile, styles.gridTile, { backgroundColor: tileColor }]}>{glyph}</View>
           <View style={{ gap: 2 }}>
@@ -227,6 +241,16 @@ export default function Home() {
           tileColor={palette.primary[10]}
           glyph={<ThemeGlyph />}
           href="/ThemeExample"
+        />
+
+        <SectionLabel>웹 검증</SectionLabel>
+        <RowCard
+          title="Web Example"
+          caption="로컬 소스 · 반응형 · E2E 검증"
+          tileColor={palette.success[10]}
+          glyph={<ZSText typo="subTitle.4" style={{ color: palette.success[90] }}>WEB</ZSText>}
+          href="/WebExample"
+          testID="web-example-card"
         />
 
         <SectionLabel>레이아웃</SectionLabel>

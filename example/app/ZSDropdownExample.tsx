@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSContainer, ZSDropdown, ZSText, useOverlay, useTheme } from 'zs-ui';
+import { ZSContainer, ZSDropdown, ZSText, useOverlay, useTheme } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
 

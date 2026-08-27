@@ -4,14 +4,20 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
+    "sync:local": "node scripts/sync-local-package.mjs",
+    "preweb": "yarn sync:local",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "prebuild:web": "yarn sync:local",
+    "build:web": "expo export --platform web",
+    "test:e2e:web": "node scripts/web-e2e.mjs"
   },
   "dependencies": {
+    "@0610studio/zs-ui": "file:..",
     "@expo/metro-runtime": "~56.0.15",
-    "@shopify/react-native-skia": "2.6.6",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@shopify/react-native-skia": "2.6.6",
     "expo": "56.0.12",
     "expo-blur": "~56.0.3",
     "expo-build-properties": "~56.0.19",
@@ -37,6 +43,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@types/react": "~19.2.14",
+    "agent-browser": "0.35.1",
     "typescript": "~6.0.3"
   },
   "private": true,

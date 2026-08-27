@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
-import { ZSCheckBox, ZSContainer, ZSRadioGroup, ZSText, useTheme } from 'zs-ui';
-import type { RadioOption } from 'zs-ui';
+import { ZSCheckBox, ZSContainer, ZSRadioGroup, ZSText, useTheme } from '@0610studio/zs-ui';
+import type { RadioOption } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
 
