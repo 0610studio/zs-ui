@@ -1,0 +1,45 @@
+name: 문서 품질 검사
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'example/**'
+      - 'src/**'
+      - 'package.json'
+      - '.github/workflows/docs-quality.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  docs-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 받기
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Corepack 활성화
+        run: corepack enable
+
+      - name: 라이브러리 의존성 설치
+        run: yarn install --frozen-lockfile
+
+      - name: 예제 의존성 설치
+        working-directory: example
+        run: yarn install --frozen-lockfile
+
+      - name: 문서 의존성 설치
+        working-directory: docs
+        run: npm ci
+
+      - name: 문서 검사
+        working-directory: docs
+        run: npm run check

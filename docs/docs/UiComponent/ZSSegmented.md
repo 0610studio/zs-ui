@@ -2,6 +2,8 @@
 sidebar_position: 12
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSSegmented
 
 트랙 안에서 선택 블록(thumb)이 미끄러지는 세그먼트 컨트롤입니다. 값 선택·필터 토글에 사용합니다.
@@ -13,6 +15,8 @@ sidebar_position: 12
 | 형태 | 트랙 + 슬라이딩 블록 | 하단 밑줄 인디케이터 |
 | 용도 | 값 선택 · 필터 토글 | 화면 내 콘텐츠 전환 |
 | 식별자 | 배열 **인덱스** | `items` 의 `value` 문자열 |
+
+<LocalPlayground example="ZSSegmented" />
 
 ## 기본 사용법
 

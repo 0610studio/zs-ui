@@ -4,6 +4,14 @@ sidebar_position: 0
 
 # 시작하기
 
+이 페이지에서는 앱 루트에 Provider를 연결하고, ZS-ui 컴포넌트와 오버레이를 사용하는 첫 화면까지 구성합니다.
+
+## 완료하면 할 수 있는 것
+
+- 테마가 적용된 `ZSContainer`와 `ZSText`로 화면을 구성합니다.
+- `ZSBlockButton`에서 `useOverlay().showAlert()`를 호출합니다.
+- Theme, UI 컴포넌트, Overlay 상세 문서로 이어서 탐색합니다.
+
 ## 1. 설치
 
 ```bash

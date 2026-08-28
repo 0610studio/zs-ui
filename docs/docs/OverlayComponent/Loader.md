@@ -2,9 +2,17 @@
 sidebar_position: 5
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # Loader
 
 진행 중인 프로세스를 사용자에게 시각적으로 표시하여, 작업이 완료될 때까지 사용자의 행동을 제어할 수 있는 로딩 컴포넌트입니다.
+
+:::note 실제 앱 추가 검증
+웹에서 표시·숨김과 상호작용 차단을 확인할 수 있습니다. Android 하드웨어 뒤로가기를 소비하면서 Loader를 유지하는 동작은 실제 Android 앱에서 확인하세요.
+:::
+
+<LocalPlayground example="Loader" height={760} />
 
 ## 기본 사용법
 

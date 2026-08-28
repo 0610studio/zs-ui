@@ -2,11 +2,15 @@
 sidebar_position: 15
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSMessageBar
 
 화면에 인라인으로 놓는 상태 메시지 바입니다. 폼 안내·경고·결과 알림에 사용합니다.
 
 일시적으로 떠올랐다 사라지는 알림이 필요하면 [Snackbar](../OverlayComponent/Snackbar.md)를 사용하세요. `ZSMessageBar` 는 레이아웃 흐름 안에 남아 있는 메시지입니다.
+
+<LocalPlayground example="ZSMessageBar" height={720} />
 
 ## 기본 사용법
 

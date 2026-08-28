@@ -2,9 +2,13 @@
 sidebar_position: 1
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ThemeProvider
 
 `ThemeProvider`는 프로젝트 전반에서 사용할 폰트와 테마 관련 설정을 관리합니다.
+
+<LocalPlayground example="ThemeProvider" height={760} />
 
 ## Props
 
@@ -175,4 +179,3 @@ function MyComponent() {
 `mode` 와 `isUsingSystemColorScheme` 는 **AsyncStorage** 에 저장되어 앱을 다시 열어도 유지됩니다. `isDarkModeEnabled={false}` 인 경우에는 저장값을 무시하고 항상 라이트 모드로 시작합니다.
 
 자세한 내용은 [Palette 문서](../Theme/palette)와 [Typography 문서](../Theme/typography)를 참조하세요.
-

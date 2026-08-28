@@ -2,13 +2,17 @@
 sidebar_position: 4
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Snackbar
 
 화면 상단에 일시적인 메시지를 표시하여 사용자에게 정보를 전달하는 컴포넌트입니다. 여러 개의 Snackbar를 동시에 표시할 수 있으며, 자동으로 사라집니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_snackbar" />
+<LocalPlayground example="Snackbar" />
+
+## SnackbarNotify 렌더러
+
+`SnackbarNotify`는 `OverlayProvider`가 스낵바 큐와 최대 표시 개수를 렌더링하는 내부 호스트입니다. 직접 마운트하는 대신 `showSnackBar()`를 호출하고, 전체 스낵바를 즉시 비울 때는 `hideOverlay('snack')`을 사용하세요. 모양을 교체하려면 `OverlayProvider`의 `customSnackbar`를 전달합니다.
 
 ## 기본 사용법
 

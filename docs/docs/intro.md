@@ -2,46 +2,17 @@
 sidebar_position: 1
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # 개요
 
-`@0610studio/zs-ui`는 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
+`@0610studio/zs-ui` 0.19.3은 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
 
-## 데모
+## 한눈에 보기
 
-<div style={{
-  display: 'flex',
-  overflowX: 'auto',
-  gap: '20px',
-  padding: '0 10px 0 0'
-}}>
-  <div style={{
-    minWidth: '300px',
-    flexShrink: 0
-  }}>
-    <video controls width="300">
-      <source src="/zs-ui/video/theme.mp4" type="video/mp4" />
-    </video>
-    <p>Theme</p>
-  </div>
-  <div style={{
-    minWidth: '300px',
-    flexShrink: 0
-  }}>
-    <video controls width="300">
-      <source src="/zs-ui/video/layout.mp4" type="video/mp4" />
-    </video>
-    <p>Layout</p>
-  </div>
-  <div style={{
-    minWidth: '300px',
-    flexShrink: 0
-  }}>
-    <video controls width="300">
-      <source src="/zs-ui/video/overlay.mp4" type="video/mp4" />
-    </video>
-    <p>Overlay</p>
-  </div>
-</div>
+현재 저장소 소스로 빌드한 앱 예제 카탈로그입니다. **예제 불러오기**를 선택하면 테마, 레이아웃, 입력, 선택, 오버레이와 폴더블 예제를 탐색하고 직접 조작할 수 있습니다.
+
+<LocalPlayground example="Catalog" height={900} title="ZS-ui 앱 예제 Playground" />
 
 ## 개발자 경험
 
@@ -71,6 +42,16 @@ hideOverlay('all');
 
 키보드가 올라오면 `ZSContainer`가 현재 포커스된 입력 필드를 자동으로 스크롤해서 보여줍니다. 별도 플래그를 관리하거나 `KeyboardAvoidingView`를 수동으로 배치할 필요가 없습니다.
 
+## 어떤 문서부터 볼까요?
+
+| 목적 | 다음 문서 |
+|---|---|
+| 앱 루트 설정과 첫 화면 구성 | [시작하기](./Provider/start) |
+| 색상·타이포그래피·공통 토큰 사용 | [설정과 테마](./Theme/start) |
+| 입력, 선택, 피드백 컴포넌트 탐색 | [UI 컴포넌트](./UiComponent/ZSText) |
+| Alert, BottomSheet, Snackbar 연결 | [Overlay](./OverlayComponent/start) |
+| 저장소 예제를 직접 조작 | [Playground](./Playground) |
+
 ---
 
 ## 설치
@@ -89,5 +70,5 @@ npx expo install @0610studio/zs-ui
 
 ## 추가 리소스
 
-- **Playground**: [Expo Snack](https://snack.expo.dev/@studio0610/zs-ui_13_playground)에서 라이브 예제 확인
+- **Playground**: [로컬 플레이그라운드](./Playground)에서 저장소 소스 기반 웹 예제 확인
 - **GitHub**: [소스 코드](https://github.com/0610studio/zs-ui)

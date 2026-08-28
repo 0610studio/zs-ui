@@ -3,9 +3,8 @@ import { Pressable, StyleSheet, View, type LayoutChangeEvent, type StyleProp, ty
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import ZSText from "../ZSText";
 import { useTheme } from "../../context/ThemeContext";
-import { STROKE_TEXT_COLOR } from "../../theme/intentColors";
 import { DISABLED_OPACITY, DURATION } from "../../theme/tokens";
-import type { IntentOptions, TypoColorOptions, TypoSubStyle } from "../../theme/types";
+import type { IntentOptions, TypoSubStyle } from "../../theme/types";
 
 const ANIMATION_DURATION = DURATION.slow;
 const TIMING_CONFIG = { duration: ANIMATION_DURATION, easing: Easing.out(Easing.quad) } as const;
@@ -122,7 +121,7 @@ function ZSTab({
     onChange?.(item.value, itemIndex);
   };
 
-  const activeTextColor: TypoColorOptions = STROKE_TEXT_COLOR[intent];
+  const activeTextColor = palette.mode === 'dark' ? palette[intent][30] : palette[intent][90];
   const isFill = layout === 'fill';
 
   return (
@@ -154,7 +153,8 @@ function ZSTab({
             >
               <ZSText
                 typo={isActive ? `subTitle.${textSize}` : `body.${textSize}`}
-                color={item.disabled ? 'disabled' : isActive ? activeTextColor : 'secondary'}
+                color={item.disabled ? 'disabled' : 'secondary'}
+                style={isActive && !item.disabled ? { color: activeTextColor } : undefined}
                 allowFontScaling={false}
                 numberOfLines={1}
               >

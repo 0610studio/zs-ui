@@ -2,11 +2,15 @@
 sidebar_position: 5
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSDropdown
 
 선택형 입력 필드입니다. [ZSTextField](./ZSTextField.md) 표면 위에 carret 을 얹어 "눌러서 고르는 입력" 을 표현합니다.
 
 선택 값(`value`)과 선택 UI(`children`)는 **외부가 소유합니다**. 이 컴포넌트는 표면과 트리거만 담당하므로, 실제 선택은 바텀시트·모달 등 원하는 방식으로 구성하면 됩니다.
+
+<LocalPlayground example="ZSDropdown" height={720} />
 
 ## 기본 사용법
 

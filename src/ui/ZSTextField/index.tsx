@@ -11,7 +11,6 @@ import ViewAtom from '../atoms/ViewAtom';
 
 export type BoxStyle = 'outline' | 'underline' | 'inbox';
 
-const iosOffset = Platform.OS === 'ios' ? 8 : 4;
 const ANIM_DURATION = DURATION.fast;
 const TIMING_CONFIG = { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System };
 
@@ -73,6 +72,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
 
   const fontSize = extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
   const fontFamily = extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
+  const inputVerticalOffset = Platform.OS === 'android' ? 4 : 8;
 
   const isError = status === 'error';
   const hasValue = value !== '';
@@ -216,7 +216,12 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     if (boxStyle === 'outline' || boxStyle === 'inbox') {
       borderStyle = { borderWidth };
     } else if (boxStyle === 'underline') {
-      borderStyle = { borderBottomWidth: borderWidth };
+      borderStyle = {
+        borderBottomWidth: borderWidth,
+        // CSS 는 radius 가 있는 단일 bottom border 를 양 끝에서 위로 말아 올린다.
+        // 웹 underline 은 radius 를 제거해 수평선만 렌더링한다.
+        ...(Platform.OS === 'web' ? { borderRadius: 0 } : {}),
+      };
     }
 
     let innerStyle = {};
@@ -274,8 +279,8 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
 
   const textInputStyle = useMemo(() => [
     {
-      paddingTop: 7 + iosOffset,
-      paddingBottom: 5 + iosOffset,
+      paddingTop: 7 + inputVerticalOffset,
+      paddingBottom: 5 + inputVerticalOffset,
       // disabled 시 DISABLED_OPACITY 가 전체에 곱해지므로 값 텍스트색을 최대 대비로 보정
       color: disabled ? palette.grey[90] : palette.text.base,
       fontSize,
@@ -285,7 +290,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
       ...(Platform.OS === 'web' ? { outline: 'none' } : {}),
     },
     textInputProps?.style,
-  ], [disabled, palette.grey, palette.text.base, fontSize, fontFamily, textInputProps?.style]);
+  ], [disabled, palette.grey, palette.text.base, fontSize, fontFamily, inputVerticalOffset, textInputProps?.style]);
 
   // 빈 문자열이 View 자식으로 렌더되지 않도록 boolean 으로 강제 (web 'Unexpected text node' 경고 방지)
   const shouldShowCloseButton = Boolean(value) && isFocusedForUI;
@@ -312,7 +317,13 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
           spellCheck={false}
         />
 
-        <ViewAtom pointerEvents="none" style={{ position: 'absolute' }}>
+        <ViewAtom
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            ...(Platform.OS === 'web' ? { left: 0 } : {}),
+          }}
+        >
           <Animated.Text allowFontScaling={allowFontScaling} style={labelStyleArray}>
             {label}
           </Animated.Text>

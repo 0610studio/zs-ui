@@ -2,7 +2,7 @@
 sidebar_position: 16
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSSkeleton & ZSSkeletonBox
 
@@ -11,10 +11,10 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 shimmer 밴드는 `@shopify/react-native-skia` 캔버스에 그리고 Reanimated 로 반복 이동시킵니다. 두 컴포넌트 모두 peer 로 `@shopify/react-native-skia` 가 필요합니다.
 
 :::warning 웹 미지원
-shimmer 효과는 iOS·Android 전용입니다. 웹에서는 효과 없이 정적으로 렌더링됩니다 — `ZSSkeleton` 은 자식을 반투명하게만 표시하고, `ZSSkeletonBox` 는 배경색 박스만 표시합니다. 아래 미리보기도 Android 탭에서 확인하세요.
+shimmer 효과는 iOS·Android 전용입니다. 웹에서는 효과 없이 정적으로 렌더링됩니다 — `ZSSkeleton` 은 자식을 반투명하게만 표시하고, `ZSSkeletonBox` 는 배경색 박스만 표시합니다. 아래 미리보기는 웹 fallback 확인용이며, shimmer 속도·밴드·투명도는 `example`의 실제 iOS·Android 앱에서 확인하세요.
 :::
 
-<ExpoSnack id="@studio0610/zs-ui_13_zsskeleton" platform="android" />
+<LocalPlayground example="ZSSkeleton" />
 
 ## ZSSkeleton
 
@@ -262,4 +262,3 @@ function ListItemSkeleton() {
   );
 }
 ```
-

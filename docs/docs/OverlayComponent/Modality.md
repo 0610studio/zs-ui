@@ -2,9 +2,17 @@
 sidebar_position: 6
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # Modality
 
 기존 화면 위에 새로운 화면을 슬라이드 방식으로 표시하는 오버레이 컴포넌트입니다. 배경 화면이 축소되며, 새로운 화면이 하단에서 올라오는 형태로 네이티브 모달과 유사하게 동작합니다.
+
+:::warning 실제 앱에서 확인하세요
+웹에서는 기본 전환과 콘텐츠 레이아웃을 확인할 수 있습니다. SafeArea, StatusBar, 화면 높이 변화, Android 하드웨어 뒤로가기와 폴더블 단일 화면 제한은 실제 iOS·Android 앱에서 확인하세요.
+:::
+
+<LocalPlayground example="Modality" height={760} />
 
 ## 기본 사용법
 

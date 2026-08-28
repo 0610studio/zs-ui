@@ -2,9 +2,13 @@
 sidebar_position: 0
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSView
 
 기본 `View` 컴포넌트에 그림자와 애니메이션 효과를 손쉽게 적용할 수 있는 래퍼 컴포넌트입니다. 내부적으로 `AnimatedWrapper`를 사용해 `boxShadow` 기반 그림자를 처리하므로 iOS·Android 가 동일하게 렌더됩니다.
+
+<LocalPlayground example="ZSView" height={780} />
 
 ## 기본 사용법
 

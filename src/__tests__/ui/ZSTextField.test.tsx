@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { StyleSheet, TextInput } from 'react-native';
+import { Platform, StyleSheet, TextInput } from 'react-native';
 import ZSTextField from '../../ui/ZSTextField';
 
 jest.mock('../../context/ThemeContext', () => {
@@ -262,5 +262,55 @@ describe('ZSTextField', () => {
     );
 
     expect(getByPlaceholderText('Custom placeholder')).toBeTruthy();
+  });
+
+  it('웹에서는 입력 높이와 라벨의 수평 기준을 네이티브와 일치시킨다', () => {
+    const originalPlatform = Platform.OS;
+    Object.defineProperty(Platform, 'OS', { configurable: true, value: 'web' });
+
+    try {
+      const { UNSAFE_getByType, UNSAFE_getByProps } = render(
+        <ZSTextField value="" onChangeText={() => {}} label="Label" />
+      );
+
+      const textInput = UNSAFE_getByType(TextInput);
+      const inputStyle = StyleSheet.flatten(textInput.props.style);
+      const labelContainerStyle = StyleSheet.flatten(
+        UNSAFE_getByProps({ pointerEvents: 'none' }).props.style
+      );
+
+      expect(inputStyle).toMatchObject({
+        paddingTop: 15,
+        paddingBottom: 13,
+      });
+      expect(labelContainerStyle).toMatchObject({
+        position: 'absolute',
+        left: 0,
+      });
+    } finally {
+      Object.defineProperty(Platform, 'OS', { configurable: true, value: originalPlatform });
+    }
+  });
+
+  it('웹 underline은 아래쪽 선만 수평으로 렌더링한다', () => {
+    const originalPlatform = Platform.OS;
+    Object.defineProperty(Platform, 'OS', { configurable: true, value: 'web' });
+
+    try {
+      const { UNSAFE_getByType } = render(
+        <ZSTextField value="" onChangeText={() => {}} label="Label" boxStyle="underline" />
+      );
+
+      const box = UNSAFE_getByType(TextInput).parent;
+      const boxStyle = StyleSheet.flatten(box?.props.style);
+
+      expect(boxStyle).toMatchObject({
+        borderBottomWidth: 1.2,
+        borderRadius: 0,
+      });
+      expect(boxStyle.borderWidth).toBeUndefined();
+    } finally {
+      Object.defineProperty(Platform, 'OS', { configurable: true, value: originalPlatform });
+    }
   });
 });

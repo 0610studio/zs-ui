@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # 시작하기
 
@@ -14,7 +14,7 @@ import ExpoSnack from '@site/src/components/ExpoSnack';
 오버레이를 사용하려면 먼저 [OverlayProvider](../Provider/OverlayProvider)로 앱을 감싸야 합니다.
 :::
 
-<ExpoSnack id="@studio0610/zs-ui_13_overlay" />
+<LocalPlayground example="Overlay" />
 
 ## useOverlay 훅
 

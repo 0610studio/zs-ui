@@ -2,13 +2,13 @@
 sidebar_position: 2
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Palette
 
 색상 팔레트를 설정하는 함수로, 라이트 및 다크 모드를 포함하며 사용자 정의 색상 팔레트를 지원합니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_theme" />
+<LocalPlayground example="Theme" />
 
 ## 기본 사용법
 

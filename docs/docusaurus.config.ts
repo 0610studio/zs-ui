@@ -1,6 +1,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import packageMetadata from '../package.json';
 
 const config: Config = {
   
@@ -20,10 +21,14 @@ const config: Config = {
   tagline: 'ReactNative Expo - UI Toolkit',
   favicon: 'img/favicon.ico',
 
+  customFields: {
+    zsUiVersion: packageMetadata.version,
+  },
+
   // --------------------------------------------
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenMarkdownLinks: 'throw',
 
   i18n: {
     defaultLocale: 'ko',

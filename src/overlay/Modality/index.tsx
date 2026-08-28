@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
   animatedBackground: {
     ...StyleSheet.absoluteFill,
     zIndex: Z_INDEX_VALUE.MODAL1,
-    alignSelf: 'center',
   },
   backScreen: {
     position: 'absolute',

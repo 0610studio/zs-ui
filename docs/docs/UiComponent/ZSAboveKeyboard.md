@@ -2,9 +2,17 @@
 sidebar_position: 2
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSAboveKeyboard
 
 키보드 바로 위에 떠 있는 floating UI를 만들 때 사용합니다. 키보드가 나타나거나 사라질 때 자동으로 위치를 조정합니다.
+
+:::warning 실제 앱에서 확인하세요
+웹 예제는 레이아웃만 참고합니다. 소프트 키보드 높이, SafeArea 하단 inset, `keyboardShowOffset`·`keyboardHideOffset`, 키보드 노출 시 표시 여부는 실제 iOS·Android 앱에서 확인하세요.
+:::
+
+<LocalPlayground example="ZSAboveKeyboard" height={760} />
 
 ## 철학
 

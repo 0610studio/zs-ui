@@ -2,11 +2,15 @@
 sidebar_position: 8
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSCheckBox
 
 체크박스 컴포넌트입니다. 라벨과 우측 부가 요소를 함께 배치할 수 있어 약관 동의·설정 목록 행으로 바로 쓸 수 있습니다.
 
 기본적으로 **부모 폭을 꽉 채우고**(`width: '100%'`) 체크 영역과 `moreComponent` 를 양 끝으로 정렬합니다.
+
+<LocalPlayground example="ZSCheckBox" />
 
 ## 기본 사용법
 

@@ -2,9 +2,17 @@
 sidebar_position: 6
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # 폴더블 기기 지원
 
 폴더블 기기의 접힘/펼침 상태를 감지하고, 펼침 상태에서 양쪽 화면에 콘텐츠를 분할하여 표시할 수 있는 기능을 제공합니다.
+
+:::warning 실제 Android 앱에서 확인하세요
+웹에서는 화면 너비에 따른 일반 반응형 레이아웃만 확인할 수 있습니다. `useFoldingState`의 접힘·펼침 감지, hinge 전환, `rightComponent` 2-pane 렌더링은 Android 폴더블 에뮬레이터 또는 실제 기기에서 확인하세요.
+:::
+
+<LocalPlayground example="FoldableDevice" height={720} />
 
 ![폴더블 기기 예제 1](/img/fold_1.gif)
 

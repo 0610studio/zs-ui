@@ -1,0 +1,73 @@
+name: GitHub Pages 문서 배포
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Docusaurus 빌드
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 받기
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Corepack 활성화
+        run: corepack enable
+
+      - name: 라이브러리 의존성 설치
+        run: yarn install --frozen-lockfile
+
+      - name: 예제 의존성 설치
+        working-directory: example
+        run: yarn install --frozen-lockfile
+
+      - name: 문서 의존성 설치
+        working-directory: docs
+        run: npm ci
+
+      - name: 문서 타입 검사
+        working-directory: docs
+        run: npm run typecheck
+
+      - name: 문서 빌드
+        working-directory: docs
+        run: npm run build
+
+      - name: GitHub Pages 설정
+        uses: actions/configure-pages@v5
+
+      - name: 배포 파일 업로드
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs/build
+
+  deploy:
+    name: GitHub Pages 배포
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages에 배포
+        id: deployment
+        uses: actions/deploy-pages@v4

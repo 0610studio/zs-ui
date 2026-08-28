@@ -98,6 +98,12 @@ describe('ZSTab', () => {
     expect(getByTestId('zs-tab-item-2').props.accessibilityState.selected).toBe(true);
   });
 
+  it('선택된 탭은 라이트 모드에서 대비가 확보된 intent 색상을 사용한다', () => {
+    const { getByText } = render(<ZSTab items={ITEMS} value='all' />);
+
+    expect(StyleSheet.flatten(getByText('전체').props.style).color).toBe('#996000');
+  });
+
   it('value 가 items 에 없으면 첫 아이템을 선택으로 본다', () => {
     const { getByTestId } = render(<ZSTab items={ITEMS} value='없는값' />);
 

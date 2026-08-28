@@ -2,13 +2,13 @@
 sidebar_position: 6
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSPressable
 
 커스텀 스타일과 애니메이션이 적용된 프레서블 컴포넌트입니다. 클릭/롱클릭 이벤트를 다루고, 배경색·그림자·애니메이션 옵션을 간단히 조합할 수 있습니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_zspressable" />
+<LocalPlayground example="ZSPressable" />
 
 ## 기본 사용법
 

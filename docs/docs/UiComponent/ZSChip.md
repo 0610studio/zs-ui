@@ -2,11 +2,15 @@
 sidebar_position: 11
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSChip
 
 선택 상태를 토글하는 칩 컴포넌트입니다. 필터·태그 선택에 사용합니다.
 
 콘텐츠 폭으로 렌더링(hug)되므로 `flexWrap` 부모 안에 여러 개를 나열하면 자동으로 줄바꿈됩니다.
+
+<LocalPlayground example="ZSChip" />
 
 ## 기본 사용법
 

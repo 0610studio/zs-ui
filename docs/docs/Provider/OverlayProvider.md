@@ -2,11 +2,15 @@
 sidebar_position: 2
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # OverlayProvider
 
 `OverlayProvider`는 앱 전역에서 오버레이 상태를 관리하는 컨텍스트 제공자입니다.
 
 이 Provider 안에서는 `useOverlay` 훅을 통해 Alert, Snackbar, BottomSheet, PopOver, Modality, Loader를 선언적으로 제어할 수 있습니다. 각 스크린마다 visible 상태를 직접 관리하거나 컴포넌트를 수동으로 배치할 필요가 없습니다.
+
+<LocalPlayground example="OverlayProvider" height={760} />
 
 ## Props
 
@@ -108,6 +112,10 @@ function App() {
 ```
 
 ## 뒤로가기(back) 처리 — 우선순위 기반
+
+:::warning 실제 Android 앱에서 확인하세요
+웹에는 Android 하드웨어 뒤로가기 이벤트가 없습니다. 로더 > Alert/PopOver/Modal > BottomSheet 우선순위와 `dismissable: false` 소비 동작은 실제 Android 앱에서 확인하세요.
+:::
 
 오버레이가 열려 있을 때 Android back 키는 **최상위 오버레이 하나만** 닫습니다
 (로더 > Alert/PopOver/Modal > BottomSheet 순). 이전처럼 모든 오버레이가 한 번에 닫히지 않습니다.

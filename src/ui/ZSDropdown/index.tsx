@@ -68,6 +68,7 @@ function ZSDropdown({
   containerStyle,
   children,
   textInputProps,
+  label = '선택 항목',
   ...fieldProps
 }: ZSDropdownProps) {
   const { palette } = useTheme();
@@ -97,6 +98,7 @@ function ZSDropdown({
   const field = (
     <ZSTextField
       {...fieldProps}
+      label={label}
       status={status}
       errorColor={errorColor}
       disabled={disabled}
@@ -112,32 +114,45 @@ function ZSDropdown({
     <>
       <View style={containerStyle}>
         <View style={styles.field}>
-          {isEditable ? field : (
+          {field}
+
+          {!isEditable && (
             <Pressable
+              style={styles.surface}
               onPress={handlePress}
               disabled={disabled}
               accessibilityRole='button'
+              accessibilityLabel={value ? `${label}, 현재 값 ${value}` : label}
+              accessibilityHint='옵션 목록 열기'
               accessibilityState={{ expanded, disabled }}
               testID='zs-dropdown-surface'
-            >
-              {/* 필드 전체를 press 대상으로 삼고 내부 TextInput 의 포커스를 차단한다 */}
-              <View pointerEvents='none'>{field}</View>
-            </Pressable>
+            />
           )}
 
-          <Pressable
-            style={[styles.chevron, { right: chevronRight, opacity: disabled ? DISABLED_OPACITY : 1 }]}
-            hitSlop={CHEVRON_HIT_SLOP}
-            disabled={disabled}
-            onPress={handlePress}
-            accessibilityRole='button'
-            accessibilityState={{ expanded, disabled }}
-            testID='zs-dropdown-chevron'
-          >
-            <Animated.View style={chevronAnimatedStyle}>
+          {isEditable ? (
+            <Pressable
+              style={[styles.chevron, { right: chevronRight, opacity: disabled ? DISABLED_OPACITY : 1 }]}
+              hitSlop={CHEVRON_HIT_SLOP}
+              disabled={disabled}
+              onPress={handlePress}
+              accessibilityRole='button'
+              accessibilityLabel={`${label} 옵션 열기`}
+              accessibilityState={{ expanded, disabled }}
+              testID='zs-dropdown-chevron'
+            >
+              <Animated.View style={chevronAnimatedStyle}>
+                {chevron ?? <SvgChevronDown size={CHEVRON_SIZE} color={disabled ? palette.grey[40] : palette.grey[60]} />}
+              </Animated.View>
+            </Pressable>
+          ) : (
+            <Animated.View
+              pointerEvents='none'
+              style={[styles.chevron, { right: chevronRight, opacity: disabled ? DISABLED_OPACITY : 1 }, chevronAnimatedStyle]}
+              testID='zs-dropdown-chevron'
+            >
               {chevron ?? <SvgChevronDown size={CHEVRON_SIZE} color={disabled ? palette.grey[40] : palette.grey[60]} />}
             </Animated.View>
-          </Pressable>
+          )}
         </View>
 
         {shouldShowError && (
@@ -154,6 +169,9 @@ export default React.memo(ZSDropdown);
 const styles = StyleSheet.create({
   field: {
     position: 'relative',
+  },
+  surface: {
+    ...StyleSheet.absoluteFill,
   },
   chevron: {
     position: 'absolute',

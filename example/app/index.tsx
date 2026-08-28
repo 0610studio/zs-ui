@@ -305,6 +305,13 @@ export default function Home() {
 
         <SectionLabel>이펙트</SectionLabel>
         <RowCard
+          title="기본 프리미티브"
+          caption="ZSView · AnimatedWrapper · Portal"
+          tileColor={palette.primary[10]}
+          glyph={<ZSText typo="subTitle.3" style={{ color: palette.primary[70] }}>UI</ZSText>}
+          href="/PrimitiveExample"
+        />
+        <RowCard
           title="ZSBorderBeam"
           caption="테두리 광선 · pulse 글로우"
           tileColor={palette.information[10]}

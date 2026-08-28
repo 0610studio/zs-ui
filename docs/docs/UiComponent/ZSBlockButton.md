@@ -2,13 +2,13 @@
 sidebar_position: 7
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSBlockButton
 
 블록 형태의 버튼 컴포넌트입니다. 다양한 intent와 variant를 지원하며, 테마 시스템과 통합되어 일관된 디자인을 제공합니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_zsbutton" />
+<LocalPlayground example="ZSBlockButton" />
 
 ## 기본 사용법
 
@@ -194,4 +194,3 @@ import { ZSBlockButton } from '@0610studio/zs-ui';
   onPress={() => {}}
 />
 ```
-

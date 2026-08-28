@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import {
   ZSBlockButton,
   ZSChip,
@@ -24,7 +24,6 @@ const WEB_TAB_ITEMS: ZSTabItem[] = [
 ];
 
 const VIEWPORT_OPTIONS = ['모바일 · 390px', '태블릿 · 768px', '데스크톱 · 1440px'];
-const WIDE_LAYOUT_MIN_WIDTH = 900;
 const CONTENT_MAX_WIDTH = 1120;
 
 type DemoPanelProps = {
@@ -56,14 +55,14 @@ const createStyles = (palette: Theme) =>
     },
     eyebrow: {
       letterSpacing: 1.4,
-      color: palette.primary[60],
+      color: palette.mode === 'dark' ? palette.primary[30] : palette.primary[90],
     },
     introTitle: {
       maxWidth: 720,
     },
     introDescription: {
       maxWidth: 760,
-      color: palette.text.secondary,
+      color: palette.mode === 'dark' ? palette.grey[80] : palette.grey[70],
     },
     statusRow: {
       flexDirection: 'row',
@@ -84,19 +83,16 @@ const createStyles = (palette: Theme) =>
     },
     grid: {
       width: '100%',
-      gap: 16,
-    },
-    gridWide: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      flexWrap: 'wrap',
+      gap: 16,
     },
     column: {
-      width: '100%',
-      gap: 16,
-    },
-    columnWide: {
-      flex: 1,
+      flexBasis: 340,
+      flexGrow: 1,
+      flexShrink: 1,
       minWidth: 0,
+      gap: 16,
     },
     panel: {
       width: '100%',
@@ -111,10 +107,13 @@ const createStyles = (palette: Theme) =>
     },
     panelEyebrow: {
       letterSpacing: 1.2,
-      color: palette.primary[60],
+      color: palette.mode === 'dark' ? palette.primary[30] : palette.primary[90],
     },
     panelDescription: {
-      color: palette.text.secondary,
+      color: palette.mode === 'dark' ? palette.grey[80] : palette.grey[70],
+    },
+    metaText: {
+      color: palette.mode === 'dark' ? palette.grey[80] : palette.grey[70],
     },
     controlGroup: {
       width: '100%',
@@ -187,9 +186,7 @@ function DemoPanel({ eyebrow, title, description, children, testID }: DemoPanelP
 
 export default function WebExampleScreen() {
   const styles = useStyleSheetCreate(createStyles);
-  const { width } = useWindowDimensions();
   const { showAlert, showBottomSheet, hideOverlay } = useOverlay();
-  const isWideLayout = width >= WIDE_LAYOUT_MIN_WIDTH;
   const [activeTab, setActiveTab] = useState('components');
   const [segmentIndex, setSegmentIndex] = useState(0);
   const [isChipSelected, setIsChipSelected] = useState(false);
@@ -244,12 +241,12 @@ export default function WebExampleScreen() {
             <View style={styles.statusBadge}>
               <ZSText typo="label.4" style={styles.statusText}>LOCAL SOURCE</ZSText>
             </View>
-            <ZSText typo="caption.1" color="secondary">Expo Web · React Native Web · 0.19.3</ZSText>
+            <ZSText typo="caption.1" style={styles.metaText}>Expo Web · React Native Web · 0.19.3</ZSText>
           </View>
         </View>
 
-        <View style={[styles.grid, isWideLayout && styles.gridWide]} testID="web-example-grid">
-          <View style={[styles.column, isWideLayout && styles.columnWide]} testID="web-example-column-primary">
+        <View style={styles.grid} testID="web-example-grid">
+          <View style={styles.column} testID="web-example-column-primary">
             <DemoPanel
               eyebrow="Navigation"
               title="탭 상태"
@@ -295,7 +292,7 @@ export default function WebExampleScreen() {
             </DemoPanel>
           </View>
 
-          <View style={[styles.column, isWideLayout && styles.columnWide]} testID="web-example-column-secondary">
+          <View style={styles.column} testID="web-example-column-secondary">
             <DemoPanel
               eyebrow="Selection"
               title="선택 컴포넌트"

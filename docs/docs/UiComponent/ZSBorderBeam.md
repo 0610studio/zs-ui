@@ -2,6 +2,8 @@
 sidebar_position: 17
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSBorderBeam
 
 테두리를 따라 광선(혜성)이 회전하는 장식 컴포넌트입니다. 신규 기능 강조·프리미엄 카드·AI 응답 영역처럼 시선을 끌어야 하는 곳에 사용합니다.
@@ -11,8 +13,10 @@ sidebar_position: 17
 :::
 
 :::warning 웹 미지원
-광선 효과는 iOS·Android 전용입니다. 웹에서는 효과 없이 콘텐츠만 렌더링됩니다.
+광선 효과는 iOS·Android 전용입니다. 웹에서는 효과 없이 콘텐츠만 렌더링됩니다. 색상, 회전, glow, pulse 애니메이션은 `example`의 실제 iOS·Android 앱에서 확인하세요.
 :::
+
+<LocalPlayground example="ZSBorderBeam" />
 
 ## 기본 사용법
 

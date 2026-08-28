@@ -2,9 +2,17 @@
 sidebar_position: 4
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSTextField
 
 Reanimated를 사용하여 다양한 스타일 애니메이션을 제공하는 텍스트 입력 필드 컴포넌트입니다. 플로팅 라벨, 포커스 애니메이션, 에러 상태 표시 등의 기능을 포함합니다.
+
+:::note 플랫폼 입력 검증
+웹에서 값 입력과 기본 포커스 애니메이션을 확인할 수 있습니다. iOS·Android 소프트 키보드, IME 조합 입력, 자동완성, 폰트 렌더링과 `ZSContainer`의 키보드 스크롤 연동은 실제 앱에서 확인하세요.
+:::
+
+<LocalPlayground example="ZSTextField" height={820} />
 
 ## 기본 사용법
 

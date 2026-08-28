@@ -3,6 +3,7 @@
 
 # Production
 /build
+/static/playground
 
 # Generated files
 .docusaurus

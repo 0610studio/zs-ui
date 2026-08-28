@@ -4,7 +4,12 @@
   "private": false,
   "scripts": {
     "docusaurus": "docusaurus",
+    "playground:build": "node scripts/build-local-playground.mjs",
+    "validate:coverage": "node scripts/validate-doc-coverage.mjs",
+    "check": "npm run typecheck && npm run validate:coverage && npm run build",
+    "prestart": "npm run playground:build",
     "start": "docusaurus start",
+    "prebuild": "npm run playground:build",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "GIT_USER=KimJeonghun91 docusaurus deploy",

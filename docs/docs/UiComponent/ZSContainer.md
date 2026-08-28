@@ -2,11 +2,19 @@
 sidebar_position: 1
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSContainer
 
 화면 단위 레이아웃을 구성할 때 사용하는 루트 컨테이너입니다. SafeArea, 스크롤, 키보드 대응을 하나로 묶어서 제공합니다.
 
 별도로 `SafeAreaView` + `KeyboardAvoidingView` + `ScrollView`를 조합할 필요가 없습니다.
+
+:::warning 실제 앱에서 확인하세요
+웹 예제로 일반 스크롤과 레이아웃을 확인할 수 있습니다. SafeArea, StatusBar, 실제 소프트 키보드에 따른 포커스 자동 스크롤, Android 폴더블 2-pane 동작은 실제 iOS·Android 앱에서 확인하세요.
+:::
+
+<LocalPlayground example="ZSContainer" height={760} />
 
 ## 철학
 

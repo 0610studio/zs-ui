@@ -2,11 +2,15 @@
 sidebar_position: 14
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSTooltip
 
 꼬리가 달린 말풍선 컴포넌트입니다. 기능 안내·신규 배지 같은 짧은 힌트에 사용합니다.
 
 **배치는 담당하지 않습니다.** 앵커 요소 주변에 놓는 것은 부모의 책임이며, 이 컴포넌트는 말풍선 자체와 꼬리 방향·정렬만 처리합니다.
+
+<LocalPlayground example="ZSTooltip" />
 
 ## 기본 사용법
 

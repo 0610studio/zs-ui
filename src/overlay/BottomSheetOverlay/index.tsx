@@ -261,12 +261,19 @@ function BottomSheetOverlay({
     };
   }, [constrainedMaxHeight, isAutoHeight]);
 
+  // 컨테이너는 절대배치로 바닥에 고정한다. 일반 flex 자식으로 두면 Yoga가 콘텐츠의
+  // % 높이(height: '100%' 등)를 가용 높이 기준으로 해석해 auto 시트가 maxHeight까지
+  // 팽창한다. bottom만 지정한 절대배치는 높이가 indefinite로 남아 콘텐츠 크기로 잡힌다.
+  const foldableWidth = Math.min(
+    windowWidth - (isFixed ? 0 : marginHorizontal * 2),
+    OVERLAY_FOLDABLE_SINGLE_WIDTH
+  );
+
   const containerStyle = [
     styles.container,
     containerHeightStyle,
     {
-      marginHorizontal: isFixed || foldableSingleScreen ? 0 : marginHorizontal,
-      marginBottom: isFixed ? 0 : marginBottom + bottomInsets,
+      bottom: isFixed ? 0 : marginBottom + bottomInsets,
       paddingBottom: isFixed ? bottomInsets : 0,
       backgroundColor: palette.background.base,
       ...(isFixed
@@ -274,10 +281,14 @@ function BottomSheetOverlay({
         : { borderRadius: RADIUS.sheet }),
       ...(foldableSingleScreen
         ? {
-          alignSelf: 'center' as const,
-          width: Math.min(windowWidth - (isFixed ? 0 : marginHorizontal * 2), OVERLAY_FOLDABLE_SINGLE_WIDTH),
+          left: Math.max((windowWidth - foldableWidth) / 2, 0),
+          width: foldableWidth,
         }
-        : null),
+        : {
+          left: 0,
+          right: 0,
+          marginHorizontal: isFixed ? 0 : marginHorizontal,
+        }),
     },
     animatedSheetStyle,
   ] as ViewStyle[];
@@ -340,7 +351,7 @@ function BottomSheetOverlay({
 
 const styles = StyleSheet.create({
   container: {
-    alignSelf: 'stretch',
+    position: 'absolute',
     borderRadius: RADIUS.sheet,
     overflow: 'hidden',
     zIndex: Z_INDEX_VALUE.BOTTOM_SHEET2,

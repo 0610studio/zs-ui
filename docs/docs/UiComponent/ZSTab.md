@@ -2,6 +2,8 @@
 sidebar_position: 13
 ---
 
+import LocalPlayground from '@site/src/components/LocalPlayground';
+
 # ZSTab
 
 하단 인디케이터형 탭입니다. 선택된 아이템 아래로 밑줄이 미끄러지며 이동합니다.
@@ -13,6 +15,8 @@ sidebar_position: 13
 | 형태 | 하단 밑줄 인디케이터 | 트랙 + 슬라이딩 블록(thumb) |
 | 용도 | 화면 내 콘텐츠 전환 (내비게이션 성격) | 값 선택 · 필터 토글 |
 | 식별자 | `items` 의 `value` 문자열 | 배열 인덱스 |
+
+<LocalPlayground example="ZSTab" height={720} />
 
 ## 기본 사용법
 

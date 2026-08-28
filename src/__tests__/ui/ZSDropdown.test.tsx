@@ -90,11 +90,20 @@ describe('ZSDropdown', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('disabled 면 필드도 carret 도 눌리지 않는다', () => {
+  it('disabled 면 표시 전용 필드가 눌리지 않는다', () => {
     const onPress = jest.fn();
     const { getByTestId } = render(<ZSDropdown label='도메인' onPress={onPress} disabled />);
 
     fireEvent.press(getByTestId('zs-dropdown-surface'));
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('disabled 면 입력형 carret 이 눌리지 않는다', () => {
+    const onPress = jest.fn();
+    const { getByTestId } = render(
+      <ZSDropdown label='도메인' onPress={onPress} onChangeText={jest.fn()} disabled />
+    );
+
     fireEvent.press(getByTestId('zs-dropdown-chevron'));
     expect(onPress).not.toHaveBeenCalled();
   });
@@ -103,6 +112,23 @@ describe('ZSDropdown', () => {
     const { getByTestId } = render(<ZSDropdown label='도메인' onPress={jest.fn()} expanded />);
 
     expect(getByTestId('zs-dropdown-surface').props.accessibilityState.expanded).toBe(true);
+  });
+
+  it('표시 전용 필드는 접근 가능한 이름과 힌트를 노출한다', () => {
+    const { getByTestId } = render(
+      <ZSDropdown label='도메인' value='gmail.com' onPress={jest.fn()} />
+    );
+
+    expect(getByTestId('zs-dropdown-surface').props.accessibilityLabel).toBe('도메인, 현재 값 gmail.com');
+    expect(getByTestId('zs-dropdown-surface').props.accessibilityHint).toBe('옵션 목록 열기');
+  });
+
+  it('입력형 carret 은 접근 가능한 이름과 expanded 상태를 노출한다', () => {
+    const { getByTestId } = render(
+      <ZSDropdown label='도메인' onPress={jest.fn()} onChangeText={jest.fn()} expanded />
+    );
+
+    expect(getByTestId('zs-dropdown-chevron').props.accessibilityLabel).toBe('도메인 옵션 열기');
     expect(getByTestId('zs-dropdown-chevron').props.accessibilityState.expanded).toBe(true);
   });
 

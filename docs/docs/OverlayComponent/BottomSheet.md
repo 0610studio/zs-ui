@@ -2,13 +2,21 @@
 sidebar_position: 3
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # BottomSheet
 
 화면 하단에서 위로 슬라이드하며 나타나는 모달 인터페이스입니다. 제스처로 드래그하여 닫을 수 있으며, 키보드가 나타나면 자동으로 위치를 조정합니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_bottomsheet" />
+:::warning 실제 앱에서 확인하세요
+웹에서는 시트 열기·닫기와 기본 레이아웃을 확인할 수 있습니다. 네이티브 드래그 감도, 소프트 키보드 회피, SafeArea, Android 하드웨어 뒤로가기와 `dismissable` 우선순위는 실제 iOS·Android 앱에서 확인하세요.
+:::
+
+<LocalPlayground example="BottomSheet" />
+
+## BottomSheetOverlay 렌더러
+
+`BottomSheetOverlay`는 `OverlayProvider` 내부에서 시트 상태, 드래그 제스처, 배경 터치, Android back 처리를 연결하는 렌더러입니다. 앱에서 직접 마운트하면 Provider가 관리하는 닫힘 콜백과 우선순위를 우회하게 되므로 `showBottomSheet()`로 여세요.
 
 ## 기본 사용법
 

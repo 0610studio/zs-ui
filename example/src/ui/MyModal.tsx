@@ -4,9 +4,9 @@ import { useOverlay, ZSPressable, ZSText, ZSView, useTheme, ZSTextField, ZSAbove
 import MyBottomSheet from './MyBottomSheet';
 import CtaButton from './CtaButton';
 
-interface MyModalProps {
+type MyModalProps = {
   onConfirm?: () => void;
-}
+};
 
 function MyModal({ onConfirm }: MyModalProps) {
   const { hideOverlay, showBottomSheet, showAlert } = useOverlay();
@@ -15,7 +15,7 @@ function MyModal({ onConfirm }: MyModalProps) {
   const styles = useMemo(() => createStyles({ background, primary }), [background, primary]);
 
   const handleConfirmPress = useCallback(() => {
-    console.log('confirm');
+    onConfirm?.();
   }, [onConfirm]);
 
   const handleClosePress = useCallback(() => {

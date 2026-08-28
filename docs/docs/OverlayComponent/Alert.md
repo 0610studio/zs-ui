@@ -2,13 +2,17 @@
 sidebar_position: 2
 ---
 
-import ExpoSnack from '@site/src/components/ExpoSnack';
+import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Alert
 
 사용자에게 중요한 메시지를 전달하거나, 모달로부터 사용자의 응답을 받을 때 사용되는 알림 컴포넌트입니다.
 
-<ExpoSnack id="@studio0610/zs-ui_13_alert" />
+<LocalPlayground example="Alert" />
+
+## AlertOverlay 렌더러
+
+`AlertOverlay`는 `OverlayProvider`가 Alert 상태를 화면에 그릴 때 사용하는 렌더러 컴포넌트입니다. 공개 export에는 포함되지만 Alert Context와 뒤로가기 우선순위에 의존하므로 앱 화면에서 직접 마운트하지 않습니다. 표시와 닫기는 `useOverlay().showAlert()`와 `hideOverlay('alert')`를 사용하세요.
 
 ## 기본 사용법
 

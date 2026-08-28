@@ -44,6 +44,11 @@ function ZSSwitch({
   const activeColor = trackColorActive ?? palette.primary.main;
   const thumbTranslateX = isActive ? width - thumbSize - padding * 2 : 0;
 
+  const handleToggle = () => {
+    if (disabled) return;
+    onToggle();
+  };
+
   const toggleStyle = {
     width,
     height,
@@ -68,11 +73,13 @@ function ZSSwitch({
 
   return (
     <Pressable
-      onPress={onToggle}
+      onPress={handleToggle}
       style={[style, disabled && { opacity: DISABLED_OPACITY }]}
       disabled={disabled}
       accessibilityRole='switch'
       accessibilityState={{ checked: isActive, disabled }}
+      aria-checked={isActive}
+      aria-disabled={disabled}
       {...props}
     >
       <Animated.View style={toggleStyle}>
