@@ -1,14 +1,10 @@
 import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { warnWebUnsupported } from "../../model/webUnsupported";
-// type-only import — 컴파일 시 제거되므로 웹 번들에 네이티브 구현(skia)이 딸려오지 않는다
+// type-only import — 웹 번들에 skia 가 딸려오지 않게 한다
 import type { ZSBorderBeamProps } from "./ZSBorderBeam";
 
-/**
- * 웹 미지원: CanvasKit 미로딩 환경에서 Skia Canvas가 크래시하므로 광선 효과 없이 콘텐츠만 렌더링한다.
- * 플랫폼 확장자(.web) 분리로 웹 번들에서 @shopify/react-native-skia import 자체를 제거한다.
- * 광선 관련 props는 웹에서 의미가 없으므로 구조 분해로 걸러 View에 전달하지 않는다.
- */
+/** CanvasKit 미로딩 환경에서 Skia Canvas 가 크래시하므로 웹은 콘텐츠만 렌더한다. */
 function ZSBorderBeam({
   children,
   colors,

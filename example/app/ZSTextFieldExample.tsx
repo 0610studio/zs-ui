@@ -6,7 +6,7 @@ import type { BoxStyle } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
 
-/** boxStyle 하나당 기본 · 값 입력 · error · disabled 상태를 한 번에 나열하는 섹션 */
+/** boxStyle 하나당 기본·값·error·disabled 를 나열한다 */
 function StateSection({ boxStyle }: { boxStyle: BoxStyle }) {
   const [value, setValue] = useState<string>('');
 
@@ -46,7 +46,7 @@ function StateSection({ boxStyle }: { boxStyle: BoxStyle }) {
   );
 }
 
-/** isTextArea 상태 나열 — multiline 스타일이 필요해 별도 섹션으로 분리 */
+/** isTextArea 는 multiline 스타일이 필요해 별도 섹션으로 뺐다 */
 function TextAreaSection() {
   const [memo, setMemo] = useState<string>('');
   const textAreaInputProps = {

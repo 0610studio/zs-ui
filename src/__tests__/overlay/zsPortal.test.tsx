@@ -38,7 +38,6 @@ describe('ZSPortal', () => {
       </PortalProvider>
     );
 
-    // Portal은 렌더되지만 등록되지 않을 수 있음
     expect(queryByText).toBeDefined();
   });
 
@@ -57,7 +56,6 @@ describe('ZSPortal', () => {
       </PortalProvider>
     );
 
-    // 포털이 제거되어야 함
     expect(true).toBe(true);
   });
 

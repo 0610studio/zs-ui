@@ -1,10 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { BackHandler, type NativeEventSubscription } from 'react-native';
 
-/**
- * 뒤로가기(back) 처리 우선순위. 숫자가 클수록 먼저 처리된다.
- * 앱 화면은 SCREEN, 바텀시트는 SHEET, Alert/PopOver/Modal은 OVERLAY, 로더는 LOADER.
- */
+/** back 처리 우선순위 — 숫자가 클수록 먼저 처리된다. */
 export const BackPriority = {
   SCREEN: 0,
   SHEET: 10,
@@ -52,8 +49,7 @@ export function BackHandlerProvider({ children }: { children: ReactNode }) {
         idRef.current += 1;
         seqRef.current += 1;
         entriesRef.current.set(id, { priority, seq: seqRef.current, callback });
-        // 새 핸들러가 생길 때마다 리스너를 맨 뒤(최신)로 재등록 → 나중에 등록되는
-        // React Navigation/react-native-screens 의 back 리스너보다 LIFO 에서 우선한다.
+        // 맨 뒤로 재등록해 나중에 붙는 React Navigation 의 back 리스너보다 LIFO 에서 우선하게 한다
         subscriptionRef.current?.remove();
         subscriptionRef.current = BackHandler.addEventListener('hardwareBackPress', dispatch);
         return id;
@@ -86,10 +82,7 @@ interface UseBackHandlerOptions {
   priority?: number;
 }
 
-/**
- * 우선순위 기반 뒤로가기 핸들러 등록. callback이 true를 반환하면 back 이벤트를 소비한다.
- * OverlayProvider(BackHandlerProvider) 내부에서 사용해야 한다.
- */
+/** callback 이 true 를 반환하면 back 을 소비한다. OverlayProvider 내부에서만 쓴다. */
 export function useBackHandler(
   callback: BackHandlerCallback,
   options: UseBackHandlerOptions = {}

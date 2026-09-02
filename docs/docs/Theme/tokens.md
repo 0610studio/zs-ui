@@ -22,7 +22,7 @@ import { RADIUS, DURATION, DISABLED_OPACITY } from '@0610studio/zs-ui';
 
 ## 그림자 생성
 
-`createShadow`는 React Native 그림자 속성과 테마 색상을 하나의 `boxShadow` 문자열로 변환합니다.
+`createShadow`는 React Native 그림자 속성과 테마 색상을 `boxShadow` 값 배열(`BoxShadowValue[]`)로 변환합니다.
 
 ```tsx
 import { createShadow, useTheme } from '@0610studio/zs-ui';

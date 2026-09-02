@@ -1,6 +1,7 @@
 {
   "name": "@0610studio/zs-ui",
-  "version": "0.19.4",
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.16.1",
   "private": false,
   "description": "EXPO ZS-UI",
   "type": "commonjs",
@@ -16,8 +17,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "start:android": "cd example && yarn install && npx expo run:android",
-    "start:ios": "cd example && yarn install && npx expo run:ios --device",
+    "start:android": "pnpm install && pnpm --filter zs-ui-example run android",
+    "start:ios": "pnpm install && pnpm --filter zs-ui-example run ios",
+    "start:ios:device": "pnpm install && pnpm --filter zs-ui-example run ios:device",
     "build": "expo-module build",
     "prepare": "expo-module prepare",
     "---------------------------------------------------------------------------": "",
@@ -42,34 +44,37 @@
   "homepage": "https://github.com/0610studio/zs-ui",
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@shopify/react-native-skia": "2.6.6",
     "@babel/plugin-transform-modules-commonjs": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
-    "@expo/metro-runtime": "~56.0.15",
+    "@expo/log-box": "~57.0.4",
+    "@expo/metro-runtime": "~57.0.14",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@shopify/react-native-skia": "2.11.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.12",
     "@types/react": "~19.2.14",
     "babel-jest": "^29",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "eslint": "^8.57.1",
-    "expo": "56.0.12",
-    "expo-constants": "~56.0.18",
-    "expo-linking": "~56.0.14",
+    "expo": "57.0.18",
+    "expo-constants": "~57.0.16",
+    "expo-linking": "~57.0.8",
+    "expo-modules-core": "~57.0.14",
     "expo-module-scripts": "^56.0.3",
-    "expo-navigation-bar": "~56.0.3",
-    "expo-router": "~56.2.11",
+    "expo-navigation-bar": "~57.0.2",
+    "expo-router": "~57.0.17",
     "jest": "^29",
-    "jest-expo": "~56.0.5",
+    "jest-expo": "~57.0.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-native": "0.85.3",
-    "react-native-reanimated": "4.3.1",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
-    "react-native-screens": "4.25.2",
+    "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
-    "react-native-worklets": "0.8.3",
+    "react-native-worklets": "0.10.1",
     "react-test-renderer": "19.2.3",
     "ts-jest": "^29.4.11",
     "typescript": "~6.0.3"
@@ -77,15 +82,17 @@
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "*",
     "@shopify/react-native-skia": ">=2.0.0",
-    "expo": ">=56.0.0",
-    "expo-navigation-bar": ">=56.0.0",
+    "expo": ">=57.0.0",
+    "expo-modules-core": ">=57.0.0",
+    "expo-navigation-bar": ">=57.0.0",
     "expo-router": "*",
     "react": "*",
-    "react-native": ">=0.85.0",
-    "react-native-reanimated": ">=4.3.0 <5.0.0",
+    "react-native": ">=0.86.0",
+    "react-native-gesture-handler": ">=2.20.0",
+    "react-native-reanimated": ">=4.5.0 <5.0.0",
     "react-native-safe-area-context": "*",
     "react-native-svg": "*",
-    "react-native-worklets": ">=0.8.0 <0.9.0"
+    "react-native-worklets": ">=0.10.0 <0.11.0"
   },
   "peerDependenciesMeta": {
     "@react-native-async-storage/async-storage": {
@@ -120,9 +127,9 @@
     },
     "expo-router": {
       "optional": false
+    },
+    "react-native-gesture-handler": {
+      "optional": false
     }
-  },
-  "installConfig": {
-    "hoistingLimits": "workspaces"
   }
 }

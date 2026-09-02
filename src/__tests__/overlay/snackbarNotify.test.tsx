@@ -26,7 +26,6 @@ describe('SnackbarNotify', () => {
     });
 
     const { queryByText } = render(<SnackbarNotify />);
-    // null이면 아무것도 렌더되지 않음
     expect(queryByText).toBeDefined();
   });
 

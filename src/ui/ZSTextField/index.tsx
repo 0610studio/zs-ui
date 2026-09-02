@@ -113,7 +113,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     primaryColor: focusColor || palette.primary.main,
     defaultBorderColor: borderColor || palette.grey[30],
     defaultLabelColor: labelColor || palette.text.secondary,
-    // disabled 시 DISABLED_OPACITY 가 전체에 곱해지므로 기본 플레이스홀더색을 진하게 보정
+    // DISABLED_OPACITY 가 전체에 곱해지므로 플레이스홀더색을 진하게 보정한다
     placeholderColor: placeHolderColor || (disabled ? palette.grey[70] : palette.grey[40]),
     errorColor: fErrorColor,
   }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor, fErrorColor, disabled]);
@@ -193,11 +193,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     textInputProps?.onBlur?.(event);
   }, [textInputProps?.onBlur]);
 
-  /**
-   * inbox 는 "채워진 박스" 스타일이므로 기본 배경을 layer1 로 둔다.
-   * base 로 두면 값이 비었을 때 outline 과 시각적으로 완전히 동일해져 boxStyle 구분이 사라진다.
-   * inputBgColor / labelBgColor 를 넘긴 경우에는 그 값이 우선한다.
-   */
+  /** inbox 배경을 base 로 두면 값이 빌 때 outline 과 똑같아져 boxStyle 구분이 사라진다. */
   const defaultFieldBgColor = boxStyle === 'inbox'
     ? palette.background.layer1
     : palette.background.base;
@@ -218,8 +214,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     } else if (boxStyle === 'underline') {
       borderStyle = {
         borderBottomWidth: borderWidth,
-        // CSS 는 radius 가 있는 단일 bottom border 를 양 끝에서 위로 말아 올린다.
-        // 웹 underline 은 radius 를 제거해 수평선만 렌더링한다.
+        // CSS 는 radius 있는 단일 bottom border 를 양 끝에서 말아 올리므로 웹은 radius 를 뺀다
         ...(Platform.OS === 'web' ? { borderRadius: 0 } : {}),
       };
     }
@@ -281,7 +276,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     {
       paddingTop: 7 + inputVerticalOffset,
       paddingBottom: 5 + inputVerticalOffset,
-      // disabled 시 DISABLED_OPACITY 가 전체에 곱해지므로 값 텍스트색을 최대 대비로 보정
+      // DISABLED_OPACITY 가 전체에 곱해지므로 값 텍스트색을 최대 대비로 보정한다
       color: disabled ? palette.grey[90] : palette.text.base,
       fontSize,
       width: '100%' as const,
@@ -292,7 +287,7 @@ const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
     textInputProps?.style,
   ], [disabled, palette.grey, palette.text.base, fontSize, fontFamily, inputVerticalOffset, textInputProps?.style]);
 
-  // 빈 문자열이 View 자식으로 렌더되지 않도록 boolean 으로 강제 (web 'Unexpected text node' 경고 방지)
+  // 빈 문자열이 View 자식으로 렌더되면 web 이 'Unexpected text node' 경고를 낸다
   const shouldShowCloseButton = Boolean(value) && isFocusedForUI;
   const shouldShowError = status === 'error' && errorMessage !== undefined && errorMessage !== '';
 

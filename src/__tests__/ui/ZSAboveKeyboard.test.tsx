@@ -58,7 +58,6 @@ describe('ZSAboveKeyboard', () => {
       </ZSAboveKeyboard>
     );
 
-    // showOnlyKeyboardVisible이 true이고 키보드가 보이지 않으면 숨김
     expect(getByText('Test Content')).toBeTruthy();
   });
 

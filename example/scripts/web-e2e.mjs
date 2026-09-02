@@ -1,5 +1,5 @@
 import { execFileSync, spawn } from 'node:child_process';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -8,6 +8,7 @@ import { syncLocalPackage } from './sync-local-package.mjs';
 
 const SCRIPT_DIRECTORY = dirname(fileURLToPath(import.meta.url));
 const EXAMPLE_DIRECTORY = resolve(SCRIPT_DIRECTORY, '..');
+const WORKSPACE_ROOT = resolve(EXAMPLE_DIRECTORY, '..');
 const ARTIFACT_DIRECTORY = resolve(
   process.env.E2E_OUTPUT_DIR ?? join(tmpdir(), 'zs-ui-web-e2e'),
 );
@@ -17,8 +18,21 @@ const PORT = Number(process.env.E2E_PORT ?? 4178);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const SESSION = `zs-ui-web-e2e-${process.pid}`;
 const CONTENT_MAX_WIDTH = 1120;
-const EXPO_BINARY = join(EXAMPLE_DIRECTORY, 'node_modules', '.bin', 'expo');
-const AGENT_BROWSER_BINARY = join(EXAMPLE_DIRECTORY, 'node_modules', '.bin', 'agent-browser');
+// pnpm hoisting 때문에 실행 파일은 보통 루트에만 있다
+function resolveBinary(name) {
+  const found = [
+    join(EXAMPLE_DIRECTORY, 'node_modules', '.bin', name),
+    join(WORKSPACE_ROOT, 'node_modules', '.bin', name),
+  ].find(existsSync);
+
+  if (!found) {
+    throw new Error(`${name} 실행 파일을 찾지 못했습니다. 저장소 루트에서 pnpm install을 먼저 실행하세요.`);
+  }
+  return found;
+}
+
+const EXPO_BINARY = resolveBinary('expo');
+const AGENT_BROWSER_BINARY = resolveBinary('agent-browser');
 const STATIC_SERVER_SCRIPT = join(SCRIPT_DIRECTORY, 'static-server.mjs');
 
 function assertCondition(condition, message) {
@@ -69,7 +83,7 @@ async function waitForStaticServer(serverProcess) {
       const response = await fetch(BASE_URL);
       if (response.ok) return;
     } catch {
-      // 서버가 포트를 열 때까지 짧게 재시도한다.
+      // 서버가 포트를 열 때까지 짧게 재시도한다
     }
     await delay(100);
   }
@@ -98,6 +112,36 @@ function verifyAccessibility() {
       violation => violation.impact === 'critical' || violation.impact === 'serious',
     ).length,
   };
+}
+
+/**
+ * ZSCalendar 은 웹을 지원하지 않는다. 그래도 웹 빌드가 죽지는 않아야 한다 —
+ * 라이브러리를 import 하는 것만으로 CanvasKit 로딩이 시작되면 캘린더를 쓰지 않는
+ * 소비자의 웹 빌드까지 통째로 무너진다.
+ */
+function verifyCalendarWebUnsupported() {
+  runBrowser(['set', 'viewport', '390', '844']);
+  runBrowser(['open', `${BASE_URL}/ZSCalendarExample`]);
+  runBrowser(['wait', '--fn', `Boolean(document.querySelector('[data-testid="calendar-web-unsupported"]'))`]);
+
+  assertCondition(
+    evaluate(`document.querySelectorAll('canvas').length === 0`),
+    '웹에서 Skia Canvas 가 마운트되었습니다 — 웹 진입점이 네이티브 구현을 끌어오고 있습니다.',
+  );
+  assertCondition(
+    evaluate(`document.querySelectorAll('[data-testid^="calendar-cell-"]').length === 0`),
+    '웹에서 달력이 렌더되었습니다 — 미지원이면 아무것도 그리지 않아야 합니다.',
+  );
+  assertCondition(
+    evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth'),
+    '캘린더 화면에 가로 넘침이 있습니다.',
+  );
+
+  runBrowser(['screenshot', join(SCREENSHOT_DIRECTORY, 'calendar-web-unsupported.png')]);
+
+  // 홈으로 돌려놓아 뒤따르는 접근성 검사가 기존 화면 기준을 유지하게 한다
+  runBrowser(['open', `${BASE_URL}/WebExample`]);
+  runBrowser(['wait', '--text', '배포 전에 웹 동작을 직접 확인하세요']);
 }
 
 function verifyBrowserErrors() {
@@ -203,17 +247,20 @@ async function main() {
     ]);
     runBrowser(['screenshot', '--full', join(SCREENSHOT_DIRECTORY, 'web-example-desktop-dark.png')]);
 
+    console.log('5/6 캘린더 웹 미지원 검증');
+    verifyCalendarWebUnsupported();
+
     const accessibility = verifyAccessibility();
     verifyBrowserErrors();
 
-    console.log('5/5 검증 완료');
+    console.log('6/6 검증 완료');
     console.log(`- WCAG A/AA 위반 규칙: ${accessibility.total}건 (중대 ${accessibility.blocking}건)`);
     console.log(`- 결과 위치: ${ARTIFACT_DIRECTORY}`);
   } finally {
     try {
       runBrowser(['close']);
     } catch {
-      // 브라우저가 먼저 종료된 경우 테스트 결과를 가리지 않는다.
+      // 브라우저가 먼저 종료돼도 테스트 결과를 가리지 않는다
     }
     serverProcess.kill('SIGTERM');
   }

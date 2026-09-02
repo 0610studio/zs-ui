@@ -6,7 +6,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # 개요
 
-`@0610studio/zs-ui` 0.19.3은 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
+`@0610studio/zs-ui`는 React Native Expo 환경에서 동작하는 UI 컴포넌트 라이브러리입니다. 다크 모드, 타이포그래피, 오버레이(Alert, BottomSheet, Snackbar), 폴더블 디바이스 지원까지 포함합니다.
 
 ## 한눈에 보기
 

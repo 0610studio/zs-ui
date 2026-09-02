@@ -18,11 +18,10 @@ const FULL_ROTATION_RADIANS = Math.PI * 2;
 const DEFAULT_GLOW_INTENSITY = 0.5;
 const GLOW_PULSE_DURATION = 2400;
 
-/** glow를 세밀하게 제어할 때 사용하는 설정 (숫자 하나로 충분하면 glow={0~1} 사용) */
+/** glow 세밀 제어용 (숫자 하나로 충분하면 glow={0~1}) */
 export interface ZSBorderBeamGlowConfig {
-  /** 글로우가 stroke 바깥으로 퍼지는 폭(px) */
+  /** stroke 바깥으로 퍼지는 폭(px) */
   width?: number;
-  /** blur 강도 */
   blur?: number;
   /** 숨쉬는 한 사이클(ms) */
   pulseDuration?: number;
@@ -32,37 +31,30 @@ export interface ZSBorderBeamGlowConfig {
 
 export interface ZSBorderBeamProps extends ViewProps {
   children?: React.ReactNode;
-  /** sweep gradient 색상 배열 (꼬리 → 머리 순) — 지정 시 colorFrom/colorTo는 무시됩니다 */
+  /** 꼬리 → 머리 순. 지정 시 colorFrom/colorTo 무시 */
   colors?: string[];
-  /** 광선 시작(꼬리) 색상 (기본: palette.primary.main) */
+  /** 기본: palette.primary.main */
   colorFrom?: string;
-  /** 광선 끝(머리) 색상 (기본: palette.secondary.main) */
+  /** 기본: palette.secondary.main */
   colorTo?: string;
-  /** 광선(혜성)이 둘레에서 차지하는 비율 (0~1). 1이면 둘레 전체 그라디언트 링 */
+  /** 0~1. 1이면 둘레 전체 그라디언트 링 */
   beamLength?: number;
-  /** 광선이 지나가지 않는 구간의 얇은 기본 테두리 색. 'none'이면 표시 안 함 (기본: colorFrom 12% 알파) */
+  /** 광선이 지나지 않는 구간의 테두리. 'none'이면 숨김 (기본: colorFrom 12% 알파) */
   trackColor?: string;
-  /**
-   * 글로우 강도.
-   * - `false` : 글로우 없음 (선명한 광선만)
-   * - `0~1`   : 숫자 하나로 폭·blur·불투명도를 함께 스케일 (기본 0.5)
-   * - config  : 세밀 제어 — { width, blur, pulseDuration, minOpacity, maxOpacity }
-   */
+  /** false=없음 · 0~1=폭·blur·불투명도 일괄 스케일(기본 0.5) · config=세밀 제어 */
   glow?: boolean | number | ZSBorderBeamGlowConfig;
-  /** 광선이 한 바퀴 도는 시간(ms) */
+  /** 한 바퀴 도는 시간(ms) */
   duration?: number;
-  /** 애니메이션 시작 지연(ms) */
   delay?: number;
-  /** 회전 방향 반전 */
   reverse?: boolean;
-  /** false면 효과를 숨기고 애니메이션을 정지 */
+  /** false면 숨기고 애니메이션 정지 */
   active?: boolean;
   borderWidth?: number;
   borderRadius?: number;
   style?: StyleProp<ViewStyle>;
 }
 
-/** #RGB / #RRGGBB hex에만 알파를 붙이고, 그 외 형식은 null 반환 */
+/** #RGB / #RRGGBB hex 에만 알파를 붙이고, 그 외는 null */
 const withAlpha = (color: string, alphaHex: string): string | null => {
   if (/^#[0-9a-fA-F]{6}$/.test(color)) return `${color}${alphaHex}`;
   if (/^#[0-9a-fA-F]{3}$/.test(color)) {
@@ -72,7 +64,7 @@ const withAlpha = (color: string, alphaHex: string): string | null => {
   return null;
 };
 
-/** 색상의 완전 투명 버전 (hue 유지 → blur 시 색 번짐이 자연스러움) */
+/** hue 를 유지한 완전 투명 색 — blur 시 색 번짐이 자연스럽다 */
 const transparentize = (color: string): string => withAlpha(color, "00") ?? "#00000000";
 
 interface GlowSettings {
@@ -134,8 +126,7 @@ function ZSBorderBeam({
   const to = colorTo || palette.secondary.main;
   const glowSettings = resolveGlow(glow);
 
-  // 혜성 형태: 꼬리(투명)에서 머리(선명)로 갈수록 밝아지고, 머리 직후 짧게 컷오프.
-  // beamLength < 1이면 positions로 광선을 둘레 일부에만 압축한다.
+  // 꼬리(투명)→머리(선명) 후 짧게 컷오프. beamLength < 1 이면 positions 로 둘레 일부에 압축한다.
   const beam = useMemo(() => {
     const length = Math.min(Math.max(beamLength, 0.05), 1);
     const base =
@@ -221,8 +212,7 @@ function ZSBorderBeam({
     interpolate(glowProgress.value, [0, 1], [borderWidth + glowWidth * 0.6, borderWidth + glowWidth])
   );
 
-  // 웹 미지원: CanvasKit 미로딩 환경에서 Skia Canvas가 크래시하므로 광선 효과 없이 콘텐츠만 렌더링한다.
-  // (rules-of-hooks 준수를 위해 분기는 모든 hook 호출 이후에 둔다)
+  // CanvasKit 미로딩 환경에서 Skia Canvas 가 크래시한다. 분기는 rules-of-hooks 때문에 모든 hook 뒤에 둔다.
   if (IS_WEB) {
     return (
       <View style={[styles.container, style]} {...props}>

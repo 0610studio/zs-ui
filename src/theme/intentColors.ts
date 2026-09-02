@@ -1,15 +1,12 @@
 import type { IntentOptions, TypoColorOptions } from './types';
 
-/**
- * variant 별 텍스트 색상 토큰 (intent 단위 예외값 포함).
- * ZSBlockButton · ZSChip 등 intent 기반 컴포넌트가 공유한다.
- */
+/** variant 별 텍스트 색상 토큰. ZSBlockButton · ZSChip 등이 공유한다. */
 export const SOLID_TEXT_COLOR: Record<IntentOptions, TypoColorOptions> = {
   primary: 'white',
   danger: 'white',
   information: 'white',
   success: 'white',
-  // 노랑(warning.50) 배경 위 흰 텍스트는 대비가 부족해 검정 사용
+  // warning.50 배경 위 흰 텍스트는 대비가 부족하다
   warning: 'black',
   grey: 'white',
 };

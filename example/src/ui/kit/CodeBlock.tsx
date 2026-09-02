@@ -2,7 +2,6 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 
 const MONO_FONT = Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' });
 
-/** 예제 하단에 사용법을 보여주는 다크 코드 블록 (라이트/다크 모드 공통 잉크 색) */
 export default function CodeBlock({ code }: { code: string }) {
   return (
     <View style={styles.container}>

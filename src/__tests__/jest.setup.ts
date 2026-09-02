@@ -1,13 +1,10 @@
-// React를 전역으로 설정하여 JSX transform이 작동하도록 함
+// JSX transform 을 위해 React 를 전역으로 둔다
 const React = require('react');
 globalThis.React = React;
 
-// RNGH는 moduleNameMapper를 통해 수동 목으로 대체됨
-
-// Reanimated는 moduleNameMapper로 mock 처리됨
 
 
-// safe-area-context mock
+
 jest.mock('react-native-safe-area-context', () => {
   const inset = { top: 0, left: 0, right: 0, bottom: 0 };
   return {
@@ -18,7 +15,6 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
-// svg 단순 목
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const View = (props) => React.createElement('View', props, props.children);
@@ -27,11 +23,14 @@ jest.mock('react-native-svg', () => {
   });
 });
 
-// ActivityIndicator mock
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
   return {
     ...RN,
+    AccessibilityInfo: {
+      ...RN.AccessibilityInfo,
+      announceForAccessibility: jest.fn(),
+    },
     ActivityIndicator: (props) => {
       const React = require('react');
       return React.createElement('View', { testID: 'activity-indicator', ...props });

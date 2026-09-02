@@ -3,8 +3,7 @@ import { Dimensions, Platform } from 'react-native';
 import ZsUiModule from '../ZsUiModule';
 import { FoldingState, FoldingStateInfo, NativeFoldingStateInfo } from './types';
 
-// 모듈 레벨 단일 스토어 — 훅 인스턴스마다 Dimensions 리스너와
-// 네이티브 getFoldingFeature 호출이 중복되지 않도록 구독자 전체가 상태를 공유한다.
+// 모듈 레벨 단일 스토어 — 훅 인스턴스마다 리스너·네이티브 호출이 중복되지 않게 상태를 공유한다
 let foldingStateInfo: FoldingStateInfo = {
   foldingState: FoldingState.FOLDED,
   width: Dimensions.get('window').width,
@@ -25,7 +24,7 @@ function setFoldingStateInfo(next: FoldingStateInfo) {
 }
 
 async function updateFoldingState(fallbackWidth = Dimensions.get('window').width) {
-  // 폴딩 감지는 Android 전용이지만 width 는 전 플랫폼에서 추적한다.
+  // 폴딩 감지는 Android 전용이지만 width 는 전 플랫폼에서 추적한다
   if (Platform.OS !== 'android') {
     setFoldingStateInfo({ foldingState: FoldingState.FOLDED, width: fallbackWidth });
     return;

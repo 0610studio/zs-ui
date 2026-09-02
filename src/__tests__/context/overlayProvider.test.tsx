@@ -114,7 +114,7 @@ describe('OverlayProvider 통합', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
 
-    // 이미 닫힌 뒤 다시 닫아도(all 포함) 재발화하지 않는다.
+    // 이미 닫힌 뒤 다시 닫아도 재발화하지 않는다
     act(() => {
       overlay.hideOverlay('all');
     });

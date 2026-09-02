@@ -83,13 +83,11 @@ function formatTestResults(jsonResults) {
     minute: '2-digit',
   });
 
-  // 커버리지 정보 파싱
   const coverageTotal = getCoverageData();
   const coverage = coverageTotal ? formatCoverage({ total: coverageTotal }) : null;
 
   let markdown = `\n${TEST_RESULTS_MARKER}\n## 테스트 결과\n\n`;
   
-  // 요약 표
   markdown += `| 항목 | 값 |\n`;
   markdown += `|------|-----|\n`;
   markdown += `| **상태** | ${status} |\n`;
@@ -99,7 +97,6 @@ function formatTestResults(jsonResults) {
   markdown += `| **실패** | ${numFailedTests > 0 ? '❌' : '✅'} ${numFailedTests} |\n`;
   markdown += `| **성공률** | ${successRate}% |\n\n`;
   
-  // 커버리지 표
   if (coverage) {
     markdown += `### 📊 코드 커버리지\n\n`;
     markdown += `| 항목 | 커버리지 | 상태 |\n`;
@@ -110,7 +107,6 @@ function formatTestResults(jsonResults) {
     markdown += `| **Lines** | ${coverage.lines.formatted} | ${coverage.lines.emoji} |\n\n`;
   }
   
-  // 실패한 테스트 표
   if (numFailedTests > 0) {
     const failedTests = [];
     testResults.forEach(result => {
@@ -154,18 +150,15 @@ function updateReadme(testResultsMarkdown) {
 
   let readmeContent = fs.readFileSync(README_PATH, 'utf8');
   
-  // 기존 테스트 결과 섹션 제거 (마커 사이의 내용)
   const markerRegex = new RegExp(`${TEST_RESULTS_MARKER}[\\s\\S]*?${TEST_RESULTS_MARKER}`, 'g');
   readmeContent = readmeContent.replace(markerRegex, '');
 
-  // 최하단에 테스트 결과 추가
   readmeContent = readmeContent.trimEnd() + testResultsMarkdown;
 
   fs.writeFileSync(README_PATH, readmeContent, 'utf8');
   console.log('✅ README.md에 테스트 결과가 업데이트되었습니다.');
 }
 
-// 메인 실행
 if (!fs.existsSync(TEST_RESULTS_JSON)) {
   console.error('test-results.json 파일을 찾을 수 없습니다. 테스트가 실행되지 않았거나 실패했을 수 있습니다.');
   process.exit(1);

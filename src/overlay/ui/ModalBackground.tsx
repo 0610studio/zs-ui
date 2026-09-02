@@ -9,11 +9,7 @@ interface ModalBackgroundProps {
   position?: 'center' | 'left' | 'right' | 'pop' | 'bottom';
   children: React.ReactNode;
   onPress?: () => void;
-  /**
-   * 전달하면 기본 FadeIn/FadeOut(50ms) 대신 주입된 opacity 스타일이 배경 레이어만 페이드한다.
-   * 자식은 배경과 분리된 형제 노드로 렌더되어 페이드 영향을 받지 않으므로,
-   * 오버레이가 자신의 등장·퇴장 애니메이션과 배경 페이드를 동기화할 때 사용한다.
-   */
+  /** 전달하면 기본 FadeIn/FadeOut(50ms) 대신 이 스타일로 배경만 페이드한다 (자식은 형제 노드라 영향 없음). */
   backdropAnimatedStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
   backdropAccessibilityLabel?: string;
 }

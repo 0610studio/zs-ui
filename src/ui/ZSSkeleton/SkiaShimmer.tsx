@@ -12,17 +12,16 @@ import {
 } from "react-native-reanimated";
 
 export interface SkiaShimmerProps {
-  /** 하이라이트 색상 (#RGB / #RRGGBB) */
   color: string;
-  /** 밴드 중심의 최대 불투명도 (0~1) */
+  /** 밴드 중심 최대 불투명도 (0~1) */
   opacity?: number;
-  /** 밴드가 한 번 지나가는 시간(ms) */
+  /** 한 번 지나가는 시간(ms) */
   duration?: number;
 }
 
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
 
-/** #RGB / #RRGGBB hex만 정규화, 그 외 형식은 null */
+/** #RGB / #RRGGBB hex 만 정규화, 그 외는 null */
 const toRgbHex = (color: string): string | null => {
   if (/^#[0-9a-fA-F]{6}$/.test(color)) return color;
   if (/^#[0-9a-fA-F]{3}$/.test(color)) {
@@ -37,16 +36,11 @@ const withAlpha = (rgbHex: string, alpha: number): string =>
     .toString(16)
     .padStart(2, "0")}`;
 
-/**
- * 부모를 가득 채우는 shimmer 오버레이.
- * 같은 hue의 알파 그라데이션(투명 → 하이라이트 → 투명)을 대각선으로 흘려보내
- * 아래 콘텐츠가 실제로 비쳐 보인다.
- */
+/** 같은 hue 의 알파 그라데이션을 대각선으로 흘려보내 아래 콘텐츠가 비쳐 보이게 한다. */
 function SkiaShimmer({ color, opacity = 0.6, duration = 1100 }: SkiaShimmerProps) {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const progress = useSharedValue(0);
 
-  // 밴드 폭·이동 거리는 실제 측정된 크기 기준 (기존 구현의 DEVICE_WIDTH 하드코딩 제거)
   const bandWidth = size.width * 0.65;
   const startOffset = bandWidth + size.height;
   const travel = size.width + bandWidth * 2 + size.height;
@@ -55,10 +49,10 @@ function SkiaShimmer({ color, opacity = 0.6, duration = 1100 }: SkiaShimmerProps
     const rgb = toRgbHex(color);
     const peak = clamp01(opacity);
     if (!rgb) {
-      // hex가 아니면 알파 조절이 불가하므로 색상 그대로 중앙에 사용
+      // hex 가 아니면 알파 조절이 안 되므로 색상 그대로 쓴다
       return { colors: ["transparent", color, "transparent"], positions: [0, 0.5, 1] };
     }
-    // 같은 hue로만 알파를 올렸다 내리는 종 모양 프로파일 → 경계선 없는 부드러운 광택
+    // 종 모양 알파 프로파일 → 경계선 없는 광택
     return {
       colors: [
         withAlpha(rgb, 0),
@@ -102,8 +96,7 @@ function SkiaShimmer({ color, opacity = 0.6, duration = 1100 }: SkiaShimmerProps
     setSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }));
   };
 
-  // 웹 미지원: CanvasKit 미로딩 환경에서 Skia Canvas가 크래시하므로 shimmer만 생략한다.
-  // (rules-of-hooks 준수를 위해 분기는 모든 hook 호출 이후에 둔다)
+  // CanvasKit 미로딩 환경에서 Skia Canvas 가 크래시한다. 분기는 rules-of-hooks 때문에 모든 hook 뒤에 둔다.
   if (IS_WEB) return null;
 
   return (

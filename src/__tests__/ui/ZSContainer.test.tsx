@@ -17,7 +17,7 @@ jest.mock('../../context/ThemeContext', () => {
 jest.mock('../../model/useKeyboard', () => ({
   __esModule: true,
   default: jest.fn(({ handleKeyboardShow, handleKeyboardHide }) => {
-    // 테스트에서 키보드 이벤트를 트리거할 수 있도록 함수를 저장
+    // 테스트에서 키보드 이벤트를 트리거하려 함수를 저장한다
     if (typeof jest !== 'undefined') {
       (jest as any).__keyboardShow = handleKeyboardShow;
       (jest as any).__keyboardHide = handleKeyboardHide;
@@ -198,7 +198,6 @@ describe('ZSContainer', () => {
       </ZSContainer>
     );
 
-    // ref가 전달되었는지 확인
     expect(ref).toBeTruthy();
   });
 

@@ -41,7 +41,7 @@ jest.mock('../../model/useFoldingState', () => ({
 // 닫힘 오프셋 = 시트높이 + bottomSpace(marginBottom 10 + inset 0) + slack 100
 const closeOffsetFor = (sheetHeight: number) => sheetHeight + 10 + 100;
 
-// translateY 닫힘 호출만 골라낸다 (backdrop 0/1, scale, keyboard 호출과 구분).
+// translateY 닫힘 호출만 골라낸다 (backdrop·scale·keyboard 와 구분)
 const closeCallsOf = (spy: jest.SpyInstance) =>
   spy.mock.calls.filter(([target]) => typeof target === 'number' && target > 100);
 
@@ -117,7 +117,6 @@ describe('BottomSheetOverlay', () => {
       );
     });
 
-    // 닫힘 애니메이션이 도는 동안에는 아직 마운트되어 있다.
     expect(getByText('content')).toBeTruthy();
 
     expect(closeCallsOf(withTimingSpy)).toHaveLength(1);
@@ -132,7 +131,7 @@ describe('BottomSheetOverlay', () => {
 
     expect(closeCallsOf(withTimingSpy)).toHaveLength(1);
 
-    // 닫힘 timing 완료 콜백이 실행되면 언마운트된다 (setTimeout 지연이 아니라 애니메이션 완료 기준).
+    // setTimeout 지연이 아니라 애니메이션 완료 기준으로 언마운트된다
     act(() => {
       jest.advanceTimersByTime(250);
     });
@@ -199,7 +198,7 @@ describe('BottomSheetOverlay', () => {
       listeners.keyboardWillShow({ endCoordinates: { height: 300 } });
     });
 
-    // keyboardOffset 목표값 -300 (insets 0), duration 250 — translateY 닫힘 timing과 무관.
+    // keyboardOffset 목표값 -300(insets 0), duration 250 — translateY 닫힘과 무관
     const keyboardCall = withTimingSpy.mock.calls.find(([target]) => target === -300);
     expect(keyboardCall).toBeDefined();
     expect(keyboardCall![1]).toEqual(expect.objectContaining({ duration: 250 }));
@@ -224,7 +223,6 @@ describe('BottomSheetOverlay', () => {
     });
     expect(translateY.value).toBe(0);
 
-    // 아래 방향 드래그는 그대로 따라간다.
     act(() => {
       config.onPanResponderMove({} as any, { dy: 40 } as any);
     });
@@ -263,7 +261,6 @@ describe('BottomSheetOverlay', () => {
     act(() => {
       config.onPanResponderGrant({} as any, {} as any);
     });
-    // grant 시 scale 0.99 timing이 없어야 한다.
     expect(withTimingSpy.mock.calls.find(([target]) => target === 0.99)).toBeUndefined();
 
     act(() => {

@@ -84,7 +84,7 @@ export function OverlayProvider({
     setSecondaryButtonTextStyle(secondaryButtonTextStyle);
   }, []);
 
-  // onClose는 어떤 경로(버튼·배경·드래그·백버튼)로 닫히든 한 번만 발화하도록 ref로 보관한다.
+  // 어떤 경로로 닫히든 onClose 가 1회만 발화하도록 ref 로 보관한다
   const bottomSheetCloseRef = useRef<(() => void) | undefined>(undefined);
 
   const showBottomSheet = useCallback(({
@@ -109,7 +109,6 @@ export function OverlayProvider({
     onClose?.();
   }, []);
 
-  // 컨텍스트로 내려주는 setter — 닫힘은 전부 dismissBottomSheet를 타서 onClose가 1회 발화된다.
   const setBottomSheetVisibleGuarded = useCallback((visible: boolean) => {
     if (visible) {
       setBottomSheetVisible(true);
@@ -193,8 +192,7 @@ export function OverlayProvider({
     };
   }, [dismissBottomSheet]);
 
-  // 뒤로가기는 각 오버레이 컴포넌트가 BackHandlerContext에 우선순위로 등록한다
-  // (LOADER 30 > OVERLAY 20 > SHEET 10) — back 한 번에 최상위 오버레이 하나만 닫힌다.
+  // 각 오버레이가 BackHandlerContext 에 우선순위로 등록해 back 한 번에 하나만 닫힌다
 
   const overlayContextValue = useMemo(() => ({
     hideOverlay,

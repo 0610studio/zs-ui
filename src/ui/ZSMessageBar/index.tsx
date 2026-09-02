@@ -9,7 +9,7 @@ import { SvgProhibition } from "../../assets/SvgProhibition";
 import { SvgCheckCircle } from "../../assets/SvgCheckCircle";
 import { SvgInfoCircle } from "../../assets/SvgInfoCircle";
 import { SvgX } from "../../assets/SvgX";
-import type { IntentOptions, TypoColorOptions, TypoSubStyle } from "../../theme/types";
+import type { IntentOptions, Theme, TypoColorOptions, TypoSubStyle } from "../../theme/types";
 import { SOLID_TEXT_COLOR } from "../../theme/intentColors";
 import { DISABLED_OPACITY, DURATION, RADIUS } from "../../theme/tokens";
 
@@ -17,11 +17,7 @@ const CLOSE_HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
 const ACTION_HIT_SLOP = { top: 8, bottom: 8, left: 4, right: 8 };
 const PRESSED_OPACITY = 0.55;
 
-/**
- * 밝은 배경(pastel · 라이트모드 stroke) 위에서 본문 대비 4.5:1 이상을 확보하는 잉크 색.
- * 칩·버튼이 쓰는 PASTEL/STROKE_TEXT_COLOR 는 짧은 라벨 기준이라 여기서는 쓰지 않는다.
- * (warning.60 은 warning.10 배경에서 1.62:1 로, 본문에 쓰면 읽히지 않는다)
- */
+/** 밝은 배경에서 본문 대비 4.5:1 을 확보하는 잉크. 칩·버튼의 PASTEL/STROKE_TEXT_COLOR 는 짧은 라벨 기준이라 여기선 못 쓴다. */
 const INK_ON_LIGHT: Record<IntentOptions, TypoColorOptions> = {
   primary: 'primary.90',
   danger: 'danger.80',
@@ -41,7 +37,15 @@ const INK_ON_DARK: Record<IntentOptions, TypoColorOptions> = {
   grey: 'grey.70',
 };
 
-/** intent 별 기본 상태 아이콘 — icon prop 으로 덮어쓰거나 null 로 숨길 수 있다 */
+/**
+ * intent 스케일은 다크에서도 라이트와 같아 pastel 배경이 늘 밝다 — 그래서 잉크도 늘 어둡게 둔다.
+ * 배경이 실제로 뒤집히는 grey intent 만 'base' 를 그대로 쓴다.
+ */
+function resolvePastelInk(mode: Theme['mode'], intent: IntentOptions): TypoColorOptions {
+  if (intent === 'grey' || mode === 'light') return 'base';
+  return 'grey.10';
+}
+
 const DEFAULT_ICONS: Record<IntentOptions, React.ComponentType<{ size?: number; color?: string }>> = {
   primary: SvgInfoCircle,
   information: SvgInfoCircle,
@@ -51,35 +55,29 @@ const DEFAULT_ICONS: Record<IntentOptions, React.ComponentType<{ size?: number; 
   danger: SvgProhibition,
 };
 
-// typo 크기(subStyle)별 상태 아이콘 · 닫기 아이콘 크기
 const ICON_SIZE: Record<TypoSubStyle, number> = { '1': 24, '2': 22, '3': 20, '4': 19, '5': 17, '6': 16 };
 const CLOSE_ICON_SIZE: Record<TypoSubStyle, number> = { '1': 15, '2': 14, '3': 13, '4': 13, '5': 12, '6': 11 };
 
 export type ZSMessageBarVariant = 'pastel' | 'solid' | 'stroke';
 
 export interface ZSMessageBarProps extends ViewProps {
-  /** 본문 메시지 */
   message: string;
-  /** 메시지 위에 굵게 표시되는 제목 (선택) */
   title?: string;
   intent?: IntentOptions;
   /** 배경 스타일 (기본: pastel) */
   variant?: ZSMessageBarVariant;
-  /** 커스텀 아이콘 노드. null 이면 아이콘을 숨긴다 (미지정 시 intent 기본 아이콘) */
+  /** null 이면 숨김. 미지정 시 intent 기본 아이콘 */
   icon?: React.ReactNode | null;
-  /** 본문 아래 텍스트 버튼 라벨 */
   actionLabel?: string;
   onAction?: () => void;
-  /** true면 우측 상단 닫기(X) 버튼 표시 */
   showClose?: boolean;
-  /** 닫기 버튼 탭 시 호출 */
   onClose?: () => void;
-  /** 표시 여부를 외부에서 제어할 때 사용 (미지정 시 닫기 버튼으로 내부 제어) */
+  /** 미지정 시 닫기 버튼으로 내부 제어 */
   visible?: boolean;
   textSize?: TypoSubStyle;
-  /** false면 콘텐츠 폭에 맞춰 줄어든다 (기본: true — 부모 폭을 꽉 채움) */
+  /** false면 콘텐츠 폭으로 hug (기본: true) */
   fullWidth?: boolean;
-  /** false면 등장·퇴장 페이드를 끈다 (기본: true) */
+  /** false면 페이드를 끈다 (기본: true) */
   animated?: boolean;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -107,23 +105,33 @@ function ZSMessageBar({
   const [internalVisible, setInternalVisible] = useState(true);
   const isVisible = visible ?? internalVisible;
 
-  // 제어 모드로 다시 열렸을 때 내부 상태가 닫힘으로 남아있지 않도록 동기화
   useEffect(() => {
     if (visible) setInternalVisible(true);
   }, [visible]);
 
-  const colors: { background: string; border: string; text: TypoColorOptions } = variant === 'solid'
-    ? { background: palette[intent][50], border: palette[intent][50], text: SOLID_TEXT_COLOR[intent] }
-    // 칩보다 면적이 넓어 테두리를 한 단계 낮춰야 배경과 함께 시끄러워지지 않는다
+  // 본문이 중립 잉크여도 아이콘은 intent 색을 유지해 성공·경고·오류를 구분시킨다
+  const colors: { background: string; border: string; text: TypoColorOptions; icon: TypoColorOptions } = variant === 'solid'
+    ? {
+      background: palette[intent][50],
+      border: palette[intent][50],
+      text: SOLID_TEXT_COLOR[intent],
+      icon: SOLID_TEXT_COLOR[intent],
+    }
     : variant === 'pastel'
-      ? { background: palette[intent][10], border: palette[intent][20], text: INK_ON_LIGHT[intent] }
+      ? {
+        background: palette[intent][5],
+        border: palette[intent][20],
+        text: resolvePastelInk(palette.mode, intent),
+        icon: INK_ON_LIGHT[intent],
+      }
       : {
         background: palette.background.base,
         border: palette[intent][30],
         text: palette.mode === 'dark' ? INK_ON_DARK[intent] : INK_ON_LIGHT[intent],
+        icon: palette.mode === 'dark' ? INK_ON_DARK[intent] : INK_ON_LIGHT[intent],
       };
 
-  const inkColor = resolveTextColor(palette, colors.text) ?? palette[intent][60];
+  const iconColor = resolveTextColor(palette, colors.icon) ?? palette[intent][60];
 
   const handleClose = () => {
     if (disabled) return;
@@ -140,14 +148,14 @@ function ZSMessageBar({
 
   const DefaultIcon = DEFAULT_ICONS[intent];
   const iconNode = icon === undefined
-    ? <DefaultIcon size={ICON_SIZE[textSize]} color={inkColor} />
+    ? <DefaultIcon size={ICON_SIZE[textSize]} color={iconColor} />
     : icon;
 
-  // 제목이 있으면 여러 줄이 되므로 아이콘·닫기를 첫 줄에 맞추고, 한 줄이면 수직 중앙에 둔다
+  // 여러 줄이면 아이콘·닫기를 첫 줄에 맞춘다
   const crossAlign = title ? 'flex-start' : 'center';
 
   return (
-    // layout 애니메이션과 opacity 를 같은 노드에 두면 Reanimated 가 덮어쓰기 경고를 낸다
+    // layout 과 opacity 를 같은 노드에 두면 Reanimated 가 덮어쓰기 경고를 낸다
     <Animated.View
       entering={animated ? FadeIn.duration(DURATION.base) : undefined}
       exiting={animated ? FadeOut.duration(DURATION.press) : undefined}
@@ -158,6 +166,7 @@ function ZSMessageBar({
       <View
         accessibilityRole='alert'
         accessibilityLiveRegion='polite'
+        testID='zs-message-bar-container'
         style={[
           styles.container,
           {
@@ -214,7 +223,7 @@ function ZSMessageBar({
               pressed && { opacity: PRESSED_OPACITY },
             ]}
           >
-            <SvgX size={CLOSE_ICON_SIZE[textSize]} color={inkColor} />
+            <SvgX size={CLOSE_ICON_SIZE[textSize]} color={iconColor} />
           </Pressable>
         )}
       </View>
@@ -236,11 +245,10 @@ const styles = StyleSheet.create({
   fullWidth: {
     width: '100%',
   },
-  // opacity 는 layout 애니메이션이 걸린 래퍼가 아니라 안쪽 View 에만 준다
+  // opacity 는 layout 이 걸린 래퍼가 아니라 안쪽 View 에만 준다
   disabled: {
     opacity: DISABLED_OPACITY,
   },
-  // 부모가 flexWrap 이거나 stretch 일 때도 콘텐츠 폭으로 hug 되도록
   hug: {
     alignSelf: 'flex-start',
   },
@@ -252,7 +260,6 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     gap: 3,
   },
-  // 폭을 채울 때만 남은 공간을 차지해 닫기 버튼을 오른쪽 끝으로 밀어낸다
   contentFill: {
     flex: 1,
   },

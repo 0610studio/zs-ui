@@ -1,22 +1,24 @@
 import React, { createContext, useContext, useMemo, useReducer, useEffect, useCallback, useRef } from 'react';
 import { Platform, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as NavigationBar from 'expo-navigation-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import palette from '../theme/palette';
-import { Theme, ThemeFonts, TypographyVariantsProps } from '../theme/types';
+import { Theme, ThemeFontAssets, ThemeFonts, TypographyVariantsProps } from '../theme/types';
 import typography from '../theme/typography';
 import elevation, { ElevationStyles } from '../theme/elevation';
 
 export interface FoldableConfig {
-  /**
-   * 언폴딩 상태에서 rightComponent가 없을 때(단일 화면) 콘텐츠 최대 가로 길이(px).
-   * 미주입(undefined) 또는 false면 전폭으로 늘린다. 폭을 제한하려면 반드시 값을 주입해야 한다.
-   */
+  /** 단일 화면 콘텐츠 최대 가로 길이(px). 미주입·false 면 전폭으로 늘린다. */
   unfoldedSinglePaneMaxWidth?: number | false;
 }
 
 export interface ThemeProviderProps {
   themeFonts?: ThemeFonts;
+  /**
+   * `themeFonts` 와 같은 굵기 키로 폰트 파일(`require(...)`)을 넘긴다.
+   * Skia 캔버스는 fontFamily 이름만으로 커스텀 폰트를 찾지 못하므로(특히 Android) 파일이 필요한 컴포넌트가 여기서 읽는다.
+   */
+  themeFontAssets?: ThemeFontAssets;
   children: React.ReactNode;
   isDarkModeEnabled?: boolean;
   customPalette?: (config: { mode?: 'light' | 'dark'; themeColors?: { light?: Theme; dark?: Theme } }) => Theme;
@@ -28,6 +30,8 @@ export interface ThemeProps {
   typography: TypographyVariantsProps;
   elevation: ElevationStyles;
   foldable: FoldableConfig;
+  /** ThemeProvider 에 넘긴 굵기별 폰트 파일. 없으면 undefined */
+  fontAssets?: ThemeFontAssets;
 }
 
 export interface Palette extends Theme {
@@ -86,7 +90,7 @@ export const useTheme = () => {
   return context;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, children, isDarkModeEnabled = true, customPalette, foldable }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, themeFontAssets, children, isDarkModeEnabled = true, customPalette, foldable }) => {
   const systemColorScheme = useColorScheme();
   const systemMode = getSystemMode(systemColorScheme);
   const [themeState, dispatchTheme] = useReducer(
@@ -98,9 +102,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
   );
   const { isUsingSystemColorScheme, mode } = themeState;
 
-  // hydrate 는 마운트(또는 isDarkModeEnabled 변경) 시 1회만 수행한다.
-  // 이후 시스템 모드 동기화는 아래 SYNC_SYSTEM_MODE effect 가 담당하므로,
-  // systemMode 변경마다 AsyncStorage 를 다시 읽지 않도록 ref 로 최신 값만 참조한다.
+  // hydrate 는 1회만 — systemMode 변경마다 AsyncStorage 를 다시 읽지 않도록 ref 로 참조한다.
+  // 이후 시스템 모드 동기화는 아래 SYNC_SYSTEM_MODE effect 가 담당한다.
   const systemModeRef = useRef(systemMode);
   systemModeRef.current = systemMode;
 
@@ -177,9 +180,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
 
   const unfoldedSinglePaneMaxWidth = foldable?.unfoldedSinglePaneMaxWidth;
 
-  // customPalette 를 인라인 함수로 넘겨도 컨텍스트 값이 매 렌더 재생성되어
-  // useTheme 구독 컴포넌트 전체가 리렌더되지 않도록, 함수 identity 대신 ref 로 최신 함수를 참조한다.
-  // (함수 identity 변경만으로는 재계산되지 않고, mode 등 다른 의존성 변경 시 최신 함수가 반영된다)
+  // 인라인 customPalette 가 매 렌더 컨텍스트를 재생성해 useTheme 구독자 전체를 리렌더시키지
+  // 않도록, 함수 identity 대신 ref 로 최신 함수를 참조한다.
   const customPaletteRef = useRef(customPalette);
   customPaletteRef.current = customPalette;
   const hasCustomPalette = Boolean(customPalette);
@@ -197,8 +199,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, childr
       typography: typography({ themeFonts }),
       elevation: elevation(currentPalette),
       foldable: { unfoldedSinglePaneMaxWidth },
+      fontAssets: themeFontAssets,
     };
-  }, [mode, isUsingSystemColorScheme, themeFonts, hasCustomPalette, handleSetUseSystemColorScheme, toggleTheme, unfoldedSinglePaneMaxWidth]);
+  }, [mode, isUsingSystemColorScheme, themeFonts, themeFontAssets, hasCustomPalette, handleSetUseSystemColorScheme, toggleTheme, unfoldedSinglePaneMaxWidth]);
 
   return (
     <ThemeContext.Provider value={themeValue}>

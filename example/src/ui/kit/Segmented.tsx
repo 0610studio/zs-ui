@@ -7,7 +7,6 @@ type Props<T extends string> = {
   onChange: (value: T) => void;
 };
 
-/** layer2 트랙 위에 선택 항목이 흰 알약으로 떠 있는 세그먼트 컨트롤 */
 export default function Segmented<T extends string>({ options, value, onChange }: Props<T>) {
   const { palette } = useTheme();
 

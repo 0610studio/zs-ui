@@ -46,7 +46,6 @@ describe('ZSChip', () => {
 
     fireEvent.press(getByTestId('chip'));
     expect(onChange).toHaveBeenCalledWith(true);
-    // 외부 상태가 바뀌지 않았으므로 선택 상태 유지
     expect(getByTestId('chip').props.accessibilityState.selected).toBe(false);
   });
 

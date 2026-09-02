@@ -13,7 +13,7 @@ function MyBottomSheet({ onConfirm }: MyBottomSheetProps) {
 
   const handleConfirmPress = useCallback(() => {
     onConfirm?.();
-    // 시트 위 Alert 스택 데모 — back 우선순위(Alert 먼저 닫힘) 검증용
+    // back 우선순위(Alert 먼저 닫힘) 검증용
     showAlert({
       title: '시트 위 알럿',
       informative: 'back 키는 이 알럿만 닫아야 합니다.',
@@ -81,5 +81,4 @@ const createStyles = ({
     },
   });
 
-// 컴포넌트 export, 이름을 명확하게 수정
 export default MyBottomSheet;

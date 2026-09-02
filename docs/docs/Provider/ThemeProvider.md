@@ -15,6 +15,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `themeFonts` | `ThemeFonts` | `undefined` | 폰트 굵기별로 사용할 폰트 이름을 정의 |
+| `themeFontAssets` | `ThemeFontAssets` | `undefined` | 굵기별 폰트 **파일**(`require(...)`). Skia 캔버스로 글자를 그리는 컴포넌트(`ZSCalendar` 날짜 숫자)가 이름 대신 이 파일을 쓴다 |
 | `isDarkModeEnabled` | `boolean` | `true` | 다크 모드 활성화 여부 |
 | `customPalette` | `function` | `undefined` | 커스텀 색상 팔레트 팩토리 함수 |
 | `foldable` | `FoldableConfig` | `undefined` | 폴더블 펼침 상태에서 단일 화면의 콘텐츠 최대 폭 설정. `{ unfoldedSinglePaneMaxWidth: number \| false }` |
@@ -73,6 +74,21 @@ export default function App() {
     </ThemeProvider>
   );
 }
+```
+
+### 캔버스 텍스트까지 같은 글꼴로
+
+`themeFonts` 는 React Native 텍스트가 쓰는 이름입니다. Skia 캔버스는 이름만으로 커스텀 폰트를 찾지 못하므로(특히 Android), 같은 파일을 굵기 키로 한 번 더 넘기면 `ZSCalendar` 의 날짜 숫자도 앱 글꼴을 따릅니다. 400 과 700 만 있어도 충분합니다.
+
+```tsx
+const themeFontAssets = {
+  400: require('../assets/fonts/Pretendard-Regular.otf'),
+  700: require('../assets/fonts/Pretendard-Bold.otf'),
+};
+
+<ThemeProvider themeFonts={themeFonts} themeFontAssets={themeFontAssets}>
+  {/* 앱 내용 */}
+</ThemeProvider>
 ```
 
 ## 커스텀 팔레트 사용

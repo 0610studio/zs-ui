@@ -10,7 +10,6 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-/** 섹션 라벨 + 흰 카드로 구성된 예제 공용 섹션 래퍼 */
 export default function Section({ label, children, gap = 14, direction = 'column', style }: Props) {
   return (
     <View style={styles.wrapper}>
@@ -24,7 +23,7 @@ export default function Section({ label, children, gap = 14, direction = 'column
         elevationLevel={1}
         style={[
           styles.card,
-          // column + wrap 은 높이 제약 시 자식이 오른쪽 새 열로 넘어가므로 row 일 때만 wrap
+          // column + wrap 은 높이 제약 시 자식이 새 열로 넘어가므로 row 일 때만 wrap
           { gap, flexDirection: direction, flexWrap: direction === 'row' ? 'wrap' : 'nowrap' },
           style,
         ]}

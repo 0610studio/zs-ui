@@ -56,15 +56,12 @@ jest.mock('react-native-reanimated', () => {
   };
   const withTiming = (v: any) => v;
   const interpolate = (value: any, inputRange: any, outputRange: any, _extrapolate?: any) => {
-    // useSharedValue로 생성된 값인 경우 value 속성 사용
     const numValue = typeof value === 'object' && value?.value !== undefined ? value.value : value;
     
-    // inputRange와 outputRange를 기반으로 보간값 계산
     if (Array.isArray(inputRange) && Array.isArray(outputRange)) {
       if (numValue <= inputRange[0]) return outputRange[0];
       if (numValue >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
       
-      // 간단한 선형 보간
       for (let i = 0; i < inputRange.length - 1; i++) {
         if (numValue >= inputRange[i] && numValue <= inputRange[i + 1]) {
           const t = (numValue - inputRange[i]) / (inputRange[i + 1] - inputRange[i]);
@@ -154,7 +151,6 @@ describe('ZSTextField', () => {
     fireEvent(input, 'focus');
     fireEvent(input, 'blur');
     
-    // blur 후 value가 없으면 버튼이 숨겨져야 함
     expect(queryByTestId('button-close')).toBeFalsy();
   });
 
@@ -185,7 +181,6 @@ describe('ZSTextField', () => {
       return StyleSheet.flatten(box?.props.style)?.backgroundColor;
     };
 
-    // 값이 비었을 때 두 boxStyle 이 시각적으로 구분되어야 한다
     expect(readBoxBackground('inbox')).toBe(palette.background.layer1);
     expect(readBoxBackground('outline')).toBe(palette.background.base);
     expect(readBoxBackground('inbox')).not.toBe(readBoxBackground('outline'));
@@ -246,8 +241,7 @@ describe('ZSTextField', () => {
       <ZSTextField ref={ref} value="" onChangeText={() => {}} label="Label" />
     );
 
-    // ref는 forwardRef를 통해 전달되므로 실제 TextInput에 연결됨
-    // 테스트 환경에서는 mock이므로 ref가 제대로 연결되지 않을 수 있음
+    // 테스트 환경은 mock 이라 ref 가 연결되지 않을 수 있다
     expect(ref).toBeTruthy();
   });
 

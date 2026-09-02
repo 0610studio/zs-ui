@@ -1,41 +1,45 @@
-# Website
+# ZS-ui 문서 사이트
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+[Docusaurus](https://docusaurus.io/)로 만든 ZS-ui 문서 사이트입니다. 저장소 루트의 pnpm 워크스페이스에 속해 있습니다.
 
-### Installation
+문서 작성 기준은 [DOCS_GUIDE.md](./DOCS_GUIDE.md)를 참고하세요.
 
-```
-$ yarn
-```
+## 설치
 
-### Local Development
+이 저장소는 **pnpm만 사용합니다.** 저장소 루트에서 한 번만 설치하면 됩니다.
 
-```
-$ yarn start
+```bash
+pnpm install
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## 로컬 실행
 
-### Build
-
-```
-$ yarn build
+```bash
+pnpm --filter docs run start
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+로컬 개발 서버를 띄우고 브라우저를 엽니다. 대부분의 변경은 서버를 다시 시작하지 않아도 반영됩니다. 실행 전에 저장소 소스로 문서용 예제(`playground:build`)를 먼저 생성합니다.
 
-### Deployment
+## 빌드
 
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
+```bash
+pnpm --filter docs run build
 ```
 
-Not using SSH:
+`build` 디렉터리에 정적 파일을 생성합니다.
 
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
+## 검사
+
+```bash
+pnpm --filter docs run check
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+타입 검사, 문서 커버리지 검증(`validate:coverage`), 빌드를 차례로 실행합니다. 공개 runtime export가 문서에 노출되지 않으면 커버리지 검증이 실패합니다.
+
+## 배포
+
+`main` 브랜치에 push하면 [deploy-docs.yml](../.github/workflows/deploy-docs.yml) 워크플로가 GitHub Pages로 자동 배포합니다. 수동 배포가 필요한 경우에만 아래를 사용합니다.
+
+```bash
+GIT_USER=<GitHub 사용자명> pnpm --filter docs run deploy
+```
