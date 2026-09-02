@@ -8,13 +8,12 @@ import SkiaShimmer from "../ZSSkeleton/SkiaShimmer";
 export interface ZSSkeletonBoxProps extends ViewProps {
   height: number;
   style?: StyleProp<ViewStyle>;
-  /** shimmer 하이라이트 색상 (기본: palette.background.layer1) */
+  /** 기본: palette.background.layer1 */
   overlayColor?: string;
-  /** shimmer 밴드 중심의 최대 불투명도 0~1 (기본 0.7) */
+  /** 밴드 중심 최대 불투명도 0~1 (기본 0.7) */
   overlayOpacity?: number;
-  /** shimmer 한 사이클(ms) */
+  /** 한 사이클(ms) */
   duration?: number;
-  /** 박스 배경 색상 토큰 */
   color?: ViewColorOptions;
 }
 

@@ -124,5 +124,4 @@ const createStyles = ({
     }
   });
 
-// 컴포넌트 export, 이름을 명확하게 수정
 export default MyModal;

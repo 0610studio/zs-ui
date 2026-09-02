@@ -39,7 +39,7 @@ export const BackHandler = {
       },
     };
   },
-  // 테스트 헬퍼: 실제 안드로이드처럼 최신 등록(LIFO)부터 호출하고 true면 소비.
+  // 실제 안드로이드처럼 최신 등록(LIFO)부터 호출하고 true 면 소비한다
   mockPressBack: () => {
     for (let i = backSubscriptions.length - 1; i >= 0; i--) {
       if (backSubscriptions[i]()) return true;

@@ -7,11 +7,11 @@ export interface ZSSkeletonProps extends ViewProps {
   isFetching?: boolean;
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
-  /** shimmer 하이라이트 색상 (기본: palette.background.base) */
+  /** 기본: palette.background.base */
   overlayColor?: string;
-  /** shimmer 밴드 중심의 최대 불투명도 0~1 (기본 0.6) */
+  /** 밴드 중심 최대 불투명도 0~1 (기본 0.6) */
   overlayOpacity?: number;
-  /** shimmer 한 사이클(ms) */
+  /** 한 사이클(ms) */
   duration?: number;
 }
 

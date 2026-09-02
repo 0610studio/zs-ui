@@ -57,12 +57,6 @@ function MyComponent() {
 
 ## 예제
 
-- **자동 위치 조정**: 화면 경계를 벗어나지 않도록 자동으로 위치가 조정됩니다
-- **애니메이션**: `FadeInUp`과 `FadeOutUp` 애니메이션이 적용됩니다
-- **배경 터치로 닫기**: 배경을 터치하면 자동으로 닫힙니다
-
-## 예제
-
 ### 기본 사용
 
 ```tsx
@@ -144,3 +138,44 @@ const { hideOverlay } = useOverlay();
 
 hideOverlay('popOver');
 ```
+
+## showPopOverMenu
+
+`PopOverButton` 없이 임의의 좌표에서 직접 메뉴를 띄우려면 `useOverlay`의 `showPopOverMenu`를 사용합니다. `PopOverButton`도 내부적으로 이 함수를 호출합니다.
+
+| 인자 | Type | Description |
+|------|------|-------------|
+| `px` | `number` | 메뉴를 띄울 기준 x 좌표 (화면 절대 좌표) |
+| `py` | `number` | 메뉴를 띄울 기준 y 좌표 (화면 절대 좌표) |
+| `component` | `React.ReactNode` | 표시할 메뉴 컴포넌트 |
+
+```tsx
+import { useOverlay } from '@0610studio/zs-ui';
+
+function MyComponent() {
+  const { showPopOverMenu } = useOverlay();
+
+  const openMenu = (event) => {
+    const { pageX, pageY } = event.nativeEvent;
+    showPopOverMenu({
+      px: pageX,
+      py: pageY,
+      component: <MenuContent />,
+    });
+  };
+
+  return (
+    <ZSPressable onPress={openMenu}>
+      <ZSText typo="body.2">메뉴 열기</ZSText>
+    </ZSPressable>
+  );
+}
+```
+
+호출 시 키보드는 자동으로 닫히고, 화면 경계를 벗어나지 않도록 위치가 조정됩니다.
+
+## 관련 문서
+
+- [Overlay 시작하기](./start)
+- [Modality](./Modality)
+- [ZSPressable](../UiComponent/ZSPressable)

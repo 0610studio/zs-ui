@@ -35,10 +35,7 @@ export interface ColorChannels {
 
 const OPAQUE_BLACK: ColorChannels = { r: 0, g: 0, b: 0, a: 1 };
 
-/**
- * `#RGB`/`#RGBA`/`#RRGGBB`/`#RRGGBBAA` hex 문자열에서 채널을 추출한다.
- * palette 의 semantic 색상(grey[100] 등)은 hex 로 정의돼 있어, 그 값을 그대로 그림자색으로 쓰려면 필요하다.
- */
+/** hex 문자열에서 채널 추출. palette semantic 색상이 hex 라 그대로 그림자색으로 쓰려면 필요하다. */
 function parseHexChannels(hex: string): ColorChannels | undefined {
   const body = hex.slice(1);
   const isShort = body.length === 3 || body.length === 4;
@@ -62,9 +59,7 @@ function parseHexChannels(hex: string): ColorChannels | undefined {
   };
 }
 
-/**
- * `rgb()`/`rgba()`/hex 색상 문자열에서 r·g·b·a 채널을 추출한다. 파싱 실패 시 불투명 검정으로 폴백.
- */
+/** rgb()/rgba()/hex 에서 채널 추출. 실패 시 불투명 검정으로 폴백. */
 export function parseColorChannels(color: string): ColorChannels {
   if (color.startsWith('#')) {
     return parseHexChannels(color) ?? OPAQUE_BLACK;
@@ -84,19 +79,8 @@ export function parseColorChannels(color: string): ColorChannels {
 }
 
 /**
- * iOS 그림자 표기(offset·opacity·radius)와 색상을 합쳐 cross-platform boxShadow 를 만든다.
- * 최종 불투명도는 색상 alpha × shadowOpacity 로 계산한다.
- *
- * boxShadow 한 표기로 iOS·Android 가 동일하게 렌더되므로, Android 에서 색상이 무시되는
- * `elevation` 이나 플랫폼별로 어긋나는 `shadow*` 조합 대신 이 헬퍼를 사용한다.
- *
- * @example
- * ```ts
- * const shadow = createShadow(
- *   { shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
- *   palette.grey[100],
- * );
- * ```
+ * iOS 그림자 표기 + 색상 → cross-platform boxShadow (불투명도는 색상 alpha × shadowOpacity).
+ * Android 에서 색이 무시되는 `elevation` 이나 플랫폼별로 어긋나는 `shadow*` 대신 이걸 쓴다.
  */
 export function createShadow(shadow: ShadowStyle, shadowColor: string): BoxShadowValue[] {
   const { r, g, b, a } = parseColorChannels(shadowColor);
@@ -117,9 +101,7 @@ export function createShadow(shadow: ShadowStyle, shadowColor: string): BoxShado
   ];
 }
 
-/**
- * IOS_SHADOW 의 레벨별 오프셋·블러와 elevationShadow 색상을 합쳐 cross-platform boxShadow 를 만든다.
- */
+/** IOS_SHADOW 레벨별 오프셋·블러 + elevationShadow 색상 → boxShadow */
 export function createBoxShadow(level: ShadowLevel, shadowColor: string): BoxShadowValue[] {
   return createShadow(IOS_SHADOW[level], shadowColor);
 }

@@ -1,0 +1,15 @@
+# 루트(라이브러리)와 example, docs를 하나의 pnpm 워크스페이스로 묶는다.
+# 루트를 '.'로 포함해야 example이 workspace:* 로 zs-ui를 참조할 수 있다.
+packages:
+  - '.'
+  - 'example'
+  - 'docs'
+
+# pnpm 10은 의존성의 설치 스크립트를 기본 차단한다. 실제로 필요한 것만 허용한다.
+onlyBuiltDependencies:
+  - agent-browser
+
+# core-js 계열의 postinstall은 후원 안내 배너라 실행할 필요가 없다.
+ignoredBuiltDependencies:
+  - core-js
+  - core-js-pure

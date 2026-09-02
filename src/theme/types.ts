@@ -95,6 +95,12 @@ export interface ThemeFonts {
   900?: string;
 };
 
+/** `require('./font.otf')` 결과 또는 `{ uri }` — Skia 처럼 폰트 파일 자체가 필요한 곳에 쓴다 */
+export type FontAsset = number | { uri: string };
+
+/** 굵기별 폰트 파일. `themeFonts` 가 이름이라면 이것은 파일이다 — 캔버스 텍스트(ZSCalendar 날짜 숫자)가 쓴다 */
+export type ThemeFontAssets = Partial<Record<keyof ThemeFonts, FontAsset>>;
+
 export interface TypoNumber {
   '1': TextProps['style'];
   '2': TextProps['style'];

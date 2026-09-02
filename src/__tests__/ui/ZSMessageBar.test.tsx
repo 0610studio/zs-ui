@@ -93,16 +93,44 @@ describe('ZSMessageBar', () => {
     expect(hug.alignSelf).toBe('flex-start');
   });
 
-  it('warning pastel 은 본문이 읽히도록 warning.100 잉크를 쓴다', () => {
+  it('pastel 은 배경을 shade 5 로 깔고 본문에 중립 base 잉크를 쓴다', () => {
     const paletteFn = require('../../theme/palette').default;
     const palette = paletteFn({ mode: 'light' });
 
-    const { getByText } = render(<ZSMessageBar intent='warning' message='곧 종료돼요' />);
-    const color = StyleSheet.flatten(getByText('곧 종료돼요').props.style).color;
+    const { getByText, getByTestId } = render(<ZSMessageBar intent='warning' message='곧 종료돼요' />);
 
-    // warning.60 (#E6C200) 은 warning.10 배경에서 1.62:1 로 본문에 못 쓴다
-    expect(color).toBe(palette.warning[100]);
-    expect(color).not.toBe(palette.warning[60]);
+    const container = StyleSheet.flatten(getByTestId('zs-message-bar-container').props.style);
+    expect(container.backgroundColor).toBe(palette.warning[5]);
+    expect(container.borderColor).toBe(palette.warning[20]);
+
+    const color = StyleSheet.flatten(getByText('곧 종료돼요').props.style).color;
+    expect(color).toBe(palette.text.base);
+    expect(color).not.toBe(palette.warning[100]);
+  });
+
+  it('pastel 다크모드는 배경이 그대로 밝으므로 본문 잉크도 어둡게 유지한다', () => {
+    const paletteFn = require('../../theme/palette').default;
+    const dark = paletteFn({ mode: 'dark' });
+
+    mockMode = 'dark';
+    const { getByText, getByTestId } = render(<ZSMessageBar intent='warning' message='곧 종료돼요' />);
+
+    expect(StyleSheet.flatten(getByTestId('zs-message-bar-container').props.style).backgroundColor).toBe(dark.warning[5]);
+    // 배경이 밝으므로 text.base 대신 어두운 grey.10 을 쓴다
+    const color = StyleSheet.flatten(getByText('곧 종료돼요').props.style).color;
+    expect(color).toBe(dark.grey[10]);
+    expect(color).not.toBe(dark.text.base);
+  });
+
+  it('grey pastel 은 배경이 mode 에 따라 뒤집히므로 base 잉크를 그대로 쓴다', () => {
+    const paletteFn = require('../../theme/palette').default;
+    const dark = paletteFn({ mode: 'dark' });
+
+    mockMode = 'dark';
+    const { getByText, getByTestId } = render(<ZSMessageBar intent='grey' message='안내' />);
+
+    expect(StyleSheet.flatten(getByTestId('zs-message-bar-container').props.style).backgroundColor).toBe(dark.grey[5]);
+    expect(StyleSheet.flatten(getByText('안내').props.style).color).toBe(dark.text.base);
   });
 
   it('stroke 는 배경이 뒤집히는 다크모드에서 밝은 잉크로 바뀐다', () => {

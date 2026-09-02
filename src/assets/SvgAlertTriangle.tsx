@@ -2,12 +2,8 @@ import React from 'react';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 /**
- * 라운드 코너 삼각형 안의 느낌표 — 경고 메시지용 상태 아이콘.
- *
- * - 꼭짓점은 strokeLinejoin 이 아니라 경로의 Q 커브로 둥글린다. strokeLinejoin 은 라운드가
- *   stroke 굵기에 비례해버려 size·strokeWidth 를 바꾸면 코너 인상이 달라진다.
- * - 삼각형은 같은 박스에서 원보다 면적이 절반이라 그대로 두면 작아 보인다. 원형 아이콘(r=9)의
- *   지름 18 보다 넓은 21.2 로 잡아야 나란히 놨을 때 같은 크기로 읽힌다 (광학 보정).
+ * 꼭짓점은 Q 커브로 둥글린다 — strokeLinejoin 은 라운드가 stroke 굵기에 비례해 인상이 달라진다.
+ * 폭 21.2 는 원형 아이콘(지름 18)과 나란히 놨을 때 같게 읽히도록 한 광학 보정이다.
  */
 export const SvgAlertTriangle = ({ size = 20, color = '#806E00', strokeWidth = 1.8 }) => {
   return (

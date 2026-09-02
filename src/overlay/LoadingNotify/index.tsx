@@ -14,7 +14,7 @@ function LoadingNotify({
   const { loaderVisible } = useLoader();
   const { palette } = useTheme();
 
-  // 로딩 중에는 back을 소비만 한다 (아무것도 닫지 않고 차단).
+  // 로딩 중에는 아무것도 닫지 않고 back 만 소비한다
   useBackHandler(() => true, { enabled: loaderVisible, priority: BackPriority.LOADER });
 
   const renderLoader = useCallback(() => {

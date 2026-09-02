@@ -1,7 +1,6 @@
 import React from 'react';
 import Svg, { Circle, Path } from 'react-native-svg';
 
-/** 원 안의 i — 안내/중립 메시지용 상태 아이콘 */
 export const SvgInfoCircle = ({ size = 20, color = '#5E696E', strokeWidth = 1.8 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

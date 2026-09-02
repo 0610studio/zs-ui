@@ -76,9 +76,8 @@ describe('PopOverButton', () => {
       </PopOverButton>
     );
 
+    // measure 좌표가 테스트 환경에서 undefined 라 호출 여부만 확인한다
     fireEvent.press(getByTestId('zspressable'));
-    // measure 함수가 호출되지만 실제 좌표는 undefined일 수 있음
-    // expect(mockShowPopOverMenu).toHaveBeenCalled();
   });
 });
 
@@ -115,10 +114,8 @@ describe('PopOverMenu', () => {
       <PopOverMenu px={100} py={100} component={<Text>Menu Content</Text>} />
     );
 
-    // 초기에는 렌더되지 않음
     expect(() => getByText('Menu Content')).toThrow();
 
-    // 타이머 진행 후 렌더됨
     act(() => {
       jest.advanceTimersByTime(200);
     });

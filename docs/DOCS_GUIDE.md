@@ -17,7 +17,7 @@
 - 내부 렌더러는 직접 사용 여부를 명시합니다.
 - 웹 미지원 기능은 플레이그라운드 결과만으로 판단하지 않도록 실제 기기 검증 범위를 적습니다.
 - 예제는 한 번에 하나의 개념을 보여주고 복사 가능한 형태로 유지합니다.
-- 새 runtime export를 추가하면 `npm run validate:coverage`가 통과하도록 관련 문서에 API 이름을 포함합니다.
+- 새 runtime export를 추가하면 `pnpm run validate:coverage`가 통과하도록 관련 문서에 API 이름을 포함합니다.
 
 ## 페이지 골격
 

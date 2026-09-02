@@ -74,6 +74,7 @@ const sidebars: SidebarsConfig = {
             'UiComponent/ZSAboveKeyboard',
             'UiComponent/ZSSkeleton',
             'UiComponent/ZSBorderBeam',
+            'UiComponent/ZSCalendar',
           ],
         },
       ],

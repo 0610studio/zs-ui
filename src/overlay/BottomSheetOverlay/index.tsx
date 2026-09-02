@@ -16,7 +16,6 @@ const IS_IOS = Platform.OS === 'ios';
 const KEYBOARD_SHOW_EVENT = IS_IOS ? 'keyboardWillShow' : 'keyboardDidShow';
 const KEYBOARD_HIDE_EVENT = IS_IOS ? 'keyboardWillHide' : 'keyboardDidHide';
 
-// 닫힐 때 시트를 화면 밖으로 완전히 밀어내기 위한 추가 이동 거리.
 const CLOSE_SLACK = 100;
 
 const ANIMATION_CONFIG = {
@@ -53,7 +52,7 @@ function BottomSheetOverlay({
     marginBottom = 10,
     padding = 14,
   } = options;
-  // dismissable 미지정 시 isBackgroundTouchClose(deprecated)를 승계한다.
+  // dismissable 미지정 시 isBackgroundTouchClose(deprecated) 승계
   const dismissable = options.dismissable ?? options.isBackgroundTouchClose ?? true;
   const isFixed = options.type === 'fixed';
 
@@ -91,7 +90,6 @@ function BottomSheetOverlay({
 
   const [localVisible, setLocalVisible] = useState(false);
 
-  // 시트 바닥부터 화면 바닥까지의 간격 — 닫힘 시 화면 밖으로 밀어낼 거리 계산에 쓴다.
   const bottomSpace = isFixed ? bottomInsets : marginBottom + bottomInsets;
   const closeOffsetRef = useRef(0);
 
@@ -104,7 +102,6 @@ function BottomSheetOverlay({
     setLocalVisible(false);
   }, []);
 
-  // 초기 마운트(한 번도 열린 적 없음)에서는 close 애니메이션을 돌릴 필요가 없다.
   const hasOpenedRef = useRef(false);
 
   useEffect(() => {
@@ -122,15 +119,14 @@ function BottomSheetOverlay({
     if (!hasOpenedRef.current) {
       return;
     }
-    // 닫힘 애니메이션이 실제로 끝난 시점에 언마운트한다 (setTimeout 매직넘버 커플링 제거).
+    // 닫힘 애니메이션이 끝난 시점에 언마운트 — setTimeout 매직넘버 커플링을 피한다
     translateY.value = withTiming(closeOffsetRef.current, ANIMATION_CONFIG.close, (finished) => {
       if (finished) scheduleOnRN(hideSheet);
     });
     backdropOpacity.value = withTiming(0, ANIMATION_CONFIG.backdropHide);
   }, [backdropOpacity, bottomSheetVisible, hideSheet, isGesturing, keyboardOffset, scale, translateY]);
 
-  // 키보드 회피는 translateY와 분리된 keyboardOffset으로 덧셈 합성한다.
-  // 시트가 보일 때만 구독해, 닫힌 시트가 앱 전역 키보드 이벤트에 반응하지 않게 한다.
+  // 보일 때만 구독해 닫힌 시트가 앱 전역 키보드 이벤트에 반응하지 않게 한다
   useEffect(() => {
     if (!localVisible) {
       return;
@@ -186,20 +182,19 @@ function BottomSheetOverlay({
   const panResponder = useMemo(
     () => PanResponder.create({
       onStartShouldSetPanResponder: () => false,
-      // 닫힘 애니메이션 중 잡으면 완료 콜백이 취소돼 언마운트가 막히므로, 열려 있을 때만 응답한다.
+      // 닫힘 중에 잡으면 완료 콜백이 취소돼 언마운트가 막힌다
       onMoveShouldSetPanResponder: (_, gestureState) =>
         bottomSheetVisible && Math.abs(gestureState.dy) > GESTURE_CONSTANTS.moveThreshold,
       onPanResponderGrant: () => {
         Keyboard.dismiss();
         isGesturing.value = true;
-        // fixed 시트는 바닥이 화면에 붙어 있어야 하므로 scale 축소(바닥이 들림)를 걸지 않는다.
         if (!isFixed) {
           scale.value = withTiming(GESTURE_CONSTANTS.scaleAmount, ANIMATION_CONFIG.scale);
         }
       },
       onPanResponderMove: (_: GestureResponderEvent, gestureState: PanResponderGestureState) => {
         if (gestureState.dy < 0) {
-          // fixed 시트는 위로 끌어도 바닥이 떨어지지 않게 이동을 막는다. floating은 감쇠 이동 유지.
+          // fixed 는 위로 끌어도 바닥이 떨어지지 않게 막는다 (floating 은 감쇠 이동)
           translateY.value = isFixed ? 0 : gestureState.dy / GESTURE_CONSTANTS.dragUpDamping;
           return;
         }
@@ -229,7 +224,7 @@ function BottomSheetOverlay({
         translateY.value = withSpring(0, {
           ...ANIMATION_CONFIG.restore,
           velocity: gestureState.vy * 1000,
-          // fixed 시트는 복귀 스프링이 0을 넘겨(위로 튀어) 바닥이 떨어지는 것도 막는다.
+          // fixed 는 복귀 스프링이 0을 넘겨 위로 튀는 것도 막는다
           overshootClamping: isFixed,
         });
       },
@@ -241,7 +236,7 @@ function BottomSheetOverlay({
     if (dismissable) closeBottomSheet();
   }, [closeBottomSheet, dismissable]);
 
-  // dismissable=false여도 true를 반환해 back을 소비 — 시트 밑 화면으로 내비게이션이 새는 것을 막는다.
+  // dismissable=false 여도 back 을 소비해 시트 밑 화면으로 내비게이션이 새지 않게 한다
   useBackHandler(
     () => {
       if (dismissable) closeBottomSheet();
@@ -261,9 +256,8 @@ function BottomSheetOverlay({
     };
   }, [constrainedMaxHeight, isAutoHeight]);
 
-  // 컨테이너는 절대배치로 바닥에 고정한다. 일반 flex 자식으로 두면 Yoga가 콘텐츠의
-  // % 높이(height: '100%' 등)를 가용 높이 기준으로 해석해 auto 시트가 maxHeight까지
-  // 팽창한다. bottom만 지정한 절대배치는 높이가 indefinite로 남아 콘텐츠 크기로 잡힌다.
+  // 절대배치 필수: flex 자식이면 Yoga 가 콘텐츠의 % 높이를 가용 높이로 해석해 auto 시트가
+  // maxHeight 까지 팽창한다. bottom 만 지정하면 높이가 indefinite 로 남아 콘텐츠 크기로 잡힌다.
   const foldableWidth = Math.min(
     windowWidth - (isFixed ? 0 : marginHorizontal * 2),
     OVERLAY_FOLDABLE_SINGLE_WIDTH

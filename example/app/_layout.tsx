@@ -5,21 +5,27 @@ import { useFonts } from 'expo-font';
 import SnackBar from '../src/ui/Snackbar';
 import HeaderRight from '../src/ui/HeaderRight';
 
-// 문서 플레이그라운드의 초기 전송량을 줄이기 위해 대표 굵기만 사용합니다.
-// 전체 굵기 매핑은 ThemeProvider 문서를 참고하세요.
+// 플레이그라운드 전송량을 줄이려 대표 굵기만 쓴다 (전체 매핑은 ThemeProvider 문서 참고)
 const themeFonts = {
   400: 'Pretendard-Regular',
   600: 'Pretendard-SemiBold',
   700: 'Pretendard-Bold',
 };
 
-const requireFonts = {
-  'Pretendard-Regular': require('../assets/fonts/Pretendard-Regular.otf'),
-  'Pretendard-SemiBold': require('../assets/fonts/Pretendard-SemiBold.otf'),
-  'Pretendard-Bold': require('../assets/fonts/Pretendard-Bold.otf'),
+// 같은 파일을 굵기 키로도 넘긴다 — Skia 캔버스(ZSCalendar 날짜 숫자)는 이름이 아니라 파일이 필요하다
+const themeFontAssets = {
+  400: require('../assets/fonts/Pretendard-Regular.otf'),
+  600: require('../assets/fonts/Pretendard-SemiBold.otf'),
+  700: require('../assets/fonts/Pretendard-Bold.otf'),
 };
 
-// Playground의 주요 액션은 브랜드 주황색을 유지하면서 흰 텍스트와 충분한 대비를 확보합니다.
+const requireFonts = {
+  'Pretendard-Regular': themeFontAssets[400],
+  'Pretendard-SemiBold': themeFontAssets[600],
+  'Pretendard-Bold': themeFontAssets[700],
+};
+
+// 브랜드 주황색을 유지하면서 흰 텍스트 대비를 확보한다
 const playgroundThemeConfig: ThemeFactoryConfig = {
   light: {
     primary: {
@@ -52,6 +58,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ThemeProvider
         themeFonts={themeFonts}
+        themeFontAssets={themeFontAssets}
         isDarkModeEnabled={true}
         customPalette={playgroundPalette}
         foldable={{

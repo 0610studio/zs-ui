@@ -57,13 +57,15 @@ import { ZSMessageBar } from '@0610studio/zs-ui';
 
 ## Variant
 
-| Variant | 배경 | 테두리 | 본문 색 |
-|---------|------|--------|---------|
-| `pastel` (기본) | `intent.10` | `intent.20` | 밝은 배경용 잉크 색 |
-| `solid` | `intent.50` | `intent.50` | 흰색 (`warning` 만 검정) |
-| `stroke` | 없음 | `intent.50` | 라이트: 어두운 잉크 / 다크: 밝은 shade |
+| Variant | 배경 | 테두리 | 본문 색 | 아이콘 색 |
+|---------|------|--------|---------|-----------|
+| `pastel` (기본) | `intent.5` | `intent.20` | 본문 기본색 (`text.base`) | intent 잉크 |
+| `solid` | `intent.50` | `intent.50` | 흰색 (`warning` 만 검정) | 본문과 동일 |
+| `stroke` | `background.base` | `intent.30` | 라이트: 어두운 잉크 / 다크: 밝은 shade | 본문과 동일 |
 
-> 본문 색은 칩·버튼이 쓰는 값과 다릅니다. 메시지 바는 본문 길이가 길어 대비 4.5:1 이상을 확보하는 별도 잉크 색을 사용합니다 (예: `warning` 은 `warning.100`).
+> `pastel` 은 본문에 intent 색 잉크가 아니라 중립 본문색을 씁니다. 색으로 상태를 전달하는 역할은 배경과 아이콘이 맡고, 본문은 읽기에만 집중시킵니다 (대비 14:1 이상).
+>
+> `intent` 스케일은 다크모드에서도 라이트와 같아 `pastel` 배경이 두 모드에서 모두 밝습니다. 그래서 다크모드에서는 `text.base`(밝은 색) 대신 명도가 같은 어두운 `grey.10` 을 씁니다. 배경이 실제로 뒤집히는 `grey` intent 만 예외로 `text.base` 를 그대로 사용합니다.
 
 ## 특징
 

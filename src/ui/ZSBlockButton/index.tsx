@@ -9,7 +9,6 @@ import ZSPressable from '../ZSPressable';
 import ZSView from '../ZSView';
 import ZSText from '../ZSText';
 
-// typo 크기(subStyle)별 패딩
 const PADDING_HORIZONTAL: Record<TypoSubStyle, number> = { '1': 11, '2': 11, '3': 10, '4': 8, '5': 7, '6': 5 };
 const PADDING_VERTICAL: Record<TypoSubStyle, number> = { '1': 9, '2': 9, '3': 8, '4': 6, '5': 5, '6': 4 };
 

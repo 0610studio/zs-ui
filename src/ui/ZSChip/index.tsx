@@ -15,27 +15,22 @@ const PRESS_SCALE = 0.04;
 
 export type ZSChipVariant = 'pastel' | 'solid' | 'stroke';
 
-// typo 크기(subStyle)별 패딩 · 체크 아이콘 크기
 const PADDING_HORIZONTAL: Record<TypoSubStyle, number> = { '1': 18, '2': 16, '3': 14, '4': 12, '5': 10, '6': 9 };
 const PADDING_VERTICAL: Record<TypoSubStyle, number> = { '1': 10, '2': 9, '3': 8, '4': 7, '5': 5, '6': 4 };
 const CHECK_ICON_SIZE: Record<TypoSubStyle, number> = { '1': 18, '2': 17, '3': 15, '4': 14, '5': 12, '6': 11 };
 
 export interface ZSChipProps extends ViewProps {
-  /** 칩 라벨 */
   label: string;
-  /** 선택 상태를 외부에서 제어할 때 사용 (미지정 시 내부 상태로 토글) */
+  /** 미지정 시 내부 상태로 토글 */
   selected?: boolean;
-  /** 비제어 모드의 초기 선택 상태 */
   initialSelected?: boolean;
-  /** 토글 시 다음 선택 상태를 전달 */
   onChange?: (selected: boolean) => void;
   intent?: IntentOptions;
-  /** 선택 상태 스타일 (기본: pastel) */
+  /** 기본: pastel */
   variant?: ZSChipVariant;
   textSize?: TypoSubStyle;
-  /** true면 선택 시 체크 아이콘 표시 */
+  /** 선택 시 체크 아이콘 */
   checkIcon?: boolean;
-  /** 라벨 왼쪽 커스텀 요소 */
   leftIcon?: React.ReactNode;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -140,7 +135,7 @@ function ZSChip({
 export default React.memo(ZSChip);
 
 const styles = StyleSheet.create({
-  // flexWrap 부모에서 콘텐츠 폭으로 렌더링되도록 hug
+  // flexWrap 부모에서 콘텐츠 폭으로 렌더되도록 hug
   pressable: {
     alignSelf: 'flex-start',
   },

@@ -6,7 +6,7 @@ import HeaderRight from '../src/ui/HeaderRight';
 
 const LIB_VERSION: string = require('@0610studio/zs-ui/package.json').version;
 
-/** 아이콘 타일용 미니 도형들 — 외부 아이콘 없이 팔레트 색으로만 구성 */
+/** 외부 아이콘 없이 팔레트 색으로만 구성한 타일 도형 */
 function ThemeGlyph() {
   const { palette } = useTheme();
   return (
@@ -60,6 +60,14 @@ function BeamGlyph({ from, to }: { from: string; to: string }) {
   return (
     <View style={{ width: 16, height: 16, borderRadius: 6, borderWidth: 2, borderColor: from }}>
       <View style={{ position: 'absolute', top: -2, right: -2, width: 9, height: 9, borderTopRightRadius: 6, borderTopWidth: 2, borderRightWidth: 2, borderColor: to }} />
+    </View>
+  );
+}
+
+function CalendarGlyph({ frame, mark }: { frame: string; mark: string }) {
+  return (
+    <View style={{ width: 16, height: 16, borderRadius: 4, borderWidth: 2, borderColor: frame, paddingTop: 3, alignItems: 'center' }}>
+      <View style={{ width: 8, height: 2, borderRadius: 1, backgroundColor: mark }} />
     </View>
   );
 }
@@ -317,6 +325,24 @@ export default function Home() {
           tileColor={palette.information[10]}
           glyph={<BeamGlyph from={palette.primary.main} to={palette.secondary.main} />}
           href="/BorderBeamExample"
+        />
+
+        <SectionLabel>달력</SectionLabel>
+        <RowCard
+          title="ZSCalendar"
+          caption="가장 짧은 사용법 · events 배열 하나 · 아젠다 연동"
+          tileColor={palette.primary[10]}
+          glyph={<CalendarGlyph frame={palette.primary[60]} mark={palette.primary[40]} />}
+          href="/ZSCalendarExample"
+          testID="calendar-basic-card"
+        />
+        <RowCard
+          title="ZSCalendar 심화"
+          caption="바라봄 일기 달력 · 커스텀 헤더 · 날짜 선택기 · mock API"
+          tileColor={palette.warning[10]}
+          glyph={<CalendarGlyph frame={palette.warning[70]} mark={palette.warning[50]} />}
+          href="/ZSCalendarAdvancedExample"
+          testID="calendar-card"
         />
 
         <SectionLabel>폴더블</SectionLabel>

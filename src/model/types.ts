@@ -8,7 +8,7 @@ export interface OverlayContextProps {
   showBottomSheet: (props: ShowBottomSheetProps) => void;
   showSnackBar: (props: ShowSnackBarProps) => void;
   showAlert: (props: ShowAlertProps) => void;
-  /** 지정한 오버레이를 닫는다. 인자 생략 시 'all' — 모든 오버레이를 닫는다. */
+  /** 인자 생략 시 'all' */
   hideOverlay: (option?: HideOption) => void;
 }
 
@@ -110,14 +110,11 @@ export interface ShowSnackBarProps {
 }
 
 export interface BottomSheetOptions {
-  /** 배경 터치·아래로 끌기 제스처로 시트를 닫을 수 있는지 여부. 기본 true. false여도 hideOverlay 호출로는 닫힌다. */
+  /** 배경 터치·드래그 닫힘 허용 (기본 true). false 여도 hideOverlay 로는 닫힌다. */
   dismissable?: boolean;
-  /**
-   * @deprecated `dismissable`을 사용하세요. `dismissable` 미지정 시에만 참조되며,
-   * 이제 배경 터치뿐 아니라 제스처 닫힘까지 함께 제어합니다.
-   */
+  /** @deprecated `dismissable` 사용. 미지정 시에만 참조되며 제스처 닫힘까지 함께 제어한다. */
   isBackgroundTouchClose?: boolean;
-  /** 시트가 어떤 경로(버튼·배경 터치·드래그·뒤로가기)로 닫히든 1회 호출되는 콜백 */
+  /** 어떤 경로로 닫히든 1회 호출된다 */
   onClose?: () => void;
   marginHorizontal?: number;
   marginBottom?: number;

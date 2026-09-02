@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@testing-library/react-native';
 import { Text } from 'react-native';
-// jest(jest-expo node preset)는 web.tsx를 우선 해석하므로 네이티브 구현을 명시 import
+// jest-expo node preset 은 web.tsx 를 우선 해석하므로 네이티브 구현을 명시 import 한다
 import ZSBorderBeam from '../../ui/ZSBorderBeam/ZSBorderBeam';
 
 jest.mock('../../context/ThemeContext', () => {
@@ -16,7 +16,6 @@ const contentLayout = (width: number, height: number) => ({
   nativeEvent: { layout: { x: 0, y: 0, width, height } },
 });
 
-// 컴포넌트 내부 content 래퍼(onLayout 대상)를 children으로 찾기 위한 헬퍼
 const fireContentLayout = (getByText: any, text: string, width = 200, height = 100) => {
   const content = getByText(text).parent;
   fireEvent(content, 'layout', contentLayout(width, height));
@@ -45,7 +44,6 @@ describe('ZSBorderBeam', () => {
     fireContentLayout(getByText, 'Beam Content');
 
     expect(getByTestId('skia-canvas')).toBeTruthy();
-    // track + glow + beam 3중 레이어
     expect(getAllByTestId('skia-rounded-rect')).toHaveLength(3);
     expect(getByTestId('skia-blur')).toBeTruthy();
   });
@@ -89,7 +87,6 @@ describe('ZSBorderBeam', () => {
     fireContentLayout(getByText, 'Beam Content');
 
     const gradient = getAllByTestId('skia-sweep-gradient')[0];
-    // 꼬리(투명) → 몸통 → 머리(선명) → 컷오프(투명) → 링 끝까지 투명 유지
     expect(gradient.props.colors).toEqual([
       '#FF000000',
       '#FF000066',
@@ -102,7 +99,6 @@ describe('ZSBorderBeam', () => {
     expect(positions).toHaveLength(6);
     expect(positions[0]).toBe(0);
     expect(positions[positions.length - 1]).toBe(1);
-    // 머리는 beamLength 위치에서 끝난다
     expect(positions[3]).toBeCloseTo(0.35);
   });
 
@@ -115,7 +111,6 @@ describe('ZSBorderBeam', () => {
 
     fireContentLayout(getByText, 'Beam Content');
 
-    // track + beam 2중 레이어만, blur 없음
     expect(getAllByTestId('skia-rounded-rect')).toHaveLength(2);
     expect(queryByTestId('skia-blur')).toBeNull();
   });
@@ -141,7 +136,6 @@ describe('ZSBorderBeam', () => {
 
     fireContentLayout(getByText, 'Beam Content');
 
-    // glow + beam 2중 레이어만
     expect(getAllByTestId('skia-rounded-rect')).toHaveLength(2);
   });
 });

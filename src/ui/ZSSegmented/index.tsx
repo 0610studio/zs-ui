@@ -11,7 +11,7 @@ const ANIMATION_DURATION = DURATION.slow;
 const CONTAINER_INSET = 3;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 
-/** thumb 를 트랙에서 띄우는 그림자. boxShadow 로 변환해 iOS·Android 가 동일하게 렌더된다. */
+/** boxShadow 로 변환해 iOS·Android 가 동일하게 렌더된다 */
 const THUMB_SHADOW: ShadowStyle = {
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.1,
@@ -21,20 +21,19 @@ const THUMB_SHADOW: ShadowStyle = {
 export type ZSSegmentedTextSize = '1' | '2' | '3' | '4' | '5' | '6';
 
 export interface ZSSegmentedProps extends ViewProps {
-  /** 세그먼트 라벨 목록 (2개 이상) */
+  /** 2개 이상 */
   options: string[];
-  /** 선택 인덱스를 외부에서 제어할 때 사용 (미지정 시 내부 상태로 동작) */
+  /** 미지정 시 내부 상태로 동작 */
   selectedIndex?: number;
-  /** 비제어 모드의 초기 선택 인덱스 */
   initialIndex?: number;
   onChange?: (index: number) => void;
-  /** true(기본): 부모 폭을 가득 채움 · false: 가장 긴 라벨 폭에 맞춰 콘텐츠 크기로 렌더링 */
+  /** false 면 가장 긴 라벨 폭으로 hug (기본: true) */
   fullWidth?: boolean;
   containerHeight?: number;
   textSize?: ZSSegmentedTextSize;
-  /** 트랙 배경색 (기본: palette.background.layer2) */
+  /** 기본: palette.background.layer2 */
   trackColor?: string;
-  /** 선택 블럭 색상 (기본: palette.background.base) */
+  /** 기본: palette.background.base */
   thumbColor?: string;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -56,7 +55,6 @@ function ZSSegmented({
   ...props
 }: ZSSegmentedProps) {
   const { palette } = useTheme();
-  // 다크 모드에서는 밝은 그림자로 thumb 를 구분한다.
   const thumbShadow = useMemo(() => createShadow(THUMB_SHADOW, palette.grey[100]), [palette.grey]);
   const [internalIndex, setInternalIndex] = useState(initialIndex);
   const [trackWidth, setTrackWidth] = useState(0);
@@ -196,7 +194,7 @@ const styles = StyleSheet.create({
     padding: CONTAINER_INSET,
     position: 'relative',
   },
-  // flexWrap 부모에서도 폭이 부모 기준으로 고정되도록 stretch 대신 100% 사용
+  // flexWrap 부모에서도 부모 기준으로 고정되도록 stretch 대신 100%
   fullWidth: {
     width: '100%',
   },

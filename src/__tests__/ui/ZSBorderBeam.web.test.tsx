@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
-// 네이티브 구현의 IS_WEB 가드(비 metro 번들러 대비 방어선)를 검증하기 위해 명시 import
+// 네이티브 구현의 IS_WEB 가드를 검증하려 명시 import 한다
 import ZSBorderBeam from '../../ui/ZSBorderBeam/ZSBorderBeam';
 import ZSBorderBeamWeb from '../../ui/ZSBorderBeam/index.web';
 import { warnWebUnsupported } from '../../model/webUnsupported';

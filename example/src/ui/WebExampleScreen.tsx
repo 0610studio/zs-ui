@@ -17,6 +17,8 @@ import {
   type ZSTabItem,
 } from '@0610studio/zs-ui';
 
+const LIB_VERSION: string = require('@0610studio/zs-ui/package.json').version;
+
 const WEB_TAB_ITEMS: ZSTabItem[] = [
   { value: 'components', label: '컴포넌트' },
   { value: 'interaction', label: '상호작용' },
@@ -241,7 +243,7 @@ export default function WebExampleScreen() {
             <View style={styles.statusBadge}>
               <ZSText typo="label.4" style={styles.statusText}>LOCAL SOURCE</ZSText>
             </View>
-            <ZSText typo="caption.1" style={styles.metaText}>Expo Web · React Native Web · 0.19.3</ZSText>
+            <ZSText typo="caption.1" style={styles.metaText}>{`Expo Web · React Native Web · ${LIB_VERSION}`}</ZSText>
           </View>
         </View>
 

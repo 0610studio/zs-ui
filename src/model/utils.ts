@@ -29,5 +29,5 @@ export const Z_INDEX_VALUE = {
     LOADING: 8999,
 };
 
-// Modality / BottomSheet 오버레이의 foldableSingleScreen 전용 단일 화면 최대 가로 길이(px)
+// foldableSingleScreen 전용 단일 화면 최대 가로 길이(px)
 export const OVERLAY_FOLDABLE_SINGLE_WIDTH = 600;

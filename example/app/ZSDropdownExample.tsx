@@ -8,7 +8,6 @@ import CodeBlock from '../src/ui/kit/CodeBlock';
 const DOMAINS = ['gmail.com', 'naver.com', 'kakao.com'];
 const CITIES = ['서울', '부산', '대구', '인천', '광주', '대전'];
 
-/** 바텀시트 안에 들어가는 단순 선택 리스트 */
 function SelectList({ options, onSelect }: { options: string[]; onSelect: (value: string) => void }) {
   const { palette } = useTheme();
 

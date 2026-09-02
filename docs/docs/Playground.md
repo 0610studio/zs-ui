@@ -25,16 +25,16 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 ```bash
 cd example
-yarn web
+pnpm run web
 ```
 
 ## 실제 앱에서 확인
 
 ```bash
 cd example
-yarn ios
+pnpm run ios
 # 또는
-yarn android
+pnpm run android
 ```
 
 SafeArea, 실제 소프트 키보드, 상태바, Android 하드웨어 뒤로가기, 폴더블 전환, Skia 애니메이션은 시뮬레이터·에뮬레이터 또는 실제 기기에서 검증합니다.
@@ -43,7 +43,7 @@ SafeArea, 실제 소프트 키보드, 상태바, Android 하드웨어 뒤로가�
 
 ```bash
 cd docs
-npm run playground:build
+pnpm run playground:build
 ```
 
-`npm run start`와 `npm run build`를 실행하면 문서용 예제가 먼저 자동 생성됩니다.
+`pnpm run start`와 `pnpm run build`는 문서용 예제 생성을 먼저 실행합니다.

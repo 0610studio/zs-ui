@@ -45,7 +45,6 @@ describe('Modality', () => {
       />
     );
     
-    // modalityVisible이 false면 null을 반환
     expect(queryByText('Test Content')).toBeNull();
   });
 

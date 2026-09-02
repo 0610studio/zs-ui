@@ -6,11 +6,10 @@ type Props = {
   caption: string;
   dotColor: string;
   onPress: () => void;
-  /** 목록의 마지막 행이면 하단 구분선을 그리지 않는다 */
+  /** 마지막 행이면 하단 구분선을 생략한다 */
   isLast?: boolean;
 };
 
-/** 오버레이류 데모 호출 리스트 행 — 컬러 도트 + 제목/설명 + 화살표 */
 export default function DemoRow({ title, caption, dotColor, onPress, isLast = false }: Props) {
   const { palette } = useTheme();
 

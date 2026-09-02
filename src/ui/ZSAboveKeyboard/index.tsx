@@ -4,9 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useKeyboard from "../../model/useKeyboard";
 import { Z_INDEX_VALUE } from "../../model/utils";
 
-// Edge-to-edge 디스플레이 정책
-// Android 11 (API 30) 이전: adjustResize가 시스템 레벨에서 자동으로 패딩을 추가
-// Android 11 (API 30) 이후: 일부 기기에서 패딩이 적용되지 않음
+// Android 11(API 30) 이전엔 adjustResize 가 시스템에서 패딩을 넣어주지만,
+// 이후로는 일부 기기에서 적용되지 않는다.
 const isLegacyAndroidKeyboardBehavior = (Platform.OS === 'android' && Platform.Version < 30);
 
 const HIDDEN_BOTTOM_OFFSET = -300;

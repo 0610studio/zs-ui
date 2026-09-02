@@ -32,10 +32,7 @@ export type ZSContainerProps = ViewProps & {
   scrollToFocusedInput?: boolean;
   foldableSingleScreen?: boolean;
   dividerLineComponent?: ReactNode;
-  /**
-   * 언폴딩 상태에서 rightComponent가 없을 때(단일 화면) 콘텐츠 최대 가로 길이(px).
-   * 전폭으로 늘리려면 false. 미지정 시 ThemeProvider의 foldable 설정값을 따른다.
-   */
+  /** 단일 화면 콘텐츠 최대 가로 길이(px). false 면 전폭, 미지정 시 ThemeProvider 설정을 따른다. */
   unfoldedSinglePaneMaxWidth?: number | false;
 };
 
@@ -169,14 +166,12 @@ const ZSContainer = forwardRef<ZSContainerRef, ZSContainerProps>(function ZSCont
     props.style
   ], [props.style]);
 
-  // prop > ThemeProvider foldable 설정 순으로 적용. 기본값(폴백) 없음 — 미주입(undefined)이거나 false면 전폭으로 채움
+  // prop > ThemeProvider 설정 순. 폴백 없음 — 미주입·false 면 전폭
   const effectiveUnfoldedMaxWidth = unfoldedSinglePaneMaxWidth ?? foldable?.unfoldedSinglePaneMaxWidth;
   const hasRightComponent = !!rightComponent;
 
   const innerMaxWidth = useMemo(() => {
-    // foldableSingleScreen 이거나, 언폴딩 + rightComponent 미지원인 단일 화면일 때 폭 제한 대상
     const isSinglePane = foldableSingleScreen || (foldingState === FoldingState.UNFOLDED && !hasRightComponent);
-    // 주입된 폭(number)이 있을 때만 제한, 없으면 전폭으로 채움
     if (isSinglePane && typeof effectiveUnfoldedMaxWidth === 'number') {
       return Math.min(width, effectiveUnfoldedMaxWidth);
     }

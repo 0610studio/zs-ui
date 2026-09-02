@@ -81,7 +81,7 @@ describe('ZSSegmented', () => {
     expect(segmentStyle(getByTestId, 0).flex).toBe(1);
     expect(segmentStyle(getByTestId, 1).flex).toBe(1);
 
-    // 트랙 406 - 인셋(3) * 2 = 400 → 세그먼트당 200
+    // 트랙 406 - 인셋(3)*2 = 400 → 세그먼트당 200
     fireEvent(getByTestId('ctrl'), 'layout', layoutEvent(406));
     expect(StyleSheet.flatten(getByTestId('zs-segmented-thumb').props.style).width).toBe(200);
   });
@@ -91,16 +91,15 @@ describe('ZSSegmented', () => {
       <ZSSegmented fullWidth={false} options={['ON', 'OFF입니다']} />
     );
 
-    // 측정 전에는 고정 폭도 썸도 없다
     expect(segmentStyle(getByTestId, 0).width).toBeUndefined();
     expect(queryByTestId('zs-segmented-thumb')).toBeNull();
 
-    // 각 라벨은 측정용 히든 텍스트 + 실제 세그먼트 텍스트로 두 번 렌더된다 (측정용이 먼저)
+    // 각 라벨은 측정용 히든 텍스트 + 실제 텍스트로 두 번 렌더된다 (측정용이 먼저)
     const hidden = { includeHiddenElements: true };
     fireEvent(getAllByText('ON', hidden)[0], 'layout', layoutEvent(24.4));
     fireEvent(getAllByText('OFF입니다', hidden)[0], 'layout', layoutEvent(70.2));
 
-    // ceil(70.2) + SEGMENT_HORIZONTAL_PADDING(14) * 2 = 99
+    // ceil(70.2) + 패딩(14)*2 = 99
     expect(segmentStyle(getByTestId, 0).width).toBe(99);
     expect(segmentStyle(getByTestId, 1).width).toBe(99);
     expect(segmentStyle(getByTestId, 0).flex).toBeUndefined();

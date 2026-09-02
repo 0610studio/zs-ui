@@ -1,0 +1,83 @@
+# 주간 모드 페이저 — 스와이프가 한 달이 아니라 한 주씩 움직이는지.
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+# Android 콜드 스타트는 Metro 번들 로드까지 1분 가까이 걸린다 — 홈이 뜬 뒤에 스크롤한다
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- scrollUntilVisible:
+    element:
+      id: 'calendar-card'
+    direction: DOWN
+- tapOn:
+    id: 'calendar-card'
+- assertVisible:
+    id: 'diary-calendar-grid'
+- extendedWaitUntil:
+    visible: '.*일정 .*건.*'
+    timeout: 8000
+- assertVisible: '보기 month'
+
+# 9월 16일을 고르고 접는다 → 09-13 ~ 09-19 주가 남는다
+- tapOn:
+    id: 'calendar-cell-2026-09-16'
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: UP
+- assertVisible: '보기 week'
+- assertVisible:
+    id: 'calendar-cell-2026-09-13'
+- assertVisible:
+    id: 'calendar-cell-2026-09-19'
+- takeScreenshot: k01-week-of-16
+
+# 왼쪽으로 밀면 다음 "주"
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: LEFT
+- assertVisible:
+    id: 'calendar-cell-2026-09-20'
+- assertVisible:
+    id: 'calendar-cell-2026-09-26'
+- assertVisible: '2026년 9월'
+- takeScreenshot: k02-next-week
+
+# 한 주 더 — 달 경계를 넘으면 제목이 따라간다
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: LEFT
+- assertVisible:
+    id: 'calendar-cell-2026-10-03'
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: LEFT
+- assertVisible:
+    id: 'calendar-cell-2026-10-04'
+- assertVisible: '2026년 10월'
+- takeScreenshot: k03-crossed-month
+
+# 오른쪽으로 되돌리면 한 주씩 되돌아온다
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: RIGHT
+- assertVisible:
+    id: 'calendar-cell-2026-09-27'
+- takeScreenshot: k04-back-one-week
+
+# 다시 펼치면 그 주가 속한 달의 월간 그리드가 된다
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: DOWN
+- assertVisible: '보기 month'
+- assertVisible:
+    id: 'calendar-cell-2026-09-01'
+- assertVisible: '2026년 9월'
+- takeScreenshot: k05-expanded-month

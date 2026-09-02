@@ -23,7 +23,6 @@ const layoutEvent = (x: number, width: number) => ({
   nativeEvent: { layout: { x, y: 0, width, height: 44 } },
 });
 
-/** 각 아이템에 폭 100 의 레이아웃을 흘려보낸다 */
 const measureItems = (getByTestId: any, count = ITEMS.length) => {
   for (let index = 0; index < count; index += 1) {
     fireEvent(getByTestId(`zs-tab-item-${index}`), 'layout', layoutEvent(index * 100, 100));
@@ -54,7 +53,7 @@ describe('ZSTab', () => {
     const { getByTestId, rerender } = render(<ZSTab items={ITEMS} value='ongoing' />);
 
     measureItems(getByTestId);
-    // shared value 는 effect 에서 갱신되므로 반영된 스타일은 다음 렌더에서 확인한다
+    // shared value 는 effect 에서 갱신되므로 다음 렌더에서 확인한다
     rerender(<ZSTab items={ITEMS} value='ongoing' />);
 
     const style = indicatorStyle(getByTestId);
@@ -94,7 +93,6 @@ describe('ZSTab', () => {
     expect(getByTestId('zs-tab-item-2').props.accessibilityState.selected).toBe(true);
 
     fireEvent.press(getByText('전체'));
-    // 부모가 value 를 바꾸지 않았으므로 선택은 그대로다
     expect(getByTestId('zs-tab-item-2').props.accessibilityState.selected).toBe(true);
   });
 

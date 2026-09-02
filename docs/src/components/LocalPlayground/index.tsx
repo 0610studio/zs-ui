@@ -24,6 +24,7 @@ type LocalExample =
   | 'ZSAboveKeyboard'
   | 'ZSBlockButton'
   | 'ZSBorderBeam'
+  | 'ZSCalendar'
   | 'ZSCheckBox'
   | 'ZSChip'
   | 'ZSContainer'
@@ -60,6 +61,7 @@ const LOCAL_EXAMPLES: Record<LocalExample, LocalExampleMetadata> = {
   },
   BottomSheet: { route: 'BottomSheetExample', sourceFile: 'BottomSheetExample.tsx' },
   Catalog: { route: '', sourceFile: 'index.tsx' },
+  ZSCalendar: { route: 'ZSCalendarExample', sourceFile: 'ZSCalendarExample.tsx' },
   ErrorComponent: {
     route: 'PrimitiveExample',
     sourceFile: 'PrimitiveExample.tsx',
