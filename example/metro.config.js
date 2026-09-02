@@ -16,7 +16,8 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, 'node_modules'),
 ];
 
-config.resolver.disableHierarchicalLookup = true;
+// pnpm의 격리된 전이 의존성도 각 패키지 위치에서 해석한다.
+config.resolver.disableHierarchicalLookup = false;
 
 // zs-ui 의 main 은 build/index.js 라 그대로 두면 src 수정마다 tsc 빌드가 필요하다.
 // 엔트리를 src 로 갈아끼워 저장 즉시 Fast Refresh 로 반영되게 한다.

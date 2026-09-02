@@ -16,7 +16,9 @@
   "dependencies": {
     "@0610studio/expo-skia-date-wheel-picker": "^0.1.1",
     "@0610studio/zs-ui": "workspace:*",
+    "@expo/log-box": "~57.0.4",
     "@expo/metro-runtime": "~57.0.14",
+    "expo-modules-core": "~57.0.14",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@shopify/react-native-skia": "2.11.1",
     "expo": "57.0.18",
