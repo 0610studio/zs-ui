@@ -29,33 +29,54 @@ export interface MonthPaneParams {
 
 export interface PanePaints {
   fill: SkPaint;
-  /** 선택 카드 그림자 — 블러 마스크가 붙어 있어 일반 채움에 쓰면 안 된다 */
-  shadow: SkPaint;
+  /** 선택 카드 그림자 두 겹 — 블러 마스크가 붙어 있어 일반 채움에 쓰면 안 된다 */
+  shadowAmbient: SkPaint;
+  shadowKey: SkPaint;
 }
 
 /** 선택 카드 형태. 셀 폭에 따라 달라지는 값은 metrics 에서 온다 */
 const SELECTED_CARD_RADIUS = 10;
 const SELECTED_CARD_INSET_Y = 2;
-/** iOS shadow {offset 4, radius 3.5, color 45% × opacity 0.22} 를 Skia 블러로 옮긴 값 — 실효 알파는 10% 다 */
-const SELECTED_CARD_SHADOW_OFFSET_Y = 4;
-const SELECTED_CARD_SHADOW_SIGMA = 1.75;
-const SELECTED_CARD_SHADOW_COLOR = 'rgba(0, 0, 0, 0.10)';
 /**
- * 마지막 행의 카드 그림자가 행 밖으로 번지는 높이(오프셋 + 블러 3σ − 카드 인셋).
+ * 그림자는 머티리얼 elevation 처럼 두 겹이다.
+ * ambient — 카드 둘레에 고르게 퍼져 "떠 있음"을 만든다(사각형을 살짝 넓히고 크게 블러, 아주 옅게).
+ * key — 아래로 떨어져 빛의 방향을 준다(바라봄 iOS shadow {offset 4, radius 3.5, 45% × opacity 0.22} 의 실효값 10% 에서 10% 연하게).
+ * key 만 있으면 받침대처럼 보여 특히 Android 에서 카드가 바닥에 붙은 느낌이 났다.
+ */
+const SHADOW_AMBIENT_SPREAD = 1;
+const SHADOW_AMBIENT_OFFSET_Y = 1;
+const SHADOW_AMBIENT_SIGMA = 3;
+const SHADOW_AMBIENT_COLOR = 'rgba(0, 0, 0, 0.063)';
+const SHADOW_KEY_OFFSET_Y = 3;
+const SHADOW_KEY_SIGMA = 2;
+const SHADOW_KEY_COLOR = 'rgba(0, 0, 0, 0.09)';
+/**
+ * 마지막 행의 카드 그림자가 행 밖으로 번지는 높이(두 겹 중 더 멀리 가는 쪽: 오프셋 + 퍼짐 + 블러 3σ − 카드 인셋).
  * 캔버스·뷰포트·픽처 컬 영역이 이만큼 더 커야 주간·월간 마지막 행에서 그림자가 잘리지 않는다.
  */
-export const SELECTED_CARD_SHADOW_BLEED = Math.ceil(SELECTED_CARD_SHADOW_OFFSET_Y + SELECTED_CARD_SHADOW_SIGMA * 3 - SELECTED_CARD_INSET_Y);
+export const SELECTED_CARD_SHADOW_BLEED = Math.ceil(
+  Math.max(
+    SHADOW_AMBIENT_OFFSET_Y + SHADOW_AMBIENT_SPREAD + SHADOW_AMBIENT_SIGMA * 3,
+    SHADOW_KEY_OFFSET_Y + SHADOW_KEY_SIGMA * 3,
+  ) - SELECTED_CARD_INSET_Y,
+);
+
+function blurPaint(color: string, sigma: number): SkPaint {
+  const paint = Skia.Paint();
+  paint.setAntiAlias(true);
+  paint.setColor(Skia.Color(color));
+  paint.setMaskFilter(Skia.MaskFilter.MakeBlur(BlurStyle.Normal, sigma, true));
+  return paint;
+}
 
 export function createPanePaints(): PanePaints {
   const fill = Skia.Paint();
   fill.setAntiAlias(true);
-
-  const shadow = Skia.Paint();
-  shadow.setAntiAlias(true);
-  shadow.setColor(Skia.Color(SELECTED_CARD_SHADOW_COLOR));
-  shadow.setMaskFilter(Skia.MaskFilter.MakeBlur(BlurStyle.Normal, SELECTED_CARD_SHADOW_SIGMA, true));
-
-  return { fill, shadow };
+  return {
+    fill,
+    shadowAmbient: blurPaint(SHADOW_AMBIENT_COLOR, SHADOW_AMBIENT_SIGMA),
+    shadowKey: blurPaint(SHADOW_KEY_COLOR, SHADOW_KEY_SIGMA),
+  };
 }
 
 /** 기록은 동기라 pane 마다 새 Paint 를 만들 이유가 없다 — 첫 사용 때 한 쌍만 만들어 돌려쓴다 */
@@ -105,14 +126,14 @@ function drawSelectedCard(canvas: SkCanvas, cx: number, metrics: GridLayoutMetri
   const height = metrics.rowHeight - SELECTED_CARD_INSET_Y * 2;
   const x = cx - width / 2;
 
-  canvas.drawRRect(
+  const rrect = (dy: number, spread: number) =>
     Skia.RRectXY(
-      Skia.XYWHRect(x, SELECTED_CARD_INSET_Y + SELECTED_CARD_SHADOW_OFFSET_Y, width, height),
-      SELECTED_CARD_RADIUS,
-      SELECTED_CARD_RADIUS,
-    ),
-    paints.shadow,
-  );
+      Skia.XYWHRect(x - spread, SELECTED_CARD_INSET_Y + dy - spread, width + spread * 2, height + spread * 2),
+      SELECTED_CARD_RADIUS + spread,
+      SELECTED_CARD_RADIUS + spread,
+    );
+  canvas.drawRRect(rrect(SHADOW_AMBIENT_OFFSET_Y, SHADOW_AMBIENT_SPREAD), paints.shadowAmbient);
+  canvas.drawRRect(rrect(SHADOW_KEY_OFFSET_Y, 0), paints.shadowKey);
 
   paints.fill.setColor(skColor(theme.selectedBackground));
   canvas.drawRRect(
@@ -177,16 +198,25 @@ export function drawWeekRow(canvas: SkCanvas, params: WeekRowParams, paints: Pan
     const dots = dotColorsOn(index, date, metrics.maxDots, theme.dotColor);
     if (dots.length === 0) continue;
 
-    const dotSpan = dots.length * metrics.dotRadius * 2 + (dots.length - 1) * metrics.dotGap;
+    // 바라봄처럼 한 줄이 차면 다음 줄로 감싼다. 두 줄이면 원래 dot 중심을 사이에 두고 위아래로 벌린다
+    const { dotRadius, dotGap, dotsPerRow } = metrics;
+    const rowCount = Math.ceil(dots.length / dotsPerRow);
     const dotOrigin = dotCenter(metrics, row, column);
-    let dotX = dotOrigin.x - dotSpan / 2 + metrics.dotRadius;
+    const rowPitch = dotRadius * 2 + dotGap;
+    const firstRowY = dotOrigin.y - ((rowCount - 1) * rowPitch) / 2;
 
-    for (const color of dots) {
-      // dot 줄은 선택 원 밖이라(layout 이 간격을 보장) 선택 여부와 무관하게 이벤트 색을 쓴다
-      fill.setColor(skColor(color));
+    fill.setAlphaf(isOutside ? 0.45 : 1);
+    for (let i = 0; i < dots.length; i += 1) {
+      const rowIndex = Math.floor(i / dotsPerRow);
+      const inRow = Math.min(dotsPerRow, dots.length - rowIndex * dotsPerRow);
+      const rowSpan = inRow * dotRadius * 2 + (inRow - 1) * dotGap;
+      const positionInRow = i - rowIndex * dotsPerRow;
+      const x = dotOrigin.x - rowSpan / 2 + dotRadius + positionInRow * rowPitch;
+      const y = firstRowY + rowIndex * rowPitch;
+      // dot 줄은 선택 카드 안이라(layout 이 폭·높이를 보장) 선택 여부와 무관하게 이벤트 색을 쓴다
+      fill.setColor(skColor(dots[i] as string));
       fill.setAlphaf(isOutside ? 0.45 : 1);
-      canvas.drawCircle(dotX, dotOrigin.y, metrics.dotRadius, fill);
-      dotX += metrics.dotRadius * 2 + metrics.dotGap;
+      canvas.drawCircle(x, y, dotRadius, fill);
     }
     fill.setAlphaf(1);
   }

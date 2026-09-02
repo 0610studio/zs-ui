@@ -29,6 +29,9 @@ export interface GridLayoutMetrics {
   dayFontSize: number;
   dotRadius: number;
   dotGap: number;
+  /** 한 줄에 들어가는 dot 수 — 선택 카드 폭 안에서 계산한다 */
+  dotsPerRow: number;
+  /** 두 줄에 들어가는 개수(dotsPerRow × 2) — 셀 폭에 따라 달라진다 */
   maxDots: number;
   selectionRadius: number;
   /** 둘 다 셀 상단 기준 세로 위치 */
@@ -45,10 +48,18 @@ const clamp = (value: number, min: number, max: number): number => Math.min(Math
 
 /** 연속 보간 대신 단계를 쓴다 — 중간 폭에서 반픽셀 떨림이 생기지 않는다 */
 function scaleForCellWidth(cellWidth: number) {
-  if (cellWidth < 40) return { dayFontSize: 11, dotRadius: 1.5, dotGap: 2, maxDots: 2 };
-  if (cellWidth < 48) return { dayFontSize: 13, dotRadius: 2, dotGap: 2.5, maxDots: 3 };
-  if (cellWidth < 60) return { dayFontSize: 15, dotRadius: 2, dotGap: 3, maxDots: 3 };
-  return { dayFontSize: 17, dotRadius: 2.5, dotGap: 4, maxDots: 4 };
+  if (cellWidth < 40) return { dayFontSize: 11, dotRadius: 1.5, dotGap: 2 };
+  if (cellWidth < 48) return { dayFontSize: 13, dotRadius: 2, dotGap: 2 };
+  if (cellWidth < 60) return { dayFontSize: 15, dotRadius: 2, dotGap: 2.5 };
+  return { dayFontSize: 17, dotRadius: 2.5, dotGap: 3 };
+}
+
+/** dot 은 두 줄까지 감싸고 그 이상은 자른다 — 개수 상한은 따로 두지 않고 두 줄에 들어가는 만큼이다 */
+export const MAX_DOT_ROWS = 2;
+
+/** 선택 카드와 같은 폭 — dot 줄이 카드 밖으로 나가지 않는다 (drawGrid 의 카드 폭 식과 같다) */
+export function dotRegionWidth(cellWidth: number, selectionRadius: number): number {
+  return Math.min(cellWidth - 6, selectionRadius * 2 + 10);
 }
 
 export function computeGridLayout({
@@ -67,6 +78,12 @@ export function computeGridLayout({
   const rowHeight = clamp(cellWidth * 0.8, minRowHeight, maxRowHeight);
   const scale = scaleForCellWidth(cellWidth);
   const safeRowCount = Math.max(rowCount, 0);
+  const selectionRadius = Math.min(cellWidth - 8, rowHeight * 0.72) / 2;
+  // 한 줄에 n개: n·2r + (n−1)·gap ≤ 폭. 폭이 0 이어도 최소 1개는 둔다
+  const dotsPerRow = Math.max(
+    1,
+    Math.floor((dotRegionWidth(cellWidth, selectionRadius) + scale.dotGap) / (scale.dotRadius * 2 + scale.dotGap)),
+  );
 
   return {
     gridWidth,
@@ -80,8 +97,10 @@ export function computeGridLayout({
     // 겹치면 dot 이 선택 원 안에 묻힌다.
     dayCenterOffsetY: rowHeight * 0.38,
     dotCenterOffsetY: rowHeight * 0.8,
-    selectionRadius: Math.min(cellWidth - 8, rowHeight * 0.72) / 2,
+    selectionRadius,
     ...scale,
+    dotsPerRow,
+    maxDots: dotsPerRow * MAX_DOT_ROWS,
   };
 }
 

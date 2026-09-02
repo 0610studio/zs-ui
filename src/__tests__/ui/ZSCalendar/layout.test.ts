@@ -53,13 +53,21 @@ describe('ZSCalendar core/layout — 셀 폭 단계 조정', () => {
   it('소형폰(320pt)에서 dot 개수와 폰트가 줄어든다', () => {
     const small = computeGridLayout({ containerWidth: 320, rowCount: 6 }); // 셀 폭 ≈45.7
     const tablet = computeGridLayout({ containerWidth: 520, rowCount: 6 }); // 셀 폭 ≈74.3
-    expect(small.maxDots).toBeLessThan(tablet.maxDots);
+    // 최대 개수는 두 줄에 들어가는 만큼 — 줄당 개수가 폭을 따라간다
+    expect(small.maxDots).toBe(small.dotsPerRow * 2);
+    expect(tablet.maxDots).toBe(tablet.dotsPerRow * 2);
+    expect(small.dotsPerRow).toBeLessThanOrEqual(tablet.dotsPerRow);
     expect(small.dayFontSize).toBeLessThan(tablet.dayFontSize);
     expect(small.dotRadius).toBeLessThan(tablet.dotRadius);
   });
 
-  it('아주 좁은 폭에서도 dot 이 최소 2개는 남는다', () => {
-    expect(computeGridLayout({ containerWidth: 240, rowCount: 6 }).maxDots).toBe(2);
+  it('아주 좁은 폭에서도 한 줄에 dot 이 여러 개 들어가고, 두 줄이 카드 안에 머문다', () => {
+    const m = computeGridLayout({ containerWidth: 240, rowCount: 6 });
+    expect(m.dotsPerRow).toBeGreaterThanOrEqual(3);
+    expect(m.maxDots).toBe(m.dotsPerRow * 2);
+    // 두 줄일 때 아래 줄 바닥이 행 밖으로 나가지 않는다 (선택 카드 아래 인셋 2 를 남긴다)
+    const secondRowBottom = m.dotCenterOffsetY + (m.dotRadius * 2 + m.dotGap) / 2 + m.dotRadius;
+    expect(secondRowBottom).toBeLessThanOrEqual(m.rowHeight - 2);
   });
 
   it('단계 경계에서 값이 단조 증가한다', () => {
