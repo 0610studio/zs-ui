@@ -1,6 +1,6 @@
 {
   "name": "@0610studio/zs-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packageManager": "pnpm@10.16.1",
   "private": false,
   "description": "EXPO ZS-UI",
