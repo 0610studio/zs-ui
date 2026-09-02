@@ -147,12 +147,18 @@ importers:
       '@docusaurus/module-type-aliases':
         specifier: 3.6.1
         version: 3.6.1(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@docusaurus/theme-classic':
+        specifier: 3.6.1
+        version: 3.6.1(@types/react@18.3.31)(eslint@8.57.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
       '@docusaurus/tsconfig':
         specifier: 3.6.1
         version: 3.6.1
       '@docusaurus/types':
         specifier: 3.6.1
         version: 3.6.1(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.26))(html-minifier-terser@7.2.0)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/node':
+        specifier: 26.4.0
+        version: 26.4.0
       '@types/react':
         specifier: ^18.3.31
         version: 18.3.31
