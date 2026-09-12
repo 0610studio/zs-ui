@@ -4,6 +4,10 @@
 
 문서 작성 기준은 [DOCS_GUIDE.md](./DOCS_GUIDE.md)를 참고하세요.
 
+## 개발 기획
+
+- [폴더블 공통 디자인 시스템 기획·설계](./plans/foldable-design-system/README.md): Android 폴더블과 iPhone Duo를 위한 제로 베이스 설계, 공식 자료 조사, 개발 실행 계획입니다. 구현 전 제안이며 현재 공개 API 문서와 구분합니다.
+
 ## 설치
 
 이 저장소는 **pnpm만 사용합니다.** 저장소 루트에서 한 번만 설치하면 됩니다.
