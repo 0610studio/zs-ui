@@ -20,7 +20,6 @@ type LocalExample =
   | 'TextAtom'
   | 'Theme'
   | 'ThemeProvider'
-  | 'WebExample'
   | 'ZSAboveKeyboard'
   | 'ZSBlockButton'
   | 'ZSBorderBeam'
@@ -83,7 +82,6 @@ const LOCAL_EXAMPLES: Record<LocalExample, LocalExampleMetadata> = {
   TextAtom: { route: 'PrimitiveExample', sourceFile: 'PrimitiveExample.tsx' },
   Theme: { route: 'ThemeExample', sourceFile: 'ThemeExample.tsx' },
   ThemeProvider: { route: 'ThemeExample', sourceFile: 'ThemeExample.tsx' },
-  WebExample: { route: 'WebExample', sourceFile: 'WebExample.tsx' },
   ZSAboveKeyboard: {
     route: 'ZSContainerExample',
     sourceFile: 'ZSContainerExample.tsx',

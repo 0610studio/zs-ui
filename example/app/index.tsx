@@ -251,16 +251,6 @@ export default function Home() {
           href="/ThemeExample"
         />
 
-        <SectionLabel>웹 검증</SectionLabel>
-        <RowCard
-          title="Web Example"
-          caption="로컬 소스 · 반응형 · E2E 검증"
-          tileColor={palette.success[10]}
-          glyph={<ZSText typo="subTitle.4" style={{ color: palette.success[90] }}>WEB</ZSText>}
-          href="/WebExample"
-          testID="web-example-card"
-        />
-
         <SectionLabel>레이아웃</SectionLabel>
         <View style={styles.gridRow}>
           <GridCard title="ZSContainer" caption="키보드 · 스크롤 대응" tileColor={palette.information[10]} glyph={<BoxGlyph color={palette.information[50]} />} href="/ZSContainerExample" />

@@ -1,8 +1,10 @@
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemeProvider, OverlayProvider, themeFactory, ThemeFactoryConfig } from '@0610studio/zs-ui';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import SnackBar from '../src/ui/Snackbar';
+import HeaderBack from '../src/ui/HeaderBack';
 import HeaderRight from '../src/ui/HeaderRight';
 
 // 플레이그라운드 전송량을 줄이려 대표 굵기만 쓴다 (전체 매핑은 ThemeProvider 문서 참고)
@@ -69,6 +71,9 @@ export default function RootLayout() {
           <Stack
             screenOptions={{
               animation: 'slide_from_right',
+              headerLeft: Platform.OS === 'web'
+                ? ({ tintColor }) => <HeaderBack tintColor={tintColor} />
+                : undefined,
               headerRight: () => <HeaderRight />,
             }}
           />

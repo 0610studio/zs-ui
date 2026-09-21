@@ -14,6 +14,7 @@ import {
   isSameMonth,
   isValidDateString,
   monthOfWeek,
+  resolveWeekMonth,
   monthsBetween,
   parseDate,
   rotateWeekdays,
@@ -328,6 +329,46 @@ describe('ZSCalendar core/date — 주 단위 페이지 변환', () => {
       const month = monthOfWeek(week);
       expect(weekRowOfMonth(week, month, 0)).toBeGreaterThanOrEqual(0);
       week = addDays(week, 7);
+    }
+  });
+
+  it('resolveWeekMonth 은 접힌 그 주에 한해 떠나온 달을 그대로 쓴다', () => {
+    // 2025-04-27~05-03 은 4월이 4일로 과반이지만 5월 그리드의 첫 행이기도 하다
+    expect(monthOfWeek('2025-04-27')).toBe('2025-04-01');
+    expect(resolveWeekMonth('2025-04-27', '2025-04-27', '2025-05-01')).toBe('2025-05-01');
+    // 같은 주라도 4월을 보다 접었다면 4월이 남는다
+    expect(resolveWeekMonth('2025-04-27', '2025-04-27', '2025-04-01')).toBe('2025-04-01');
+  });
+
+  it('resolveWeekMonth 은 접힌 주를 벗어나면 과반 달로 돌아간다', () => {
+    // 앵커가 04-27 이어도 다른 주로 넘어가면 과반 규칙이다
+    expect(resolveWeekMonth('2025-04-20', '2025-04-27', '2025-05-01')).toBe('2025-04-01');
+    expect(resolveWeekMonth('2025-05-04', '2025-04-27', '2025-05-01')).toBe('2025-05-01');
+    // 5월을 보다 접은 뒤 10월 주를 물어도 앵커가 새어나가지 않는다
+    expect(resolveWeekMonth('2025-09-28', '2025-04-27', '2025-05-01')).toBe('2025-10-01');
+  });
+
+  it('앵커가 걸리지 않은 주는 언제나 그 주를 품은 달을 가리킨다', () => {
+    let week = startOfWeek('2026-01-01', 0);
+    for (let index = 0; index < 120; index += 1) {
+      // 앵커와 어긋나면 과반 규칙이고, 그 달의 그리드에는 이 주가 반드시 들어 있다
+      const resolved = resolveWeekMonth(week, '2000-01-02', '2000-01-01');
+      expect(resolved).toBe(monthOfWeek(week));
+      expect(weekRowOfMonth(week, resolved, 0)).toBeGreaterThanOrEqual(0);
+      week = addDays(week, 7);
+    }
+  });
+
+  it('앵커 달은 컴포넌트가 넘기는 대로 — 그 주를 품은 달이면 그리드 안에 남는다', () => {
+    // 월간에서 접을 때 앵커 달은 언제나 그 주를 한 행으로 품은 달이다
+    for (const [week, month] of [
+      ['2025-04-27', '2025-05-01'],
+      ['2025-04-27', '2025-04-01'],
+      ['2026-09-27', '2026-10-01'],
+      ['2026-09-27', '2026-09-01'],
+    ] as const) {
+      expect(resolveWeekMonth(week, week, month)).toBe(month);
+      expect(weekRowOfMonth(week, month, 0)).toBeGreaterThanOrEqual(0);
     }
   });
 });

@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { ZSBorderBeam, ZSContainer, ZSSwitch, ZSText, useTheme } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
+import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
 
 export default function BorderBeamExample() {
   const [active, setActive] = useState(true);
   const { palette } = useTheme();
+
+  if (Platform.OS === 'web') {
+    return (
+      <>
+        <Stack.Screen options={{ title: 'ZSBorderBeam' }} />
+        <WebUnsupportedNotice component="ZSBorderBeam" />
+      </>
+    );
+  }
 
   return (
     <>

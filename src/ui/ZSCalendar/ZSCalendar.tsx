@@ -10,16 +10,16 @@ import {
   addMonths,
   buildEventIndex,
   computeGridLayout,
-  monthOfWeek,
+  isSameMonth,
   monthsBetween,
   resolveCalendarLocale,
   resolveCalendarTheme,
+  resolveWeekMonth,
   rotateWeekdays,
   startOfMonth,
   startOfWeek,
   todayDateString,
   visibleRangeOf,
-  weekRowOfMonth,
   weeksBetween,
   weeksInMonth,
   type CalendarEvent,
@@ -160,6 +160,15 @@ function ZSCalendar<T = unknown>({
   const [baseMonth, setBaseMonth] = useState(visibleMonth);
   const [baseWeekRaw, setBaseWeek] = useState(() => startOfWeek(visibleMonth, firstDayOfWeek));
   const baseWeek = useMemo(() => startOfWeek(baseWeekRaw, firstDayOfWeek), [baseWeekRaw, firstDayOfWeek]);
+  /**
+   * 접히는 순간의 주와 그때 보던 달. 경계 주(04-27~05-03 처럼 두 달에 걸친 주)는 어느 달의
+   * 그리드에도 들어가 주만 보고는 정할 수 없어, 그 한 주에 한해 떠나온 달을 들고 간다.
+   * 다른 주로 넘어가면 과반 규칙으로 돌아간다 — 주 이동까지 붙들면 되돌아온 주의 달이 어긋난다.
+   */
+  const [weekAnchor, setWeekAnchor] = useState(() => ({
+    week: startOfWeek(visibleMonth, firstDayOfWeek),
+    month: startOfMonth(visibleMonth),
+  }));
 
   const { width, onLayout } = useContainerWidth();
   const index = useMemo(() => buildEventIndex(events), [events]);
@@ -190,17 +199,19 @@ function ZSCalendar<T = unknown>({
   const currentWeekStart = useMemo(() => {
     if (unit === 'week') return addDays(baseWeek, page * 7);
     const month = startOfMonth(addMonths(baseMonth, page));
-    const candidate = startOfWeek(selectedDate ?? today, firstDayOfWeek);
-    // 선택일이 이 달 그리드에 없으면(달만 넘겨봤다면) 첫 주를 남긴다
-    return weekRowOfMonth(candidate, month, firstDayOfWeek) >= 0
-      ? candidate
+    // 선택일이 이 달의 날짜일 때만 그 주를 남긴다. 다른 달이면(달만 넘겨봤다면) 이 달의 첫 주
+    return selectedDate && isSameMonth(selectedDate, month)
+      ? startOfWeek(selectedDate, firstDayOfWeek)
       : startOfWeek(startOfMonth(month), firstDayOfWeek);
-  }, [unit, page, baseWeek, baseMonth, selectedDate, today, firstDayOfWeek]);
+  }, [unit, page, baseWeek, baseMonth, selectedDate, firstDayOfWeek]);
 
-  // 헤더·범위의 기준 달. 주간에서는 보이는 주의 과반이 속한 달
+  // 헤더·범위의 기준 달. 주간에서는 접힌 그 주만 떠나온 달을 쓰고, 나머지 주는 과반을 따른다
   const derivedMonth = useMemo(
-    () => (unit === 'week' ? monthOfWeek(currentWeekStart) : startOfMonth(addMonths(baseMonth, page))),
-    [unit, currentWeekStart, baseMonth, page],
+    () =>
+      unit === 'week'
+        ? resolveWeekMonth(currentWeekStart, weekAnchor.week, weekAnchor.month)
+        : startOfMonth(addMonths(baseMonth, page)),
+    [unit, currentWeekStart, weekAnchor, baseMonth, page],
   );
   const rowCount = useMemo(() => weeksInMonth(derivedMonth, firstDayOfWeek), [derivedMonth, firstDayOfWeek]);
 
@@ -208,6 +219,7 @@ function ZSCalendar<T = unknown>({
     unit,
     baseMonth,
     baseWeek,
+    weekAnchor,
     anchorWeekStart: currentWeekStart,
     metrics,
     theme,
@@ -245,16 +257,21 @@ function ZSCalendar<T = unknown>({
   const { progress, setMode: driveMode } = transition;
 
   // 워클릿·이펙트 순서에 휘둘리지 않도록 전환 시점 상태를 ref 로 들고 한 번에 바꾼다
-  const unitStateRef = useRef({ unit, page, currentWeekStart, baseWeek, baseMonth, firstDayOfWeek });
-  unitStateRef.current = { unit, page, currentWeekStart, baseWeek, baseMonth, firstDayOfWeek };
+  const unitStateRef = useRef({ unit, page, currentWeekStart, baseWeek, baseMonth, derivedMonth, firstDayOfWeek });
+  unitStateRef.current = { unit, page, currentWeekStart, baseWeek, baseMonth, derivedMonth, firstDayOfWeek };
 
   // 화면은 그대로, 현재 페이지 번호가 새 단위에서도 같은 주/달을 가리키도록 원점을 잡는다
   const switchUnit = useCallback((next: CalendarPagerUnit) => {
     const current = unitStateRef.current;
     if (current.unit === next) return;
 
-    if (next === 'week') setBaseWeek(addDays(current.currentWeekStart, -7 * current.page));
-    else setBaseMonth(addMonths(monthOfWeek(current.currentWeekStart), -current.page));
+    // 단위가 바뀌어도 내세우는 달은 그대로다 — 과반으로 다시 판정하면 경계 주에서 달이 밀린다
+    if (next === 'week') {
+      setWeekAnchor({ week: current.currentWeekStart, month: current.derivedMonth });
+      setBaseWeek(addDays(current.currentWeekStart, -7 * current.page));
+    } else {
+      setBaseMonth(addMonths(current.derivedMonth, -current.page));
+    }
     setUnit(next);
   }, []);
 
@@ -294,10 +311,15 @@ function ZSCalendar<T = unknown>({
 
     lastMonthRef.current = visibleMonth;
     const current = unitStateRef.current;
-    const target =
-      current.unit === 'week'
-        ? weeksBetween(current.baseWeek, startOfWeek(visibleMonth, current.firstDayOfWeek))
-        : monthsBetween(current.baseMonth, visibleMonth);
+    let target: number;
+    if (current.unit === 'week') {
+      // 밖에서 달을 바꾸면 그 달의 첫 주로 가되, 그 주가 내세울 달도 같이 옮긴다
+      const week = startOfWeek(visibleMonth, current.firstDayOfWeek);
+      target = weeksBetween(current.baseWeek, week);
+      setWeekAnchor({ week, month: startOfMonth(visibleMonth) });
+    } else {
+      target = monthsBetween(current.baseMonth, visibleMonth);
+    }
     setPage(target);
     goToPage(target);
   }, [derivedMonth, visibleMonth, setVisibleMonth, goToPage]);
