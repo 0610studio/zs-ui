@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ZSCalendar, ZSText, useCalendarAgenda, todayDateString, type CalendarEvent, type DateString } from '@0610studio/zs-ui';
+import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
 
 type Memo = { title: string };
 
@@ -38,6 +39,15 @@ function MemoList() {
 /** 기본 예제 — 이벤트 배열 하나와 선택 날짜 상태만으로 동작하는 최소 구성 */
 export default function ZSCalendarExample() {
   const [selectedDate, setSelectedDate] = useState<DateString>(today);
+
+  if (Platform.OS === 'web') {
+    return (
+      <>
+        <Stack.Screen options={{ title: 'ZSCalendar' }} />
+        <WebUnsupportedNotice component="ZSCalendar" />
+      </>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={styles.root}>

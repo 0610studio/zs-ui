@@ -218,6 +218,83 @@ describe('ZSCalendar — 주간 모드 페이저', () => {
     expect(screen.queryByTestId('calendar-cell-2026-09-01')).toBeNull();
     expect(screen.queryByTestId('calendar-cell-2026-09-20')).toBeNull();
   });
+
+  /**
+   * 2025-05 그리드의 첫 행(04-27~05-03)은 4월이 과반이다. 주간으로 접을 때 이 주를 과반으로
+   * 다시 판정하면 보고 있던 5월이 4월로 밀린다 — 헤더만이 아니라 되돌아올 달까지 어긋난다.
+   */
+  describe('경계 주로 접혀도 보고 있던 달을 유지한다', () => {
+    const scene = (mode: 'month' | 'week', props: Record<string, unknown>) => (
+      <ZSCalendar mode={mode} testID="calendar" {...props} />
+    );
+    const title = () => screen.getByTestId('calendar-header-title').props.accessibilityLabel;
+    // 접힘이 끝난 뒤에야 주 단위로 갈아탄다 — 한 프레임 더 흘려보낸다
+    const settle = async () => {
+      await act(async () => {});
+      await act(async () => {});
+    };
+
+    it('선택일이 다른 달이면 첫 주를 남기고, 선택은 그대로 둔다', async () => {
+      const onMonthChange = jest.fn();
+      const props = { defaultVisibleMonth: '2025-06-01', defaultSelectedDate: '2025-06-03', onMonthChange };
+      const { rerender } = renderCalendar(scene('month', props));
+      const show = (mode: 'month' | 'week') => rerender(<ThemeProvider>{scene(mode, props)}</ThemeProvider>);
+
+      fireEvent.press(screen.getByTestId('calendar-header-prev'));
+      await settle();
+      expect(title()).toBe('2025년 5월');
+
+      show('week');
+      await settle();
+
+      expect(title()).toBe('2025년 5월');
+      expect(onMonthChange).toHaveBeenLastCalledWith('2025-05-01');
+      // 남는 주는 5월 그리드의 첫 행
+      expect(screen.getByTestId('calendar-cell-2025-04-27')).toBeTruthy();
+      expect(screen.getByTestId('calendar-cell-2025-05-03')).toBeTruthy();
+      expect(screen.queryByTestId('calendar-cell-2025-05-04')).toBeNull();
+
+      // 다시 펼쳐도 4월이 아니라 떠나온 5월로 돌아온다
+      show('month');
+      await settle();
+      expect(title()).toBe('2025년 5월');
+
+      // 선택은 6/3 그대로 — 6월로 가면 다시 표시된다
+      fireEvent.press(screen.getByTestId('calendar-header-next'));
+      await settle();
+      expect(title()).toBe('2025년 6월');
+      expect(screen.getByTestId('calendar-cell-2025-06-03').props.accessibilityState.selected).toBe(true);
+    });
+
+    it('선택일이 이 달의 첫 행에 있어도 달이 밀리지 않는다', async () => {
+      const onMonthChange = jest.fn();
+      const props = { defaultVisibleMonth: '2025-05-01', defaultSelectedDate: '2025-05-02', onMonthChange };
+      const { rerender } = renderCalendar(scene('month', props));
+      expect(title()).toBe('2025년 5월');
+
+      rerender(<ThemeProvider>{scene('week', props)}</ThemeProvider>);
+      await settle();
+
+      expect(title()).toBe('2025년 5월');
+      expect(onMonthChange).not.toHaveBeenCalled();
+      expect(screen.getByTestId('calendar-cell-2025-05-02').props.accessibilityState.selected).toBe(true);
+    });
+
+    it('주간에서 그 달 그리드를 벗어나면 그때 달이 넘어간다', async () => {
+      renderCalendar(scene('week', { defaultVisibleMonth: '2025-05-01', defaultSelectedDate: '2025-05-02' }));
+      await settle();
+
+      // 04-27 주는 5월 그리드의 첫 행이라 아직 5월이다
+      expect(screen.getByTestId('calendar-cell-2025-04-27')).toBeTruthy();
+      expect(title()).toBe('2025년 5월');
+
+      // 한 주 더 가면 5월 그리드 밖 — 그때 비로소 4월로 넘어간다
+      fireEvent.press(screen.getByTestId('calendar-header-prev'));
+      await settle();
+      expect(screen.getByTestId('calendar-cell-2025-04-20')).toBeTruthy();
+      expect(title()).toBe('2025년 4월');
+    });
+  });
 });
 
 describe('ZSCalendar — onVisibleRangeChange (prefetch 힌트)', () => {

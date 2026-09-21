@@ -13,7 +13,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 :::
 
 :::warning 웹 미지원
-광선 효과는 iOS·Android 전용입니다. 웹에서는 효과 없이 콘텐츠만 렌더링됩니다. 색상, 회전, glow, pulse 애니메이션은 `example`의 실제 iOS·Android 앱에서 확인하세요.
+광선 효과는 iOS·Android 전용입니다. 라이브러리는 웹에서도 깨지지 않게 효과 없이 콘텐츠만 렌더링하지만, 아래 미리보기는 그 반쪽 화면 대신 미지원 안내만 띄웁니다. 색상, 회전, glow, pulse 애니메이션은 `example`의 실제 iOS·Android 앱에서 확인하세요.
 :::
 
 <LocalPlayground example="ZSBorderBeam" />

@@ -26,6 +26,7 @@ import { AgendaItem } from '../src/ui/barabom/AgendaItem';
 import BarabomCalendarHeader from '../src/ui/barabom/CalendarHeader';
 import DatePickerSheet from '../src/ui/barabom/DatePickerSheet';
 import { BARABOM_IMAGES } from '../src/ui/barabom/stickers';
+import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
 
 /** 바라봄 CALENDAR_COLORS — 팔레트에서 나오지 않는 요일 색만 여기 둔다. 선택 카드·오늘 원은 ZSCalendar 기본 그림이다 */
 const BARABOM_CALENDAR_THEME: CalendarThemeOverride = {
@@ -125,6 +126,19 @@ function DevStrip({
  * 가장 짧은 사용법은 ZSCalendarExample 을 본다.
  */
 export default function ZSCalendarAdvancedExample() {
+  if (Platform.OS === 'web') {
+    return (
+      <>
+        <Stack.Screen options={{ title: 'ZSCalendar 심화' }} />
+        <WebUnsupportedNotice component="ZSCalendar" />
+      </>
+    );
+  }
+
+  return <ZSCalendarAdvancedScreen />;
+}
+
+function ZSCalendarAdvancedScreen() {
   const { palette } = useTheme();
 
   // 빈 목록으로 시작하면 연동이 보이지 않는다
@@ -180,14 +194,6 @@ export default function ZSCalendarAdvancedExample() {
     <GestureHandlerRootView style={styles.root}>
       <Stack.Screen options={{ title: 'ZSCalendar 심화' }} />
       <ZSContainer scrollViewDisabled style={[styles.container, { backgroundColor: palette.background.base }]}>
-        {Platform.OS === 'web' && (
-          <View style={[styles.notice, { backgroundColor: palette.warning[10] }]} testID="calendar-web-unsupported">
-            <ZSText typo="caption.1" style={{ color: palette.warning[70] }}>
-              ZSCalendar 는 웹을 지원하지 않습니다. iOS · Android 에서 확인하세요.
-            </ZSText>
-          </View>
-        )}
-
         {(__DEV__ || process.env.EXPO_PUBLIC_DEV_STRIP === '1') && (
           <DevStrip
             selectedDate={selectedDate}
@@ -250,7 +256,6 @@ const styles = StyleSheet.create({
   devRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 },
   devRowRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   toggleChip: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 },
-  notice: { borderRadius: 10, padding: 10, marginHorizontal: 16, marginTop: 12 },
   errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 10, padding: 10, marginHorizontal: 16, marginTop: 12 },
   retryButton: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
   empty: { paddingVertical: 16, textAlign: 'center' },

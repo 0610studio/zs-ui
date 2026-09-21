@@ -6,7 +6,7 @@ import {
   buildMonthMatrix,
   buildWeek,
   diffDays,
-  monthOfWeek,
+  resolveWeekMonth,
   startOfMonth,
   weekRowOfMonth,
   type CalendarTheme,
@@ -26,6 +26,8 @@ export interface PaneInput {
   /** 페이지 0 에 해당하는 달 / 주의 첫날 */
   baseMonth: DateString;
   baseWeek: DateString;
+  /** 접힌 그 주와 그때 보던 달 — 경계 주가 어느 달 소속인지 헤더와 같은 답을 내야 한다 */
+  weekAnchor: { week: DateString; month: DateString };
   /** 접혔을 때 화면에 남는 주의 첫날 */
   anchorWeekStart: DateString;
   metrics: GridLayoutMetrics;
@@ -59,7 +61,7 @@ const isInWeek = (weekStart: DateString, date: DateString): boolean => {
  * 스와이프 한 번에 새로 기록되는 건 새로 들어온 이웃 1개뿐이다.
  */
 export function usePaneCache(input: PaneInput) {
-  const { unit, baseMonth, baseWeek, anchorWeekStart, metrics, theme, fonts, index, selectedDate, today, firstDayOfWeek } = input;
+  const { unit, baseMonth, baseWeek, weekAnchor, anchorWeekStart, metrics, theme, fonts, index, selectedDate, today, firstDayOfWeek } = input;
   const cache = useRef(new Map<string, Pane>());
 
   // 레이아웃·테마 변경은 빈도가 낮아, 키를 잘게 쪼개는 것보다 통째로 버리는 편이 싸다
@@ -77,15 +79,18 @@ export function usePaneCache(input: PaneInput) {
     (page: number): Pane => {
       const isWeek = unit === 'week';
       const weekStart = isWeek ? addDays(baseWeek, page * 7) : null;
-      // 주간 페이지에서 흐리게 처리할 기준 달은 그 주의 과반이 속한 달
-      const month = weekStart ? monthOfWeek(weekStart) : startOfMonth(addMonths(baseMonth, page));
+      // 주간 페이지에서 흐리게 처리할 기준 달은 헤더와 같은 규칙으로 고른다
+      const month = weekStart
+        ? resolveWeekMonth(weekStart, weekAnchor.week, weekAnchor.month)
+        : startOfMonth(addMonths(baseMonth, page));
 
       // 선택 표시는 그 날짜를 품은 pane 만 다시 그리면 된다. 히트 여부는 매트릭스 없이 산술로 판정한다
       const holdsSelected =
         !!selectedDate
         && (weekStart ? isInWeek(weekStart, selectedDate) : weekRowOfMonth(selectedDate, month, firstDayOfWeek) >= 0);
-      // 키는 내용(달/주)이다 — 페이지 번호는 원점이 옮겨지면 같은 그림을 다른 번호로 가리킨다
-      const key = `${unit}|${weekStart ?? month}|${holdsSelected ? selectedDate : ''}`;
+      // 키는 내용(달/주 + 기준 달)이다 — 페이지 번호는 원점이 옮겨지면 같은 그림을 다른 번호로 가리킨다.
+      // 같은 주도 기준 달이 달라지면 흐림 처리가 달라지므로 달까지 키에 넣는다
+      const key = `${unit}|${weekStart ?? ''}|${month}|${holdsSelected ? selectedDate : ''}`;
 
       // page·anchorRow 는 그림이 아니라 배치라, 캐시된 픽처를 그대로 쓰고 위치만 갈아끼운다
       const anchorRow = weekStart ? 0 : Math.max(weekRowOfMonth(anchorWeekStart, month, firstDayOfWeek), 0);
@@ -129,7 +134,7 @@ export function usePaneCache(input: PaneInput) {
       }
       return pane;
     },
-    [unit, baseMonth, baseWeek, anchorWeekStart, metrics, theme, fonts, index, selectedDate, today, firstDayOfWeek],
+    [unit, baseMonth, baseWeek, weekAnchor, anchorWeekStart, metrics, theme, fonts, index, selectedDate, today, firstDayOfWeek],
   );
 
   return { getPane };

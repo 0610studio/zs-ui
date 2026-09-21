@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { ZSAboveKeyboard, ZSContainer, ZSText, useTheme } from '@0610studio/zs-ui';
 import CtaButton from '../src/ui/CtaButton';
 import { TextFieldExample } from '../src/ui/TextFieldExample';
 import CodeBlock from '../src/ui/kit/CodeBlock';
+import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
 
 export default function FoldableExample() {
   const [ctaLayoutHeight, setCtaLayoutHeight] = useState(0);
   const { palette } = useTheme();
+
+  if (Platform.OS === 'web') {
+    return (
+      <>
+        <Stack.Screen options={{ title: '폴더블 레이아웃' }} />
+        <WebUnsupportedNotice component="폴더블 레이아웃" />
+      </>
+    );
+  }
 
   return (
     <>

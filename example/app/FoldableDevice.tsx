@@ -1,10 +1,11 @@
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { FoldingState, ZSBlockButton, ZSContainer, ZSText, useFoldingState, useOverlay, useTheme } from '@0610studio/zs-ui';
 import MyModal from '../src/ui/MyModal';
 import MyBottomSheet from '../src/ui/MyBottomSheet';
 import Section from '../src/ui/kit/Section';
 import CodeBlock from '../src/ui/kit/CodeBlock';
+import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
 
 function InfoRow({ label, value, valueColor, isLast }: {
   label: string;
@@ -27,6 +28,15 @@ export default function FoldableDevice() {
   const { showModality, showBottomSheet } = useOverlay();
 
   const isFolded = foldingInfo.foldingState === FoldingState.FOLDED;
+
+  if (Platform.OS === 'web') {
+    return (
+      <>
+        <Stack.Screen options={{ title: 'Foldable 상태' }} />
+        <WebUnsupportedNotice component="useFoldingState" />
+      </>
+    );
+  }
 
   return (
     <>

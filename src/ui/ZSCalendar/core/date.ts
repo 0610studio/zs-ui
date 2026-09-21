@@ -165,6 +165,17 @@ export function weekRowOfMonth(
   return row < weeksInMonth(monthAnchor, firstDayOfWeek) ? row : -1;
 }
 
+/**
+ * 주간 화면이 내세울 달. 경계 주는 두 달의 그리드에 동시에 들어가 과반만으로는 정할 수 없다 —
+ * 접히는 순간의 주(anchorWeek)에 한해 그때 보던 달(anchorMonth)을 그대로 쓰고,
+ * 다른 주로 넘어가면 과반이 속한 달을 따른다.
+ */
+export const resolveWeekMonth = (
+  weekStart: DateString,
+  anchorWeek: DateString,
+  anchorMonth: DateString,
+): DateString => (weekStart === anchorWeek ? startOfMonth(anchorMonth) : monthOfWeek(weekStart));
+
 /** labels 는 항상 일요일 시작으로 받아 firstDayOfWeek 기준으로 회전시킨다 */
 export function rotateWeekdays<T>(labels: ReadonlyArray<T>, firstDayOfWeek: FirstDayOfWeek = 0): T[] {
   return labels.map((_, index) => labels[(index + firstDayOfWeek) % labels.length] as T);

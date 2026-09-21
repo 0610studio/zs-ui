@@ -41,6 +41,16 @@ function assertCondition(condition, message) {
   }
 }
 
+/** 헤더 뒤로가기를 눌러 카탈로그로 돌아오는지 본다 */
+function goBackToCatalog(fromRoute) {
+  runBrowser(['find', 'testid', 'header-back', 'click']);
+  runBrowser(['wait', '--text', 'ZS-UI']);
+  assertCondition(
+    evaluate(`location.pathname === '/'`),
+    `${fromRoute}: 헤더 뒤로가기가 카탈로그로 돌아가지 않았습니다.`,
+  );
+}
+
 function runCommand(binary, args, options = {}) {
   return execFileSync(binary, args, {
     cwd: EXAMPLE_DIRECTORY,
@@ -114,32 +124,49 @@ function verifyAccessibility() {
   };
 }
 
+/** 웹 미지원 예제 — Skia 이펙트와 네이티브 폴딩 감지는 안내만 띄우고 아무것도 그리지 않는다 */
+const WEB_UNSUPPORTED_ROUTES = [
+  'ZSCalendarExample',
+  'ZSCalendarAdvancedExample',
+  'BorderBeamExample',
+  'ZSSkeletonExample',
+  'FoldableDevice',
+  'FoldableExample',
+];
+
 /**
- * ZSCalendar 은 웹을 지원하지 않는다. 그래도 웹 빌드가 죽지는 않아야 한다 —
- * 라이브러리를 import 하는 것만으로 CanvasKit 로딩이 시작되면 캘린더를 쓰지 않는
+ * 위 예제는 웹에서 효과·기능이 빠진 반쪽 화면이 되므로 안내만 띄운다. 그래도 웹 빌드가 죽지는 않아야 한다 —
+ * 라이브러리를 import 하는 것만으로 CanvasKit 로딩이 시작되면 그 컴포넌트를 쓰지 않는
  * 소비자의 웹 빌드까지 통째로 무너진다.
  */
-function verifyCalendarWebUnsupported() {
+function verifyWebUnsupported() {
   runBrowser(['set', 'viewport', '390', '844']);
-  runBrowser(['open', `${BASE_URL}/ZSCalendarExample`]);
-  runBrowser(['wait', '--fn', `Boolean(document.querySelector('[data-testid="calendar-web-unsupported"]'))`]);
 
-  assertCondition(
-    evaluate(`document.querySelectorAll('canvas').length === 0`),
-    '웹에서 Skia Canvas 가 마운트되었습니다 — 웹 진입점이 네이티브 구현을 끌어오고 있습니다.',
-  );
+  WEB_UNSUPPORTED_ROUTES.forEach(route => {
+    runBrowser(['open', `${BASE_URL}/${route}`]);
+    runBrowser(['wait', '--fn', `Boolean(document.querySelector('[data-testid="web-unsupported-notice"]'))`]);
+
+    assertCondition(
+      evaluate(`document.querySelectorAll('canvas').length === 0`),
+      `${route}: 웹에서 Skia Canvas 가 마운트되었습니다 — 웹 진입점이 네이티브 구현을 끌어오고 있습니다.`,
+    );
+    assertCondition(
+      evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth'),
+      `${route}: 안내 화면에 가로 넘침이 있습니다.`,
+    );
+
+    runBrowser(['screenshot', join(SCREENSHOT_DIRECTORY, `web-unsupported-${route}.png`)]);
+  });
+
   assertCondition(
     evaluate(`document.querySelectorAll('[data-testid^="calendar-cell-"]').length === 0`),
     '웹에서 달력이 렌더되었습니다 — 미지원이면 아무것도 그리지 않아야 합니다.',
   );
-  assertCondition(
-    evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth'),
-    '캘린더 화면에 가로 넘침이 있습니다.',
-  );
 
-  runBrowser(['screenshot', join(SCREENSHOT_DIRECTORY, 'calendar-web-unsupported.png')]);
+  // 문서 iframe 처럼 서브 라우트로 바로 들어온 뒤에도 헤더 뒤로가기가 카탈로그로 돌려보내야 한다
+  goBackToCatalog('딥링크 진입');
 
-  // 홈으로 돌려놓아 뒤따르는 접근성 검사가 기존 화면 기준을 유지하게 한다
+  // 뒤따르는 접근성 검사가 기존 화면 기준을 유지하도록 되돌려 놓는다
   runBrowser(['open', `${BASE_URL}/WebExample`]);
   runBrowser(['wait', '--text', '배포 전에 웹 동작을 직접 확인하세요']);
 }
@@ -176,8 +203,14 @@ async function main() {
       evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth'),
       '홈 화면에 가로 넘침이 있습니다.',
     );
-    runBrowser(['find', 'testid', 'web-example-card', 'click']);
-    runBrowser(['wait', '--url', '**/WebExample']);
+    // 카탈로그 → 상세 이동과 웹 헤더 뒤로가기(native-stack 기본 back 이 없는 경로)를 함께 본다
+    runBrowser(['find', 'testid', 'calendar-basic-card', 'click']);
+    runBrowser(['wait', '--url', '**/ZSCalendarExample']);
+    runBrowser(['wait', '--fn', `Boolean(document.querySelector('[data-testid="web-unsupported-notice"]'))`]);
+    goBackToCatalog('ZSCalendarExample');
+
+    // WebExample 은 카탈로그에서 링크하지 않는 e2e 전용 화면이라 직접 진입한다
+    runBrowser(['open', `${BASE_URL}/WebExample`]);
     runBrowser(['wait', '--text', '배포 전에 웹 동작을 직접 확인하세요']);
 
     assertCondition(
@@ -247,8 +280,8 @@ async function main() {
     ]);
     runBrowser(['screenshot', '--full', join(SCREENSHOT_DIRECTORY, 'web-example-desktop-dark.png')]);
 
-    console.log('5/6 캘린더 웹 미지원 검증');
-    verifyCalendarWebUnsupported();
+    console.log('5/6 Skia 예제 웹 미지원 검증');
+    verifyWebUnsupported();
 
     const accessibility = verifyAccessibility();
     verifyBrowserErrors();
