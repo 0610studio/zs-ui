@@ -5,6 +5,8 @@ This library was created using [create-expo-module](https://docs.expo.dev/module
 
 # ZS-ui
 
+현재 패키지 버전은 `package.json`의 1.0.3입니다. 공개 API와 예제는 [문서 사이트 소스](docs/README.md)를 기준으로 확인합니다.
+
 ZS-ui는 JavaScript만으로 구현된 Expo용 UI 컴포넌트 라이브러리입니다.
 
 다크 모드, 테마, 타이포그래피, Alert, BottomSheet와 같은 주요 UI 요소가 포함되어 있으며, 직관적이고 일관된 사용자 인터페이스를 구현할 수 있습니다.
@@ -45,7 +47,7 @@ Skia를 사용하는 `ZSBorderBeam`, `ZSSkeleton`의 shimmer 효과는 iOS·Andr
 
 <br />
 
-## 0.21.0 업그레이드 안내
+## 0.21.0에서 도입된 Gesture Handler 의존성
 
 `ZSCalendar`가 추가되면서 **`react-native-gesture-handler`가 필수 peer 의존성이 되었습니다.** 0.20.x에서 올라온다면 설치가 필요합니다.
 
