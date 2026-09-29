@@ -13,7 +13,7 @@ tags: [zsUi, barabom]
 
 <br />
 
-현재 `바라봄APP`은 React Native CLI에서 Expo로 마이그레이션 작업 중이며, `ZS-ui`와 함께 활발히 개발하고 있습니다.
+이 글을 작성한 2024년 11월에는 `바라봄APP`을 React Native CLI에서 Expo로 전환하는 작업이 진행 중이었습니다. 현재 앱은 Expo 기반이며, `ZS-ui`는 앱에서 사용하는 UI 컴포넌트 라이브러리입니다.
 
 바라봄 앱에 대한 자세한 정보는 아래에서 확인 가능합니다.
 
