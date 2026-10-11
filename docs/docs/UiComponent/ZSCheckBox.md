@@ -1,7 +1,3 @@
----
-sidebar_position: 8
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSCheckBox
@@ -35,8 +31,8 @@ function MyForm() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | `boolean` | Required | 체크 상태 |
-| `onChange` | `(value: boolean) => void` | Required | 토글 시 다음 상태를 전달 |
+| `value` | `boolean` | 필수 | 체크 상태 |
+| `onChange` | `(value: boolean) => void` | 필수 | 토글 시 다음 상태를 전달 |
 | `size` | `number` | `18` | 체크 박스 한 변의 길이(px). 곡률·테두리 두께가 비율로 함께 조정됩니다 |
 | `activeColor` | `string` | 테마 `primary.main` | 체크 상태의 배경·테두리 색 |
 | `label` | `string` | `undefined` | 라벨 텍스트 |
@@ -44,7 +40,7 @@ function MyForm() {
 | `labelComponent` | `React.ReactNode` | `undefined` | 라벨을 완전히 대체하는 커스텀 노드. 지정 시 `label`·`labelStyle` 은 무시됩니다 |
 | `moreComponent` | `React.ReactNode` | `undefined` | 행 우측 끝에 배치되는 부가 요소. **press 영역 밖**이라 별도 동작을 붙일 수 있습니다 |
 | `disabled` | `boolean` | `false` | 비활성화 (흐리게 표시되고 토글되지 않음) |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 

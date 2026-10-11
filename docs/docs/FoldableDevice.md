@@ -1,7 +1,3 @@
----
-sidebar_position: 6
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # 폴더블 기기 지원
@@ -82,11 +78,11 @@ export enum FoldingState {
 
 ### ZSContainer Props
 
-| 속성명 | 타입 | 기본값 | 설명 |
-|--------|------|--------|------|
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
 | `dividerLineComponent` | `ReactNode` | `undefined` | 두 화면 사이의 구분선 컴포넌트 |
 | `rightComponent` | `ReactNode` | `undefined` | 펼침 상태에서 오른쪽 화면에 표시할 컴포넌트 |
-| `foldableSingleScreen` | `boolean` | `false` | 펼침 상태에서도 분할하지 않고 단일 화면으로 유지 |
+| `foldableSingleScreen` | `boolean` | `undefined` | 펼침 상태에서도 분할하지 않고 단일 화면으로 유지 |
 | `unfoldedSinglePaneMaxWidth` | `number \| false` | `ThemeProvider` 의 `foldable` 설정 | 펼침 + 단일 화면일 때 콘텐츠 최대 가로 길이(px). `false`면 전폭 |
 
 ### 동작 방식
@@ -113,7 +109,7 @@ export enum FoldingState {
 </ZSContainer>
 ```
 
-## 주의사항
+## 특징
 
 1. **플랫폼 지원**: 현재 Android 폴더블 기기에서만 지원됩니다.
 2. **스크롤 동기화**: 양쪽 화면의 스크롤은 독립적으로 동작합니다.

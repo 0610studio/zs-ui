@@ -1,7 +1,3 @@
----
-sidebar_position: 3
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSText
@@ -30,7 +26,7 @@ export default function App() {
 |------|------|---------|-------------|
 | `typo` | `TypoOptions` | `'body.2'` | 테마 설정에 따른 타이포그래피 스타일 선택 |
 | `color` | `TypoColorOptions` | `'base'` | 테마 팔레트에 따른 텍스트 색상 지정 |
-| `...props` | `TextProps` | - | React Native `Text` 컴포넌트의 모든 기본 속성 |
+| `...props` | `TextProps` | `undefined` | React Native `Text` 컴포넌트의 모든 기본 속성 |
 
 ## 타이포그래피 옵션
 

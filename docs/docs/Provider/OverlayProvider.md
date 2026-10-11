@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # OverlayProvider
@@ -11,15 +7,6 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 이 Provider 안에서는 `useOverlay` 훅을 통해 Alert, Snackbar, BottomSheet, PopOver, Modality, Loader를 선언적으로 제어할 수 있습니다. 각 스크린마다 visible 상태를 직접 관리하거나 컴포넌트를 수동으로 배치할 필요가 없습니다.
 
 <LocalPlayground example="OverlayProvider" height={760} />
-
-## Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | Required | 자식 컴포넌트 |
-| `customSnackbar` | `(props: CustomSnackbarProps) => ReactNode` | `undefined` | 기본 Snackbar를 대체할 커스텀 컴포넌트 |
-| `loaderComponent` | `() => ReactNode` | `undefined` | 기본 Loader를 대체할 커스텀 컴포넌트 |
-| `maxSnackbarCount` | `number` | `3` | 동시에 표시할 수 있는 Snackbar 최대 개수 |
 
 ## 기본 사용법
 
@@ -42,6 +29,15 @@ import { ThemeProvider, OverlayProvider } from '@0610studio/zs-ui';
   </OverlayProvider>
 </ThemeProvider>
 ```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | 필수 | 자식 컴포넌트 |
+| `customSnackbar` | `(props: CustomSnackbarProps) => ReactNode` | `undefined` | 기본 Snackbar를 대체할 커스텀 컴포넌트 |
+| `loaderComponent` | `() => ReactNode` | `undefined` | 기본 Loader를 대체할 커스텀 컴포넌트 |
+| `maxSnackbarCount` | `number` | `3` | 동시에 표시할 수 있는 Snackbar 최대 개수 |
 
 ## 커스텀 스낵바
 
@@ -118,10 +114,10 @@ function App() {
 :::
 
 오버레이가 열려 있을 때 Android back 키는 **최상위 오버레이 하나만** 닫습니다
-(로더 > Alert/PopOver/Modal > BottomSheet 순). 이전처럼 모든 오버레이가 한 번에 닫히지 않습니다.
+(로더 > Alert/PopOver/Modal > BottomSheet 순).
 로더가 표시 중이면 back은 무시(소비)되고, `dismissable: false` 바텀시트는 back을 소비만 하고 유지됩니다.
 
-앱 화면도 같은 체계에 참여할 수 있습니다:
+앱 화면도 `useBackHandler(callback, { enabled, priority })`로 같은 체계에 참여할 수 있습니다. `BackPriority`는 숫자가 클수록 먼저 처리되며 `SCREEN`(0, 기본값) · `SHEET`(10) · `OVERLAY`(20) · `LOADER`(30)입니다. `useBackHandler`는 `OverlayProvider` 안에서만 동작합니다.
 
 ```tsx
 import { useBackHandler, BackPriority } from '@0610studio/zs-ui';

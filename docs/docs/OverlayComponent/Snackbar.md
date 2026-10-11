@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Snackbar
@@ -45,7 +41,7 @@ showSnackBar(props: ShowSnackBarProps): void
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `message` | `string` | Required | Snackbar에 표시할 메시지 |
+| `message` | `string` | 필수 | Snackbar에 표시할 메시지 |
 | `type` | `SnackType` | `'success'` | Snackbar의 유형 (`'success'`, `'error'`, `''`) |
 | `index` | `number` | `Date.now()` | Snackbar의 고유 식별자 |
 | `snackbarDuration` | `number` | `3500` | Snackbar가 표시될 지속 시간 (밀리초) |
@@ -163,32 +159,7 @@ function MyComponent() {
 
 ### 커스텀 Snackbar 컴포넌트
 
-`OverlayProvider`에 커스텀 Snackbar 컴포넌트를 전달할 수 있습니다:
-
-```tsx
-import { OverlayProvider, CustomSnackbarProps } from '@0610studio/zs-ui';
-import { View, Text } from 'react-native';
-
-function CustomSnackbar({ snackType, snackMessage }: CustomSnackbarProps) {
-  return (
-    <View style={{
-      backgroundColor: snackType === 'error' ? '#e74c3c' : '#2ecc71',
-      padding: 15,
-      borderRadius: 8,
-    }}>
-      <Text style={{ color: '#fff' }}>{snackMessage}</Text>
-    </View>
-  );
-}
-
-function App() {
-  return (
-    <OverlayProvider customSnackbar={CustomSnackbar}>
-      {/* 앱 내용 */}
-    </OverlayProvider>
-  );
-}
-```
+`OverlayProvider`의 `customSnackbar`에 `CustomSnackbarProps`(`snackType`, `snackMessage`)를 받는 컴포넌트를 넘기면 기본 Snackbar를 대체합니다. 예제는 [OverlayProvider의 커스텀 스낵바](../Provider/OverlayProvider#커스텀-스낵바)를 참고하세요.
 
 ### Snackbar 닫기
 
@@ -209,10 +180,4 @@ function MyComponent() {
 
 ### 최대 개수 제한
 
-`OverlayProvider`에서 동시에 표시할 수 있는 Snackbar의 최대 개수를 설정할 수 있습니다:
-
-```tsx
-<OverlayProvider maxSnackbarCount={5}>
-  {/* 앱 내용 */}
-</OverlayProvider>
-```
+동시에 표시할 수 있는 Snackbar 수는 `OverlayProvider`의 `maxSnackbarCount`(기본값 `3`)로 정합니다. 개수를 넘으면 가장 오래된 Snackbar부터 닫힙니다. 설정 예제는 [OverlayProvider의 최대 스낵바 개수 설정](../Provider/OverlayProvider#최대-스낵바-개수-설정)을 참고하세요.

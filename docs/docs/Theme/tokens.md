@@ -1,7 +1,3 @@
----
-sidebar_position: 5
----
-
 # 공통 토큰과 유틸리티
 
 ZS-ui 컴포넌트가 함께 사용하는 모서리, 모션, 비활성 상태와 그림자 기준입니다. 앱에서 ZS-ui 컴포넌트와 나란히 배치하는 커스텀 UI에도 같은 값을 적용할 수 있습니다.
@@ -12,11 +8,11 @@ ZS-ui 컴포넌트가 함께 사용하는 모서리, 모션, 비활성 상태와
 import { RADIUS, DURATION, DISABLED_OPACITY } from '@0610studio/zs-ui';
 ```
 
-| Export | 용도 |
-|---|---|
-| `RADIUS` | 컴포넌트 모서리 반경 단계 |
-| `DURATION` | 상태 변화와 진입 애니메이션 시간 |
-| `DISABLED_OPACITY` | 비활성 컴포넌트의 공통 투명도 |
+| Export | 값 | 용도 |
+|---|---|---|
+| `RADIUS` | `xs` 4 · `sm` 6 · `md` 12 · `lg` 14 · `xl` 16 · `xxl` 22 · `sheet` 26 · `pill` 9999 | 컴포넌트 모서리 반경 단계(체크박스 `xs`, 버튼 `sm`·`md`, 입력·카드 `lg`, 스낵바 `xl`, 다이얼로그 `xxl`, 바텀시트 `sheet`) |
+| `DURATION` | `press` 100 · `fast` 150 · `base` 200 · `slow` 250 · `enter` 300 (ms) | 눌림·퇴장, 포커스, 상태 전환, 이동, 오버레이 진입 애니메이션 시간 |
+| `DISABLED_OPACITY` | `0.7` | 비활성 컴포넌트의 공통 투명도 |
 
 토큰은 개별 화면에서 비슷한 숫자를 새로 만드는 대신, ZS-ui 컴포넌트와 시각적 리듬을 맞춰야 할 때 사용합니다.
 
@@ -42,7 +38,7 @@ const cardShadow = createShadow(
 
 ## 중복 실행 방지
 
-`usePreventDoublePress`는 결제나 제출처럼 중복 호출을 막아야 하는 액션에 사용합니다. 기본 잠금 시간은 `PREVENT_DOUBLE_PRESS_INTERVAL`로 확인할 수 있습니다.
+`usePreventDoublePress(onPress, interval?)`는 결제나 제출처럼 중복 호출을 막아야 하는 액션에 사용합니다. 첫 호출만 통과시키고 `interval` 동안 연속 호출을 막으며, 기본 잠금 시간은 `PREVENT_DOUBLE_PRESS_INTERVAL`(2000ms)입니다.
 
 ```tsx
 import {

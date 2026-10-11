@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # 개요
@@ -42,33 +38,22 @@ hideOverlay('all');
 
 키보드가 올라오면 `ZSContainer`가 현재 포커스된 입력 필드를 자동으로 스크롤해서 보여줍니다. 별도 플래그를 관리하거나 `KeyboardAvoidingView`를 수동으로 배치할 필요가 없습니다.
 
+## 플랫폼 지원
+
+iOS·Android·웹에서 동작합니다. 다음 Skia 기반 기능만 iOS·Android 전용입니다.
+
+- `ZSBorderBeam` 광선, `ZSSkeleton`·`ZSSkeletonBox` shimmer: 웹에서는 효과 없이 콘텐츠만 렌더링합니다.
+- `ZSCalendar`: 웹에서는 아무것도 렌더링하지 않습니다(웹 빌드는 유지됩니다).
+
+웹 미지원 기능이 웹에서 렌더링되면 개발 모드에서 컴포넌트당 한 번 경고합니다. 웹 플레이그라운드로 최종 판단할 수 없는 범위는 [Playground](./Playground) 문서에 정리되어 있습니다.
+
 ## 어떤 문서부터 볼까요?
 
 | 목적 | 다음 문서 |
 |---|---|
-| 앱 루트 설정과 첫 화면 구성 | [시작하기](./Provider/start) |
+| 설치, 앱 루트 설정과 첫 화면 구성 | [시작하기](./Provider/start) |
 | 색상·타이포그래피·공통 토큰 사용 | [설정과 테마](./Theme/start) |
 | 입력, 선택, 피드백 컴포넌트 탐색 | [UI 컴포넌트](./UiComponent/ZSText) |
 | Alert, BottomSheet, Snackbar 연결 | [Overlay](./OverlayComponent/start) |
+| 폴더블 기기의 분할 화면 대응 | [폴더블 기기 지원](./FoldableDevice) |
 | 저장소 예제를 직접 조작 | [Playground](./Playground) |
-
----
-
-## 설치
-
-```bash
-npx expo install @0610studio/zs-ui
-```
-
-## 문서 구조
-
-- **[시작하기](/docs/Provider/start)**: Provider 설정과 첫 컴포넌트 사용
-- **[Theme](/docs/Theme/start)**: 테마 시스템과 `useStyleSheetCreate`
-- **[UI 컴포넌트](/docs/UiComponent/ZSText)**: ZSText, ZSView, ZSContainer 등
-- **[폴더블 기기 지원](/docs/FoldableDevice)**: 분할 화면/힌지 대응 가이드
-- **[Overlay 컴포넌트](/docs/OverlayComponent/start)**: Alert, BottomSheet, Snackbar 등
-
-## 추가 리소스
-
-- **Playground**: [로컬 플레이그라운드](./Playground)에서 저장소 소스 기반 웹 예제 확인
-- **GitHub**: [소스 코드](https://github.com/0610studio/zs-ui)

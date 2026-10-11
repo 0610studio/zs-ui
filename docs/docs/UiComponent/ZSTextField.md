@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSTextField
@@ -40,13 +36,14 @@ function MyComponent() {
 |------|------|---------|-------------|
 | `typo` | `TypoOptions` | `'body.2'` | 텍스트 스타일을 정의. 테마에 따라 자동 적용 |
 | `status` | `'default' \| 'error'` | `'default'` | 입력 상태를 설정. 에러 시 라벨 및 테두리 색상이 변경됨 |
-| `value` | `string` | Required | 텍스트 필드의 입력 값 |
+| `value` | `string` | 필수 | 텍스트 필드의 입력 값 |
 | `onChangeText` | `(text: string) => void` | `undefined` | 텍스트 변경 이벤트 핸들러 |
 | `label` | `string` | `'Placeholder'` | 텍스트 필드의 라벨 텍스트 |
-| `inputBgColor` | `string` | 테마 `background.base` | 입력 필드의 배경색 |
-| `labelBgColor` | `string` | 테마 `background.base` | 라벨의 배경색 |
+| `inputBgColor` | `string` | 테마 `background.base` (`inbox`는 `background.layer1`) | 입력 필드의 배경색 |
+| `labelBgColor` | `string` | 테마 `background.base` (`inbox`는 `background.layer1`) | 라벨의 배경색 |
 | `labelColor` | `string` | 테마 `text.secondary` | 라벨의 기본 텍스트 색상 |
-| `placeHolderColor` | `string` | 테마 `grey[40]` | placeholder 텍스트 색상 |
+| `placeHolderColor` | `string` | 테마 `grey[40]` (`disabled`면 `grey[70]`) | placeholder 텍스트 색상 |
+| `fontSize` | `number` | `undefined` | 타입에만 선언되어 있고 적용되지 않습니다. 글자 크기는 `typo`로 정합니다 |
 | `borderColor` | `string` | 테마 `grey[30]` | 테두리 색상 |
 | `borderRadius` | `number` | `14` | 테두리의 라운딩 반경 |
 | `focusColor` | `string` | 테마 `primary.main` | 포커스 상태에서의 테두리 색상 |
@@ -54,12 +51,12 @@ function MyComponent() {
 | `paddingHorizontal` | `number` | `15` | 텍스트 필드의 좌우 여백 |
 | `borderWidth` | `number` | `1.2` | 테두리 두께 |
 | `errorMessage` | `string` | `undefined` | 에러 상태에서 표시할 메시지 |
-| `textInputProps` | `TextInputProps` | `{}` | 기본 React Native `TextInput` 속성 |
+| `textInputProps` | `TextInputProps` | `undefined` | 기본 React Native `TextInput` 속성 |
 | `boxStyle` | `'outline' \| 'underline' \| 'inbox'` | `'outline'` | 텍스트 필드 스타일 |
 | `innerBoxStyle` | `'top' \| 'middle' \| 'bottom'` | `undefined` | 텍스트 필드가 그룹일 때 스타일을 정의 |
 | `disabled` | `boolean` | `false` | 텍스트 필드 비활성화 여부 |
 | `allowFontScaling` | `boolean` | `true` | 텍스트 크기 자동 조정 허용 여부 |
-| `isTextArea` | `boolean` | `false` | 멀티라인 입력 여부 |
+| `isTextArea` | `boolean` | `false` | 텍스트 영역 레이아웃 여부. 입력과 라벨을 위쪽에 정렬합니다. 여러 줄 입력은 `textInputProps.multiline`으로 켭니다 |
 
 ## 특징
 

@@ -1,7 +1,3 @@
----
-sidebar_position: 5
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Loader
@@ -50,12 +46,12 @@ showLoader(): void
 `hideOverlay` 함수는 특정 유형의 오버레이를 숨기는 데 사용됩니다. Loader를 숨기기 위해서는 `'loader'`를 인수로 전달합니다.
 
 ```typescript
-hideOverlay(option: HideOption): void
+hideOverlay(option?: HideOption): void
 ```
 
 `HideOption` 타입:
 - `'loader'` – Loader를 숨깁니다
-- `'all'` – 모든 오버레이를 숨깁니다
+- `'all'` – 모든 오버레이를 숨깁니다 (인자를 생략할 때의 기본값)
 
 ## 특징
 

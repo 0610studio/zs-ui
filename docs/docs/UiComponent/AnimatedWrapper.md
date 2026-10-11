@@ -1,7 +1,3 @@
----
-sidebar_position: 20
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # AnimatedWrapper
@@ -32,14 +28,16 @@ import { AnimatedWrapper, ZSText } from '@0610studio/zs-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `isAnimation` | `boolean` | `true` | `true`면 `FadeInDown` 진입과 `FadeOut` 퇴장 애니메이션 적용 |
+| `isAnimation` | `boolean` | 필수 | `true`면 `FadeInDown` 진입과 `FadeOut` 퇴장 애니메이션 적용 |
 | `duration` | `number` | `200` | 진입 애니메이션 시간(ms) |
 | `elevationLevel` | `ShadowLevel` | `0` | 테마 그림자 단계(0~9) |
-| `color` | `ViewColorOptions` | `undefined` | 테마 팔레트 기반 배경색 |
+| `color` | `ViewColorOptions` | `undefined` | 테마 팔레트 기반 배경색. 미지정이고 `elevationLevel`이 1 이상이면 `background.base`를 사용합니다 |
 | `children` | `React.ReactNode` | `undefined` | 내부 콘텐츠 |
-| `...props` | `ViewProps` | - | React Native `View` 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View` 속성 |
 
-## 애니메이션 없이 사용
+## 예제
+
+### 애니메이션 없이 사용
 
 `isAnimation={false}`면 Reanimated 진입·퇴장 효과 없이 일반 `View`로 렌더링하면서 배경색과 elevation 스타일은 유지합니다.
 

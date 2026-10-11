@@ -1,7 +1,3 @@
----
-sidebar_position: 9
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSRadioGroup
@@ -39,16 +35,16 @@ function MyComponent() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `options` | `RadioOption[]` | Required | 라디오 버튼 옵션 배열 |
+| `options` | `RadioOption[]` | 필수 | 라디오 버튼 옵션 배열 |
 | `value` | `RadioOption` | `undefined` | 현재 선택된 값 |
-| `onSelect` | `(value: RadioOption) => void` | Required | 값이 변경될 때 호출되는 함수 |
-| `containerStyle` | `ViewProps` | `undefined` | 최상위 컨테이너 스타일 |
+| `onSelect` | `(value: RadioOption) => void` | 필수 | 값이 변경될 때 호출되는 함수 |
+| `containerStyle` | `ViewProps` | `undefined` | 최상위 컨테이너에 펼쳐 넣는 `View` props. 안에 `style` 을 넣으면 기본 컨테이너 스타일(방향·줄바꿈·비활성 투명도)을 대체합니다 |
 | `valueStyle` | `ZSTextProps` | `undefined` | 옵션 텍스트 스타일 |
 | `selectStyle` | `ZSTextProps` | `undefined` | fullWidth 모드에서 선택 버튼 텍스트 스타일 |
 | `selectLabel` | `string` | `'선택'` | `rowCount={1}` 일 때 우측 선택 버튼에 표시할 라벨 |
 | `disabled` | `boolean` | `false` | 전체 비활성화 여부 |
 | `rowCount` | `1 \| 2 \| 3` | `1` | 한 행에 표시할 옵션 개수 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 
@@ -94,33 +90,6 @@ interface RadioOption {
 ```
 
 ## 예제
-
-### 기본 사용 (세로 배열)
-
-```tsx
-const options: RadioOption[] = [
-  { index: '0', value: '옵션 1' },
-  { index: '1', value: '옵션 2' },
-  { index: '2', value: '옵션 3' },
-];
-
-<ZSRadioGroup
-  options={options}
-  value={selected}
-  onSelect={setSelected}
-/>
-```
-
-### 그리드 레이아웃 (2열)
-
-```tsx
-<ZSRadioGroup
-  options={options}
-  value={selected}
-  onSelect={setSelected}
-  rowCount={2}
-/>
-```
 
 ### 그리드 레이아웃 (3열)
 
@@ -177,8 +146,10 @@ const options: RadioOption[] = [
   value={selected}
   onSelect={setSelected}
   containerStyle={{
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    style: {
+      padding: 20,
+      backgroundColor: '#f5f5f5',
+    },
   }}
 />
 ```

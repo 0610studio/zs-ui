@@ -1,7 +1,3 @@
----
-sidebar_position: 21
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # TextAtom

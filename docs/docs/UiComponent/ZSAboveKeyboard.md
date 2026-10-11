@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSAboveKeyboard
@@ -14,13 +10,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 <LocalPlayground example="ZSAboveKeyboard" height={760} />
 
-## 철학
-
-1. **ZSContainer와 보완 관계입니다**. ZSContainer가 화면 전체 레이아웃과 자동 스크롤을 담당한다면, ZSAboveKeyboard는 키보드 위에 띄워야 하는 독립적인 UI 요소를 담당합니다.
-2. **오버레이 시스템과는 독립입니다**. `hideOverlay('all')`로 닫히지 않고, `OverlayProvider` 없이도 동작합니다.
-3. **필요한 곳에만 사용합니다**. 단순히 "키보드가 올라와도 입력 필드가 보이게" 하려면 [ZSContainer](./ZSContainer.md)의 `scrollToFocusedInput`을 사용하세요. ZSAboveKeyboard는 전송 버튼, 툴바 같이 키보드에 딱 붙어서 따라다녀야 하는 UI에 적합합니다.
-
-## ZSAboveKeyboard
+## 사용 시점
 
 | 상황 | 설명 |
 |------|------|
@@ -53,13 +43,19 @@ function ChatScreen() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `React.ReactNode` | Required | 키보드 위에 표시할 컴포넌트 |
+| `children` | `React.ReactNode` | 필수 | 키보드 위에 표시할 컴포넌트 |
 | `keyboardShowOffset` | `number` | `0` | 키보드 표시 시 추가 여백 (px) |
 | `keyboardHideOffset` | `number` | `0` | 키보드 숨김 시 추가 여백 (px) |
 | `handleLayoutHeight` | `(height: number) => void` | `undefined` | 레이아웃 높이 변경 콜백 |
 | `showOnlyKeyboardVisible` | `boolean` | `false` | 키보드가 열렸을 때만 표시 |
 | `backgroundColor` | `string` | `undefined` | 배경색 |
-| `...props` | `ViewProps` | - | React Native `View` 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View` 기본 속성 |
+
+## 특징
+
+1. **ZSContainer와 보완 관계입니다**. ZSContainer가 화면 전체 레이아웃과 자동 스크롤을 담당한다면, ZSAboveKeyboard는 키보드 위에 띄워야 하는 독립적인 UI 요소를 담당합니다.
+2. **오버레이 시스템과는 독립입니다**. `hideOverlay('all')`로 닫히지 않고, `OverlayProvider` 없이도 동작합니다.
+3. **필요한 곳에만 사용합니다**. 단순히 "키보드가 올라와도 입력 필드가 보이게" 하려면 [ZSContainer](./ZSContainer.md)의 `scrollToFocusedInput`을 사용하세요. ZSAboveKeyboard는 전송 버튼, 툴바 같이 키보드에 딱 붙어서 따라다녀야 하는 UI에 적합합니다.
 
 ## 예제
 

@@ -1,7 +1,3 @@
----
-sidebar_position: 22
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSCalendar
@@ -100,7 +96,7 @@ function MemoList() {
 </ZSCalendar>
 ```
 
-`{...bindScroll}` 은 세 핸들러(`onScroll` · `onScrollEndDrag` · `onMomentumScrollEnd`)가 한 묶음이라 그대로 펼쳐 넣어야 합니다. 이걸 넣으면 리스트 스크롤이 월간↔주간 전환을 함께 구동합니다 ([규칙](#리스트-스크롤로-접기)). 스크롤 연동이 필요 없으면 `bindScroll` 없이 `items` 만 써도 됩니다.
+`{...bindScroll}` 은 세 핸들러(`onScroll` · `onScrollEndDrag` · `onMomentumScrollEnd`)와 `scrollEventThrottle` 이 한 묶음이라 그대로 펼쳐 넣어야 합니다. 이걸 넣으면 리스트 스크롤이 월간↔주간 전환을 함께 구동합니다 ([규칙](#리스트-스크롤로-접기)). 스크롤 연동이 필요 없으면 `bindScroll` 없이 `items` 만 써도 됩니다.
 
 전체 코드는 `example/app/ZSCalendarExample.tsx` 에 있습니다.
 
@@ -136,19 +132,19 @@ function MemoList() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `events` | `CalendarEvent<T>[]` | `[]` | 달력 점과 리스트가 공유하는 단일 소스 |
+| `events` | `ReadonlyArray<CalendarEvent<T>>` | `[]` | 달력 점과 리스트가 공유하는 단일 소스 |
 | `onVisibleRangeChange` | `(range: DateRange) => void` | `undefined` | 앞뒤 1페이지를 포함한 표시 범위 (prefetch 힌트) |
-| `selectedDate` | `DateString \| null` | - | 선택된 날짜 (controlled) |
+| `selectedDate` | `DateString \| null` | `undefined` | 선택된 날짜 (controlled) |
 | `defaultSelectedDate` | `DateString \| null` | 오늘 | 선택된 날짜 초기값 (uncontrolled) |
 | `onDateChange` | `(date: DateString) => void` | `undefined` | 날짜를 탭했을 때 |
-| `visibleMonth` | `DateString` | - | 표시 중인 달 (controlled). 해당 월 1일로 정규화됩니다 |
+| `visibleMonth` | `DateString` | `undefined` | 표시 중인 달 (controlled). 해당 월 1일로 정규화됩니다 |
 | `defaultVisibleMonth` | `DateString` | 이번 달 | 표시 중인 달 초기값 (uncontrolled) |
 | `onMonthChange` | `(month: DateString) => void` | `undefined` | 스와이프·헤더 화살표로 달이 바뀌었을 때 |
-| `mode` | `'week' \| 'month'` | - | 보기 모드 (controlled) |
+| `mode` | `'week' \| 'month'` | `undefined` | 보기 모드 (controlled) |
 | `defaultMode` | `'week' \| 'month'` | `'month'` | 보기 모드 초기값 (uncontrolled) |
-| `onModeChange` | `(mode) => void` | `undefined` | 전환이 양 끝(0 또는 1)에 도달했을 때만 호출됩니다 |
+| `onModeChange` | `(mode: CalendarMode) => void` | `undefined` | 전환이 양 끝(0 또는 1)에 도달했을 때만 호출됩니다 |
 | `calendarTheme` | `CalendarThemeOverride` | 테마 팔레트에서 파생 | 색 토큰 부분 오버라이드 |
-| `fonts` | `{ regular?, bold? }` | `undefined` | 날짜 숫자 폰트 파일. 미주입 시 `ThemeProvider` 의 `themeFontAssets`(400·700), 그것도 없으면 시스템 폰트 |
+| `fonts` | `CalendarFontSources` | `undefined` | 날짜 숫자 폰트 파일. 미주입 시 `ThemeProvider` 의 `themeFontAssets`(400·700), 그것도 없으면 시스템 폰트 |
 | `firstDayOfWeek` | `0 \| 1` | `0` | 0=일요일, 1=월요일 시작 |
 | `locale` | `'ko' \| 'en' \| CalendarLocaleStrings` | `'ko'` | 요일·월 제목·접근성 라벨·스크린리더 안내 언어 |
 | `labels` | `CalendarLabels` | locale 을 따름 | locale 위에 요일 라벨·월 제목만 덮어쓴다 |
@@ -187,7 +183,7 @@ type CalendarEvent<T = unknown> = {
 ## useCalendarAgenda
 
 ```ts
-function useCalendarAgenda<T>(options?: {
+function useCalendarAgenda<T = unknown>(options?: {
   index?: EventIndex<T>;            // 생략 시 <ZSCalendar> 컨텍스트
   selectedDate?: DateString | null; // 생략 시 <ZSCalendar> 의 선택일
 }): {
@@ -208,7 +204,7 @@ const { items } = useCalendarAgenda({ index: buildEventIndex(events), selectedDa
 const items = eventsInRange(index, { startDate: selected, endDate: addMonths(selected, 1) });
 ```
 
-한때 훅에 이어보기 옵션이 있었지만 뺐습니다. 목록 길이가 보기 모드에 따라 흔들리면(월간 3개월 → 주간 3주) 콘텐츠가 뷰포트보다 짧아지는 순간 스크롤이 0 으로 되감기고, 아래의 접기 규칙과 부딪혔기 때문입니다. 범위를 정하는 책임은 소비자에게 두는 편이 예측 가능합니다.
+훅이 여러 날 이어보기를 다루지 않는 이유는 목록 길이가 보기 모드에 따라 흔들리면(월간 3개월 → 주간 3주) 콘텐츠가 뷰포트보다 짧아지는 순간 스크롤이 0 으로 되감기고, 아래의 접기 규칙과 부딪히기 때문입니다. 범위를 정하는 책임은 소비자에게 두는 편이 예측 가능합니다.
 
 ### 리스트 스크롤로 접기
 
@@ -236,16 +232,17 @@ const items = eventsInRange(index, { startDate: selected, endDate: addMonths(sel
 
 기본값은 전부 `useTheme()` 팔레트에서 나오므로 다크 모드를 따로 처리할 필요가 없습니다. 아래 토큰만 부분적으로 덮어씁니다.
 
-| 토큰 | 기본값 |
-|------|--------|
-| `background` | `'transparent'` |
-| `dayText` | `text.base` |
-| `outsideDayText` | `text.disabled` |
-| `sundayText` / `saturdayText` | `danger[50]` / `information[50]` |
-| `selectedText` | `primary.main` |
-| `todayText` | `text.base` |
-| `weekdayText` | `text.secondary` |
-| `dotColor` | `primary.main` |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `background` | `string` | `'transparent'` | 그리드 배경. 투명하면 컨테이너 배경이 비칩니다 |
+| `dayText` | `string` | `text.base` | 날짜 숫자 |
+| `outsideDayText` | `string` | `text.disabled` | 인접 달 날짜 숫자 |
+| `sundayText` | `string` | `danger[50]` | 일요일 날짜 숫자와 요일 라벨 |
+| `saturdayText` | `string` | `information[50]` | 토요일 날짜 숫자와 요일 라벨 |
+| `selectedText` | `string` | `primary.main` | 선택한 날짜 숫자 |
+| `todayText` | `string` | `text.base` | 오늘 날짜 숫자 |
+| `weekdayText` | `string` | `text.secondary` | 평일 요일 라벨 |
+| `dotColor` | `string` | `primary.main` | `color` 를 지정하지 않은 이벤트의 점 |
 
 ```tsx
 <ZSCalendar calendarTheme={{ selectedText: '#111827', todayText: '#F59E0B' }} />
@@ -318,7 +315,7 @@ Skia 는 React Native 의 `fontFamily` 문자열을 그대로 쓰지 못합니�
 
 ## 커스텀 헤더
 
-`renderHeader` 는 헤더 영역을 통째로 넘겨받습니다. 컨텍스트에 현재 제목·달·모드와 이동 콜백이 들어 있어 기본 헤더와 같은 동작을 유지하면서 모양만 바꿀 수 있습니다.
+`renderHeader` 는 헤더 영역을 통째로 넘겨받습니다. 컨텍스트에 현재 달(`visibleMonth`)과 이동 콜백(`onPrev` · `onNext` · `onTitlePress`)이 들어 있어 기본 헤더와 같은 동작을 유지하면서 모양만 바꿀 수 있습니다.
 
 ```tsx
 import type { CalendarHeaderContext } from '@0610studio/zs-ui';

@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSView
@@ -26,12 +22,12 @@ import { ZSView } from '@0610studio/zs-ui';
 |------|------|---------|-------------|
 | `isAnimation` | `boolean` | `false` | 마운트 시 페이드 애니메이션 적용 여부 |
 | `elevationLevel` | `ShadowLevel` | `0` | 그림자 단계 (0~9) |
-| `color` | `ViewColorOptions` | `undefined` | 배경색 옵션 (테마 팔레트 기반) |
-| `...rest` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `color` | `ViewColorOptions` | 테마 `background.base` | 배경색 옵션 (테마 팔레트 기반) |
+| `...rest` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 그림자 레벨 (ShadowLevel)
 
-`elevationLevel` 값에 따라 적절한 그림자 스타일이 적용됩니다. 레벨별 오프셋·블러와 테마의 `elevationShadow` 색상을 합쳐 **단일 `boxShadow`** 로 렌더하므로, `elevation` 을 쓰던 방식과 달리 Android 에서도 그림자 색상이 그대로 반영됩니다.
+`elevationLevel` 값에 따라 적절한 그림자 스타일이 적용됩니다. 레벨별 오프셋·블러와 테마의 `elevationShadow` 색상을 합쳐 **단일 `boxShadow`** 로 렌더하므로, 그림자 색상을 무시하는 Android `elevation` 과 달리 Android 에서도 그림자 색상이 그대로 반영됩니다.
 
 | Level | boxShadow | 용도 |
 |-------|-----------|------|

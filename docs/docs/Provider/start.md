@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # 시작하기
 
 이 페이지에서는 앱 루트에 Provider를 연결하고, ZS-ui 컴포넌트와 오버레이를 사용하는 첫 화면까지 구성합니다.
@@ -14,24 +10,35 @@ sidebar_position: 0
 
 ## 1. 설치
 
+ZS-ui와 필수 peer 의존성을 함께 설치합니다. 버전 범위는 패키지 `package.json`의 `peerDependencies`를 따릅니다(Expo SDK 57, React Native 0.86 이상).
+
 ```bash
-npx expo install @0610studio/zs-ui
+npx expo install @0610studio/zs-ui \
+  @react-native-async-storage/async-storage @shopify/react-native-skia \
+  expo-navigation-bar expo-router react-native-gesture-handler \
+  react-native-reanimated react-native-worklets \
+  react-native-safe-area-context react-native-svg
 ```
+
+`react-native-gesture-handler`는 `ZSCalendar`를 쓰지 않아도 필요합니다. 배포물이 CommonJS 번들이라 tree-shaking이 없어, 라이브러리를 import하는 순간 모든 모듈이 평가되기 때문입니다. 앱 루트는 `GestureHandlerRootView`로 감쌉니다. react-navigation 같은 제스처 기반 라이브러리를 이미 쓰고 있다면 대부분 충족되어 있습니다.
 
 ## 2. Provider 설정
 
 앱 최상위에 `ThemeProvider`와 `OverlayProvider`를 추가합니다. `ThemeProvider`가 바깥쪽이어야 합니다.
 
 ```tsx
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, OverlayProvider } from '@0610studio/zs-ui';
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <OverlayProvider>
-        {/* 앱 내용 */}
-      </OverlayProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <OverlayProvider>
+          {/* 앱 내용 */}
+        </OverlayProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 ```
@@ -80,6 +87,7 @@ export default function HomeScreen() {
       </ZSText>
       <ZSBlockButton
         title="저장"
+        typo="body.2"
         intent="primary"
         variant="solid"
         onPress={() =>
@@ -96,7 +104,7 @@ export default function HomeScreen() {
 
 ## 다음 단계
 
-- **[Theme](/docs/Theme/start)**: 다크 모드, 색상 팔레트, `useStyleSheetCreate`
+- **[테마 개요](/docs/Theme/start)**: 다크 모드, 색상 팔레트, `useStyleSheetCreate`
 - **[Overlay 컴포넌트](/docs/OverlayComponent/start)**: Alert, BottomSheet, Snackbar 상세 옵션
 - **[UI 컴포넌트](/docs/UiComponent/ZSText)**: ZSText, ZSView, ZSContainer, ZSTextField 등
 - **[ThemeProvider](/docs/Provider/ThemeProvider)**: `themeFactory`와 `customPalette` 상세 설정

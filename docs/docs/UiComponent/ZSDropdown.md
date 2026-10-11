@@ -1,7 +1,3 @@
----
-sidebar_position: 5
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSDropdown
@@ -51,7 +47,7 @@ function MyForm() {
 | 키보드 | 뜨지 않음 | 포커스 시 뜸 |
 | 용도 | 목록에서만 고르는 값 | 직접입력 + 선택 병행 |
 
-표시 전용은 필드를 `pointerEvents="none"` 로 감싸 포커스를 차단하므로, 탭하면 키보드 없이 `onPress` 만 호출됩니다.
+표시 전용은 입력을 `editable={false}` 로 막고 필드 전체를 덮는 press 영역을 얹으므로, 탭하면 키보드 없이 `onPress` 만 호출됩니다.
 
 ```tsx
 {/* 표시 전용 */}
@@ -67,7 +63,7 @@ function MyForm() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `onPress` | `() => void` | Required | carret 또는 필드를 눌렀을 때 호출 — 보통 바텀시트를 엽니다 |
+| `onPress` | `() => void` | 필수 | carret 또는 필드를 눌렀을 때 호출 — 보통 바텀시트를 엽니다 |
 | `value` | `string` | `''` | 선택된 값 |
 | `onChangeText` | `(text: string) => void` | `undefined` | 전달하면 입력형이 됩니다 (위 표 참조) |
 | `expanded` | `boolean` | `false` | 열림 상태. `true`면 carret 이 180° 뒤집힙니다 |
@@ -76,7 +72,7 @@ function MyForm() {
 | `chevron` | `React.ReactNode` | `SvgChevronDown` | carret 커스텀 요소 |
 | `containerStyle` | `StyleProp<ViewStyle>` | `undefined` | 필드 + 에러 메시지를 감싸는 컨테이너 스타일 |
 | `children` | `React.ReactNode` | `undefined` | 필드 뒤에 함께 렌더할 요소 (인라인 시트 등) |
-| `label` | `string` | `'Placeholder'` | 플로팅 라벨 |
+| `label` | `string` | `'선택 항목'` | 플로팅 라벨 |
 | `boxStyle` | `'outline' \| 'underline' \| 'inbox'` | `'outline'` | 필드 스타일 |
 | `disabled` | `boolean` | `false` | 필드·carret 모두 비활성화 |
 

@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSContainer
@@ -16,13 +12,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 <LocalPlayground example="ZSContainer" height={760} />
 
-## 철학
-
-1. **화면 하나 = ZSContainer 하나**. 각 스크린의 최상단 래퍼로 사용합니다.
-2. **키보드가 올라와도 입력 필드가 보입니다**. `scrollToFocusedInput`이 기본 켜져 있어, 터치한 입력 필드를 키보드 위로 자동 스크롤합니다. 추가 여백이 필요하면 `keyboardScrollExtraOffset`으로 조절합니다.
-3. **필요한 것만 키면 됩니다**. 기본값(ScrollView 활성, 바텀 SafeArea)만으로 대부분의 화면이 동작합니다.
-
-## ZSContainer
+## 사용 시점
 
 | 상황 | 설명 |
 |------|------|
@@ -66,12 +56,18 @@ function MyScreen() {
 | `translucent` | `boolean` | `undefined` | 상태바 반투명 여부 |
 | `onScroll` | `(event: NativeSyntheticEvent<NativeScrollEvent>) => void` | `undefined` | 스크롤 이벤트 핸들러 |
 | `scrollEventThrottle` | `number` | `16` | 스크롤 이벤트 스로틀 (ms) |
-| `foldableSingleScreen` | `boolean` | `false` | 폴더블 펼침 상태에서도 단일 화면 모드 |
+| `foldableSingleScreen` | `boolean` | `undefined` | 폴더블 펼침 상태에서도 단일 화면 모드 |
 | `dividerLineComponent` | `ReactNode` | `undefined` | 폴더블 좌우 화면 사이 구분선 |
 | `unfoldedSinglePaneMaxWidth` | `number \| false` | `ThemeProvider` 의 `foldable` 설정 | 폴더블 펼침 + `rightComponent` 없음(단일 화면)일 때 콘텐츠 최대 가로 길이(px). `false`면 전폭 |
-| `...props` | `ViewProps` | - | React Native `View` 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | `style`은 콘텐츠를 감싸는 내부 `View`에 적용됩니다. 그 밖의 `ViewProps`는 전달되지 않습니다 |
 
-## 주요 기능
+## 특징
+
+1. **화면 하나 = ZSContainer 하나**. 각 스크린의 최상단 래퍼로 사용합니다.
+2. **키보드가 올라와도 입력 필드가 보입니다**. `scrollToFocusedInput`이 기본 켜져 있어, 터치한 입력 필드를 키보드 위로 자동 스크롤합니다. 추가 여백이 필요하면 `keyboardScrollExtraOffset`으로 조절합니다.
+3. **필요한 것만 키면 됩니다**. 기본값(ScrollView 활성, 바텀 SafeArea)만으로 대부분의 화면이 동작합니다.
+
+## 예제
 
 ### 키보드 자동 스크롤
 
@@ -93,7 +89,7 @@ function MyScreen() {
 ```tsx
 <ZSContainer
   topComponent={<Header title="제목" />}
-  bottomComponent={<ZSBlockButton title="저장" onPress={handleSave} />}
+  bottomComponent={<ZSBlockButton title="저장" typo="body.2" onPress={handleSave} />}
 >
   <ZSText typo="body.2">스크롤되는 본문</ZSText>
 </ZSContainer>

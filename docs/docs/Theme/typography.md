@@ -1,7 +1,3 @@
----
-sidebar_position: 3
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Typography
@@ -20,15 +16,17 @@ function MyComponent() {
   const { typography } = useTheme();
 
   return (
-    <Text style={typography.heading[1]}>제목</Text>
-    <Text style={typography.body[2]}>본문</Text>
+    <>
+      <Text style={typography.heading[1]}>제목</Text>
+      <Text style={typography.body[2]}>본문</Text>
+    </>
   );
 }
 ```
 
-## Typography 구조
+## API 참조
 
-타이포그래피는 다음과 같은 구조로 구성됩니다:
+`useTheme().typography`(`TypographyVariantsProps`)는 다음 스타일을 제공합니다. 각 스타일은 `1`~`6` 단계를 가집니다.
 
 - `heading`: 제목 스타일 (1~6)
 - `title`: 페이지/섹션 제목 스타일 (1~6)
@@ -37,7 +35,16 @@ function MyComponent() {
 - `body`: 본문 스타일 (1~6)
 - `caption`: 작은 텍스트 스타일 (1~6)
 
-## 사용 예제
+### 폰트
+
+`ThemeProvider`의 `themeFonts`로 굵기별 폰트 이름을 지정합니다(`400`·`700` 필수). 설정 예제는 [ThemeProvider의 폰트 설정](../Provider/ThemeProvider#폰트-설정)을 참고하세요. 적용된 매핑은 `typography.themeFonts`로 읽습니다.
+
+```tsx
+const { typography } = useTheme();
+const fontFamily = typography.themeFonts?.[400]; // 'Pretendard-Regular'
+```
+
+## 예제
 
 ### Heading
 
@@ -77,40 +84,7 @@ const { typography } = useTheme();
 <Text style={typography.caption[2]}>Caption 2</Text>
 ```
 
-## 폰트 설정
-
-### ThemeFonts
-
-`ThemeProvider`에서 폰트를 설정할 수 있습니다:
-
-```tsx
-const themeFonts = {
-  100: 'Pretendard-Thin',
-  200: 'Pretendard-ExtraLight',
-  300: 'Pretendard-Light',
-  400: 'Pretendard-Regular',
-  500: 'Pretendard-Medium',
-  600: 'Pretendard-SemiBold',
-  700: 'Pretendard-Bold',
-  800: 'Pretendard-ExtraBold',
-  900: 'Pretendard-Black',
-};
-
-<ThemeProvider themeFonts={themeFonts}>
-  {/* 앱 내용 */}
-</ThemeProvider>
-```
-
-### 폰트 접근
-
-```tsx
-const { typography } = useTheme();
-
-// 폰트 정보 접근
-const fontFamily = typography.themeFonts?.[400]; // 'Pretendard-Regular'
-```
-
-## 스타일 병합
+### 스타일 병합
 
 타이포그래피 스타일을 다른 스타일과 병합할 수 있습니다:
 

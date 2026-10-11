@@ -1,7 +1,3 @@
----
-sidebar_position: 12
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSSegmented
@@ -41,18 +37,18 @@ function MyControl() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `options` | `string[]` | Required | 세그먼트 라벨 목록 (2개 이상) |
+| `options` | `string[]` | 필수 | 세그먼트 라벨 목록 (2개 이상) |
 | `selectedIndex` | `number` | `undefined` | 선택 인덱스를 외부에서 제어할 때 사용 (미지정 시 내부 상태로 동작) |
 | `initialIndex` | `number` | `0` | 비제어 모드의 초기 선택 인덱스 |
 | `onChange` | `(index: number) => void` | `undefined` | 세그먼트 선택 시 호출. 이미 선택된 세그먼트를 눌러도 호출되지 않습니다 |
 | `fullWidth` | `boolean` | `true` | `true`: 부모 폭을 가득 채워 균등 분할 · `false`: 가장 긴 라벨 폭에 맞춤 |
 | `containerHeight` | `number` | `40` | 컨트롤 높이(px). 곡률은 높이의 절반으로 자동 계산됩니다 |
-| `textSize` | `'1'` ~ `'6'` | `'2'` | 라벨 typo 크기 |
+| `textSize` | `ZSSegmentedTextSize` | `'2'` | 라벨 typo 크기 (`'1'`~`'6'`) |
 | `trackColor` | `string` | 테마 `background.layer2` | 트랙 배경색 |
 | `thumbColor` | `string` | 테마 `background.base` | 선택 블록 색상 |
 | `disabled` | `boolean` | `false` | 비활성화 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 

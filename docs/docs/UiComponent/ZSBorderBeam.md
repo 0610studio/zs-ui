@@ -1,7 +1,3 @@
----
-sidebar_position: 17
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSBorderBeam
@@ -33,7 +29,7 @@ import { ZSBorderBeam, ZSText } from '@0610studio/zs-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | `undefined` | 테두리 안에 표시할 콘텐츠 |
-| `colors` | `string[]` | `undefined` | sweep gradient 색상 배열 (꼬리 → 머리 순). **지정 시 `colorFrom`·`colorTo` 는 무시됩니다** |
+| `colors` | `string[]` | `undefined` | sweep gradient 색상 배열 (꼬리 → 머리 순). **2개 이상 지정하면 `colorFrom`·`colorTo` 는 무시됩니다** |
 | `colorFrom` | `string` | 테마 `primary.main` | 광선 시작(꼬리) 색상 |
 | `colorTo` | `string` | 테마 `secondary.main` | 광선 끝(머리) 색상 |
 | `beamLength` | `number` | `0.35` | 광선이 둘레에서 차지하는 비율 (0~1). `1`이면 둘레 전체가 그라디언트 링이 됩니다 |
@@ -46,7 +42,7 @@ import { ZSBorderBeam, ZSText } from '@0610studio/zs-ui';
 | `borderWidth` | `number` | `2` | 테두리(광선) 두께 |
 | `borderRadius` | `number` | `14` | 테두리 곡률 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## glow 설정
 

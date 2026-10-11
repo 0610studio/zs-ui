@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Alert

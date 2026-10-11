@@ -1,7 +1,3 @@
----
-sidebar_position: 6
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Modality
@@ -44,7 +40,7 @@ showModality(props: ModalityProps): void
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `component` | `React.ReactNode` | Required | 모달로 표시할 컴포넌트 |
+| `component` | `React.ReactNode` | 필수 | 모달로 표시할 컴포넌트 |
 | `foldableSingleScreen` | `boolean` | `false` | 폴더블 디바이스에서 단일 화면 모드 사용 여부 |
 
 ## 특징

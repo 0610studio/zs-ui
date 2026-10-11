@@ -1,7 +1,3 @@
----
-sidebar_position: 14
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSTooltip
@@ -42,7 +38,7 @@ import { ZSTooltip } from '@0610studio/zs-ui';
 | `tailOffset` | `number` | `16` | `start`/`end` 정렬 시 가장자리에서 꼬리까지의 간격(px) |
 | `closeAccessibilityLabel` | `string` | `'툴팁 닫기'` | 닫기 버튼의 접근성 라벨 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 

@@ -1,7 +1,3 @@
----
-sidebar_position: 11
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSChip
@@ -35,7 +31,7 @@ function MyFilter() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | Required | 칩 라벨 |
+| `label` | `string` | 필수 | 칩 라벨 |
 | `selected` | `boolean` | `undefined` | 선택 상태를 외부에서 제어할 때 사용 (미지정 시 내부 상태로 토글) |
 | `initialSelected` | `boolean` | `false` | 비제어 모드의 초기 선택 상태 |
 | `onChange` | `(selected: boolean) => void` | `undefined` | 토글 시 다음 선택 상태를 전달 |
@@ -46,17 +42,17 @@ function MyFilter() {
 | `leftIcon` | `React.ReactNode` | `undefined` | 라벨 왼쪽 커스텀 요소 |
 | `disabled` | `boolean` | `false` | 비활성화 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 칩 본체 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## Variant
 
-선택 상태일 때의 표현만 달라집니다. **미선택 상태는 세 variant 모두 동일**하게 흰 배경 + 회색 테두리입니다.
+선택 상태일 때의 표현만 달라집니다. **미선택 상태는 세 variant 모두 동일**하게 `background.base` 배경 + `grey.30` 테두리입니다.
 
 | Variant | 선택 시 배경 | 선택 시 테두리 | 선택 시 텍스트 |
 |---------|-------------|---------------|---------------|
-| `pastel` (기본) | `intent.10` | `intent.30` | `intent.60` |
+| `pastel` (기본) | `intent.10` | `intent.30` | `intent.60` (`grey` 는 `grey.70`) |
 | `solid` | `intent.50` | `intent.50` | 흰색 (`warning` 만 검정) |
-| `stroke` | 배경 없음 | `intent.50` | `intent.50` |
+| `stroke` | `background.base` (미선택과 동일) | `intent.50` | `intent.50` (`warning` 은 `warning.60`, `grey` 는 `grey.60`) |
 
 ```tsx
 <ZSChip label="pastel" variant="pastel" initialSelected />

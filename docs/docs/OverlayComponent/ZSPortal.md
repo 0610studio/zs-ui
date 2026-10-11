@@ -1,7 +1,3 @@
----
-sidebar_position: 8
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSPortal
@@ -47,7 +43,7 @@ const styles = StyleSheet.create({
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `React.ReactNode` | Required | 최상위 레이어에 렌더링할 콘텐츠 |
+| `children` | `React.ReactNode` | 필수 | 최상위 레이어에 렌더링할 콘텐츠 |
 | `isFocused` | `boolean` | `true` | `true`면 등록하고 `false`면 포털에서 제거 |
 
 컴포넌트가 언마운트될 때 등록된 콘텐츠도 자동으로 제거됩니다. `children`이 바뀌면 같은 포털 항목의 내용이 갱신됩니다.

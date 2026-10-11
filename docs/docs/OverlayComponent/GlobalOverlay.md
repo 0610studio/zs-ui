@@ -1,7 +1,3 @@
----
-sidebar_position: 9
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # GlobalOverlay
@@ -29,19 +25,21 @@ export function notifyRequestFailure() {
 }
 ```
 
-## 제공 메서드
+## API 참조
 
-| Method | Description |
-|--------|-------------|
+| 메서드 | 설명 |
+|--------|------|
 | `showAlert(props)` | Alert 표시 |
 | `showSnackBar(props)` | Snackbar 표시 |
 | `showBottomSheet(props)` | BottomSheet 표시 |
 | `showPopOverMenu(props)` | PopOver 표시 |
 | `showModality(props)` | Modality 표시 |
 | `showLoader()` | Loader 표시 |
-| `hideOverlay(option?)` | 지정한 오버레이 또는 전체 오버레이 닫기 |
+| `hideOverlay(option?)` | 지정한 오버레이 또는 전체 오버레이 닫기 (인자를 생략하면 `'all'`) |
 
-## 비동기 요청에서 사용
+## 예제
+
+### 비동기 요청에서 사용
 
 ```tsx
 import { GlobalOverlay } from '@0610studio/zs-ui';

@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # 시작하기
@@ -15,20 +11,6 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 :::
 
 <LocalPlayground example="Overlay" />
-
-## useOverlay 훅
-
-`useOverlay` 훅에서 제공하는 메서드 목록입니다.
-
-| 메서드 | 설명 |
-| ------ | ---- |
-| `showAlert(props)` | Alert 표시 |
-| `showSnackBar(props)` | Snackbar 표시 |
-| `showBottomSheet(props)` | BottomSheet 표시 |
-| `showPopOverMenu(props)` | PopOver 메뉴 표시 |
-| `showModality(props)` | Modality 표시 |
-| `showLoader()` | Loader 표시 |
-| `hideOverlay(option)` | 특정 오버레이를 닫거나 전체 닫기 |
 
 ## 기본 사용법
 
@@ -71,7 +53,21 @@ function MyComponent() {
 }
 ```
 
-## hideOverlay
+## API 참조
+
+`useOverlay` 훅에서 제공하는 메서드 목록입니다.
+
+| 메서드 | 설명 |
+| ------ | ---- |
+| `showAlert(props)` | Alert 표시 |
+| `showSnackBar(props)` | Snackbar 표시 |
+| `showBottomSheet(props)` | BottomSheet 표시 |
+| `showPopOverMenu(props)` | PopOver 메뉴 표시 |
+| `showModality(props)` | Modality 표시 |
+| `showLoader()` | Loader 표시 |
+| `hideOverlay(option?)` | 특정 오버레이를 닫거나 전체 닫기 (인자를 생략하면 `'all'`) |
+
+### hideOverlay
 
 `hideOverlay`는 특정 오버레이를 닫거나 한 번에 모두 닫을 수 있습니다.
 
@@ -92,7 +88,7 @@ hideOverlay('all');
 `hideOverlay('all')`은 Alert, BottomSheet, Snackbar, Loader, PopOver, Modality를 닫습니다. `ZSAboveKeyboard`는 오버레이 시스템과 독립적으로 동작하므로 포함되지 않습니다.
 :::
 
-## 개별 오버레이 문서
+## 관련 문서
 
 각 컴포넌트의 상세한 props와 예제는 해당 문서를 참조하세요.
 
@@ -102,3 +98,5 @@ hideOverlay('all');
 - [Loader](./Loader)
 - [PopOver](./PopOver)
 - [Modality](./Modality)
+- [ZSPortal](./ZSPortal)
+- [GlobalOverlay](./GlobalOverlay)

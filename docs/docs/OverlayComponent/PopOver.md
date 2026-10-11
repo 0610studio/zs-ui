@@ -1,7 +1,3 @@
----
-sidebar_position: 7
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # PopOver
@@ -37,16 +33,58 @@ function MyComponent() {
 }
 ```
 
-## PopOverButton Props
+## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `width` | `number` | Required | 버튼 영역의 너비 |
-| `height` | `number` | Required | 버튼 영역의 높이 |
+| `width` | `number` | 필수 | 버튼 영역의 너비 |
+| `height` | `number` | 필수 | 버튼 영역의 높이 |
 | `backgroundColor` | `string` | `'transparent'` | 버튼 배경색 |
-| `popOverMenuComponent` | `React.ReactNode` | Required | 표시할 메뉴 컴포넌트 |
-| `children` | `React.ReactNode` | Required | 버튼 내부에 표시할 컴포넌트 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `popOverMenuComponent` | `React.ReactNode` | 필수 | 표시할 메뉴 컴포넌트 |
+| `children` | `React.ReactNode` | `undefined` | 버튼 내부에 표시할 컴포넌트 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
+
+## API 참조
+
+### `showPopOverMenu` 함수
+
+`PopOverButton` 없이 임의의 좌표에서 직접 메뉴를 띄우려면 `useOverlay`의 `showPopOverMenu`를 사용합니다. `PopOverButton`도 내부적으로 이 함수를 호출합니다.
+
+```typescript
+showPopOverMenu(props: PopOverMenuProps): void
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `px` | `number` | 필수 | 메뉴를 띄울 기준 x 좌표 (화면 절대 좌표) |
+| `py` | `number` | 필수 | 메뉴를 띄울 기준 y 좌표 (화면 절대 좌표) |
+| `component` | `React.ReactNode` | 필수 | 표시할 메뉴 컴포넌트 |
+
+```tsx
+import { useOverlay, ZSText } from '@0610studio/zs-ui';
+import { Pressable, type GestureResponderEvent } from 'react-native';
+
+function MyComponent() {
+  const { showPopOverMenu } = useOverlay();
+
+  const openMenu = (event: GestureResponderEvent) => {
+    const { pageX, pageY } = event.nativeEvent;
+    showPopOverMenu({
+      px: pageX,
+      py: pageY,
+      component: <MenuContent />,
+    });
+  };
+
+  return (
+    <Pressable onPress={openMenu}>
+      <ZSText typo="body.2">메뉴 열기</ZSText>
+    </Pressable>
+  );
+}
+```
+
+호출 시 키보드는 자동으로 닫히고, 화면 경계를 벗어나지 않도록 위치가 조정됩니다.
 
 ## 특징
 
@@ -138,41 +176,6 @@ const { hideOverlay } = useOverlay();
 
 hideOverlay('popOver');
 ```
-
-## showPopOverMenu
-
-`PopOverButton` 없이 임의의 좌표에서 직접 메뉴를 띄우려면 `useOverlay`의 `showPopOverMenu`를 사용합니다. `PopOverButton`도 내부적으로 이 함수를 호출합니다.
-
-| 인자 | Type | Description |
-|------|------|-------------|
-| `px` | `number` | 메뉴를 띄울 기준 x 좌표 (화면 절대 좌표) |
-| `py` | `number` | 메뉴를 띄울 기준 y 좌표 (화면 절대 좌표) |
-| `component` | `React.ReactNode` | 표시할 메뉴 컴포넌트 |
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showPopOverMenu } = useOverlay();
-
-  const openMenu = (event) => {
-    const { pageX, pageY } = event.nativeEvent;
-    showPopOverMenu({
-      px: pageX,
-      py: pageY,
-      component: <MenuContent />,
-    });
-  };
-
-  return (
-    <ZSPressable onPress={openMenu}>
-      <ZSText typo="body.2">메뉴 열기</ZSText>
-    </ZSPressable>
-  );
-}
-```
-
-호출 시 키보드는 자동으로 닫히고, 화면 경계를 벗어나지 않도록 위치가 조정됩니다.
 
 ## 관련 문서
 

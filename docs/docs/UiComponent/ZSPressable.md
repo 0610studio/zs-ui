@@ -1,7 +1,3 @@
----
-sidebar_position: 6
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSPressable
@@ -34,14 +30,14 @@ import { ZSPressable, ZSText } from '@0610studio/zs-ui';
 | `onLongPress` | `(value?: any) => void` | `undefined` | 버튼을 길게 누를 때 실행될 콜백 함수 |
 | `pressedBackgroundColor` | `string` | 테마 `grey[50]` + 10% 투명도 | 눌렸을 때 버튼의 배경 색상 |
 | `pressedBackgroundBorderRadius` | `number` | `16` | 눌렸을 때의 버튼의 둥근 모서리 반경 |
-| `isAnimation` | `boolean` | `true` | 버튼에 애니메이션 효과를 적용할지 여부 |
+| `isAnimation` | `boolean` | `true` | `true`면 `FadeInDown` 진입과 `FadeOut` 퇴장 애니메이션 적용. 눌림 스케일은 이 값과 관계없이 동작합니다 |
 | `elevationLevel` | `ShadowLevel` | `undefined` | 버튼의 그림자 깊이를 설정 (0~9 단계) |
 | `fullWidth` | `boolean` | `false` | 버튼이 부모 요소의 전체 너비를 차지하도록 설정 |
 | `color` | `ViewColorOptions` | `undefined` | 배경색 옵션 (테마 팔레트 기반) |
 | `isLoading` | `boolean` | `false` | `true`일 때 클릭/롱클릭이 비활성화되고 버튼이 흐리게 표시됩니다. |
 | `preventDoublePress` | `boolean` | `false` | `true`일 때 기본 디바운스(300ms) 대신 2초 잠금을 적용합니다. 결제·제출처럼 중복 실행이 위험한 액션에 사용합니다 |
 | `disabled` | `boolean` | `false` | `true`일 때 클릭/롱클릭이 비활성화되고 버튼이 흐리게 표시됩니다. |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 

@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # 로컬 플레이그라운드
@@ -21,29 +17,6 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 <LocalPlayground example="Catalog" height={1000} title="ZS-ui 전체 예제 메뉴" />
 
-## 로컬 실행
+## 저장소에서 실행
 
-```bash
-cd example
-pnpm run web
-```
-
-## 실제 앱에서 확인
-
-```bash
-cd example
-pnpm run ios
-# 또는
-pnpm run android
-```
-
-SafeArea, 실제 소프트 키보드, 상태바, Android 하드웨어 뒤로가기, 폴더블 전환, Skia 애니메이션은 시뮬레이터·에뮬레이터 또는 실제 기기에서 검증합니다.
-
-## 문서용 정적 예제 생성
-
-```bash
-cd docs
-pnpm run playground:build
-```
-
-`pnpm run start`와 `pnpm run build`는 문서용 예제 생성을 먼저 실행합니다.
+같은 예제를 웹·iOS·Android에서 직접 실행하는 방법은 [예제 앱 README](https://github.com/0610studio/zs-ui/blob/main/example/README.md)를 참고하세요. SafeArea, 실제 소프트 키보드, 상태바, Android 하드웨어 뒤로가기, 폴더블 전환, Skia 애니메이션은 시뮬레이터·에뮬레이터 또는 실제 기기에서 검증합니다.

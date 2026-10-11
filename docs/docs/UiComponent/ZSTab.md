@@ -1,7 +1,3 @@
----
-sidebar_position: 13
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSTab
@@ -41,7 +37,7 @@ function MyScreen() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | `ZSTabItem[]` | Required | 탭 아이템 목록 |
+| `items` | `ZSTabItem[]` | 필수 | 탭 아이템 목록 |
 | `value` | `string` | `undefined` | 선택 값을 외부에서 제어할 때 사용 (미지정 시 내부 상태로 동작) |
 | `initialValue` | `string` | 첫 아이템의 `value` | 비제어 모드의 초기 선택 값 |
 | `onChange` | `(value: string, index: number) => void` | `undefined` | 탭 선택 시 호출. 이미 선택된 탭을 눌러도 호출되지 않습니다 |
@@ -52,7 +48,7 @@ function MyScreen() {
 | `showDivider` | `boolean` | `true` | 탭 하단 구분선 표시 |
 | `disabled` | `boolean` | `false` | 전체 비활성화 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ### ZSTabItem
 

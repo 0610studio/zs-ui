@@ -1,7 +1,3 @@
----
-sidebar_position: 16
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSSkeleton & ZSSkeletonBox
@@ -44,7 +40,7 @@ export default function App() {
 | `overlayColor` | `string` | 테마 `background.base` | shimmer 하이라이트 색상 |
 | `overlayOpacity` | `number` | `0.6` | shimmer 밴드 중심의 최대 불투명도 (0~1) |
 | `duration` | `number` | `1100` | shimmer 밴드가 한 번 지나가는 시간 (ms) |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ### 특징
 
@@ -73,13 +69,13 @@ export default function App() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `height` | `number` | Required | 스켈레톤 박스의 높이 |
+| `height` | `number` | 필수 | 스켈레톤 박스의 높이 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 박스의 추가 스타일 |
 | `overlayColor` | `string` | 테마 `background.layer1` | shimmer 하이라이트 색상 |
 | `overlayOpacity` | `number` | `0.7` | shimmer 밴드 중심의 최대 불투명도 (0~1) |
 | `duration` | `number` | `1100` | shimmer 밴드가 한 번 지나가는 시간 (ms) |
 | `color` | `ViewColorOptions` | `'neutral'` | 박스의 배경색 (테마 팔레트 기반) |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ### 배경색 옵션 (ViewColorOptions)
 

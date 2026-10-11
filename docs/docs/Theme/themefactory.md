@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 # ThemeFactory
 
 테마 팩토리 함수는 기본 색상 팔레트를 재정의하여 커스텀 테마를 생성할 수 있는 기능을 제공합니다. 라이트 모드와 다크 모드별로 색상을 개별적으로 커스터마이징할 수 있습니다.
@@ -38,7 +34,13 @@ function App() {
 }
 ```
 
-## 타입 정의
+## API 참조
+
+`themeFactory`는 설정에 없는 색상을 기본 팔레트로 채운 팔레트 함수를 반환합니다. 반환값을 `ThemeProvider`의 `customPalette`에 넘깁니다.
+
+```typescript
+themeFactory(config?: ThemeFactoryConfig): (options?: { mode?: 'light' | 'dark' }) => Theme
+```
 
 ### ThemeFactoryConfig
 
@@ -176,34 +178,7 @@ const customPalette = themeFactory({
 </ThemeProvider>
 ```
 
-## 사용 예제
+## 관련 문서
 
-### 브랜드 색상 적용
-
-```tsx
-// 브랜드 색상으로 테마 커스터마이징
-const brandPalette = themeFactory({
-  light: {
-    primary: {
-      main: '#FF5722', // 브랜드 오렌지
-      lighter: '#FFE0B2',
-      light: '#FFAB91',
-      dark: '#D84315',
-      darker: '#BF360C',
-    },
-  },
-  dark: {
-    primary: {
-      main: '#FF8A65', // 다크 모드용 밝은 오렌지
-    },
-  },
-});
-
-function App() {
-  return (
-    <ThemeProvider customPalette={brandPalette}>
-      <MyApp />
-    </ThemeProvider>
-  );
-}
-```
+- [ThemeProvider](../Provider/ThemeProvider)
+- [Palette](./palette)

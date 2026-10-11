@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ThemeProvider
@@ -9,17 +5,6 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 `ThemeProvider`는 프로젝트 전반에서 사용할 폰트와 테마 관련 설정을 관리합니다.
 
 <LocalPlayground example="ThemeProvider" height={760} />
-
-## Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `themeFonts` | `ThemeFonts` | `undefined` | 폰트 굵기별로 사용할 폰트 이름을 정의 |
-| `themeFontAssets` | `ThemeFontAssets` | `undefined` | 굵기별 폰트 **파일**(`require(...)`). Skia 캔버스로 글자를 그리는 컴포넌트(`ZSCalendar` 날짜 숫자)가 이름 대신 이 파일을 쓴다 |
-| `isDarkModeEnabled` | `boolean` | `true` | 다크 모드 활성화 여부 |
-| `customPalette` | `function` | `undefined` | 커스텀 색상 팔레트 팩토리 함수 |
-| `foldable` | `FoldableConfig` | `undefined` | 폴더블 펼침 상태에서 단일 화면의 콘텐츠 최대 폭 설정. `{ unfoldedSinglePaneMaxWidth: number \| false }` |
-| `children` | `React.ReactNode` | Required | 자식 컴포넌트 |
 
 ## 기본 사용법
 
@@ -30,6 +15,17 @@ import { ThemeProvider } from '@0610studio/zs-ui';
   {/* 앱 내용 */}
 </ThemeProvider>
 ```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `themeFonts` | `ThemeFonts` | `undefined` | 폰트 굵기별로 사용할 폰트 이름을 정의 |
+| `themeFontAssets` | `ThemeFontAssets` | `undefined` | 굵기별 폰트 **파일**(`require(...)`). Skia 캔버스로 글자를 그리는 컴포넌트(`ZSCalendar` 날짜 숫자)가 이름 대신 이 파일을 쓴다 |
+| `isDarkModeEnabled` | `boolean` | `true` | 다크 모드 활성화 여부 |
+| `customPalette` | `(config) => Theme` | `undefined` | `themeFactory`로 만든 커스텀 팔레트 함수 |
+| `foldable` | `FoldableConfig` | `undefined` | 폴더블 펼침 상태에서 단일 화면의 콘텐츠 최대 폭 설정. `{ unfoldedSinglePaneMaxWidth: number \| false }` |
+| `children` | `React.ReactNode` | 필수 | 자식 컴포넌트 |
 
 ## 폰트 설정
 
@@ -128,55 +124,7 @@ import { ThemeProvider } from '@0610studio/zs-ui';
 
 ## useTheme 훅
 
-`ThemeProvider` 내부에서 `useTheme` 훅을 사용하여 테마 정보에 접근할 수 있습니다:
-
-```tsx
-import { useTheme } from '@0610studio/zs-ui';
-import { View, Text } from 'react-native';
-
-function MyComponent() {
-  const { palette, typography, elevation } = useTheme();
-
-  return (
-    <View style={{ backgroundColor: palette.background.base }}>
-      <Text style={typography.heading[1]}>제목</Text>
-    </View>
-  );
-}
-```
-
-### 테마 모드 전환
-
-```tsx
-import { useTheme } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { palette } = useTheme();
-
-  return (
-    <Pressable onPress={palette.toggleTheme}>
-      <Text>현재 모드: {palette.mode}</Text>
-    </Pressable>
-  );
-}
-```
-
-### 시스템 색상 스키마 사용
-
-```tsx
-import { useTheme } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { palette } = useTheme();
-
-  // 시스템 색상 스키마 사용 여부 설정
-  palette.setUseSystemColorScheme(true);
-
-  // 현재 모드 확인
-  const currentMode = palette.mode; // 'light' | 'dark'
-  const isUsingSystem = palette.isUsingSystemColorScheme; // boolean
-}
-```
+`ThemeProvider` 내부에서는 `useTheme()`으로 팔레트·타이포그래피·그림자에 접근하고 테마 모드를 바꿉니다. 반환값과 모드 전환·저장 동작은 [테마 개요](../Theme/start)를 참고하세요.
 
 ## 폴더블 단일 화면 폭 제한
 
@@ -190,8 +138,9 @@ function MyComponent() {
 
 자세한 내용은 [폴더블 기기 지원](../FoldableDevice) 문서를 참조하세요.
 
-## 테마 저장
+## 관련 문서
 
-`mode` 와 `isUsingSystemColorScheme` 는 **AsyncStorage** 에 저장되어 앱을 다시 열어도 유지됩니다. `isDarkModeEnabled={false}` 인 경우에는 저장값을 무시하고 항상 라이트 모드로 시작합니다.
-
-자세한 내용은 [Palette 문서](../Theme/palette)와 [Typography 문서](../Theme/typography)를 참조하세요.
+- [테마 개요](../Theme/start)
+- [Palette](../Theme/palette)
+- [Typography](../Theme/typography)
+- [ThemeFactory](../Theme/themefactory)

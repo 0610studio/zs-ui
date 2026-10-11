@@ -1,7 +1,3 @@
----
-sidebar_position: 15
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSMessageBar
@@ -27,7 +23,7 @@ import { ZSMessageBar } from '@0610studio/zs-ui';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `message` | `string` | Required | 본문 메시지 |
+| `message` | `string` | 필수 | 본문 메시지 |
 | `title` | `string` | `undefined` | 메시지 위에 굵게 표시되는 제목 |
 | `intent` | `IntentOptions` | `'information'` | 색상 계열과 기본 아이콘을 결정 |
 | `variant` | `'pastel' \| 'solid' \| 'stroke'` | `'pastel'` | 배경 스타일 |
@@ -42,7 +38,7 @@ import { ZSMessageBar } from '@0610studio/zs-ui';
 | `animated` | `boolean` | `true` | `false`면 등장·퇴장 페이드를 끕니다 |
 | `disabled` | `boolean` | `false` | 비활성화 (흐리게 표시) |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## intent 별 기본 아이콘
 

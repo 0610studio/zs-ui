@@ -1,7 +1,3 @@
----
-sidebar_position: 7
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSBlockButton
@@ -30,9 +26,9 @@ export default function App() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `onPress` | `() => void` | Required | 버튼 클릭 시 호출되는 함수 |
-| `title` | `string` | Required | 버튼에 표시될 텍스트 |
-| `typo` | `TypoOptions` | Required | 버튼 텍스트의 타이포그래피 스타일 |
+| `onPress` | `() => void` | 필수 | 버튼 클릭 시 호출되는 함수 |
+| `title` | `string` | 필수 | 버튼에 표시될 텍스트 |
+| `typo` | `TypoOptions` | 필수 | 버튼 텍스트의 타이포그래피 스타일 |
 | `intent` | `IntentOptions` | `'primary'` | 버튼의 의도/색상 테마 |
 | `variant` | `'solid' \| 'pastel' \| 'stroke'` | `'solid'` | 버튼의 스타일 변형 |
 | `prefixIcon` | `ImageSourcePropType` | `undefined` | 버튼 텍스트 앞에 표시될 아이콘 (12×12, 텍스트 색으로 tint) |
@@ -40,7 +36,7 @@ export default function App() {
 | `preventDoublePress` | `boolean` | `false` | `true`일 때 2초 잠금으로 중복 실행을 막습니다 (결제·제출 등) |
 | `disabled` | `boolean` | `false` | 버튼 비활성화 여부 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 버튼 컨테이너의 추가 스타일 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## Intent 옵션
 
@@ -122,14 +118,6 @@ export default function App() {
 <ZSBlockButton title="Success" typo="body.2" intent="success" onPress={() => {}} />
 <ZSBlockButton title="Information" typo="body.2" intent="information" onPress={() => {}} />
 <ZSBlockButton title="Grey" typo="body.2" intent="grey" onPress={() => {}} />
-```
-
-### 다양한 Variant
-
-```tsx
-<ZSBlockButton title="Solid" typo="body.2" variant="solid" onPress={() => {}} />
-<ZSBlockButton title="Pastel" typo="body.2" variant="pastel" onPress={() => {}} />
-<ZSBlockButton title="Stroke" typo="body.2" variant="stroke" onPress={() => {}} />
 ```
 
 ### 아이콘과 함께 사용

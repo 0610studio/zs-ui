@@ -1,7 +1,3 @@
----
-sidebar_position: 3
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # BottomSheet
@@ -52,7 +48,7 @@ showBottomSheet(props: ShowBottomSheetProps): void
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `component` | `React.ReactNode` | Required | Bottom Sheet 내부에 표시할 컴포넌트 |
+| `component` | `React.ReactNode` | 필수 | Bottom Sheet 내부에 표시할 컴포넌트 |
 | `headerComponent` | `React.ReactNode` | `undefined` | 상단에 표시할 헤더 컴포넌트 |
 | `options` | `BottomSheetOptions` | `{}` | Bottom Sheet 옵션 |
 
@@ -60,9 +56,9 @@ showBottomSheet(props: ShowBottomSheetProps): void
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `dismissable` | `boolean` | `true` | 배경 터치·아래로 끌기 제스처로 닫을 수 있는지 여부. `false`여도 `hideOverlay('bottomSheet')` 호출로는 닫힙니다 |
+| `dismissable` | `boolean` | `true` | 배경 터치·아래로 끌기 제스처로 닫을 수 있는지 여부. `false`면 Android 뒤로가기는 시트를 닫지 않고 소비만 하며, `hideOverlay('bottomSheet')` 호출로는 닫힙니다 |
 | `onClose` | `() => void` | `undefined` | 시트가 어떤 경로(버튼·배경 터치·드래그·뒤로가기)로 닫히든 정확히 1회 호출되는 콜백 |
-| `isBackgroundTouchClose` | `boolean` | `true` | **Deprecated** — `dismissable`을 사용하세요. `dismissable` 미지정 시에만 참조되며, 이제 배경 터치뿐 아니라 제스처 닫힘까지 함께 제어합니다 |
+| `isBackgroundTouchClose` | `boolean` | `undefined` | 사용 중단 예정. `dismissable`을 사용하세요. `dismissable` 미지정 시에만 참조되며, 배경 터치와 제스처 닫힘을 함께 제어합니다 |
 | `marginHorizontal` | `number` | `10` | 시트의 좌우 여백 |
 | `marginBottom` | `number` | `10` | 시트의 하단 여백 |
 | `height` | `number \| 'auto'` | `300` | 시트의 높이 (`'auto'` 지정 시 컨텐츠 크기에 맞춤) |

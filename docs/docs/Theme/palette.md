@@ -1,12 +1,8 @@
----
-sidebar_position: 2
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # Palette
 
-색상 팔레트를 설정하는 함수로, 라이트 및 다크 모드를 포함하며 사용자 정의 색상 팔레트를 지원합니다.
+`useTheme()`의 `palette`로 현재 모드(라이트·다크)의 색상을 읽습니다. 색상을 바꾸려면 [ThemeFactory](./themefactory)로 커스텀 팔레트를 만듭니다.
 
 <LocalPlayground example="Theme" />
 
@@ -30,33 +26,7 @@ function MyComponent() {
 }
 ```
 
-## 테마 모드
-
-### 모드 전환
-
-```tsx
-const { palette } = useTheme();
-
-// 테마 토글
-palette.toggleTheme();
-
-// 시스템 색상 스키마 사용 여부 설정
-palette.setUseSystemColorScheme(true);
-
-// 현재 모드 확인
-const currentMode = palette.mode; // 'light' | 'dark'
-const isUsingSystem = palette.isUsingSystemColorScheme; // boolean
-```
-
-### 모드 확인
-
-```tsx
-<Pressable onPress={palette.toggleTheme}>
-  <ZSText typo="body.2">현재 모드: {palette.mode}</ZSText>
-</Pressable>
-```
-
-## 색상 팔레트
+## API 참조
 
 각 테마 색상은 `primary`, `secondary`, `danger`, `warning`, `success`, `information`, `grey`와 같이 지정되어 있으며, 팔레트의 각 색상은 라이트와 다크 모드를 지원합니다.
 
@@ -90,7 +60,31 @@ type ColorPaletteExtend = ColorPalette & {
 };
 ```
 
-## 색상 사용 예제
+### mainColor
+
+```tsx
+palette.mainColor.primary    // Primary 메인 색상
+palette.mainColor.secondary  // Secondary 메인 색상
+palette.mainColor.danger     // Danger 메인 색상
+palette.mainColor.warning    // Warning 메인 색상
+palette.mainColor.success    // Success 메인 색상
+palette.mainColor.information // Information 메인 색상
+palette.mainColor.grey       // Grey 메인 색상
+```
+
+### modalBgColor
+
+```tsx
+palette.modalBgColor // 모달 오버레이 배경색
+```
+
+### elevationShadow
+
+```tsx
+palette.elevationShadow // 그림자 색상 배열 (0~9 레벨)
+```
+
+## 예제
 
 ### Primary 색상
 
@@ -175,28 +169,8 @@ type ColorPaletteExtend = ColorPalette & {
 </View>
 ```
 
-## 주요 색상
+## 관련 문서
 
-### Main Colors
-
-```tsx
-palette.mainColor.primary    // Primary 메인 색상
-palette.mainColor.secondary  // Secondary 메인 색상
-palette.mainColor.danger     // Danger 메인 색상
-palette.mainColor.warning    // Warning 메인 색상
-palette.mainColor.success    // Success 메인 색상
-palette.mainColor.information // Information 메인 색상
-palette.mainColor.grey       // Grey 메인 색상
-```
-
-## 모달 배경색
-
-```tsx
-palette.modalBgColor // 모달 오버레이 배경색
-```
-
-## 그림자 색상
-
-```tsx
-palette.elevationShadow // 그림자 색상 배열 (0~9 레벨)
-```
+- [테마 개요](./start): `useTheme` 반환값과 테마 모드 전환
+- [ThemeFactory](./themefactory)
+- [ZSText](../UiComponent/ZSText): `color` 옵션

@@ -1,7 +1,3 @@
----
-sidebar_position: 10
----
-
 import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSSwitch
@@ -32,15 +28,15 @@ function MyComponent() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `isActive` | `boolean` | Required | 스위치의 활성화 상태 |
-| `onToggle` | `() => void` | Required | 토글 시 호출되는 함수 |
+| `isActive` | `boolean` | 필수 | 스위치의 활성화 상태 |
+| `onToggle` | `() => void` | 필수 | 토글 시 호출되는 함수 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 스타일 |
 | `width` | `number` | `50` | 스위치의 너비 (높이는 자동으로 계산됨: width * 0.6) |
 | `trackColorInactive` | `string` | 테마 `grey[30]` | 비활성화 상태의 트랙 색상 |
 | `trackColorActive` | `string` | 테마 `primary.main` | 활성화 상태의 트랙 색상 |
 | `thumbColor` | `string` | `'#FFFFFF'` | 썸(움직이는 원)의 색상 |
 | `disabled` | `boolean` | `false` | `true`일 때 토글이 비활성화되고 흐리게 표시됩니다 |
-| `...props` | `ViewProps` | - | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 특징
 
