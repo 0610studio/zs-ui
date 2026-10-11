@@ -10,7 +10,6 @@
     "start": "pnpm run playground:build && docusaurus start",
     "build": "pnpm run playground:build && docusaurus build",
     "swizzle": "docusaurus swizzle",
-    "deploy": "GIT_USER=KimJeonghun91 docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
@@ -22,7 +21,6 @@
     "@docusaurus/preset-classic": "3.6.1",
     "@giscus/react": "^3.0.0",
     "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.0.0",
     "lucide-react": "^0.456.0",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
@@ -36,7 +34,6 @@
     "@types/node": "26.4.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
-    "gh-pages": "^6.2.0",
     "typescript": "~5.6.2",
     "webpack": "~5.97.1"
   },

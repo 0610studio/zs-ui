@@ -13,7 +13,6 @@ const IGNORE_PATTERNS = [
   '/src/context/',
   '/types\\.ts$',
   '/src/ZsUiModule',
-  '/src/ZsUiView',
 ];
 
 module.exports = {
