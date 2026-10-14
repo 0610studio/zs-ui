@@ -22,9 +22,9 @@ import { ThemeProvider } from '@0610studio/zs-ui';
 |------|------|---------|-------------|
 | `themeFonts` | `ThemeFonts` | `undefined` | 폰트 굵기별로 사용할 폰트 이름을 정의 |
 | `themeFontAssets` | `ThemeFontAssets` | `undefined` | 굵기별 폰트 **파일**(`require(...)`). Skia 캔버스로 글자를 그리는 컴포넌트(`ZSCalendar` 날짜 숫자)가 이름 대신 이 파일을 쓴다 |
-| `isDarkModeEnabled` | `boolean` | `true` | 다크 모드 활성화 여부 |
+| `isDarkModeEnabled` | `boolean` | `true` | `false`면 라이트 모드로 시작하고 시스템 모드 추종과 저장값 복원을 끕니다. `toggleTheme` 같은 수동 전환은 막지 않습니다 |
 | `customPalette` | `(config) => Theme` | `undefined` | `themeFactory`로 만든 커스텀 팔레트 함수 |
-| `foldable` | `FoldableConfig` | `undefined` | 폴더블 펼침 상태에서 단일 화면의 콘텐츠 최대 폭 설정. `{ unfoldedSinglePaneMaxWidth: number \| false }` |
+| `foldable` | `FoldableConfig` | `undefined` | 폴더블 펼침 상태에서 단일 화면의 콘텐츠 최대 폭 설정. `{ unfoldedSinglePaneMaxWidth?: number \| false }` |
 | `children` | `React.ReactNode` | 필수 | 자식 컴포넌트 |
 
 ## 폰트 설정
@@ -89,36 +89,17 @@ const themeFontAssets = {
 
 ## 커스텀 팔레트 사용
 
-```tsx
-import { ThemeProvider, themeFactory } from '@0610studio/zs-ui';
+`customPalette`에는 `themeFactory`가 반환한 팔레트 함수를 넘깁니다. 색상 지정 방법과 예제는 [ThemeFactory](../Theme/themefactory)를 참고하세요.
 
-const customPalette = themeFactory({
-  light: {
-    primary: {
-      main: '#2196F3',
-    },
-  },
-  dark: {
-    primary: {
-      main: '#64B5F6',
-    },
-  },
-});
+## 라이트 모드로 시작
 
-<ThemeProvider customPalette={customPalette}>
-  {/* 앱 내용 */}
-</ThemeProvider>
-```
-
-자세한 내용은 [ThemeFactory 문서](../Theme/themefactory)를 참조하세요.
-
-## 다크 모드 비활성화
+`isDarkModeEnabled={false}`면 시스템 모드와 저장된 모드를 따르지 않고 라이트 모드로 시작합니다. 앱에서 `toggleTheme`을 호출하면 다크 모드로 바뀔 수 있습니다.
 
 ```tsx
 import { ThemeProvider } from '@0610studio/zs-ui';
 
 <ThemeProvider isDarkModeEnabled={false}>
-  {/* 앱 내용 - 항상 라이트 모드 */}
+  {/* 앱 내용 - 라이트 모드로 시작 */}
 </ThemeProvider>
 ```
 

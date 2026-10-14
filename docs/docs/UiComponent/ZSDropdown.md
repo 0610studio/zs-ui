@@ -137,16 +137,3 @@ const openSheet = () => {
   onPress={openSheet}
 />
 ```
-
-### 직접입력 + 선택 병행
-
-이메일 도메인처럼 목록에 없는 값도 입력받아야 할 때 사용합니다.
-
-```tsx
-<ZSDropdown
-  label="이메일 도메인"
-  value={domain}
-  onChangeText={setDomain}
-  onPress={openSheet}
-/>
-```

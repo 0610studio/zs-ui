@@ -18,38 +18,45 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 | 툴바 | 키보드가 열렸을 때만 보여야 하는 포맷 툴바 |
 | 상태 표시 | 키보드와 함께 올라오는 상태 메시지 |
 
-> **ZSContainer와 함께 쓸 수 있습니다**. ZSContainer 안에서 ZSAboveKeyboard를 형제 레벨에 배치하면, 스크롤 자동 대응과 floating UI를 동시에 사용할 수 있습니다.
+> **ZSContainer와 함께 쓸 때는 `bottomComponent`에 넣습니다**. children으로 넣으면 스크롤 영역 안에 들어가 콘텐츠와 함께 스크롤되고 키보드 여백이 겹칩니다.
 
 ## 기본 사용법
 
 ```tsx
-import { ZSAboveKeyboard } from '@0610studio/zs-ui';
+import { useState } from 'react';
+import { ZSAboveKeyboard, ZSContainer } from '@0610studio/zs-ui';
 
 function ChatScreen() {
+  const [barHeight, setBarHeight] = useState(0);
+
   return (
-    <ZSContainer>
-      {/* 메시지 목록 */}
+    <ZSContainer
+      style={{ paddingBottom: barHeight }}
+      bottomComponent={
+        <ZSAboveKeyboard handleLayoutHeight={setBarHeight}>
+          <SendButton onPress={handleSend} />
+        </ZSAboveKeyboard>
+      }
+    >
       <MessageList />
-      {/* 키보드 위 전송 버튼 */}
-      <ZSAboveKeyboard>
-        <SendButton onPress={handleSend} />
-      </ZSAboveKeyboard>
     </ZSContainer>
   );
 }
 ```
+
+`ZSAboveKeyboard`는 절대 위치로 떠 있으므로, 마지막 콘텐츠가 가려지지 않게 `handleLayoutHeight`로 받은 높이만큼 아래 여백을 둡니다.
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | 필수 | 키보드 위에 표시할 컴포넌트 |
-| `keyboardShowOffset` | `number` | `0` | 키보드 표시 시 추가 여백 (px) |
+| `keyboardShowOffset` | `number` | `0` | 키보드 표시 시 추가 여백 (px). Android 11(API 30) 미만에서는 시스템이 키보드 여백을 처리하므로 적용되지 않습니다 |
 | `keyboardHideOffset` | `number` | `0` | 키보드 숨김 시 추가 여백 (px) |
 | `handleLayoutHeight` | `(height: number) => void` | `undefined` | 레이아웃 높이 변경 콜백 |
 | `showOnlyKeyboardVisible` | `boolean` | `false` | 키보드가 열렸을 때만 표시 |
 | `backgroundColor` | `string` | `undefined` | 배경색 |
-| `...props` | `ViewProps` | `undefined` | React Native `View` 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View` 기본 속성. 내부 `style`·`onLayout` 뒤에 펼쳐지므로 `style`이나 `onLayout`을 넘기면 위치 지정 스타일과 높이 측정이 대체됩니다. 높이는 `handleLayoutHeight`로 받습니다 |
 
 ## 특징
 

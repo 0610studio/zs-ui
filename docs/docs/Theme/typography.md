@@ -104,10 +104,10 @@ const { typography } = useTheme();
 `ZSText` 컴포넌트는 내부적으로 이 타이포그래피 시스템을 사용합니다:
 
 ```tsx
-// 이 두 가지는 동일한 결과를 생성합니다
+// 두 줄은 같은 결과입니다. ZSText는 기본 color="base"로 palette.text.base를 적용합니다
 <ZSText typo="body.2">텍스트</ZSText>
 
-<Text style={typography.body[2]}>텍스트</Text>
+<Text style={[typography.body[2], { color: palette.text.base }]}>텍스트</Text>
 ```
 
 하지만 `ZSText`는 추가로 색상 시스템과 통합되어 있어 더 편리합니다:

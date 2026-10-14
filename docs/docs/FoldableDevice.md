@@ -90,28 +90,9 @@ export enum FoldingState {
 - **접힘 상태 (FOLDED)**: 일반적인 단일 화면으로 동작하며 `rightComponent`는 표시되지 않습니다.
 - **펼침 상태 (UNFOLDED)**: 화면이 좌우로 분할되어 왼쪽에는 기본 콘텐츠, 오른쪽에는 `rightComponent`가 표시됩니다.
 
-### 구분선 설정
-
-두 화면 사이에 구분선을 추가할 수 있습니다.
-
-```tsx
-<ZSContainer
-  dividerLineComponent={
-    <View style={{ 
-      width: 2, 
-      backgroundColor: '#E0E0E0',
-      marginHorizontal: 8 
-    }} />
-  }
-  rightComponent={<RightContent />}
->
-  <LeftContent />
-</ZSContainer>
-```
-
 ## 특징
 
-1. **플랫폼 지원**: 현재 Android 폴더블 기기에서만 지원됩니다.
-2. **스크롤 동기화**: 양쪽 화면의 스크롤은 독립적으로 동작합니다.
-3. **키보드 처리**: 키보드가 나타날 때 양쪽 화면 모두에서 적절한 스크롤 처리가 이루어집니다.
-4. **성능**: 폴딩 상태 변경 시 리렌더링 및 재시작 발생
+1. **플랫폼 지원**: Android 폴더블 기기에서만 동작합니다. iOS·웹에서는 항상 `FoldingState.FOLDED`입니다.
+2. **독립 스크롤**: 양쪽 화면은 각자 스크롤됩니다.
+3. **키보드 처리**: 키보드가 열리면 마지막으로 터치한 쪽 화면을 키보드 위로 스크롤합니다.
+4. **상태 변경**: 접거나 펼치면 화면 크기 변경 이벤트로 상태를 다시 읽어 리렌더링합니다. Activity가 다시 만들어지지 않게 하려면 [config plugin](./Provider/start#android-폴더블-설정)을 등록합니다.

@@ -77,17 +77,7 @@ export default function App() {
 | `color` | `ViewColorOptions` | `'neutral'` | 박스의 배경색 (테마 팔레트 기반) |
 | `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
-### 배경색 옵션 (ViewColorOptions)
-
-테마 팔레트 기반의 배경색을 사용할 수 있습니다:
-
-- `layer1`, `layer2`, `neutral`, `base`
-- `primary`, `primary.5`, `primary.10`, ..., `primary.100`
-- `danger`, `danger.5`, ..., `danger.100`
-- `warning`, `warning.5`, ..., `warning.100`
-- `success`, `success.5`, ..., `success.100`
-- `information`, `information.5`, ..., `information.100`
-- `grey.5`, `grey.10`, ..., `grey.100`
+`color`에 쓸 수 있는 값은 [ZSView의 배경색 옵션](./ZSView#배경색-옵션-viewcoloroptions)과 같습니다.
 
 ### 특징
 
@@ -97,39 +87,6 @@ export default function App() {
 - **다양한 형태**: `style` prop을 통해 원형, 둥근 모서리 등 다양한 형태로 커스터마이징 가능합니다
 
 ## 예제
-
-### ZSSkeleton 기본 사용
-
-```tsx
-import { ZSSkeleton, ZSText } from '@0610studio/zs-ui';
-import { useState } from 'react';
-
-function MyComponent() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  return (
-    <ZSSkeleton isFetching={isLoading}>
-      <ZSText typo="heading.1">로딩 중인 제목</ZSText>
-    </ZSSkeleton>
-  );
-}
-```
-
-### ZSSkeleton 다양한 타이포그래피
-
-```tsx
-<ZSSkeleton isFetching={true}>
-  <ZSText typo="heading.1">큰 제목</ZSText>
-</ZSSkeleton>
-
-<ZSSkeleton isFetching={true}>
-  <ZSText typo="heading.3">중간 제목</ZSText>
-</ZSSkeleton>
-
-<ZSSkeleton isFetching={true}>
-  <ZSText typo="heading.6">작은 제목</ZSText>
-</ZSSkeleton>
-```
 
 ### ZSSkeleton 조건부 렌더링
 
@@ -169,16 +126,6 @@ function DataComponent({ data, isLoading }) {
 <ZSSkeletonBox height={80} duration={1800} overlayOpacity={0.4} />
 ```
 
-### ZSSkeletonBox 기본 사용
-
-```tsx
-import { ZSSkeletonBox } from '@0610studio/zs-ui';
-
-<ZSSkeletonBox height={100} />
-<ZSSkeletonBox height={50} />
-<ZSSkeletonBox height={200} />
-```
-
 ### ZSSkeletonBox 다양한 형태
 
 ```tsx
@@ -198,19 +145,6 @@ import { ZSSkeletonBox } from '@0610studio/zs-ui';
 <ZSSkeletonBox height={100} color="layer1" />
 <ZSSkeletonBox height={100} color="primary.10" />
 <ZSSkeletonBox height={100} color="grey.20" />
-```
-
-### ZSSkeletonBox 커스텀 스타일
-
-```tsx
-<ZSSkeletonBox 
-  height={120} 
-  style={{ 
-    borderRadius: 15, 
-    marginVertical: 10,
-    width: '90%' 
-  }} 
-/>
 ```
 
 ### 실제 사용 예제

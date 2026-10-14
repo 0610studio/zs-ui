@@ -55,14 +55,14 @@ showAlert(props: ShowAlertProps): void
 |------|------|---------|-------------|
 | `title` | `string` | `undefined` | 알림의 제목 |
 | `informative` | `string` | `undefined` | 알림의 설명 메시지 |
-| `actions` | `AlertActions` | `undefined` | 알림에 표시할 액션들 (기본 및 보조 버튼) |
-| `isBackgroundTouchClose` | `boolean` | `true` | 배경을 터치하면 알림이 닫히는지 여부 |
+| `actions` | `AlertActions` | `undefined` | 알림에 표시할 액션들 (기본 및 보조 버튼). 생략하면 '확인' 버튼 하나를 표시합니다 |
+| `isBackgroundTouchClose` | `boolean` | `true` | 배경을 터치하면 알림이 닫히는지 여부. Android 뒤로가기로는 이 값과 관계없이 닫힙니다 |
 | `titleStyle` | `TextProps['style']` | `undefined` | 알림 제목의 커스텀 스타일 |
 | `informativeStyle` | `TextProps['style']` | `undefined` | 설명 메시지의 커스텀 스타일 |
 | `secondaryButtonStyle` | `TouchableOpacityProps['style']` | `undefined` | 보조 버튼의 커스텀 스타일 |
 | `primaryButtonStyle` | `TouchableOpacityProps['style']` | `undefined` | 기본 버튼의 커스텀 스타일 |
 | `secondaryButtonTextStyle` | `TextProps['style']` | `undefined` | 보조 버튼 텍스트의 커스텀 스타일 |
-| `primaryButtonTextStyle` | `TextProps['style']` | `undefined` | 기본 버튼 텍스트의 커스텀 스타일 |
+| `primaryButtonTextStyle` | `TextProps['style']` | `undefined` | 기본 버튼 텍스트의 커스텀 스타일. 현재 `showAlert`가 이 값을 렌더러에 넘기지 않아 적용되지 않습니다 |
 
 ### `AlertActions` 인터페이스
 
@@ -113,39 +113,6 @@ function MyComponent() {
   };
 
   return <Button title="Alert 표시" onPress={handleShowAlert} />;
-}
-```
-
-### 두 개의 버튼 Alert
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showAlert } = useOverlay();
-
-  const handleDelete = () => {
-    showAlert({
-      title: '삭제 확인',
-      informative: '이 항목을 삭제하시겠습니까?',
-      actions: {
-        primary: {
-          label: '삭제',
-          onPress: () => {
-            // 삭제 로직
-          },
-        },
-        secondary: {
-          label: '취소',
-          onPress: () => {
-            // 취소 로직
-          },
-        },
-      },
-    });
-  };
-
-  return <Button title="삭제" onPress={handleDelete} />;
 }
 ```
 

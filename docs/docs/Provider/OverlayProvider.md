@@ -36,7 +36,7 @@ import { ThemeProvider, OverlayProvider } from '@0610studio/zs-ui';
 |------|------|---------|-------------|
 | `children` | `ReactNode` | 필수 | 자식 컴포넌트 |
 | `customSnackbar` | `(props: CustomSnackbarProps) => ReactNode` | `undefined` | 기본 Snackbar를 대체할 커스텀 컴포넌트 |
-| `loaderComponent` | `() => ReactNode` | `undefined` | 기본 Loader를 대체할 커스텀 컴포넌트 |
+| `loaderComponent` | `() => ReactNode` | `undefined` | 기본 로딩 인디케이터를 대체할 함수. 배경 딤과 가운데 정렬은 그대로 유지됩니다 |
 | `maxSnackbarCount` | `number` | `3` | 동시에 표시할 수 있는 Snackbar 최대 개수 |
 
 ## 커스텀 스낵바
@@ -70,22 +70,14 @@ function App() {
 
 ## 커스텀 로더
 
+`loaderComponent`는 Loader의 배경 딤 가운데에 들어갈 인디케이터만 바꿉니다. 컴포넌트로 마운트하지 않고 함수로 호출하므로 안에서 훅을 쓰지 않습니다.
+
 ```tsx
 import { OverlayProvider } from '@0610studio/zs-ui';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 function CustomLoader() {
-  return (
-    <View style={{
-      position: 'absolute',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      <ActivityIndicator size="large" color="#007AFF" />
-    </View>
-  );
+  return <ActivityIndicator size="large" color="#007AFF" />;
 }
 
 function App() {

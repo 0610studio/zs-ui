@@ -17,10 +17,13 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 ## 기본 사용법
 
 ```tsx
+import { View } from 'react-native';
 import { ZSBorderBeam, ZSText } from '@0610studio/zs-ui';
 
-<ZSBorderBeam style={{ padding: 20 }}>
-  <ZSText typo="body.2">강조하고 싶은 콘텐츠</ZSText>
+<ZSBorderBeam>
+  <View style={{ padding: 20 }}>
+    <ZSText typo="body.2">강조하고 싶은 콘텐츠</ZSText>
+  </View>
 </ZSBorderBeam>
 ```
 
@@ -29,11 +32,11 @@ import { ZSBorderBeam, ZSText } from '@0610studio/zs-ui';
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | `undefined` | 테두리 안에 표시할 콘텐츠 |
-| `colors` | `string[]` | `undefined` | sweep gradient 색상 배열 (꼬리 → 머리 순). **2개 이상 지정하면 `colorFrom`·`colorTo` 는 무시됩니다** |
+| `colors` | `string[]` | `undefined` | sweep gradient 색상 배열 (꼬리 → 머리 순). **2개 이상 지정하면 광선 색에서 `colorFrom`·`colorTo` 는 무시됩니다**. 기본 `trackColor` 는 여전히 `colorFrom` 기준입니다 |
 | `colorFrom` | `string` | 테마 `primary.main` | 광선 시작(꼬리) 색상 |
 | `colorTo` | `string` | 테마 `secondary.main` | 광선 끝(머리) 색상 |
 | `beamLength` | `number` | `0.35` | 광선이 둘레에서 차지하는 비율 (0~1). `1`이면 둘레 전체가 그라디언트 링이 됩니다 |
-| `trackColor` | `string` | `colorFrom` 의 12% 알파 | 광선이 지나지 않는 구간의 얇은 기본 테두리. `'none'` 이면 표시하지 않습니다 |
+| `trackColor` | `string` | `colorFrom` 의 12% 알파 (`colorFrom` 이 `#RGB`·`#RRGGBB` 가 아니면 `#8080801F`) | 광선이 지나지 않는 구간의 기본 테두리. 두께는 `borderWidth` 와 같습니다. `'none'` 이면 표시하지 않습니다 |
 | `glow` | `boolean \| number \| ZSBorderBeamGlowConfig` | `true` | 글로우 강도 (아래 참조) |
 | `duration` | `number` | `5000` | 광선이 한 바퀴 도는 시간(ms) |
 | `delay` | `number` | `0` | 애니메이션 시작 지연(ms) |
@@ -41,7 +44,7 @@ import { ZSBorderBeam, ZSText } from '@0610studio/zs-ui';
 | `active` | `boolean` | `true` | `false`면 효과를 숨기고 애니메이션을 정지합니다 |
 | `borderWidth` | `number` | `2` | 테두리(광선) 두께 |
 | `borderRadius` | `number` | `14` | 테두리 곡률 |
-| `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
+| `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일. 광선은 children 영역의 테두리를 따라 그려지므로 `padding` 은 children 쪽에 줍니다 |
 | `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## glow 설정
@@ -90,13 +93,17 @@ interface ZSBorderBeamGlowConfig {
 
 ```tsx
 {/* 두 색 그라디언트 */}
-<ZSBorderBeam colorFrom="#6366F1" colorTo="#EC4899" style={{ padding: 20 }}>
-  <ZSText typo="body.2">보라 → 분홍</ZSText>
+<ZSBorderBeam colorFrom="#6366F1" colorTo="#EC4899">
+  <View style={{ padding: 20 }}>
+    <ZSText typo="body.2">보라 → 분홍</ZSText>
+  </View>
 </ZSBorderBeam>
 
 {/* 여러 색 */}
-<ZSBorderBeam colors={['#22D3EE', '#6366F1', '#EC4899']} style={{ padding: 20 }}>
-  <ZSText typo="body.2">3색 광선</ZSText>
+<ZSBorderBeam colors={['#22D3EE', '#6366F1', '#EC4899']}>
+  <View style={{ padding: 20 }}>
+    <ZSText typo="body.2">3색 광선</ZSText>
+  </View>
 </ZSBorderBeam>
 ```
 
@@ -115,8 +122,10 @@ interface ZSBorderBeamGlowConfig {
 로딩 중에만 효과를 주고 싶을 때 `active` 로 제어합니다.
 
 ```tsx
-<ZSBorderBeam active={isGenerating} style={{ padding: 16 }}>
-  <ZSText typo="body.3">{isGenerating ? '생성 중…' : answer}</ZSText>
+<ZSBorderBeam active={isGenerating}>
+  <View style={{ padding: 16 }}>
+    <ZSText typo="body.3">{isGenerating ? '생성 중…' : answer}</ZSText>
+  </View>
 </ZSBorderBeam>
 ```
 
@@ -134,19 +143,23 @@ interface ZSBorderBeamGlowConfig {
 
 ```tsx
 {items.map((item, index) => (
-  <ZSBorderBeam key={item.id} delay={index * 400} style={{ padding: 16 }}>
-    <ZSText typo="body.2">{item.title}</ZSText>
+  <ZSBorderBeam key={item.id} delay={index * 400}>
+    <View style={{ padding: 16 }}>
+      <ZSText typo="body.2">{item.title}</ZSText>
+    </View>
   </ZSBorderBeam>
 ))}
 ```
 
 ### 카드 형태
 
-`borderRadius` 는 콘텐츠 컨테이너와 맞춰야 광선 경로가 어긋나지 않습니다.
+`borderRadius` 는 광선 경로와 children 영역에 함께 적용되고, 모서리 밖으로 넘치는 콘텐츠는 잘립니다.
 
 ```tsx
-<ZSBorderBeam borderRadius={20} borderWidth={3} style={{ padding: 24, borderRadius: 20 }}>
-  <ZSText typo="subTitle.2">프리미엄 플랜</ZSText>
-  <ZSText typo="caption.1" color="secondary">모든 기능을 제한 없이</ZSText>
+<ZSBorderBeam borderRadius={20} borderWidth={3}>
+  <View style={{ padding: 24 }}>
+    <ZSText typo="subTitle.2">프리미엄 플랜</ZSText>
+    <ZSText typo="caption.1" color="secondary">모든 기능을 제한 없이</ZSText>
+  </View>
 </ZSBorderBeam>
 ```

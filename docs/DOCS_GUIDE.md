@@ -21,24 +21,28 @@
 - 메서드 표 머리글은 `| 메서드 | 설명 |`를 씁니다.
 - 인터페이스·반환값 타입은 TypeScript 코드 블록으로 적습니다.
 - frontmatter는 쓰지 않습니다. 사이드바 순서와 분류는 `sidebars.ts`가 정하므로 새 문서는 `sidebars.ts`에 추가합니다.
-- 현재 동작과 사용법만 적고, 버전별 변경 경과는 Git과 릴리스 기록에 맡깁니다. 블로그(`docs/blog/`)는 게시 시점의 글로 유지합니다.
+- 현재 동작과 사용법만 적고, 버전별 변경 경과는 Git과 릴리스 기록에 맡깁니다. 블로그(`docs/blog/`)는 게시한 글을 유지하되, 지금과 달라진 사실은 현재 상태로 고칩니다.
 
 ## 작성 원칙
 
 - 공개 API 이름과 기본값은 `src/` 타입과 구현을 확인해 작성합니다.
 - 내부 렌더러는 직접 사용 여부를 명시합니다.
 - 웹 미지원 기능은 플레이그라운드 결과만으로 판단하지 않도록 실제 기기 검증 범위를 적습니다.
-- 예제는 한 번에 하나의 개념을 보여주고 복사 가능한 형태로 유지합니다. import는 `@0610studio/zs-ui`의 공개 export만 씁니다.
+- 예제는 한 번에 하나의 개념을 보여주고 복사 가능한 형태로 유지합니다. `## 기본 사용법`과 같은 코드를 `## 예제`에 다시 싣지 않습니다. import는 `@0610studio/zs-ui`의 공개 export만 씁니다.
 - 새 runtime export를 추가하면 `pnpm --filter docs run validate:coverage`가 통과하도록 관련 문서에 API 이름을 포함합니다.
 - 같은 내용은 아래 정본 한 곳에 두고 다른 문서는 링크합니다.
 
 | 내용 | 정본 |
 |---|---|
-| 설치, 필수 peer 의존성, 앱 루트 구성 | `docs/docs/Provider/start.md` |
+| 설치, 필수 peer 의존성, config plugin, 앱 루트 구성 | `docs/docs/Provider/start.md` |
 | 플랫폼 지원 | `docs/docs/intro.md` |
 | `ThemeProvider` props와 폰트 설정 | `docs/docs/Provider/ThemeProvider.md` |
 | `useTheme` 반환값, 테마 모드 전환·저장 | `docs/docs/Theme/start.md` |
 | `OverlayProvider` props, 커스텀 스낵바·로더, 뒤로가기 우선순위 | `docs/docs/Provider/OverlayProvider.md` |
+| `themeFactory` 설정과 커스텀 팔레트 예제 | `docs/docs/Theme/themefactory.md` |
+| `RADIUS`·`DURATION`·`DISABLED_OPACITY`, `createShadow`, `usePreventDoublePress` | `docs/docs/Theme/tokens.md` |
+| `ViewColorOptions`(배경색 `color` 값) | `docs/docs/UiComponent/ZSView.md` |
+| 폴더블 상태 감지와 2-pane 예제 | `docs/docs/FoldableDevice.md` |
 | 예제 앱 실행과 웹·Maestro E2E | `example/README.md` |
 | 문서 사이트 실행·빌드·배포 | `docs/README.md` |
 

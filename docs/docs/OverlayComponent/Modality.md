@@ -33,10 +33,10 @@ function MyComponent() {
 ### `showModality` 함수
 
 ```typescript
-showModality(props: ModalityProps): void
+showModality(props: { component: React.ReactNode; foldableSingleScreen?: boolean }): void
 ```
 
-### `ModalityProps` 인터페이스
+### `showModality` 인자
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|

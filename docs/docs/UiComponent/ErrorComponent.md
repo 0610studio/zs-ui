@@ -31,7 +31,7 @@ function ValidationMessage() {
 |------|------|---------|-------------|
 | `errorMessage` | `string` | 필수 | 표시할 오류 문구 |
 | `errorColor` | `string` | 필수 | 아이콘 배경과 문구에 적용할 색상 |
-| `...props` | `ViewProps` | `undefined` | 최상위 Animated View에 전달할 속성 |
+| `...props` | `ViewProps` | `undefined` | 최상위 Animated View에 전달할 속성. `style`을 넘기면 기본 레이아웃(가로 배치·전체 폭·여백)을 대체합니다 |
 
 컴포넌트가 나타날 때 `FadeInDown` 애니메이션이 적용됩니다. 색상은 `palette.danger.main`처럼 현재 테마의 시맨틱 색상을 전달하세요.
 

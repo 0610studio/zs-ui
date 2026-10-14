@@ -35,7 +35,7 @@ function MyFilter() {
 | `selected` | `boolean` | `undefined` | 선택 상태를 외부에서 제어할 때 사용 (미지정 시 내부 상태로 토글) |
 | `initialSelected` | `boolean` | `false` | 비제어 모드의 초기 선택 상태 |
 | `onChange` | `(selected: boolean) => void` | `undefined` | 토글 시 다음 선택 상태를 전달 |
-| `intent` | `IntentOptions` | `'primary'` | 선택 상태의 색상 계열 |
+| `intent` | `'primary' \| 'danger' \| 'warning' \| 'success' \| 'information' \| 'grey'` | `'primary'` | 선택 상태의 색상 계열 |
 | `variant` | `'pastel' \| 'solid' \| 'stroke'` | `'pastel'` | 선택 상태의 스타일 |
 | `textSize` | `TypoSubStyle` | `'3'` | 라벨 typo 크기 (`'1'`~`'6'`). 패딩과 체크 아이콘 크기도 함께 결정됩니다 |
 | `checkIcon` | `boolean` | `false` | `true`면 선택 시 라벨 앞에 체크 아이콘 표시 |

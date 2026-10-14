@@ -42,7 +42,7 @@ function MyScreen() {
 | `initialValue` | `string` | 첫 아이템의 `value` | 비제어 모드의 초기 선택 값 |
 | `onChange` | `(value: string, index: number) => void` | `undefined` | 탭 선택 시 호출. 이미 선택된 탭을 눌러도 호출되지 않습니다 |
 | `layout` | `'fill' \| 'hug'` | `'fill'` | `fill`: 부모 폭을 균등 분할 · `hug`: 라벨 폭에 맞춰 좌측 정렬 |
-| `intent` | `IntentOptions` | `'primary'` | 활성 탭의 텍스트·인디케이터 색상 계열 |
+| `intent` | `'primary' \| 'danger' \| 'warning' \| 'success' \| 'information' \| 'grey'` | `'primary'` | 활성 탭의 텍스트·인디케이터 색상 계열 |
 | `textSize` | `TypoSubStyle` | `'2'` | 라벨 typo 크기 (`'1'`~`'6'`). 아이템 세로 패딩도 함께 결정됩니다 |
 | `indicatorColor` | `string` | `palette[intent][50]` | 인디케이터 색상 직접 지정 |
 | `showDivider` | `boolean` | `true` | 탭 하단 구분선 표시 |

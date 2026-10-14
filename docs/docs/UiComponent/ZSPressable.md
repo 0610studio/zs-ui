@@ -33,7 +33,7 @@ import { ZSPressable, ZSText } from '@0610studio/zs-ui';
 | `isAnimation` | `boolean` | `true` | `true`면 `FadeInDown` 진입과 `FadeOut` 퇴장 애니메이션 적용. 눌림 스케일은 이 값과 관계없이 동작합니다 |
 | `elevationLevel` | `ShadowLevel` | `undefined` | 버튼의 그림자 깊이를 설정 (0~9 단계) |
 | `fullWidth` | `boolean` | `false` | 버튼이 부모 요소의 전체 너비를 차지하도록 설정 |
-| `color` | `ViewColorOptions` | `undefined` | 배경색 옵션 (테마 팔레트 기반) |
+| `color` | `ViewColorOptions` | `undefined` | 배경색 옵션 (테마 팔레트 기반). 값은 [ZSView의 배경색 옵션](./ZSView#배경색-옵션-viewcoloroptions)을 참고하세요 |
 | `isLoading` | `boolean` | `false` | `true`일 때 클릭/롱클릭이 비활성화되고 버튼이 흐리게 표시됩니다. |
 | `preventDoublePress` | `boolean` | `false` | `true`일 때 기본 디바운스(300ms) 대신 2초 잠금을 적용합니다. 결제·제출처럼 중복 실행이 위험한 액션에 사용합니다 |
 | `disabled` | `boolean` | `false` | `true`일 때 클릭/롱클릭이 비활성화되고 버튼이 흐리게 표시됩니다. |
@@ -49,7 +49,7 @@ import { ZSPressable, ZSText } from '@0610studio/zs-ui';
 
 ## 중복 실행 방지
 
-`ZSPressable` 은 기본적으로 마지막 press 이후 300ms 동안 재호출을 무시합니다. 결제·주문 제출처럼 두 번 실행되면 안 되는 액션에는 `preventDoublePress` 로 잠금을 2초로 늘립니다.
+결제·주문 제출처럼 두 번 실행되면 안 되는 액션에는 `preventDoublePress` 로 잠금을 2초로 늘립니다.
 
 ```tsx
 <ZSPressable preventDoublePress onPress={submitOrder}>
@@ -57,16 +57,7 @@ import { ZSPressable, ZSText } from '@0610studio/zs-ui';
 </ZSPressable>
 ```
 
-`ZSPressable` 을 쓰지 않는 커스텀 버튼에는 같은 잠금을 `usePreventDoublePress` 훅으로 직접 적용할 수 있습니다.
-
-```tsx
-import { usePreventDoublePress } from '@0610studio/zs-ui';
-
-const handleSubmit = usePreventDoublePress(submitOrder);        // 기본 2000ms
-const handleSearch = usePreventDoublePress(search, 500);        // 간격 직접 지정
-
-<Pressable onPress={handleSubmit} />
-```
+`ZSPressable` 을 쓰지 않는 커스텀 버튼에는 같은 잠금을 `usePreventDoublePress` 훅으로 적용합니다. 사용법은 [공통 토큰과 유틸리티](../Theme/tokens#중복-실행-방지)를 참고하세요.
 
 ## 예제
 

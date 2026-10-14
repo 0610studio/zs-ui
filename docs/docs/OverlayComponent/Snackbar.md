@@ -42,7 +42,7 @@ showSnackBar(props: ShowSnackBarProps): void
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `message` | `string` | 필수 | Snackbar에 표시할 메시지 |
-| `type` | `SnackType` | `'success'` | Snackbar의 유형 (`'success'`, `'error'`, `''`) |
+| `type` | `SnackType` | `'success'` | Snackbar의 유형 (`'success'`, `'error'`, `''`). 기본 Snackbar는 `'error'`가 아니면 성공 스타일로 표시합니다 |
 | `index` | `number` | `Date.now()` | Snackbar의 고유 식별자 |
 | `snackbarDuration` | `number` | `3500` | Snackbar가 표시될 지속 시간 (밀리초) |
 
@@ -60,25 +60,6 @@ type SnackType = 'success' | 'error' | '';
 
 ## 예제
 
-### 성공 메시지
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showSnackBar } = useOverlay();
-
-  const handleSuccess = () => {
-    showSnackBar({
-      message: '저장되었습니다.',
-      type: 'success',
-    });
-  };
-
-  return <Button title="성공 메시지" onPress={handleSuccess} />;
-}
-```
-
 ### 에러 메시지
 
 ```tsx
@@ -95,25 +76,6 @@ function MyComponent() {
   };
 
   return <Button title="에러 메시지" onPress={handleError} />;
-}
-```
-
-### 일반 메시지
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showSnackBar } = useOverlay();
-
-  const handleShowMessage = () => {
-    showSnackBar({
-      message: '알림 메시지',
-      type: '',
-    });
-  };
-
-  return <Button title="메시지 표시" onPress={handleShowMessage} />;
 }
 ```
 

@@ -56,7 +56,7 @@ hideOverlay(option?: HideOption): void
 ## 특징
 
 - **전체 화면 오버레이**: 화면 전체를 덮어 다른 상호작용을 차단합니다
-- **커스터마이징 가능**: `OverlayProvider`에서 커스텀 로더 컴포넌트를 사용할 수 있습니다
+- **커스터마이징 가능**: `OverlayProvider`의 `loaderComponent`로 가운데 인디케이터를 바꿀 수 있습니다
 - **간단한 API**: `showLoader()`와 `hideOverlay('loader')`로 쉽게 제어 가능
 
 ## 예제

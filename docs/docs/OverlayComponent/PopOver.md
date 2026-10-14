@@ -2,7 +2,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # PopOver
 
-작은 메뉴나 도구 모음을 버튼 위치 기준으로 표시할 수 있는 오버레이 컴포넌트입니다. `PopOverButton`을 사용하면 손쉽게 메뉴를 열 수 있으며, 메뉴 내용은 `PopOverMenu`에 전달한 컴포넌트로 렌더링됩니다.
+작은 메뉴나 도구 모음을 버튼 위치 기준으로 표시할 수 있는 오버레이 컴포넌트입니다. `PopOverButton`의 `popOverMenuComponent`로 메뉴 내용을 넘기면 버튼을 눌렀을 때 메뉴가 열립니다. `PopOverMenu`는 `OverlayProvider`가 메뉴를 그릴 때 쓰는 렌더러이므로 앱 화면에서 직접 마운트하지 않습니다.
 
 <LocalPlayground example="PopOver" />
 
@@ -42,13 +42,13 @@ function MyComponent() {
 | `backgroundColor` | `string` | `'transparent'` | 버튼 배경색 |
 | `popOverMenuComponent` | `React.ReactNode` | 필수 | 표시할 메뉴 컴포넌트 |
 | `children` | `React.ReactNode` | `undefined` | 버튼 내부에 표시할 컴포넌트 |
-| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
+| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성. `style`을 넘기면 `width`·`height`·`backgroundColor` 스타일을 대체합니다 |
 
 ## API 참조
 
 ### `showPopOverMenu` 함수
 
-`PopOverButton` 없이 임의의 좌표에서 직접 메뉴를 띄우려면 `useOverlay`의 `showPopOverMenu`를 사용합니다. `PopOverButton`도 내부적으로 이 함수를 호출합니다.
+`PopOverButton` 없이 임의의 좌표에서 직접 메뉴를 띄우려면 `useOverlay`의 `showPopOverMenu`를 사용합니다. `PopOverButton`도 내부적으로 버튼의 오른쪽 아래 모서리 좌표로 이 함수를 호출합니다.
 
 ```typescript
 showPopOverMenu(props: PopOverMenuProps): void
@@ -56,8 +56,8 @@ showPopOverMenu(props: PopOverMenuProps): void
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `px` | `number` | 필수 | 메뉴를 띄울 기준 x 좌표 (화면 절대 좌표) |
-| `py` | `number` | 필수 | 메뉴를 띄울 기준 y 좌표 (화면 절대 좌표) |
+| `px` | `number` | 필수 | 메뉴 오른쪽 끝을 맞출 x 좌표 (화면 절대 좌표) |
+| `py` | `number` | 필수 | 메뉴 위쪽을 맞출 y 좌표 (화면 절대 좌표). 메뉴가 화면 아래로 넘치면 이 좌표 위쪽에 띄웁니다 |
 | `component` | `React.ReactNode` | 필수 | 표시할 메뉴 컴포넌트 |
 
 ```tsx
@@ -94,24 +94,6 @@ function MyComponent() {
 - **유연한 메뉴**: 원하는 컴포넌트를 메뉴로 표시할 수 있습니다
 
 ## 예제
-
-### 기본 사용
-
-```tsx
-import { PopOverButton } from '@0610studio/zs-ui';
-
-<PopOverButton
-  width={40}
-  height={40}
-  popOverMenuComponent={
-    <View style={{ backgroundColor: '#fff', padding: 10 }}>
-      <ZSText typo="body.2">메뉴 항목</ZSText>
-    </View>
-  }
->
-  <Icon name="more" />
-</PopOverButton>
-```
 
 ### 커스텀 배경색
 
@@ -165,16 +147,6 @@ function MenuContent() {
 >
   <Icon name="more" />
 </PopOverButton>
-```
-
-### PopOver 닫기
-
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-const { hideOverlay } = useOverlay();
-
-hideOverlay('popOver');
 ```
 
 ## 관련 문서

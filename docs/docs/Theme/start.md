@@ -79,7 +79,7 @@ interface Theme {
 현재 팔레트로 스타일 객체를 만들고, 팔레트가 바뀔 때만 다시 계산합니다.
 
 ```typescript
-useStyleSheetCreate<T>(createStyles: (palette: Theme) => T): T
+useStyleSheetCreate<T extends Record<string, any>>(createStyles: (palette: Theme) => T): T
 ```
 
 ```tsx

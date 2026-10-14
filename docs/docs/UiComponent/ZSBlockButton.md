@@ -29,7 +29,7 @@ export default function App() {
 | `onPress` | `() => void` | 필수 | 버튼 클릭 시 호출되는 함수 |
 | `title` | `string` | 필수 | 버튼에 표시될 텍스트 |
 | `typo` | `TypoOptions` | 필수 | 버튼 텍스트의 타이포그래피 스타일 |
-| `intent` | `IntentOptions` | `'primary'` | 버튼의 의도/색상 테마 |
+| `intent` | `'primary' \| 'danger' \| 'warning' \| 'success' \| 'information' \| 'grey'` | `'primary'` | 버튼의 의도/색상 테마 |
 | `variant` | `'solid' \| 'pastel' \| 'stroke'` | `'solid'` | 버튼의 스타일 변형 |
 | `prefixIcon` | `ImageSourcePropType` | `undefined` | 버튼 텍스트 앞에 표시될 아이콘 (12×12, 텍스트 색으로 tint) |
 | `isLoading` | `boolean` | `false` | `true`일 때 클릭이 비활성화되고 버튼이 흐리게 표시됩니다 |

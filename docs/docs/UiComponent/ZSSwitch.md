@@ -2,7 +2,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 
 # ZSSwitch
 
-애니메이션이 적용된 토글 스위치 컴포넌트입니다. RN 의 CSS transition(`transitionProperty`)으로 트랙 색상과 썸 위치를 부드럽게 전환합니다.
+애니메이션이 적용된 토글 스위치 컴포넌트입니다. Reanimated 의 CSS transition(`transitionProperty`)으로 트랙 색상과 썸 위치를 부드럽게 전환합니다.
 
 <LocalPlayground example="ZSSwitch" />
 

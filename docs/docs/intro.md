@@ -36,7 +36,7 @@ hideOverlay('all');
 
 ### 3. Input Scroll Tracking
 
-키보드가 올라오면 `ZSContainer`가 현재 포커스된 입력 필드를 자동으로 스크롤해서 보여줍니다. 별도 플래그를 관리하거나 `KeyboardAvoidingView`를 수동으로 배치할 필요가 없습니다.
+키보드가 올라오면 `ZSContainer`가 마지막으로 터치한 입력 필드를 키보드 위로 스크롤해서 보여줍니다. 별도 플래그를 관리하거나 `KeyboardAvoidingView`를 수동으로 배치할 필요가 없습니다.
 
 ## 플랫폼 지원
 

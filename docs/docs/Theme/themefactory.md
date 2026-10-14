@@ -36,10 +36,13 @@ function App() {
 
 ## API 참조
 
-`themeFactory`는 설정에 없는 색상을 기본 팔레트로 채운 팔레트 함수를 반환합니다. 반환값을 `ThemeProvider`의 `customPalette`에 넘깁니다.
+`themeFactory`는 설정에 없는 색상을 기본 팔레트로 채운 팔레트 함수를 반환합니다. 반환값을 `ThemeProvider`의 `customPalette`에 넘깁니다. `ThemeProvider`는 이 함수에 `mode`만 넘깁니다.
 
 ```typescript
-themeFactory(config?: ThemeFactoryConfig): (options?: { mode?: 'light' | 'dark' }) => Theme
+themeFactory(config?: ThemeFactoryConfig): (options?: {
+  mode?: 'light' | 'dark';
+  themeColors?: { light?: Theme; dark?: Theme }; // 지정한 모드의 Theme 값을 통째로 덮어씀
+}) => Theme
 ```
 
 ### ThemeFactoryConfig
@@ -66,26 +69,6 @@ interface ThemeFactoryColors {
 ```
 
 ## 예제
-
-### Primary 색상만 변경
-
-```tsx
-const customPalette = themeFactory({
-  light: {
-    primary: {
-      main: '#FF6B6B',
-      lighter: '#FFE5E5',
-      light: '#FFB3B3',
-      dark: '#CC5555',
-      darker: '#993333',
-    },
-  },
-});
-
-<ThemeProvider customPalette={customPalette}>
-  {/* 앱 */}
-</ThemeProvider>
-```
 
 ### 여러 색상 변경
 
@@ -155,27 +138,6 @@ const customPalette = themeFactory({
 });
 
 // 나머지 색상(5, 10, 20 등)은 기본값 유지
-```
-
-### 라이트/다크 모드별 설정
-
-```tsx
-const customPalette = themeFactory({
-  light: {
-    primary: {
-      main: '#2196F3', // 라이트 모드: 밝은 블루
-    },
-  },
-  dark: {
-    primary: {
-      main: '#90CAF9', // 다크 모드: 더 밝은 블루
-    },
-  },
-});
-
-<ThemeProvider customPalette={customPalette}>
-  {/* 앱 */}
-</ThemeProvider>
 ```
 
 ## 관련 문서

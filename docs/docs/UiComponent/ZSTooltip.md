@@ -90,11 +90,15 @@ const [visible, setVisible] = useState(true);
 
 ### 커스텀 콘텐츠
 
+말풍선 배경은 다크 모드에서 밝아지므로, 커스텀 콘텐츠의 글자색은 기본 `textColor`와 같은 `palette.background.base`를 씁니다.
+
 ```tsx
+const { palette } = useTheme();
+
 <ZSTooltip placement="bottom" tailAlign="center">
   <View style={{ gap: 4 }}>
-    <ZSText typo="subTitle.4" color="white">신규 기능</ZSText>
-    <ZSText typo="caption.1" color="white">이제 폴더블 기기를 지원합니다</ZSText>
+    <ZSText typo="subTitle.4" style={{ color: palette.background.base }}>신규 기능</ZSText>
+    <ZSText typo="caption.1" style={{ color: palette.background.base }}>폴더블 기기를 지원합니다</ZSText>
   </View>
 </ZSTooltip>
 ```

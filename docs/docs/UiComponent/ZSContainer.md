@@ -26,7 +26,7 @@ import LocalPlayground from '@site/src/components/LocalPlayground';
 ## 기본 사용법
 
 ```tsx
-import { ZSContainer } from '@0610studio/zs-ui';
+import { ZSContainer, ZSText } from '@0610studio/zs-ui';
 
 function MyScreen() {
   return (
@@ -42,7 +42,8 @@ function MyScreen() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `backgroundColor` | `string` | 테마 `background.base` | 배경 색상 |
+| `children` | `ReactNode` | `undefined` | 스크롤 영역에 표시할 화면 콘텐츠 |
+| `backgroundColor` | `string` | 테마 `background.base` | SafeArea inset 영역(폴더블 단일 화면이면 최대 폭 바깥 여백 포함)의 배경색. 콘텐츠 영역은 항상 테마 `background.base`이므로 콘텐츠 배경은 `style={{ backgroundColor }}`로 지정합니다 |
 | `statusBarColor` | `string` | `undefined` | 상태바 배경 색상 |
 | `barStyle` | `'light-content' \| 'dark-content'` | `undefined` | 상태바 텍스트 스타일 |
 | `edges` | `Array<'top' \| 'right' \| 'bottom' \| 'left'>` | `['bottom']` | SafeAreaView의 가장자리 설정 |
@@ -51,7 +52,7 @@ function MyScreen() {
 | `bottomComponent` | `ReactNode` | `undefined` | 하단에 표시할 컴포넌트 (스크롤 밖에 고정) |
 | `rightComponent` | `ReactNode` | `undefined` | 우측 화면 컴포넌트 (폴더블 펼침 상태) |
 | `showsVerticalScrollIndicator` | `boolean` | `true` | 세로 스크롤 인디케이터 표시 여부 |
-| `scrollToFocusedInput` | `boolean` | `true` | 입력 필드 포커스 시 키보드 위로 자동 스크롤 |
+| `scrollToFocusedInput` | `boolean` | `true` | 키보드가 열릴 때 마지막으로 터치한 위치가 키보드 위로 오도록 자동 스크롤 |
 | `keyboardScrollExtraOffset` | `number` | `30` | 자동 스크롤 시 키보드와의 추가 여백 (px) |
 | `translucent` | `boolean` | `undefined` | 상태바 반투명 여부 |
 | `onScroll` | `(event: NativeSyntheticEvent<NativeScrollEvent>) => void` | `undefined` | 스크롤 이벤트 핸들러 |
@@ -64,14 +65,14 @@ function MyScreen() {
 ## 특징
 
 1. **화면 하나 = ZSContainer 하나**. 각 스크린의 최상단 래퍼로 사용합니다.
-2. **키보드가 올라와도 입력 필드가 보입니다**. `scrollToFocusedInput`이 기본 켜져 있어, 터치한 입력 필드를 키보드 위로 자동 스크롤합니다. 추가 여백이 필요하면 `keyboardScrollExtraOffset`으로 조절합니다.
+2. **키보드가 올라와도 입력 필드가 보입니다**. `scrollToFocusedInput`이 기본으로 켜져 있어, 키보드가 열릴 때 마지막으로 터치한 위치(보통 입력 필드)를 키보드 위로 스크롤합니다. 추가 여백이 필요하면 `keyboardScrollExtraOffset`으로 조절합니다.
 3. **필요한 것만 키면 됩니다**. 기본값(ScrollView 활성, 바텀 SafeArea)만으로 대부분의 화면이 동작합니다.
 
 ## 예제
 
 ### 키보드 자동 스크롤
 
-`scrollToFocusedInput={true}` (기본값)일 때, 터치한 입력 필드가 키보드에 가리지 않도록 자동으로 스크롤합니다. `keyboardScrollExtraOffset`으로 입력 필드와 키보드 사이의 여백을 조절할 수 있습니다.
+`scrollToFocusedInput={true}` (기본값)일 때, 키보드가 열리면 마지막으로 터치한 위치가 키보드에 가리지 않도록 자동으로 스크롤합니다. `keyboardScrollExtraOffset`으로 입력 필드와 키보드 사이의 여백을 조절할 수 있습니다.
 
 ```tsx
 <ZSContainer keyboardScrollExtraOffset={50}>
@@ -109,7 +110,8 @@ function MyScreen() {
 <ZSContainer
   barStyle="light-content"
   statusBarColor="#000000"
-  backgroundColor="#000000"
+  backgroundColor="#000000"           // SafeArea inset 영역
+  style={{ backgroundColor: '#000000' }} // 콘텐츠 영역
 >
   <ZSText typo="body.2" color="white">다크 배경 화면</ZSText>
 </ZSContainer>
@@ -154,13 +156,4 @@ function MyComponent() {
 
 ## 폴더블 기기 지원
 
-폴더블 기기에서 화면을 좌우로 분할할 수 있습니다. 자세한 내용은 [폴더블 기기 지원](../FoldableDevice) 문서를 참조하세요.
-
-```tsx
-<ZSContainer
-  rightComponent={<RightPanel />}
-  dividerLineComponent={<View style={{ width: 1, backgroundColor: '#E0E0E0' }} />}
->
-  <LeftPanel />
-</ZSContainer>
-```
+폴더블 기기를 펼치면 `rightComponent`로 화면을 좌우로 분할할 수 있습니다. 사용법과 동작은 [폴더블 기기 지원](../FoldableDevice) 문서를 참고하세요.

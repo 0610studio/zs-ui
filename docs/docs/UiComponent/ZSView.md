@@ -22,7 +22,7 @@ import { ZSView } from '@0610studio/zs-ui';
 |------|------|---------|-------------|
 | `isAnimation` | `boolean` | `false` | 마운트 시 페이드 애니메이션 적용 여부 |
 | `elevationLevel` | `ShadowLevel` | `0` | 그림자 단계 (0~9) |
-| `color` | `ViewColorOptions` | 테마 `background.base` | 배경색 옵션 (테마 팔레트 기반) |
+| `color` | `ViewColorOptions` | 테마 `background.base` | 배경색 옵션 (테마 팔레트 기반). `color`를 지정하거나 `elevationLevel`이 1 이상이면 이 배경색이 `style` 뒤에 적용되어 `style.backgroundColor`는 무시됩니다 |
 | `...rest` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
 
 ## 그림자 레벨 (ShadowLevel)
@@ -38,23 +38,11 @@ import { ZSView } from '@0610studio/zs-ui';
 
 그림자 색상은 테마 모드에 따라 바뀝니다 — 라이트는 검정 계열, 다크는 흰색 계열입니다.
 
-임의의 오프셋·블러가 필요하면 `createShadow` 헬퍼로 직접 만들 수 있습니다.
-
-```tsx
-import { createShadow, useTheme } from '@0610studio/zs-ui';
-
-const { palette } = useTheme();
-const shadow = createShadow(
-  { shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-  palette.grey[100],
-);
-
-<View style={{ boxShadow: shadow }} />
-```
+임의의 오프셋·블러가 필요하면 `createShadow` 헬퍼로 직접 만듭니다. 사용법은 [공통 토큰과 유틸리티](../Theme/tokens#그림자-생성)를 참고하세요.
 
 ## 배경색 옵션 (ViewColorOptions)
 
-테마 팔레트 기반의 배경색을 사용할 수 있습니다:
+테마 팔레트 기반의 배경색을 사용할 수 있습니다. `ViewColorOptions`는 공개 export가 아니므로 타입이 필요하면 `NonNullable<ZSSkeletonBoxProps['color']>`처럼 공개 props 타입에서 꺼내 씁니다.
 
 - `layer1`, `layer2`, `neutral`, `base`
 - `primary`, `primary.5`, `primary.10`, ..., `primary.100`
@@ -65,16 +53,6 @@ const shadow = createShadow(
 - `grey.5`, `grey.10`, ..., `grey.100`
 
 ## 예제
-
-### 기본 사용
-
-```tsx
-import { ZSView } from '@0610studio/zs-ui';
-
-<ZSView style={{ padding: 20 }}>
-  <Text>기본 뷰</Text>
-</ZSView>
-```
 
 ### 그림자 적용
 

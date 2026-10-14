@@ -135,14 +135,14 @@ function MemoList() {
 | `events` | `ReadonlyArray<CalendarEvent<T>>` | `[]` | 달력 점과 리스트가 공유하는 단일 소스 |
 | `onVisibleRangeChange` | `(range: DateRange) => void` | `undefined` | 앞뒤 1페이지를 포함한 표시 범위 (prefetch 힌트) |
 | `selectedDate` | `DateString \| null` | `undefined` | 선택된 날짜 (controlled) |
-| `defaultSelectedDate` | `DateString \| null` | 오늘 | 선택된 날짜 초기값 (uncontrolled) |
+| `defaultSelectedDate` | `DateString \| null` | 오늘 | 선택된 날짜 초기값 (uncontrolled). `null`도 오늘로 바뀌므로, 선택 없이 시작하려면 `selectedDate={null}`로 제어합니다 |
 | `onDateChange` | `(date: DateString) => void` | `undefined` | 날짜를 탭했을 때 |
 | `visibleMonth` | `DateString` | `undefined` | 표시 중인 달 (controlled). 해당 월 1일로 정규화됩니다 |
 | `defaultVisibleMonth` | `DateString` | 이번 달 | 표시 중인 달 초기값 (uncontrolled) |
 | `onMonthChange` | `(month: DateString) => void` | `undefined` | 스와이프·헤더 화살표로 달이 바뀌었을 때 |
 | `mode` | `'week' \| 'month'` | `undefined` | 보기 모드 (controlled) |
 | `defaultMode` | `'week' \| 'month'` | `'month'` | 보기 모드 초기값 (uncontrolled) |
-| `onModeChange` | `(mode: CalendarMode) => void` | `undefined` | 전환이 양 끝(0 또는 1)에 도달했을 때만 호출됩니다 |
+| `onModeChange` | `(mode: CalendarMode) => void` | `undefined` | 마운트 때 초기 모드로 한 번, 이후에는 전환이 양 끝(0 또는 1)에 도달했을 때만 호출됩니다 |
 | `calendarTheme` | `CalendarThemeOverride` | 테마 팔레트에서 파생 | 색 토큰 부분 오버라이드 |
 | `fonts` | `CalendarFontSources` | `undefined` | 날짜 숫자 폰트 파일. 미주입 시 `ThemeProvider` 의 `themeFontAssets`(400·700), 그것도 없으면 시스템 폰트 |
 | `firstDayOfWeek` | `0 \| 1` | `0` | 0=일요일, 1=월요일 시작 |
@@ -161,9 +161,9 @@ function MemoList() {
 ## 특징
 
 - **단일 데이터 소스**: 달력 점과 아젠다 리스트가 같은 `events` 인덱스를 조회하므로 날짜별로 데이터를 다시 묶을 필요가 없습니다
-- **로컬 날짜 문자열**: 모든 날짜가 `'YYYY-MM-DD'` 이고 timestamp 를 쓰지 않아 타임존·서머타임에서 하루가 밀리지 않습니다. 형식이 잘못된 이벤트는 조용히 건너뛰고 개발 모드에서 한 번 경고합니다
+- **로컬 날짜 문자열**: 모든 날짜가 `'YYYY-MM-DD'` 이고 timestamp 를 쓰지 않아 타임존·서머타임에서 하루가 밀리지 않습니다. 형식이 잘못된 이벤트는 건너뛰고, 개발 모드에서는 인덱스를 만들 때마다(`events` 참조가 바뀔 때마다) 건너뛴 건수를 한 번에 경고합니다
 - **제어·비제어 양쪽 지원**: `selectedDate` · `visibleMonth` · `mode` 는 값을 넘기면 부모가 소유하고, `default*` 만 넘기면 내부 상태로 동작합니다. `mode` 를 밖에서 바꾸면 같은 스프링으로 전환 애니메이션이 재생됩니다
-- **전환이 끝난 뒤에만 알림**: `onModeChange` 는 전환이 양 끝(0 또는 1)에 도달했을 때만 호출됩니다 — 중간 값에서 알리면 소비자 상태가 전환 도중에 흔들립니다
+- **전환이 끝난 뒤에만 알림**: `onModeChange` 는 마운트 때 초기 모드로 한 번 호출된 뒤에는 전환이 양 끝(0 또는 1)에 도달했을 때만 호출됩니다 — 중간 값에서 알리면 소비자 상태가 전환 도중에 흔들립니다
 - **참조 안정성이 곧 성능**: 렌더마다 `events` 배열을 새로 만들면 내부 캐시가 통째로 버려져 매번 세 페이지를 다시 그립니다. `useMemo` 로 감싸거나 받아온 데이터를 누적하세요
 - **컨텍스트 기반 아젠다**: `useCalendarAgenda()` 를 인자 없이 쓰는 곳은 `ZSCalendar` 의 children 안입니다. 밖에서는 `index` 와 `selectedDate` 를 직접 넘깁니다
 
@@ -178,7 +178,7 @@ type CalendarEvent<T = unknown> = {
 };
 ```
 
-같은 날짜에 여러 건이 있으면 색마다 점을 하나씩 찍습니다(같은 색은 하나로 합칩니다). 한 줄이 차면 다음 줄로 감싸 두 줄까지 보이고 그 이상은 자릅니다. 개수 상한은 따로 없고 두 줄에 들어가는 만큼입니다(한 줄 개수는 셀 폭에 따라 5~7개, 태블릿은 더 많이).
+같은 날짜에 여러 건이 있으면 색마다 점을 하나씩 찍습니다(같은 색은 하나로 합칩니다). 한 줄이 차면 다음 줄로 감싸 두 줄까지 보이고 그 이상은 자릅니다. 개수 상한은 따로 없고 두 줄에 들어가는 만큼입니다. 한 줄 개수는 셀 폭으로 정해지며, 기본 `maxContentWidth`(520)에서는 6개 안팎이고 `maxContentWidth`를 늘리거나 `false`로 주면 넓은 화면에서 더 많아집니다.
 
 ## useCalendarAgenda
 
@@ -245,7 +245,10 @@ const items = eventsInRange(index, { startDate: selected, endDate: addMonths(sel
 | `dotColor` | `string` | `primary.main` | `color` 를 지정하지 않은 이벤트의 점 |
 
 ```tsx
-<ZSCalendar calendarTheme={{ selectedText: '#111827', todayText: '#F59E0B' }} />
+// 참조가 바뀌면 그려 둔 페이지를 모두 다시 그리므로 모듈 상수나 useMemo 로 고정합니다
+const CALENDAR_THEME = { selectedText: '#111827', todayText: '#F59E0B' };
+
+<ZSCalendar calendarTheme={CALENDAR_THEME} />
 ```
 
 선택한 날짜는 숫자와 점을 함께 감싸는 둥근 카드로 띄웁니다. 카드는 라이트에서 배경색(`background.base`) 그대로이고 아래로 옅은 그림자가 떨어져 떠 보입니다. 다크에서는 그림자가 묻히므로 `grey[20]` 으로 띄웁니다. 오늘은 글자색을 4% 만 깐 옅은 원으로 표시합니다. 카드색과 오늘 원 색은 팔레트에서 나오며 토큰으로 바꾸지 않습니다.
@@ -369,13 +372,15 @@ props 를 고를 때 판단이 쉬워지는 배경입니다.
 | 함수 | 설명 |
 |------|------|
 | `todayDateString()` | 로컬 기준 오늘 |
-| `addDays` · `addMonths` · `diffDays` · `monthsBetween` · `weeksBetween` | 서머타임에 안전한 날짜 이동·차이 |
+| `addDays` · `addMonths` · `diffDays` · `monthsBetween` · `weeksBetween` | 서머타임에 안전한 날짜 이동·차이. `weeksBetween(a, b)`는 두 인자 모두 같은 `firstDayOfWeek`의 주 시작일이어야 합니다 |
 | `startOfMonth` · `endOfMonth` · `startOfWeek` · `endOfWeek` | 경계 계산 |
 | `weeksInMonth` · `buildMonthMatrix` | 월 그리드 (4~6주) |
-| `monthOfWeek` | 한 주가 속한 달 (과반 기준) |
-| `buildEventIndex` · `getEventsOn` · `countEventsOn` · `eventsInRange` | 이벤트 인덱스 O(1) 조회 |
+| `monthOfWeek(weekStart)` | 주 시작일을 받아 그 주가 속한 달 (과반 기준) |
+| `buildEventIndex` · `getEventsOn` · `countEventsOn` · `eventsInRange` | 이벤트 인덱스 생성과 조회 (`getEventsOn`·`countEventsOn`은 O(1), `eventsInRange`는 범위만큼 순회) |
 | `visibleRangeOf` | 앞뒤 페이지를 포함한 표시 범위 |
-| `isValidDateString` · `compareDate` · `isSameMonth` · `daysInMonth` · `toDateString` | 검증·비교 |
+| `isValidDateString` · `compareDate` · `isSameMonth` | 검증·비교 |
+| `daysInMonth(year, month)` | 그 달의 일수 |
+| `toDateString({ y, m, d })` | 연·월·일 숫자를 `DateString`으로 변환 |
 | `CALENDAR_LOCALES` · `resolveCalendarLocale` | 내장 문자열 묶음과 그 해석 |
 
 ## 관련 문서

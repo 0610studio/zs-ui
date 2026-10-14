@@ -25,17 +25,17 @@ import { ZSMessageBar } from '@0610studio/zs-ui';
 |------|------|---------|-------------|
 | `message` | `string` | 필수 | 본문 메시지 |
 | `title` | `string` | `undefined` | 메시지 위에 굵게 표시되는 제목 |
-| `intent` | `IntentOptions` | `'information'` | 색상 계열과 기본 아이콘을 결정 |
+| `intent` | `'primary' \| 'danger' \| 'warning' \| 'success' \| 'information' \| 'grey'` | `'information'` | 색상 계열과 기본 아이콘을 결정 |
 | `variant` | `'pastel' \| 'solid' \| 'stroke'` | `'pastel'` | 배경 스타일 |
 | `icon` | `React.ReactNode \| null` | intent 기본 아이콘 | 커스텀 아이콘. **`null` 을 넘기면 아이콘을 숨깁니다** |
 | `actionLabel` | `string` | `undefined` | 본문 아래 텍스트 버튼 라벨 |
 | `onAction` | `() => void` | `undefined` | 액션 버튼 탭 시 호출 |
-| `showClose` | `boolean` | `false` | `true`면 우측 상단 닫기(X) 버튼 표시 |
+| `showClose` | `boolean` | `false` | `true`면 우측에 닫기(X) 버튼 표시. `title`이 있으면 첫 줄에, 없으면 세로 가운데에 맞춥니다 |
 | `onClose` | `() => void` | `undefined` | 닫기 버튼 탭 시 호출 |
 | `visible` | `boolean` | `undefined` | 표시 여부를 외부에서 제어할 때 사용 (미지정 시 닫기 버튼으로 내부 제어) |
 | `textSize` | `TypoSubStyle` | `'3'` | 텍스트 typo 크기 (`'1'`~`'6'`). 아이콘 크기도 함께 결정됩니다 |
 | `fullWidth` | `boolean` | `true` | `false`면 콘텐츠 폭에 맞춰 줄어듭니다 |
-| `animated` | `boolean` | `true` | `false`면 등장·퇴장 페이드를 끕니다 |
+| `animated` | `boolean` | `true` | `false`면 등장·퇴장 페이드와 레이아웃 전환 애니메이션을 모두 끕니다 |
 | `disabled` | `boolean` | `false` | 비활성화 (흐리게 표시) |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너 추가 스타일 |
 | `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
@@ -65,7 +65,7 @@ import { ZSMessageBar } from '@0610studio/zs-ui';
 
 ## 특징
 
-- **레이아웃 애니메이션**: 닫기·표시 전환 시 페이드와 함께 주변 레이아웃이 부드럽게 재배치됩니다 (`LinearTransition`)
+- **레이아웃 애니메이션**: `animated`가 `true`(기본값)일 때 닫기·표시 전환 시 페이드와 함께 주변 레이아웃이 부드럽게 재배치됩니다 (`LinearTransition`)
 - **제어·비제어 양쪽 지원**: `visible` 미지정 시 닫기 버튼이 내부 상태로 동작하고, 지정하면 부모가 소유합니다. 제어 모드에서 다시 열리면 내부 상태도 함께 동기화됩니다
 - **대비 보정된 본문 색**: intent × variant × 테마 모드별로 읽히는 색을 따로 정의합니다
 

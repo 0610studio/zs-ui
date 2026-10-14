@@ -59,10 +59,10 @@ showBottomSheet(props: ShowBottomSheetProps): void
 | `dismissable` | `boolean` | `true` | 배경 터치·아래로 끌기 제스처로 닫을 수 있는지 여부. `false`면 Android 뒤로가기는 시트를 닫지 않고 소비만 하며, `hideOverlay('bottomSheet')` 호출로는 닫힙니다 |
 | `onClose` | `() => void` | `undefined` | 시트가 어떤 경로(버튼·배경 터치·드래그·뒤로가기)로 닫히든 정확히 1회 호출되는 콜백 |
 | `isBackgroundTouchClose` | `boolean` | `undefined` | 사용 중단 예정. `dismissable`을 사용하세요. `dismissable` 미지정 시에만 참조되며, 배경 터치와 제스처 닫힘을 함께 제어합니다 |
-| `marginHorizontal` | `number` | `10` | 시트의 좌우 여백 |
-| `marginBottom` | `number` | `10` | 시트의 하단 여백 |
+| `marginHorizontal` | `number` | `10` | 시트의 좌우 여백. `type: 'fixed'`면 무시합니다 |
+| `marginBottom` | `number` | `10` | 시트의 하단 여백. `type: 'fixed'`면 무시합니다 |
 | `height` | `number \| 'auto'` | `300` | 시트의 높이 (`'auto'` 지정 시 컨텐츠 크기에 맞춤) |
-| `maxHeight` | `number` | `화면 높이` | 시트의 최대 높이 제한 |
+| `maxHeight` | `number` | `화면 높이` | 시트의 최대 높이 제한. 이 값과 관계없이 화면 높이에서 SafeArea 위·아래와 30px를 뺀 높이를 넘지 않습니다 |
 | `padding` | `number` | `14` | 시트 내부 패딩 |
 | `foldableSingleScreen` | `boolean` | `false` | 폴더블 디바이스에서 단일 화면 모드 사용 여부 |
 | `type` | `'floating' \| 'fixed'` | `'floating'` | 시트 타입 (`floating`: 떠있는 형태, `fixed`: 화면 하단에 고정) |
@@ -207,24 +207,5 @@ function MyComponent() {
   };
 
   return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
-```
-
-### BottomSheet 닫기
-
-```tsx
-import { useOverlay, ZSPressable, ZSText } from '@0610studio/zs-ui';
-import { View } from 'react-native';
-
-function MyBottomSheetContent() {
-  const { hideOverlay } = useOverlay();
-
-  return (
-    <View>
-      <ZSPressable onPress={() => hideOverlay('bottomSheet')}>
-        <ZSText typo="body.2">닫기</ZSText>
-      </ZSPressable>
-    </View>
-  );
 }
 ```

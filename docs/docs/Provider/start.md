@@ -22,6 +22,18 @@ npx expo install @0610studio/zs-ui \
 
 `react-native-gesture-handler`는 `ZSCalendar`를 쓰지 않아도 필요합니다. 배포물이 CommonJS 번들이라 tree-shaking이 없어, 라이브러리를 import하는 순간 모든 모듈이 평가되기 때문입니다. 앱 루트는 `GestureHandlerRootView`로 감쌉니다. react-navigation 같은 제스처 기반 라이브러리를 이미 쓰고 있다면 대부분 충족되어 있습니다.
 
+### Android 폴더블 설정
+
+폴더블 기기를 접고 펼 때 Android가 Activity를 다시 만들지 않도록 패키지의 config plugin을 등록하고 네이티브 프로젝트를 다시 생성합니다(`npx expo prebuild`). 플러그인은 MainActivity의 `configChanges`에 `screenSize`·`smallestScreenSize`·`screenLayout` 등을 더하고 `launchMode`를 `singleTask`로 설정합니다.
+
+```json
+{
+  "expo": {
+    "plugins": ["@0610studio/zs-ui"]
+  }
+}
+```
+
 ## 2. Provider 설정
 
 앱 최상위에 `ThemeProvider`와 `OverlayProvider`를 추가합니다. `ThemeProvider`가 바깥쪽이어야 합니다.

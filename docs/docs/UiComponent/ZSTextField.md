@@ -41,17 +41,17 @@ function MyComponent() {
 | `label` | `string` | `'Placeholder'` | 텍스트 필드의 라벨 텍스트 |
 | `inputBgColor` | `string` | 테마 `background.base` (`inbox`는 `background.layer1`) | 입력 필드의 배경색 |
 | `labelBgColor` | `string` | 테마 `background.base` (`inbox`는 `background.layer1`) | 라벨의 배경색 |
-| `labelColor` | `string` | 테마 `text.secondary` | 라벨의 기본 텍스트 색상 |
-| `placeHolderColor` | `string` | 테마 `grey[40]` (`disabled`면 `grey[70]`) | placeholder 텍스트 색상 |
+| `labelColor` | `string` | 테마 `text.secondary` | 값이 입력되어 있고 포커스가 없을 때의 라벨 색상 |
+| `placeHolderColor` | `string` | 테마 `grey[40]` (`disabled`면 `grey[70]`) | 값이 비어 있고 포커스가 없을 때(라벨이 입력 자리에 있을 때)의 라벨 색상. `textInputProps.placeholder` 글자색에는 적용되지 않습니다 |
 | `fontSize` | `number` | `undefined` | 타입에만 선언되어 있고 적용되지 않습니다. 글자 크기는 `typo`로 정합니다 |
 | `borderColor` | `string` | 테마 `grey[30]` | 테두리 색상 |
 | `borderRadius` | `number` | `14` | 테두리의 라운딩 반경 |
-| `focusColor` | `string` | 테마 `primary.main` | 포커스 상태에서의 테두리 색상 |
+| `focusColor` | `string` | 테마 `primary.main` | 포커스 상태의 테두리·라벨 색상 |
 | `errorColor` | `string` | 테마 `danger.main` | 에러 상태에서의 테두리 및 라벨 색상 |
 | `paddingHorizontal` | `number` | `15` | 텍스트 필드의 좌우 여백 |
 | `borderWidth` | `number` | `1.2` | 테두리 두께 |
 | `errorMessage` | `string` | `undefined` | 에러 상태에서 표시할 메시지 |
-| `textInputProps` | `TextInputProps` | `undefined` | 기본 React Native `TextInput` 속성 |
+| `textInputProps` | `TextInputProps` | `undefined` | React Native `TextInput` 속성. `onFocus`·`onBlur`·`onChangeText`는 내부 처리 뒤에 이어서 호출되고 `style`은 내부 스타일 뒤에 병합됩니다. `value`·`allowFontScaling`은 같은 이름의 prop이 우선하고, `autoCorrect`·`spellCheck`(항상 `false`)와 `selectionColor`는 바꿀 수 없습니다 |
 | `boxStyle` | `'outline' \| 'underline' \| 'inbox'` | `'outline'` | 텍스트 필드 스타일 |
 | `innerBoxStyle` | `'top' \| 'middle' \| 'bottom'` | `undefined` | 텍스트 필드가 그룹일 때 스타일을 정의 |
 | `disabled` | `boolean` | `false` | 텍스트 필드 비활성화 여부 |
