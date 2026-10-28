@@ -47,6 +47,24 @@ export const BackHandler = {
     return false;
   },
 };
+type AppStateListener = (state: string) => void;
+const appStateListeners: AppStateListener[] = [];
+export const AppState = {
+  currentState: 'active',
+  addEventListener: (_event: string, cb: AppStateListener) => {
+    appStateListeners.push(cb);
+    return {
+      remove: () => {
+        const index = appStateListeners.indexOf(cb);
+        if (index >= 0) appStateListeners.splice(index, 1);
+      },
+    };
+  },
+  mockChange: (state: string) => {
+    AppState.currentState = state;
+    appStateListeners.forEach((cb) => cb(state));
+  },
+};
 export const PanResponder = { create: (_: any) => ({ panHandlers: {} }) };
 export const ScrollView = React.forwardRef((props: any, ref: any) => 
   React.createElement('ScrollView', { ...props, ref }, props.children)
@@ -55,5 +73,5 @@ export const TextInput = React.forwardRef((props: any, ref: any) =>
   React.createElement('TextInput', { ...props, ref }, props.children)
 );
 
-export default { Platform, StyleSheet, View, Text, StatusBar, Pressable, TouchableOpacity, Dimensions, useWindowDimensions, Keyboard, BackHandler, PanResponder, ScrollView, TextInput };
+export default { Platform, StyleSheet, View, Text, StatusBar, Pressable, TouchableOpacity, Dimensions, useWindowDimensions, Keyboard, BackHandler, AppState, PanResponder, ScrollView, TextInput };
 

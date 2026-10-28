@@ -11,6 +11,7 @@ import { ShowBottomSheetProps } from '../../model/types';
 import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import { RADIUS } from '../../theme/tokens';
 import useFoldingState from '../../model/useFoldingState';
+import { forceSharedValue, useReapplyOnResume } from '../../model/useReapplyOnResume';
 
 const IS_IOS = Platform.OS === 'ios';
 const KEYBOARD_SHOW_EVENT = IS_IOS ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -125,6 +126,15 @@ function BottomSheetOverlay({
     });
     backdropOpacity.value = withTiming(0, ANIMATION_CONFIG.backdropHide);
   }, [backdropOpacity, bottomSheetVisible, hideSheet, isGesturing, keyboardOffset, scale, translateY]);
+
+  // 백그라운드 복귀 뒤 열린 시트가 마운트 때 위치로 돌아가지 않게 지금 값을 다시 넣는다
+  useReapplyOnResume(bottomSheetVisible, () => {
+    if (isGesturing.value) return;
+    forceSharedValue(translateY, 0);
+    forceSharedValue(keyboardOffset);
+    forceSharedValue(scale);
+    forceSharedValue(backdropOpacity, 1);
+  });
 
   // 보일 때만 구독해 닫힌 시트가 앱 전역 키보드 이벤트에 반응하지 않게 한다
   useEffect(() => {

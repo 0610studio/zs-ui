@@ -272,6 +272,28 @@ describe('BottomSheetOverlay', () => {
     expect(restoreCall).toBeDefined();
   });
 
+  it('백그라운드에서 돌아오면 열린 시트의 값을 강제로 다시 넣는다', () => {
+    const { AppState } = require('react-native');
+    const sharedValueSpy = jest.spyOn(Reanimated, 'useSharedValue');
+
+    render(<BottomSheetOverlay component={<Text>content</Text>} />);
+
+    // useSharedValue 생성 순서: translateY → keyboardOffset → backdropOpacity → scale → isGesturing
+    const [translateY, keyboardOffset, backdropOpacity, scale] = sharedValueSpy.mock.results.map((r) => r.value);
+    const modifySpies = [translateY, keyboardOffset, backdropOpacity, scale].map((sv) => jest.spyOn(sv, 'modify'));
+    translateY.value = 999;
+    backdropOpacity.value = 0;
+
+    act(() => {
+      AppState.mockChange('background');
+      AppState.mockChange('active');
+    });
+
+    modifySpies.forEach((spy) => expect(spy).toHaveBeenCalledWith(expect.any(Function), true));
+    expect(translateY.value).toBe(0);
+    expect(backdropOpacity.value).toBe(1);
+  });
+
   it('시트가 보이지 않을 때는 키보드 리스너를 등록하지 않는다', () => {
     const addListenerSpy = jest.spyOn(Keyboard, 'addListener');
     mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ bottomSheetVisible: false }));

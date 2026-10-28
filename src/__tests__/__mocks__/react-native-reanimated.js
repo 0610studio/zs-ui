@@ -27,7 +27,12 @@ const makeAnim = () => {
   return animation;
 };
 // 렌더 간 안정된 참조를 반환한다 — effect deps 재실행 방지
-const useSharedValue = (v) => React.useRef({ value: v }).current;
+const useSharedValue = (v) => React.useRef({
+  value: v,
+  modify(modifier) {
+    if (modifier) this.value = modifier(this.value);
+  },
+}).current;
 const useAnimatedStyle = (fn) => fn() || {};
 const useAnimatedProps = (fn) => fn() || {};
 const Easing = {

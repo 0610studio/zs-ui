@@ -7,6 +7,7 @@ import { BackPriority, useBackHandler } from '../../context/BackHandlerContext';
 import { OVERLAY_FOLDABLE_SINGLE_WIDTH, Z_INDEX_VALUE } from '../../model/utils';
 import ZSView from '../../ui/ZSView';
 import { useTheme } from '../../context/ThemeContext';
+import { forceSharedValue, useReapplyOnResume } from '../../model/useReapplyOnResume';
 
 function Modality({
   foldableSingleScreen,
@@ -62,6 +63,15 @@ function Modality({
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [modalityVisible, insets.top, windowHeight]);
+
+  // 백그라운드 복귀 뒤 열린 모달이 닫힌 값(투명·화면 아래)으로 돌아가지 않게 열림 값을 다시 넣는다
+  useReapplyOnResume(modalityVisible, () => {
+    forceSharedValue(backScale, 0.92);
+    forceSharedValue(backTranslateY, insets.top);
+    forceSharedValue(backBorderRadius, 12);
+    forceSharedValue(mainTranslateY, overrideMargin + insets.top);
+    forceSharedValue(backgroundOpacity, 1);
+  });
 
   const backScreenAnimatedStyle = useAnimatedStyle(() => {
     return {
