@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 // ThemeContext 는 expo-navigation-bar 를 끌고 와 jest 환경에서 파싱에 실패한다 —
@@ -114,6 +114,17 @@ describe('ZSCalendar — 렌더와 선택', () => {
     const cell = screen.getByTestId('calendar-cell-2026-09-01');
     expect(cell.props.hitSlop.left).toBeGreaterThanOrEqual(0);
     expect(cell.props.hitSlop.top).toBeGreaterThanOrEqual(0);
+  });
+
+  it('요일 줄은 최소 높이만 정해 큰 글씨에서 라벨 높이만큼 늘어난다', () => {
+    renderCalendar(<ZSCalendar defaultVisibleMonth="2026-09-01" testID="calendar" />);
+
+    // 라벨 → 칸 → 줄 순서로 올라가 줄(가로 배치) 스타일을 본다
+    let node: any = screen.getByText('일', { includeHiddenElements: true });
+    while (node && StyleSheet.flatten(node.props.style)?.flexDirection !== 'row') node = node.parent;
+    const rowStyle = StyleSheet.flatten(node.props.style);
+    expect(rowStyle.minHeight).toBe(28);
+    expect(rowStyle.height).toBeUndefined();
   });
 });
 

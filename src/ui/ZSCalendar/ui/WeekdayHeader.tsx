@@ -14,11 +14,12 @@ export interface WeekdayHeaderProps {
 /**
  * Canvas 가 아니라 RN Text 다. drawText 는 폰트 폴백을 하지 않아 한글 라벨이 깨지고,
  * 이 줄은 페이저가 밀 때 고정되어야 하므로 pane 밖에 있는 편이 맞다.
+ * 높이는 최소값이다 — 접근성 큰 글씨(iOS AX5 등)에서 라벨이 커지면 줄이 따라 늘어나야 위아래가 잘리지 않는다.
  */
 export default function WeekdayHeader({ labels, metrics, theme, firstDayOfWeek }: WeekdayHeaderProps) {
   return (
     <View
-      style={[styles.row, { width: metrics.gridWidth, height: metrics.weekdayHeaderHeight }]}
+      style={[styles.row, { width: metrics.gridWidth, minHeight: metrics.weekdayHeaderHeight }]}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
