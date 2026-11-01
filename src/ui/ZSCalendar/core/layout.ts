@@ -21,6 +21,7 @@ export interface GridLayoutMetrics {
   offsetX: number;
   cellWidth: number;
   rowHeight: number;
+  /** 요일 줄 최소 높이 — 큰 글씨에서는 라벨 높이만큼 늘어난다 */
   weekdayHeaderHeight: number;
   /** 주 행만의 높이 — Skia Canvas 가 차지하는 높이 */
   rowsHeight: number;
