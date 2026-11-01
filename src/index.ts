@@ -7,7 +7,7 @@ import { useFoldingState } from './model/useFoldingState'
 import { usePreventDoublePress, PREVENT_DOUBLE_PRESS_INTERVAL } from './model/usePreventDoublePress';
 import { themeFactory } from './theme/palette';
 import { createShadow } from './theme/elevation';
-import { RADIUS, DURATION, DISABLED_OPACITY } from './theme/tokens';
+import { RADIUS, SPACING, DURATION, DISABLED_OPACITY } from './theme/tokens';
 import { FoldingState } from './model/types';
 import ErrorComponent from './ui/ZSTextField/ui/ErrorComponent';
 import ZSContainer from './ui/ZSContainer';
@@ -77,6 +77,7 @@ export {
   OverlayProvider,
   themeFactory,
   RADIUS,
+  SPACING,
   DURATION,
   DISABLED_OPACITY,
   FoldingState,

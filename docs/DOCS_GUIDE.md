@@ -40,7 +40,7 @@
 | `useTheme` 반환값, 테마 모드 전환·저장 | `docs/docs/Theme/start.md` |
 | `OverlayProvider` props, 커스텀 스낵바·로더, 뒤로가기 우선순위 | `docs/docs/Provider/OverlayProvider.md` |
 | `themeFactory` 설정과 커스텀 팔레트 예제 | `docs/docs/Theme/themefactory.md` |
-| `RADIUS`·`DURATION`·`DISABLED_OPACITY`, `createShadow`, `usePreventDoublePress` | `docs/docs/Theme/tokens.md` |
+| `RADIUS`·`SPACING`·`DURATION`·`DISABLED_OPACITY`, `createShadow`, `usePreventDoublePress` | `docs/docs/Theme/tokens.md` |
 | `ViewColorOptions`(배경색 `color` 값) | `docs/docs/UiComponent/ZSView.md` |
 | 폴더블 상태 감지와 2-pane 예제 | `docs/docs/FoldableDevice.md` |
 | 예제 앱 실행과 웹·Maestro E2E | `example/README.md` |
