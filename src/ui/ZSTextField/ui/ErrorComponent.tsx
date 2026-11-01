@@ -18,7 +18,8 @@ const ErrorComponent = ({
         backgroundColor={errorColor}
       />
 
-      <ZSText typo='body.4' style={{ marginLeft: 5, color: errorColor }}>
+      {/* 가로 줄이라 글자가 줄지 않으면 큰 글자에서 두 줄 문구가 화면 밖으로 밀린다 */}
+      <ZSText typo='body.4' style={{ flexShrink: 1, marginLeft: 5, color: errorColor }}>
         {errorMessage}
       </ZSText>
     </Animated.View>
