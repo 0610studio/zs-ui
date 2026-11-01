@@ -272,7 +272,7 @@ describe('BottomSheetOverlay', () => {
     expect(restoreCall).toBeDefined();
   });
 
-  it('백그라운드에서 돌아오면 열린 시트의 값을 강제로 다시 넣는다', () => {
+  it('백그라운드에서 돌아오면 열린 시트 위치를 다시 넣고 배경은 중간값을 거쳐 1로 돌린다', () => {
     const { AppState } = require('react-native');
     const sharedValueSpy = jest.spyOn(Reanimated, 'useSharedValue');
 
@@ -280,18 +280,58 @@ describe('BottomSheetOverlay', () => {
 
     // useSharedValue 생성 순서: translateY → keyboardOffset → backdropOpacity → scale → isGesturing
     const [translateY, keyboardOffset, backdropOpacity, scale] = sharedValueSpy.mock.results.map((r) => r.value);
-    const modifySpies = [translateY, keyboardOffset, backdropOpacity, scale].map((sv) => jest.spyOn(sv, 'modify'));
+    const translateYModify = jest.spyOn(translateY, 'modify');
+    const keyboardModify = jest.spyOn(keyboardOffset, 'modify');
+    const scaleModify = jest.spyOn(scale, 'modify');
     translateY.value = 999;
-    backdropOpacity.value = 0;
+    keyboardOffset.value = -120;
+    scale.value = 0.995;
+
+    // 원시값 스타일은 같은 값이면 다시 쓰이지 않으므로, 1 과 다른 값을 거쳤는지 본다
+    const backdropWrites: number[] = [];
+    let backdropValue = backdropOpacity.value;
+    Object.defineProperty(backdropOpacity, 'value', {
+      configurable: true,
+      get: () => backdropValue,
+      set: (v: number) => {
+        backdropWrites.push(v);
+        backdropValue = v;
+      },
+    });
 
     act(() => {
       AppState.mockChange('background');
       AppState.mockChange('active');
     });
 
-    modifySpies.forEach((spy) => expect(spy).toHaveBeenCalledWith(expect.any(Function), true));
+    expect(translateYModify).toHaveBeenCalledWith(expect.any(Function), true);
     expect(translateY.value).toBe(0);
-    expect(backdropOpacity.value).toBe(1);
+    // 진행 중인 키보드·scale 애니메이션을 끊지 않게 직접 넣지 않는다
+    expect(keyboardModify).not.toHaveBeenCalled();
+    expect(scaleModify).not.toHaveBeenCalled();
+    expect(keyboardOffset.value).toBe(-120);
+    expect(scale.value).toBe(0.995);
+    expect(backdropWrites).toEqual([0.999, 1]);
+  });
+
+  it('닫힌 시트는 백그라운드에서 돌아와도 값을 건드리지 않는다', () => {
+    const { AppState } = require('react-native');
+    mockUseBottomSheet.mockReturnValue(createBottomSheetContext({ bottomSheetVisible: false }));
+    const sharedValueSpy = jest.spyOn(Reanimated, 'useSharedValue');
+
+    render(<BottomSheetOverlay component={<Text>content</Text>} />);
+
+    const [translateY, , backdropOpacity] = sharedValueSpy.mock.results.map((r) => r.value);
+    const translateYModify = jest.spyOn(translateY, 'modify');
+    const before = backdropOpacity.value;
+
+    act(() => {
+      AppState.mockChange('background');
+      AppState.mockChange('active');
+    });
+
+    expect(translateYModify).not.toHaveBeenCalled();
+    expect(backdropOpacity.value).toBe(before);
   });
 
   it('시트가 보이지 않을 때는 키보드 리스너를 등록하지 않는다', () => {

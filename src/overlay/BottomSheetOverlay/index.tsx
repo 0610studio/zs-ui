@@ -28,7 +28,11 @@ const ANIMATION_CONFIG = {
   scale: { duration: 180, reduceMotion: ReduceMotion.System },
   keyboardShow: { duration: 250, reduceMotion: ReduceMotion.System },
   keyboardHide: { duration: 150, reduceMotion: ReduceMotion.System },
+  // 복귀 때 배경을 눈에 안 띄는 중간값에서 1로 되돌린다. 동작 줄이기에서도 프레임을 나눠야 해서 Never
+  resumeBackdrop: { duration: 50, reduceMotion: ReduceMotion.Never },
 } as const;
+
+const RESUME_BACKDROP_FROM = 0.999;
 
 const GESTURE_CONSTANTS = {
   scaleAmount: 0.99,
@@ -127,13 +131,15 @@ function BottomSheetOverlay({
     backdropOpacity.value = withTiming(0, ANIMATION_CONFIG.backdropHide);
   }, [backdropOpacity, bottomSheetVisible, hideSheet, isGesturing, keyboardOffset, scale, translateY]);
 
-  // 백그라운드 복귀 뒤 열린 시트가 마운트 때 위치로 돌아가지 않게 지금 값을 다시 넣는다
+  // 백그라운드 복귀 뒤 열린 시트가 마운트 때 스타일(배경 투명)로 돌아가지 않게 열림 값을 다시 넣는다
   useReapplyOnResume(bottomSheetVisible, () => {
     if (isGesturing.value) return;
+    // transform 은 매번 새 배열이라 하나만 넣어도 키보드·scale 지금 값까지 함께 다시 간다.
+    // keyboardOffset·scale 을 직접 넣으면 진행 중인 키보드·복원 애니메이션이 끊겨 넣지 않는다
     forceSharedValue(translateY, 0);
-    forceSharedValue(keyboardOffset);
-    forceSharedValue(scale);
-    forceSharedValue(backdropOpacity, 1);
+    // opacity 같은 원시값은 직전 값과 같으면 다시 쓰지 않아(useAnimatedStyle shallowEqual) 중간값을 거쳐 1로 돌린다
+    backdropOpacity.value = RESUME_BACKDROP_FROM;
+    backdropOpacity.value = withTiming(1, ANIMATION_CONFIG.resumeBackdrop);
   });
 
   // 보일 때만 구독해 닫힌 시트가 앱 전역 키보드 이벤트에 반응하지 않게 한다

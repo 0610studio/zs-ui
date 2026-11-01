@@ -30,7 +30,20 @@ describe("useReapplyOnResume", () => {
     expect(reapply).toHaveBeenCalledTimes(1);
   });
 
-  it("inactive 에서 active 로 돌아오면 부르지 않는다", () => {
+  it("background → inactive → active 로 돌아와도 한 번 부른다", () => {
+    const reapply = jest.fn();
+    renderHook(() => useReapplyOnResume(true, reapply));
+
+    mockAppStateListener?.("background");
+    mockAppStateListener?.("inactive");
+    mockAppStateListener?.("active");
+    expect(reapply).toHaveBeenCalledTimes(1);
+    mockAppStateListener?.("inactive");
+    mockAppStateListener?.("active");
+    expect(reapply).toHaveBeenCalledTimes(1);
+  });
+
+  it("background 를 거치지 않은 inactive → active 면 부르지 않는다", () => {
     const reapply = jest.fn();
     renderHook(() => useReapplyOnResume(true, reapply));
 
