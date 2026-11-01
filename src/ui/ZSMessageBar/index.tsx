@@ -15,6 +15,8 @@ import { DISABLED_OPACITY, DURATION, RADIUS } from "../../theme/tokens";
 
 const CLOSE_HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
 const ACTION_HIT_SLOP = { top: 8, bottom: 8, left: 4, right: 8 };
+/** 큰 글자에서 한글 낱말 중간('금 / 식')이 아니라 띄어쓰기에서 줄을 바꾼다. Android 는 무시된다. */
+const HANGUL_BREAK = 'hangul-word' as const;
 const PRESSED_OPACITY = 0.55;
 
 /** 밝은 배경에서 본문 대비 4.5:1 을 확보하는 잉크. 칩·버튼의 PASTEL/STROKE_TEXT_COLOR 는 짧은 라벨 기준이라 여기선 못 쓴다. */
@@ -187,11 +189,11 @@ function ZSMessageBar({
 
         <View style={[styles.content, fullWidth && styles.contentFill]}>
           {title != null && (
-            <ZSText typo={`subTitle.${textSize}`} color={colors.text}>
+            <ZSText typo={`subTitle.${textSize}`} color={colors.text} lineBreakStrategyIOS={HANGUL_BREAK}>
               {title}
             </ZSText>
           )}
-          <ZSText typo={`body.${textSize}`} color={colors.text}>
+          <ZSText typo={`body.${textSize}`} color={colors.text} lineBreakStrategyIOS={HANGUL_BREAK}>
             {message}
           </ZSText>
 
