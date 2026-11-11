@@ -121,7 +121,7 @@ export default function HomeLayout() {
 
 #### `prominent`
 
-화면의 대표 동작(글쓰기 등) 탭 하나를 강조합니다(`UITabBarController.prominentTabIdentifier`). 그 탭은 탭 바에서 떨어져 자기 표면(Liquid Glass)에 아이콘으로 놓이고, 스크롤로 탭 바가 최소화돼도 남습니다. 미지정이면 시스템 기본입니다(검색 탭이 검색을 바로 여는 설정이면 그 탭).
+화면의 대표 동작(글쓰기 등) 탭 하나를 강조합니다(`UITabBarController.prominentTabIdentifier`). 그 탭은 탭 바에서 떨어져 자기 표면(Liquid Glass)에 아이콘으로 놓이고, 스크롤로 탭 바가 최소화돼도 남습니다. 미지정이면 시스템 기본입니다(검색 탭이 검색을 바로 여는 설정이면 그 탭). iOS 26 이하에서는 지정해도 적용하지 않습니다.
 
 ```tsx
 <ZSTabNavigator ios={{ prominent: 'compose' }}>

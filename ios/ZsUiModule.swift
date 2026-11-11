@@ -10,14 +10,17 @@ public class ZsUiModule: Module {
     }
 
     // Dynamic Island iPhones report a top safe area taller than the status bar (62 vs 54), so overlays that sit
-    // right below the status bar need its own frame. UIKit state is read on the main queue.
+    // right below the status bar need its own frame. UIKit state is read on the main queue, which runOnQueue(.main)
+    // guarantees, so the body asserts main-actor isolation instead of hopping again.
     AsyncFunction("getStatusBarFrame") { () -> [String: Double]? in
-      let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-      let scene = scenes.first { $0.windows.contains { $0.isKeyWindow } } ?? scenes.first
-      guard let frame = scene?.statusBarManager?.statusBarFrame else {
-        return nil
+      MainActor.assumeIsolated {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.windows.contains { $0.isKeyWindow } } ?? scenes.first
+        guard let frame = scene?.statusBarManager?.statusBarFrame else {
+          return nil
+        }
+        return ["x": Double(frame.minX), "y": Double(frame.minY), "width": Double(frame.width), "height": Double(frame.height)]
       }
-      return ["x": Double(frame.minX), "y": Double(frame.minY), "width": Double(frame.width), "height": Double(frame.height)]
     }.runOnQueue(.main)
 
     View(ZSWindowObserverView.self) {

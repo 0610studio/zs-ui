@@ -1,5 +1,5 @@
 import React, { type ComponentType } from 'react';
-import { StyleSheet, type ViewProps } from 'react-native';
+import { Platform, StyleSheet, type ViewProps } from 'react-native';
 import { requireNativeView } from 'expo';
 import { NativeTabs } from 'expo-router/native-tabs';
 import { useTheme } from '../context/ThemeContext';
@@ -11,6 +11,13 @@ import { resolveTabTheme } from './tabTheme';
 type TriggerIconProps = React.ComponentProps<typeof NativeTabs.Trigger.Icon>;
 
 let NativeSidebarObserver: ComponentType<ViewProps> | undefined;
+
+// 강조 탭(prominentTabIdentifier)은 iOS 27부터 있습니다. 그 아래에서 넘기면 react-native-screens가 개발 경고를 띄웁니다.
+const PROMINENT_TAB_MIN_IOS = 27;
+
+function supportsProminentTab(): boolean {
+  return Platform.OS === 'ios' && parseInt(String(Platform.Version), 10) >= PROMINENT_TAB_MIN_IOS;
+}
 
 function SidebarObserver() {
   NativeSidebarObserver ??= requireNativeView<ViewProps>('ZsUi', 'ZSTabSidebarObserverView');
@@ -24,6 +31,7 @@ function ZSTabNavigator({ children, ios, unselectedIconColor, unselectedLabelCol
     label: resolveColor(roles, unselectedLabelColor),
   });
   const screens = collectScreens(children);
+  const prominent = supportsProminentTab() ? ios?.prominent : undefined;
 
   return (
     <>
@@ -50,7 +58,7 @@ function ZSTabNavigator({ children, ios, unselectedIconColor, unselectedLabelCol
               name={name}
               hidden={options.hidden}
               role={options.role}
-              prominent={ios?.prominent === name}
+              prominent={prominent === name}
               disabled={options.disabled}
               accessibilityLabel={options.accessibilityLabel}
               listeners={listeners}

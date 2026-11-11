@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import ZSTabNavigator from '../../navigation/ZSTabNavigator';
 import { getByHostType, queryAllByHostType } from '../utils/hostQueries';
 import { setTestTheme } from '../utils/theme';
@@ -177,7 +177,15 @@ describe('ZSTabNavigator', () => {
   });
 
   describe('ios.prominent (iOS 27 강조 탭)', () => {
+    const platform = Platform as { OS: string; Version?: string | number };
+
+    afterEach(() => {
+      platform.OS = 'ios';
+      delete platform.Version;
+    });
+
     it('이름이 같은 Trigger 하나만 prominent 로 넘기고, 사이드바 배치는 건드리지 않는다', async () => {
+      platform.Version = '27.0';
       const root = await renderTabs(
         <ZSTabNavigator ios={{ prominent: 'b' }}>
           <ZSTabNavigator.Screen name="a" options={{ title: 'A' }} />
@@ -190,8 +198,21 @@ describe('ZSTabNavigator', () => {
     });
 
     it('미지정이면 강조 탭이 없다(시스템 기본)', async () => {
+      platform.Version = '27.0';
       const root = await renderTabs(<ZSTabNavigator><ZSTabNavigator.Screen name="a" options={{ title: 'A' }} /></ZSTabNavigator>);
       expect(getByHostType('NativeTabs.Trigger', root).props.prominent).toBe(false);
+    });
+
+    it('iOS 27 미만이면 지정해도 넘기지 않는다 — react-native-screens 개발 경고가 뜨지 않게', async () => {
+      platform.Version = '26.5';
+      const root = await renderTabs(
+        <ZSTabNavigator ios={{ prominent: 'b' }}>
+          <ZSTabNavigator.Screen name="a" options={{ title: 'A' }} />
+          <ZSTabNavigator.Screen name="b" options={{ title: 'B' }} />
+        </ZSTabNavigator>,
+      );
+      const triggers = queryAllByHostType('NativeTabs.Trigger', root);
+      expect(triggers.map((node) => node.props.prominent)).toEqual([false, false]);
     });
   });
 });
