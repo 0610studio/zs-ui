@@ -1,0 +1,154 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      true: ${STEP == 'setup'}
+    commands:
+      - launchApp:
+          clearState: false
+      - extendedWaitUntil:
+          visible: 'ZS-UI'
+          timeout: 120000
+      - runFlow:
+          when:
+            true: ${SCENARIO == 'tabs'}
+          commands:
+            - openLink: zs-ui-example:///lab/tabs-stack/feed
+            - tapOn:
+                id: tabs-stack-feed-plus
+            - tapOn:
+                id: tabs-stack-feed-input
+            - inputText: fold-tabs
+            - pressKey: Enter
+      - runFlow:
+          when:
+            true: ${SCENARIO == 'keyboard'}
+          commands:
+            - openLink: zs-ui-example:///lab/keyboard
+            - tapOn:
+                id: lab-keyboard-field-1
+            - inputText: fold-input
+            - tapOn: CTA 버튼
+      - runFlow:
+          when:
+            true: ${SCENARIO == 'pane'}
+          commands:
+            - openLink: zs-ui-example:///lab/pane-layout
+            - tapOn:
+                id: lab-pane-compact-stack
+            - tapOn:
+                id: lab-pane-tabletop
+            - tapOn:
+                id: lab-pane-item-2
+            - scrollUntilVisible:
+                element:
+                  id: lab-pane-memo
+                direction: DOWN
+            - tapOn:
+                id: lab-pane-memo
+            - inputText: fold-detail
+            - pressKey: Enter
+      - runFlow:
+          when:
+            true: ${SCENARIO == 'sheet'}
+          commands:
+            - openLink: zs-ui-example:///lab/overlay-placement
+            - scrollUntilVisible:
+                element:
+                  id: lab-overlay-sheet
+                direction: DOWN
+            - tapOn:
+                id: lab-overlay-sheet
+            - tapOn:
+                id: lab-overlay-memo
+            - inputText: fold-sheet
+            - pressKey: Enter
+      - runFlow:
+          when:
+            true: ${SCENARIO == 'visual'}
+          commands:
+            - openLink: zs-ui-example:///lab/visual
+            - tapOn:
+                id: lab-visual-flash
+            - assertVisible: '조명 켜짐'
+            - scrollUntilVisible:
+                element:
+                  id: lab-visual-mode-tutorial
+                direction: UP
+            - tapOn:
+                id: lab-visual-mode-tutorial
+            - tapOn:
+                id: lab-visual-next
+- runFlow:
+    when:
+      true: ${SCENARIO == 'tabs'}
+    commands:
+      - assertVisible:
+          id: tabs-stack-feed-count
+          text: '1'
+      - assertVisible: fold-tabs
+- runFlow:
+    when:
+      true: ${SCENARIO == 'keyboard'}
+    commands:
+      - assertVisible: fold-input
+      - assertVisible: CTA 버튼
+- runFlow:
+    when:
+      true: ${SCENARIO == 'pane'}
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: lab-pane-memo
+          direction: DOWN
+      - assertVisible: fold-detail
+      - assertVisible:
+          id: lab-pane-detail-title
+          text: 항목 2 상세
+- runFlow:
+    when:
+      true: ${SCENARIO == 'sheet'}
+    commands:
+      - assertVisible:
+          id: zs-bottom-sheet
+      - assertVisible: fold-sheet
+      - runFlow:
+          when:
+            true: ${STEP == 'verify' && POSTURE == 'reopened'}
+          commands:
+            - tapOn:
+                id: lab-overlay-sheet-alert
+            - assertVisible: 알림을 닫아도 메모와 시트가 남아야 합니다.
+            - tapOn: 확인
+            - assertVisible: fold-sheet
+            - tapOn:
+                id: lab-overlay-sheet-close
+            - assertVisible:
+                id: lab-overlay-close-count
+                text: 시트 닫힘 1회
+- runFlow:
+    when:
+      true: ${SCENARIO == 'visual'}
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: lab-visual-mode-tutorial
+          direction: UP
+      - tapOn:
+          id: lab-visual-mode-tutorial
+      - assertVisible:
+          id: lab-visual-step
+          text: 2 / 3
+      - assertVisible:
+          id: lab-visual-next
+      - tapOn:
+          id: lab-visual-mode-qr
+      - assertVisible: 조명 켜짐
+      - scrollUntilVisible:
+          element:
+            id: lab-visual-frame
+          direction: DOWN
+      - assertVisible:
+          id: lab-visual-action
+      - takeScreenshot: foldable-qr-${POSTURE}
+- takeScreenshot: foldable-${SCENARIO}-${POSTURE}

@@ -7,8 +7,6 @@ import {
   dayOfWeek,
   daysInMonth,
   diffDays,
-  endOfMonth,
-  endOfWeek,
   fromEpochDay,
   isLeapYear,
   isSameMonth,
@@ -27,6 +25,7 @@ import {
   weeksBetween,
   weeksInMonth,
 } from '../../../ui/ZSCalendar/core/date';
+import { nth } from '../../utils/hostQueries';
 
 describe('ZSCalendar core/date — 윤년·말일', () => {
   it.each([
@@ -103,7 +102,6 @@ describe('ZSCalendar core/date — 문자열 파싱·검증', () => {
   });
 
   it('todayDateString 은 로컬 타임존 기준이다', () => {
-    // 로컬 자정 직후 — UTC 로 환산하면 전날이 될 수 있는 시각
     const localMidnight = new Date(2025, 8, 1, 0, 30, 0);
     expect(todayDateString(localMidnight)).toBe('2025-09-01');
   });
@@ -151,10 +149,8 @@ describe('ZSCalendar core/date — 월 이동', () => {
     expect(addMonths('2025-01-01', -13)).toBe('2023-12-01');
   });
 
-  it('startOfMonth / endOfMonth', () => {
+  it('startOfMonth', () => {
     expect(startOfMonth('2025-09-17')).toBe('2025-09-01');
-    expect(endOfMonth('2025-09-17')).toBe('2025-09-30');
-    expect(endOfMonth('2024-02-10')).toBe('2024-02-29');
   });
 });
 
@@ -162,13 +158,12 @@ describe('ZSCalendar core/date — 주 계산', () => {
   it('일요일 시작 기준 startOfWeek', () => {
     expect(startOfWeek('2025-09-01', 0)).toBe('2025-08-31');
     expect(startOfWeek('2025-08-31', 0)).toBe('2025-08-31');
-    expect(endOfWeek('2025-09-01', 0)).toBe('2025-09-06');
   });
 
   it('월요일 시작 기준 startOfWeek', () => {
     expect(startOfWeek('2025-09-01', 1)).toBe('2025-09-01');
     expect(startOfWeek('2025-08-31', 1)).toBe('2025-08-25');
-    expect(endOfWeek('2025-09-07', 1)).toBe('2025-09-07');
+    expect(startOfWeek('2025-09-07', 1)).toBe('2025-09-01');
   });
 
   it('buildWeek 은 항상 firstDayOfWeek 부터 7칸', () => {
@@ -181,7 +176,6 @@ describe('ZSCalendar core/date — 주 계산', () => {
 
 describe('ZSCalendar core/date — 월 그리드 주 수 (4·5·6주 경계)', () => {
   it('6주가 필요한 달', () => {
-    // 2025-08-01 은 금요일 → 일요일 시작 시 앞 5칸 + 31일 = 6주
     expect(weeksInMonth('2025-08-01', 0)).toBe(6);
   });
 
@@ -190,9 +184,7 @@ describe('ZSCalendar core/date — 월 그리드 주 수 (4·5·6주 경계)', (
   });
 
   it('평년 2월이 일요일에 시작하면 4주', () => {
-    // 2026-02-01 은 일요일, 28일 → 정확히 4주
     expect(weeksInMonth('2026-02-01', 0)).toBe(4);
-    // 월요일 시작 기준으로는 같은 달이 5주가 된다
     expect(weeksInMonth('2026-02-01', 1)).toBe(5);
   });
 
@@ -215,13 +207,13 @@ describe('ZSCalendar core/date — buildMonthMatrix', () => {
     const matrix = buildMonthMatrix('2025-09-01', 0);
     expect(matrix).toHaveLength(5);
     matrix.forEach((row) => expect(row).toHaveLength(7));
-    expect(matrix[0][0]).toBe('2025-08-31');
-    expect(matrix[4][6]).toBe('2025-10-04');
+    expect(matrix[0]?.[0]).toBe('2025-08-31');
+    expect(matrix[4]?.[6]).toBe('2025-10-04');
 
     const flat = matrix.flat();
     flat.forEach((date, index) => {
       if (index === 0) return;
-      expect(diffDays(flat[index - 1], date)).toBe(1);
+      expect(diffDays(nth(flat, index - 1), date)).toBe(1);
     });
   });
 
@@ -229,7 +221,7 @@ describe('ZSCalendar core/date — buildMonthMatrix', () => {
     [0, 1].forEach((first) => {
       for (let month = 1; month <= 12; month += 1) {
         const matrix = buildMonthMatrix(toDateString({ y: 2025, m: month, d: 1 }), first as 0 | 1);
-        expect(dayOfWeek(matrix[0][0])).toBe(first);
+        expect(dayOfWeek(nth(nth(matrix, 0), 0))).toBe(first);
       }
     });
   });
@@ -314,11 +306,8 @@ describe('ZSCalendar core/date — 주 단위 페이지 변환', () => {
   });
 
   it('monthOfWeek 은 그 주의 과반이 속한 달을 고른다', () => {
-    // 2026-08-30(일)~09-05: 8월 2일 + 9월 5일 → 9월
     expect(monthOfWeek('2026-08-30')).toBe('2026-09-01');
-    // 2026-09-27(일)~10-03: 9월 4일 + 10월 3일 → 9월
     expect(monthOfWeek('2026-09-27')).toBe('2026-09-01');
-    // 2026-10-04(일)~10-10: 전부 10월
     expect(monthOfWeek('2026-10-04')).toBe('2026-10-01');
     expect(monthOfWeek('2026-09-06')).toBe('2026-09-01');
   });
@@ -333,25 +322,20 @@ describe('ZSCalendar core/date — 주 단위 페이지 변환', () => {
   });
 
   it('resolveWeekMonth 은 접힌 그 주에 한해 떠나온 달을 그대로 쓴다', () => {
-    // 2025-04-27~05-03 은 4월이 4일로 과반이지만 5월 그리드의 첫 행이기도 하다
     expect(monthOfWeek('2025-04-27')).toBe('2025-04-01');
     expect(resolveWeekMonth('2025-04-27', '2025-04-27', '2025-05-01')).toBe('2025-05-01');
-    // 같은 주라도 4월을 보다 접었다면 4월이 남는다
     expect(resolveWeekMonth('2025-04-27', '2025-04-27', '2025-04-01')).toBe('2025-04-01');
   });
 
   it('resolveWeekMonth 은 접힌 주를 벗어나면 과반 달로 돌아간다', () => {
-    // 앵커가 04-27 이어도 다른 주로 넘어가면 과반 규칙이다
     expect(resolveWeekMonth('2025-04-20', '2025-04-27', '2025-05-01')).toBe('2025-04-01');
     expect(resolveWeekMonth('2025-05-04', '2025-04-27', '2025-05-01')).toBe('2025-05-01');
-    // 5월을 보다 접은 뒤 10월 주를 물어도 앵커가 새어나가지 않는다
     expect(resolveWeekMonth('2025-09-28', '2025-04-27', '2025-05-01')).toBe('2025-10-01');
   });
 
   it('앵커가 걸리지 않은 주는 언제나 그 주를 품은 달을 가리킨다', () => {
     let week = startOfWeek('2026-01-01', 0);
     for (let index = 0; index < 120; index += 1) {
-      // 앵커와 어긋나면 과반 규칙이고, 그 달의 그리드에는 이 주가 반드시 들어 있다
       const resolved = resolveWeekMonth(week, '2000-01-02', '2000-01-01');
       expect(resolved).toBe(monthOfWeek(week));
       expect(weekRowOfMonth(week, resolved, 0)).toBeGreaterThanOrEqual(0);
@@ -360,7 +344,6 @@ describe('ZSCalendar core/date — 주 단위 페이지 변환', () => {
   });
 
   it('앵커 달은 컴포넌트가 넘기는 대로 — 그 주를 품은 달이면 그리드 안에 남는다', () => {
-    // 월간에서 접을 때 앵커 달은 언제나 그 주를 한 행으로 품은 달이다
     for (const [week, month] of [
       ['2025-04-27', '2025-05-01'],
       ['2025-04-27', '2025-04-01'],

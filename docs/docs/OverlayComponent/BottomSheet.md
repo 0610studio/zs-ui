@@ -1,211 +1,159 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
-
 # BottomSheet
 
-화면 하단에서 위로 슬라이드하며 나타나는 모달 인터페이스입니다. 제스처로 드래그하여 닫을 수 있으며, 키보드가 나타나면 자동으로 위치를 조정합니다.
+화면을 떠나지 않고 짧은 선택·입력을 받을 때 시스템 시트에 React Native 콘텐츠를 띄웁니다. 입력이 여러 개인 화면 단위 작성·편집은 [formSheet 라우트](./start#화면-단위-모달--formsheet-라우트)를 씁니다.
 
-:::warning 실제 앱에서 확인하세요
-웹에서는 시트 열기·닫기와 기본 레이아웃을 확인할 수 있습니다. 네이티브 드래그 감도, 소프트 키보드 회피, SafeArea, Android 하드웨어 뒤로가기와 `dismissable` 우선순위는 실제 iOS·Android 앱에서 확인하세요.
-:::
+| 플랫폼 | 구현 |
+|--------|------|
+| iOS | SwiftUI sheet(detent) — 시스템 재질(Liquid Glass), 그래버, 넓은 창에서 시스템 폭 |
+| Android | Compose Material 3 `ModalBottomSheet` — 배경 `surface2`, 막 `backdrop` 32%, 넓은 창에서 최대 640dp 가운데, predictive back |
 
-<LocalPlayground example="BottomSheet" />
+콘텐츠 위에서 누른 채 움직이거나 스크롤해도 시트는 늘어나거나 끌려 내려가지 않습니다. 시트를 끄는 곳은 맨 위 손잡이와 그 아래 [헤더 줄](#헤더--header--headerright)입니다.
 
-## BottomSheetOverlay 렌더러
-
-`BottomSheetOverlay`는 `OverlayProvider` 내부에서 시트 상태, 드래그 제스처, 배경 터치, Android back 처리를 연결하는 렌더러입니다. 앱에서 직접 마운트하면 Provider가 관리하는 닫힘 콜백과 우선순위를 우회하게 되므로 `showBottomSheet()`로 여세요.
+| 플랫폼 | 콘텐츠 위 끌기 |
+|--------|---------------|
+| iOS | 콘텐츠를 네이티브 뷰로 감싸 시스템 시트 끌기가 콘텐츠 끌기에 반응하지 않습니다. 그래버 끌기·바깥 탭은 그대로이고 시트 안 스크롤·피커는 움직입니다 |
+| Android | 콘텐츠를 네이티브 뷰로 감싸 콘텐츠 위 터치를 콘텐츠가 먼저 가져갑니다. 시트는 손잡이로만 끌어 단계를 옮기거나 닫고, 시트 안 스크롤·피커는 움직입니다. 손잡이는 Material 3와 같은 모양(32×4dp, 연한 회색)이고 탭해도 닫히거나 단계가 바뀌지 않습니다 |
 
 ## 기본 사용법
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 300,
-        padding: 20,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
-```
-
-## API 참조
-
-### `showBottomSheet` 함수
-
-```typescript
-showBottomSheet(props: ShowBottomSheetProps): void
-```
-
-### `ShowBottomSheetProps` 인터페이스
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `component` | `React.ReactNode` | 필수 | Bottom Sheet 내부에 표시할 컴포넌트 |
-| `headerComponent` | `React.ReactNode` | `undefined` | 상단에 표시할 헤더 컴포넌트 |
-| `options` | `BottomSheetOptions` | `{}` | Bottom Sheet 옵션 |
-
-### `BottomSheetOptions` 인터페이스
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `dismissable` | `boolean` | `true` | 배경 터치·아래로 끌기 제스처로 닫을 수 있는지 여부. `false`면 Android 뒤로가기는 시트를 닫지 않고 소비만 하며, `hideOverlay('bottomSheet')` 호출로는 닫힙니다 |
-| `onClose` | `() => void` | `undefined` | 시트가 어떤 경로(버튼·배경 터치·드래그·뒤로가기)로 닫히든 정확히 1회 호출되는 콜백 |
-| `isBackgroundTouchClose` | `boolean` | `undefined` | 사용 중단 예정. `dismissable`을 사용하세요. `dismissable` 미지정 시에만 참조되며, 배경 터치와 제스처 닫힘을 함께 제어합니다 |
-| `marginHorizontal` | `number` | `10` | 시트의 좌우 여백. `type: 'fixed'`면 무시합니다 |
-| `marginBottom` | `number` | `10` | 시트의 하단 여백. `type: 'fixed'`면 무시합니다 |
-| `height` | `number \| 'auto'` | `300` | 시트의 높이 (`'auto'` 지정 시 컨텐츠 크기에 맞춤) |
-| `maxHeight` | `number` | `화면 높이` | 시트의 최대 높이 제한. 이 값과 관계없이 화면 높이에서 SafeArea 위·아래와 30px를 뺀 높이를 넘지 않습니다 |
-| `padding` | `number` | `14` | 시트 내부 패딩 |
-| `foldableSingleScreen` | `boolean` | `false` | 폴더블 디바이스에서 단일 화면 모드 사용 여부 |
-| `type` | `'floating' \| 'fixed'` | `'floating'` | 시트 타입 (`floating`: 떠있는 형태, `fixed`: 화면 하단에 고정) |
-
-## 특징
-
-- **제스처 지원**: 드래그하여 닫을 수 있습니다
-- **키보드 대응**: 키보드가 나타나면 자동으로 위치를 조정합니다
-- **애니메이션**: 부드러운 스프링 애니메이션이 적용됩니다
-- **폴더블 디바이스 지원**: 폴더블 디바이스에서도 올바르게 동작합니다
-
-## 예제
-
-### 기본 사용
-
-```tsx
-import { useOverlay, ZSText, ZSPressable } from '@0610studio/zs-ui';
 import { View } from 'react-native';
+import { ZSButton, ZSText, useOverlay } from '@0610studio/zs-ui';
 
-function MyBottomSheetContent() {
-  const { hideOverlay } = useOverlay();
+function SortButton() {
+  const { showBottomSheet, hideBottomSheet } = useOverlay();
 
   return (
-    <View>
-      <ZSText typo="heading.2">제목</ZSText>
-      <ZSText typo="body.2">내용</ZSText>
-      <ZSPressable onPress={() => hideOverlay('bottomSheet')}>
-        <ZSText typo="body.2">닫기</ZSText>
-      </ZSPressable>
-    </View>
+    <ZSButton
+      title="정렬"
+      variant="outlined"
+      onPress={() =>
+        showBottomSheet({
+          component: (
+            <View style={{ gap: 12, paddingBottom: 24 }}>
+              <ZSText variant="subtitle1">정렬 기준</ZSText>
+              <ZSButton title="최신순" variant="text" onPress={hideBottomSheet} />
+              <ZSButton title="이름순" variant="text" onPress={hideBottomSheet} />
+            </View>
+          ),
+        })
+      }
+    />
   );
 }
-
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 300,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
 ```
 
-### 헤더 컴포넌트 사용
+- `snapPoints`를 주지 않으면 시트 높이가 콘텐츠에 맞춰집니다.
+- `showBottomSheet`는 먼저 키보드를 내립니다.
+- 시트 안에 `ZSTextField`를 둘 수 있습니다. 시트 안 입력은 [ZSScreen](../UiComponent/ZSScreen#키보드-자동-스크롤)의 키보드 자동 스크롤 대상이 아닙니다.
+
+## Props — `ShowBottomSheetProps`
+
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `header` | `ReactNode` | `undefined` | 손잡이 아래 헤더 줄. 문자열이면 제목(h4)으로 그립니다. 헤더에서 끌어도 시트가 움직입니다 — [헤더](#헤더--header--headerright) |
+| `headerRight` | `ReactNode` | `undefined` | 헤더 줄 오른쪽(버튼 등). 탭은 버튼이 받습니다 |
+| `component` | `ReactNode` | Required | 시트에 넣을 콘텐츠 |
+| `bottomComponent` | `ReactNode` | `undefined` | 시트 아래에 고정하는 영역(확인 버튼 등) — [하단 고정](#하단-고정--bottomcomponent) |
+| `options` | `BottomSheetOptions` | `undefined` | 아래 표 |
+
+### `BottomSheetOptions`
+
+| 옵션 | Type | Default | 설명 |
+|------|------|---------|------|
+| `dismissible` | `boolean` | `true` | 손잡이 끌기·바깥 탭·뒤로가기로 닫기. `false`여도 `hideBottomSheet()`로는 닫힙니다. Android는 `false`면 시트 끌기가 모두 꺼져 단계 사이로도 옮길 수 없습니다 |
+| `onClose` | `() => void` | `undefined` | 어떤 경로로 닫히든 1회 호출됩니다. 닫힘 전환이 끝난 뒤라 여기서 다른 오버레이를 띄워도 됩니다 |
+| `snapPoints` | ``Array<'half' \| 'full' \| `${number}%`>`` | `undefined` | 멈출 높이 — [높이](#높이--snappoints). 생략하면 콘텐츠 높이에 맞춥니다 |
+| `contentPadding` | `number` | iOS `20` · Android `16` | 콘텐츠 좌우 여백. `0`이면 가장자리까지 채웁니다 |
+
+`ShowBottomSheetProps`·`BottomSheetOptions` 타입을 내보냅니다.
+
+## 헤더 — `header` · `headerRight`
+
+제목을 `component` 안에 두면 끌기가 막혀 손잡이(48)에서만 시트를 끌 수 있습니다. 제목은 `header` 로 넘기면 손잡이 아래 헤더 줄(최소 높이 48)에 그려지고, 그 줄(오른쪽 버튼 밖)에서 끌면 시트가 늘어나거나 내려갑니다.
 
 ```tsx
-import { useOverlay, ZSText } from '@0610studio/zs-ui';
-import { View } from 'react-native';
-
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      headerComponent: (
-        <View style={{ padding: 20 }}>
-          <ZSText typo="heading.2">헤더</ZSText>
-        </View>
-      ),
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 400,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
+showBottomSheet({
+  options: { snapPoints: ['half', 'full'] },
+  header: '정렬 기준',
+  headerRight: <ZSButton title="초기화" variant="text" size="small" onPress={reset} />,
+  component: <SortOptions />,
+});
 ```
 
-### Fixed 타입 (화면 하단 고정)
+- 문자열 `header` 는 제목(h4, 굵게)으로 그리고 줄 전체를 스크린 리더 머리글로 읽습니다. 노드를 넘기면 그대로 그립니다.
+- 헤더 줄 좌우 여백은 `contentPadding` 을 따르고, 헤더는 스크롤되는 본문 밖이라 본문을 스크롤해도 제자리에 있습니다.
+- `headerRight` 의 버튼은 탭하면 버튼이 눌리고 시트는 움직이지 않습니다. 버튼 위에서 시작한 끌기로는 버튼이 눌리지 않습니다.
+
+## 높이 — `snapPoints`
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 500,
-        type: 'fixed',
-        padding: 20,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
+showBottomSheet({
+  options: { snapPoints: ['half', 'full'] },
+  component: <FilterForm />,
+});
 ```
 
-### 커스텀 여백
+`'half'`는 화면 높이 50%, `'full'`은 100%, `'40%'`처럼 비율도 줄 수 있습니다.
+
+| 플랫폼 | 단계 |
+|--------|------|
+| iOS | 준 값마다 detent가 생기고 첫 번째 값으로 열립니다. 사용자가 끌어 단계를 옮깁니다 |
+| Android | M3 시트는 절반·전체 두 단계뿐이라 값은 쓰지 않고 개수만 봅니다. 두 개 이상이면 절반으로 열려 전체까지 끌 수 있고, 하나면 전체 높이로 엽니다. 전체 높이는 상태 표시줄 아래에서 멈춥니다 |
+
+## 하단 고정 — `bottomComponent`
+
+[ZSScreen](../UiComponent/ZSScreen)의 `bottomComponent`처럼 확인 버튼을 시트 아래에 고정합니다.
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 400,
-        marginHorizontal: 20,
-        marginBottom: 30,
-        padding: 30,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
+showBottomSheet({
+  options: { snapPoints: ['half', 'full'] },
+  component: (
+    <ScrollView contentContainerStyle={{ gap: 12 }}>
+      {regions.map((region) => <RegionRow key={region.id} region={region} />)}
+    </ScrollView>
+  ),
+  bottomComponent: <ZSButton title="선택 완료" fullWidth onPress={hideBottomSheet} />,
+});
 ```
 
-### 배경 터치·제스처로 닫기 비활성화
+| 시트 높이 | 배치 |
+|----------|------|
+| `snapPoints` 있음 | 본문이 남은 높이를 채우고 하단 영역은 단계를 옮겨도 시트 바닥에 붙습니다. 넘치는 본문은 잘리므로 긴 본문은 `component` 안에 `ScrollView`·`FlatList`를 둡니다 |
+| 생략(콘텐츠 높이) | 본문 바로 아래에 옵니다 |
 
-`dismissable: false`를 지정하면 배경 터치와 아래로 끌기 제스처 모두 무시됩니다. 사용자가 반드시 시트 내부 동작(버튼 등)으로만 닫아야 할 때 사용하세요.
+- 좌우 여백은 `contentPadding`을 따르고, 위·아래에 12씩 띄웁니다.
+- 홈 인디케이터·내비게이션 바 위에 놓입니다. 시트 안 입력에 포커스하면 시트가 키보드 위로 올라가 하단 영역도 함께 보입니다.
+
+## 닫기 — `dismissible` · `hideBottomSheet` · `onClose`
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+const { showBottomSheet, hideBottomSheet } = useOverlay();
 
-function MyComponent() {
-  const { showBottomSheet } = useOverlay();
-
-  const handleOpenBottomSheet = () => {
-    showBottomSheet({
-      component: <MyBottomSheetContent />,
-      options: {
-        height: 300,
-        dismissable: false,
-      },
-    });
-  };
-
-  return <Button title="BottomSheet 열기" onPress={handleOpenBottomSheet} />;
-}
+showBottomSheet({
+  options: {
+    dismissible: false,
+    onClose: () => refetch(),
+  },
+  component: (
+    <View style={{ gap: 16, paddingBottom: 24 }}>
+      <ZSText variant="subtitle1">약관에 동의해 주세요</ZSText>
+      <ZSButton title="동의" fullWidth onPress={hideBottomSheet} />
+    </View>
+  ),
+});
 ```
+
+- `dismissible: false`면 끌기·바깥 탭·Android 뒤로가기로 닫히지 않습니다(뒤로가기는 소비만 합니다). 콘텐츠 안 버튼에서 `hideBottomSheet()`를 부르세요.
+- 시트가 열린 채 `showBottomSheet`를 다시 부르면 이전 시트의 `onClose`가 1회 불리고 새 시트로 바뀝니다.
+- 닫힘이 끝나면 시트 본문을 언마운트합니다. 본문의 구독·타이머는 effect 정리 함수에서 해제합니다.
+
+## 접근성
+
+시스템 시트의 모달 포커스와 스크린 리더(VoiceOver·TalkBack) 동작을 따릅니다.
+
+## 관련 문서
+
+- [오버레이 개요](./start) — formSheet 라우트
+- [Alert](./Alert)
+- [ZSMenu](../UiComponent/ZSMenu) — 동작 목록은 메뉴로

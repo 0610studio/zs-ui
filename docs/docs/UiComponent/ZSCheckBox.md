@@ -1,128 +1,72 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
+# ZSCheckbox
 
-# ZSCheckBox
+여러 항목을 고르거나 약관에 동의할 때 쓰는 체크 선택입니다. 두 플랫폼 모두 네모 체크박스입니다.
 
-체크박스 컴포넌트입니다. 라벨과 우측 부가 요소를 함께 배치할 수 있어 약관 동의·설정 목록 행으로 바로 쓸 수 있습니다.
+| 플랫폼 | 구현 |
+|--------|------|
+| iOS·Android | SVG 컨트롤입니다. 라벨을 포함한 줄 전체가 선택 영역입니다. |
 
-기본적으로 **부모 폭을 꽉 채우고**(`width: '100%'`) 체크 영역과 `moreComponent` 를 양 끝으로 정렬합니다.
+켠 상태는 채움 강조라 두 플랫폼 모두 `primary` 칸 + 흰 체크이고, 끈 상태는 `textSecondary` 테두리입니다.
 
-<LocalPlayground example="ZSCheckBox" />
+`label`이 있으면 부모 폭을 채우는 한 줄(iOS 44pt·Android 56dp)이고, [ZSRadioGroup](./ZSRadioGroup)·[ZSSwitch](./ZSSwitch) 행과 높이가 같아 `gap` 없이 쌓으면 됩니다.
 
 ## 기본 사용법
 
 ```tsx
-import { ZSCheckBox } from '@0610studio/zs-ui';
 import { useState } from 'react';
+import { ZSCheckbox } from '@0610studio/zs-ui';
 
-function MyForm() {
-  const [checked, setChecked] = useState(false);
-
+function Agreements() {
+  const [terms, setTerms] = useState(false);
+  const [marketing, setMarketing] = useState(false);
   return (
-    <ZSCheckBox
-      value={checked}
-      onChange={setChecked}
-      label="이용약관에 동의합니다"
-    />
+    <>
+      <ZSCheckbox label="이용약관 동의 (필수)" value={terms} onValueChange={setTerms} />
+      <ZSCheckbox label="마케팅 수신 동의 (선택)" value={marketing} onValueChange={setMarketing} />
+    </>
   );
 }
 ```
 
-## Props
+## Props — `ZSCheckboxProps`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `boolean` | 필수 | 체크 상태 |
-| `onChange` | `(value: boolean) => void` | 필수 | 토글 시 다음 상태를 전달 |
-| `size` | `number` | `18` | 체크 박스 한 변의 길이(px). 곡률·테두리 두께가 비율로 함께 조정됩니다 |
-| `activeColor` | `string` | 테마 `primary.main` | 체크 상태의 배경·테두리 색 |
-| `label` | `string` | `undefined` | 라벨 텍스트 |
-| `labelStyle` | `ZSTextProps` | `undefined` | 라벨에 전달할 `ZSText` props (`typo`·`color` 등) |
-| `labelComponent` | `React.ReactNode` | `undefined` | 라벨을 완전히 대체하는 커스텀 노드. 지정 시 `label`·`labelStyle` 은 무시됩니다 |
-| `moreComponent` | `React.ReactNode` | `undefined` | 행 우측 끝에 배치되는 부가 요소. **press 영역 밖**이라 별도 동작을 붙일 수 있습니다 |
-| `disabled` | `boolean` | `false` | 비활성화 (흐리게 표시되고 토글되지 않음) |
-| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `value` | `boolean` | `undefined` | 선택 여부(제어) |
+| `defaultValue` | `boolean` | `false` | 비제어 초기값 |
+| `onValueChange` | `(value: boolean) => void` | `undefined` | 바뀐 값 |
+| `label` | `string` | `undefined` | 라벨. 없으면 컨트롤 크기만 차지합니다 |
+| `disabled` | `boolean` | `false` | |
+| `accessibilityLabel` | `string` | `label` | 스크린 리더가 읽는 이름. 라벨 없이 쓰면 꼭 줍니다 |
+| `accessibilityHint` | `string` | `undefined` | 스크린 리더 힌트 |
+| `style` | `StyleProp<ViewStyle>` | `undefined` | |
+| `testID` | `string` | `undefined` | |
 
-## 특징
+`ZSCheckboxProps` 타입을 내보냅니다.
 
-- **행 레이아웃 내장**: 체크박스 + 라벨은 좌측, `moreComponent` 는 우측 끝에 붙습니다
-- **press 영역 분리**: 체크박스와 라벨만 토글 대상이고 `moreComponent` 는 제외되므로, "동의" 체크와 "약관 보기" 버튼을 한 행에 둘 수 있습니다
-- **비율 스케일링**: `size` 를 바꾸면 곡률과 테두리 두께가 18px 기준 비율로 따라갑니다
-- **접근성**: `checkbox` 역할과 `accessibilityState.checked` 를 부여합니다
+## 제어·비제어
 
-## 예제
-
-### 라벨 스타일 지정
+`value`를 주지 않으면 비제어이고, 처음 값은 `defaultValue`(기본 `false`)입니다.
 
 ```tsx
-<ZSCheckBox
-  value={checked}
-  onChange={setChecked}
-  label="필수 항목입니다"
-  labelStyle={{ typo: 'body.3', color: 'secondary' }}
-/>
+<ZSCheckbox label="로그인 상태 유지" defaultValue onValueChange={(checked) => saveKeepSignedIn(checked)} />
 ```
 
-### 약관 동의 행 (moreComponent 활용)
+## 접근성
 
-`moreComponent` 는 토글 영역 밖이므로 독립적인 버튼을 놓을 수 있습니다.
+라벨 없이 쓰면(표 머리의 전체 선택 등) `accessibilityLabel`을 꼭 주세요. 둘 다 없으면 개발 모드에서 경고합니다.
 
 ```tsx
-<ZSCheckBox
-  value={agreed}
-  onChange={setAgreed}
-  label="개인정보 처리방침 동의 (필수)"
-  moreComponent={
-    <Pressable onPress={openPolicy}>
-      <ZSText typo="caption.1" color="secondary">보기</ZSText>
-    </Pressable>
-  }
-/>
+<ZSCheckbox accessibilityLabel="전체 선택" value={allChecked} onValueChange={toggleAll} />
 ```
 
-### 커스텀 라벨
+| | iOS (VoiceOver) | Android (TalkBack) |
+|---|-----|---------|
+| 읽는 것 | 이름, 체크 상태, 체크박스 | 체크 상태, 이름, 체크박스 |
+| 포커스 | 라벨이 있으면 줄 전체가 한 번 | 라벨이 있으면 줄 전체가 한 번 |
+| `accessibilityHint` | 이름·값 다음에 읽습니다 | 이름·값 다음에 읽습니다 |
 
-여러 줄이나 강조가 섞인 라벨은 `labelComponent` 로 직접 구성합니다.
+## 관련 문서
 
-```tsx
-<ZSCheckBox
-  value={checked}
-  onChange={setChecked}
-  labelComponent={
-    <View style={{ flex: 1 }}>
-      <ZSText typo="body.2">마케팅 정보 수신</ZSText>
-      <ZSText typo="caption.2" color="secondary">언제든 해제할 수 있습니다</ZSText>
-    </View>
-  }
-/>
-```
-
-### 크기·색상 변경
-
-```tsx
-<ZSCheckBox value={checked} onChange={setChecked} size={24} label="큰 체크박스" />
-<ZSCheckBox value={checked} onChange={setChecked} activeColor="#10B981" label="커스텀 색상" />
-```
-
-### 전체 동의 패턴
-
-```tsx
-const [items, setItems] = useState([false, false, false]);
-const allChecked = items.every(Boolean);
-
-<ZSCheckBox
-  value={allChecked}
-  onChange={(next) => setItems(items.map(() => next))}
-  label="전체 동의"
-  labelStyle={{ typo: 'subTitle.2' }}
-/>
-{items.map((checked, index) => (
-  <ZSCheckBox
-    key={index}
-    value={checked}
-    onChange={(next) => setItems(items.map((v, i) => (i === index ? next : v)))}
-    label={`항목 ${index + 1}`}
-  />
-))}
-```
-
-> 부분 선택(indeterminate) 상태는 지원하지 않습니다. 전체 동의 체크박스는 위처럼 `every` 로 계산하세요.
+- [ZSSwitch](./ZSSwitch)
+- [ZSRadioGroup](./ZSRadioGroup)

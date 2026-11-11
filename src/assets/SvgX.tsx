@@ -1,20 +1,13 @@
-import React from 'react';
 import Svg, { Path } from 'react-native-svg';
+import { ICON_VIEW_BOX, iconStrokeWidth } from './iconStroke';
 
 export const SvgX = ({ size = 12, color = '#5E696E' }) => {
-  const strokeWidth = size * 0.12;
-  
   return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <Svg width={size} height={size} viewBox={ICON_VIEW_BOX} fill="none">
       <Path
-        d={`
-          M ${size * 0.25} ${size * 0.25}
-          Q ${size / 2} ${size / 2} ${size * 0.75} ${size * 0.75}
-          M ${size * 0.25} ${size * 0.75}
-          Q ${size / 2} ${size / 2} ${size * 0.75} ${size * 0.25}
-        `}
+        d="M6 6L18 18M6 18L18 6"
         stroke={color}
-        strokeWidth={strokeWidth}
+        strokeWidth={iconStrokeWidth(size)}
         strokeLinecap="round"
       />
     </Svg>

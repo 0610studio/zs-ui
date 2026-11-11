@@ -18,14 +18,14 @@ function collectMarkdown(directory) {
 }
 
 const source = readFileSync(INDEX_FILE, 'utf8');
-const runtimeExportBlock = source.match(/export\s*\{([\s\S]*?)\};/);
+const runtimeExportBlocks = [...source.matchAll(/export\s*\{([\s\S]*?)\}\s*from/g)];
 
-if (!runtimeExportBlock) {
+if (runtimeExportBlocks.length === 0) {
   throw new Error('src/index.ts에서 runtime export 블록을 찾지 못했습니다.');
 }
 
-const exportedNames = runtimeExportBlock[1]
-  .split(',')
+const exportedNames = runtimeExportBlocks
+  .flatMap(match => match[1].split(','))
   .map(value => value.trim())
   .filter(Boolean)
   .map(value => value.split(/\s+as\s+/).at(-1));

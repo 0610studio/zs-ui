@@ -1,148 +1,120 @@
 import { StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { ZSContainer, ZSText, ZSView, useTheme } from '@0610studio/zs-ui';
+import { ZSScreen, ZSText, ZSBox, radiusStyle, useTheme, type ColorName } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
+import ContentIcon from '../src/ui/kit/ContentIcon';
+import { PAGE_CONTENT } from '../src/ui/kit/layout';
 import Segmented from '../src/ui/kit/Segmented';
-import CodeBlock from '../src/ui/kit/CodeBlock';
+import useLargeText from '../src/hooks/useLargeText';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
-const STEPS = [5, 10, 20, 30, 40, 50] as const;
-const SEMANTICS = ['primary', 'secondary', 'danger', 'warning', 'success', 'information'] as const;
-const BACKGROUNDS = ['base', 'layer1', 'layer2', 'neutral'] as const;
-const TEXT_COLORS = ['base', 'secondary', 'disabled', 'primary', 'danger', 'success', 'information'] as const;
-const ELEVATIONS = [2, 4, 6, 8, 9] as const;
+const PALETTE = ['primary', 'secondary', 'tertiary', 'neutral', 'error', 'success', 'warning', 'info'] as const;
+const SURFACES: ColorName[] = ['background', 'surface2', 'surface3', 'surface4', 'surface5'];
+const RADII = ['md', 'lg', 'xl', '2xl', '3xl'] as const;
+const SHADOWS = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function ThemeExample() {
-  const { palette } = useTheme();
+  const { colors, mode, contrastLevel, colorSchemePreference, setColorSchemePreference } = useTheme();
+  const large = useLargeText();
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Theme' }} />
-      <ZSContainer style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        {/* 현재 테마 모드 전환 */}
-        <Segmented
-          options={['light', 'dark'] as const}
-          value={palette.mode}
-          onChange={(next) => {
-            if (next !== palette.mode) palette.toggleTheme();
-          }}
-        />
+      <ScreenHeader title="Theme" />
+      <ZSScreen backgroundColor="background" style={styles.container}>
+        <Segmented options={['system', 'light', 'dark'] as const} value={colorSchemePreference} onValueChange={setColorSchemePreference} testID="theme-preference" />
+        <ZSText variant="caption" color="textSecondary" testID="theme-state">{`mode ${mode} · contrast ${contrastLevel}`}</ZSText>
 
-        <Section label="Background" direction="row" gap={8}>
-          {BACKGROUNDS.map((name) => (
-            <View key={name} style={styles.bgChipSlot}>
-              <View
-                style={[
-                  styles.bgChip,
-                  { backgroundColor: palette.background[name], borderColor: palette.grey[30] },
-                ]}
-              />
-              <ZSText typo="caption.2" color="secondary">{name}</ZSText>
+        <Section label="팔레트 색 (main · on · container · onContainer)" gap={10}>
+          {PALETTE.map((name) => (
+            <View key={name} style={large ? styles.paletteStack : styles.paletteRow}>
+              <ZSText variant="label" color="textSecondary" style={styles.paletteLabel} numberOfLines={1}>{name}</ZSText>
+              <View style={styles.swatches}>
+                {[name, `on${cap(name)}`, `${name}Container`, `on${cap(name)}Container`].map((token) => (
+                  <View key={token} style={[styles.swatch, { backgroundColor: colors[token as ColorName], borderColor: colors.border }]} />
+                ))}
+              </View>
             </View>
           ))}
         </Section>
 
-        <Section label="Semantic × Step" gap={10}>
-          {SEMANTICS.map((name) => (
-            <View key={name} style={styles.stepRow}>
-              <ZSText typo="caption.1" color="secondary" style={styles.stepLabel}>{name}</ZSText>
-              {STEPS.map((step) => (
-                <View
-                  key={step}
-                  style={[
-                    styles.stepChip,
-                    { backgroundColor: palette[name][step] },
-                    step <= 10 && { borderWidth: 1, borderColor: palette.grey[20] },
-                  ]}
-                />
-              ))}
-            </View>
+        <Section label="면 (background = surface1 → surface5)" direction="row" gap={8}>
+          {SURFACES.map((token) => (
+            <View key={token} style={[styles.surfaceSwatch, { backgroundColor: colors[token], borderColor: colors.border }]} />
           ))}
-          <View style={styles.stepRow}>
-            <View style={styles.stepLabel} />
-            {STEPS.map((step) => (
-              <ZSText key={step} typo="caption.3" color="disabled" style={styles.stepCaption}>{step}</ZSText>
-            ))}
+        </Section>
+
+        <Section label="글자" gap={6}>
+          <ZSText variant="body1" color="text">text — 본문 · 얇은 선택 표시</ZSText>
+          <ZSText variant="body1" color="textSecondary">textSecondary — 보조</ZSText>
+          <ZSText variant="body1" color="error">error — 오류 · 위험 동작</ZSText>
+        </Section>
+
+        <Section label="주색은 두 가지 — 채움 primary · 표시 primaryMark" surface="plain" gap={12}>
+          <View style={styles.ruleRow}>
+            <View style={[styles.ruleSample, styles.accentFace, radiusStyle('full'), { backgroundColor: colors.primary }]}>
+              <ZSText variant="subtitle2" emphasized color="onPrimary">고른 것</ZSText>
+            </View>
+            <ZSText variant="caption" color="textSecondary" style={styles.flexShrink}>
+              {`primary ${colors.primary} — 버튼·칩·달력 선택일·스위치 같은 면. 위 글자는 onPrimary`}
+            </ZSText>
+          </View>
+          <View style={styles.ruleRow}>
+            <View style={styles.ruleSample}>
+              <View style={[styles.markCapsule, radiusStyle('full'), { backgroundColor: colors.surface4 }]}>
+                <ContentIcon name="chat" color={colors.primaryMark} size={20} />
+                <ZSText variant="caption" emphasized color="primaryMark">채팅</ZSText>
+              </View>
+            </View>
+            <ZSText variant="caption" color="textSecondary" style={styles.flexShrink}>
+              {`primaryMark ${colors.primaryMark} — 탭 선택 아이콘·라벨처럼 주색으로 표시할 때. 채도는 지키고 밝기만 내린 같은 계열`}
+            </ZSText>
+          </View>
+          <View style={styles.ruleRow}>
+            <View style={styles.ruleSample}>
+              <View style={[styles.inkRing, { borderColor: colors.text }]}>
+                <View style={[styles.inkDot, { backgroundColor: colors.text }]} />
+              </View>
+            </View>
+            <ZSText variant="caption" color="textSecondary" style={styles.flexShrink}>
+              text — 라디오·체크·포커스·밑줄 같은 얇은 선
+            </ZSText>
           </View>
         </Section>
 
-        <Section label="Main Variants" direction="row" gap={8}>
-          {(['lighter', 'light', 'main', 'dark', 'darker'] as const).map((variant) => (
-            <View key={variant} style={styles.bgChipSlot}>
-              <View style={[styles.bgChip, { backgroundColor: palette.primary[variant], borderWidth: 0 }]} />
-              <ZSText typo="caption.2" color="secondary">{variant}</ZSText>
-            </View>
+        <Section label="shadow (xs → xl)" direction="row" gap={12}>
+          {SHADOWS.map((token) => (
+            <ZSBox key={token} backgroundColor="surface1" shadow={token} style={styles.shadowBox}>
+              <ZSText variant="label">{token}</ZSText>
+            </ZSBox>
           ))}
         </Section>
 
-        <Section label="Text" direction="row" gap={16}>
-          {TEXT_COLORS.map((color) => (
-            <ZSText key={color} typo="subTitle.2" color={color}>{color}</ZSText>
+        <Section label="radius (md → 3xl)" direction="row" gap={8}>
+          {RADII.map((token) => (
+            <View key={token} style={[styles.shape, radiusStyle(token), { backgroundColor: colors.surface4 }]} />
           ))}
         </Section>
-
-        <Section label="Elevation" gap={12}>
-          {ELEVATIONS.map((level) => (
-            <ZSView key={level} color="base" elevationLevel={level} style={styles.elevationBox}>
-              <ZSText typo="caption.2" color="secondary">elevationLevel {level}</ZSText>
-            </ZSView>
-          ))}
-        </Section>
-
-        <CodeBlock
-          code={`const palette = themeFactory({
-  light: { primary: { main: '#6366F1' } },
-  dark:  { primary: { main: '#8B5CF6' } },
-});
-
-<ThemeProvider customPalette={palette}>`}
-        />
-      </ZSContainer>
+      </ZSScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingTop: 24,
-    paddingBottom: 48,
-    paddingHorizontal: 20,
-  },
-  bgChipSlot: {
-    flex: 1,
-    gap: 6,
-    alignItems: 'center',
-  },
-  bgChip: {
-    width: '100%',
-    height: 44,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  stepRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  stepLabel: {
-    width: 76,
-    flexShrink: 0,
-  },
-  stepChip: {
-    flex: 1,
-    height: 32,
-    borderRadius: 8,
-  },
-  stepCaption: {
-    flex: 1,
-    textAlign: 'center',
-  },
-  elevationBox: {
-    width: '100%',
-    height: 44,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container: PAGE_CONTENT,
+  paletteRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  paletteStack: { alignItems: 'flex-start', gap: 4 },
+  paletteLabel: { flexGrow: 1, flexShrink: 1 },
+  swatches: { flexDirection: 'row', gap: 8 },
+  swatch: { width: 36, height: 28, borderRadius: 8, borderWidth: StyleSheet.hairlineWidth },
+  surfaceSwatch: { width: 48, height: 48, borderRadius: 12, borderWidth: StyleSheet.hairlineWidth },
+  shadowBox: { minWidth: 48, minHeight: 48, paddingHorizontal: 8, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  shape: { width: 48, height: 48 },
+  ruleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  ruleSample: { width: 96, alignItems: 'center' },
+  accentFace: { height: 36, paddingHorizontal: 16, justifyContent: 'center' },
+  markCapsule: { width: 64, paddingVertical: 6, alignItems: 'center', gap: 2 },
+  inkRing: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  inkDot: { width: 10, height: 10, borderRadius: 5 },
+  flexShrink: { flexShrink: 1 },
 });

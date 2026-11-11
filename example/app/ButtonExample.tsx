@@ -1,151 +1,72 @@
-import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { ZSBlockButton, ZSContainer, ZSPressable, ZSText, useTheme } from '@0610studio/zs-ui';
-import type { TypoOptions } from '@0610studio/zs-ui';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { ZSButton, ZSChip, ZSScreen, ZSPressable, ZSText, type PaletteColor, type ZSButtonSize, type ZSButtonVariant } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
-import CodeBlock from '../src/ui/kit/CodeBlock';
+import { PAGE_CONTENT } from '../src/ui/kit/layout';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
-type Intent = 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'information' | 'grey';
-type Variant = 'solid' | 'pastel' | 'stroke';
-
-const INTENTS: Exclude<Intent, 'secondary'>[] = ['primary', 'danger', 'information', 'success', 'warning', 'grey'];
-const VARIANTS: Variant[] = ['solid', 'pastel', 'stroke'];
-const SIZE_TYPOS: TypoOptions[] = ['label.1', 'label.2', 'label.3', 'label.4'];
+const INTENTS: PaletteColor[] = ['primary', 'secondary', 'neutral', 'error', 'success', 'info'];
+const VARIANTS: ZSButtonVariant[] = ['filled', 'tonal', 'outlined', 'text'];
+const SIZES: ZSButtonSize[] = ['small', 'medium', 'large'];
 
 export default function ButtonExample() {
-  const { palette } = useTheme();
-  const [intent, setIntent] = useState<Exclude<Intent, 'secondary'>>('primary');
-
-  const handleSubmit = useCallback(async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve('완료'), 500);
-    });
-  }, []);
+  const [color, setColor] = useState<PaletteColor>('primary');
+  const [loading, setLoading] = useState(false);
+  const [presses, setPresses] = useState(0);
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Button' }} />
-      <ZSContainer keyboardScrollExtraOffset={130} style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <Section label="ZSPressable" gap={10}>
-          <ZSPressable
-            style={[styles.fullButton, { backgroundColor: palette.primary[50] }]}
-            fullWidth
-            onPress={() => console.log('Primary FullWidth')}
-          >
-            <ZSText typo="subTitle.1" color="white">Primary FullWidth 버튼</ZSText>
-          </ZSPressable>
-          <ZSPressable
-            style={[styles.fullButton, { backgroundColor: palette.danger[50] }]}
-            fullWidth
-            onPress={() => console.log('Danger FullWidth')}
-          >
-            <ZSText typo="body.1" color="white">Danger FullWidth 버튼</ZSText>
-          </ZSPressable>
-          <ZSPressable
-            style={[styles.fullButton, { backgroundColor: palette.primary[50] }]}
-            fullWidth
-            isLoading
-            onPress={handleSubmit}
-          >
-            <ZSText typo="subTitle.1" color="white">Primary FullWidth (Loading)</ZSText>
-          </ZSPressable>
+      <ScreenHeader title="ZSButton" />
+      <ZSScreen backgroundColor="background" style={styles.container}>
+        <Section label="색 · color" surface="plain" gap={8} direction="row">
+          {INTENTS.map((name) => (
+            <ZSChip key={name} label={name} selected={name === color} onSelectedChange={() => setColor(name)} checkIcon={false} />
+          ))}
         </Section>
 
-        <Section label="ZSBlockButton" gap={14}>
-          {/* intent 선택 칩 */}
-          <View style={styles.chipRow}>
-            {INTENTS.map((name) => {
-              const active = name === intent;
-              return (
-                <Pressable
-                  key={name}
-                  onPress={() => setIntent(name)}
-                  style={[
-                    styles.chip,
-                    { backgroundColor: active ? palette.grey[80] : palette.background.layer2 },
-                  ]}
-                >
-                  <ZSText typo="label.4" style={{ color: active ? palette.background.base : palette.text.secondary }}>
-                    {name}
-                  </ZSText>
-                </Pressable>
-              );
-            })}
-          </View>
+        <Section label="모양 · variant" surface="plain" gap={12}>
+          {VARIANTS.map((variant) => (
+            <ZSButton key={variant} title={variant} variant={variant} color={color} onPress={() => setPresses((n) => n + 1)} testID={`button-${variant}`} />
+          ))}
+          <ZSText variant="caption" color="textSecondary" testID="button-presses">{`누른 횟수 ${presses}`}</ZSText>
+        </Section>
 
-          {/* 선택된 intent 의 variant 3종 */}
-          <View style={styles.buttonRow}>
-            {VARIANTS.map((variant) => (
-              <ZSBlockButton
-                key={variant}
-                onPress={() => console.log(`${intent} ${variant}`)}
-                title={variant}
-                intent={intent}
-                variant={variant}
-                typo="label.1"
-              />
-            ))}
-          </View>
+        <Section label="크기 · size" surface="plain" gap={12}>
+          {SIZES.map((size) => (
+            <ZSButton key={size} title={size} size={size} color={color} onPress={() => undefined} />
+          ))}
+        </Section>
 
-          {/* typo 크기별 패딩 스케일 */}
-          <View style={styles.buttonRow}>
-            {SIZE_TYPOS.map((typo) => (
-              <ZSBlockButton
-                key={typo}
-                onPress={() => console.log(typo)}
-                title={typo}
-                intent={intent}
-                variant="solid"
-                typo={typo}
-              />
-            ))}
+        <Section label="상태" surface="plain" gap={12}>
+          <ZSButton
+            title="저장"
+            fullWidth
+            loading={loading}
+            preventDoublePress
+            onPress={() => {
+              setLoading(true);
+              setTimeout(() => setLoading(false), 1500);
+            }}
+            testID="button-loading"
+          />
+          <View style={styles.row}>
+            <ZSButton title="비활성" disabled onPress={() => undefined} />
+            <ZSButton title="비활성" variant="outlined" disabled onPress={() => undefined} />
           </View>
         </Section>
 
-        <CodeBlock
-          code={`<ZSBlockButton
-  title="solid"
-  intent="${intent}"
-  variant="solid"
-  typo="label.1"
-  onPress={...}
-/>`}
-        />
-      </ZSContainer>
+        <Section label="ZSPressable" surface="plain" gap={12}>
+          <ZSPressable radius="xl" backgroundColor="surface2" style={styles.pressable} onPress={() => setPresses((n) => n + 1)}>
+            <ZSText variant="body1">누름 표시: Android ripple · iOS 하이라이트</ZSText>
+          </ZSPressable>
+        </Section>
+      </ZSScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingTop: 24,
-    paddingBottom: 90,
-    paddingHorizontal: 20,
-  },
-  fullButton: {
-    padding: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-  },
-  chipRow: {
-    width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 100,
-  },
-  buttonRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
+  container: PAGE_CONTENT,
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  pressable: { padding: 20 },
 });

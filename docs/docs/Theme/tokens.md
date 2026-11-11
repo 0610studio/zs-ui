@@ -1,89 +1,145 @@
-# 공통 토큰과 유틸리티
+# 토큰
 
-ZS-ui 컴포넌트가 함께 사용하는 모서리, 간격, 모션, 비활성 상태와 그림자 기준입니다. 앱에서 ZS-ui 컴포넌트와 나란히 배치하는 커스텀 UI에도 같은 값을 적용할 수 있습니다.
+zs-ui 컴포넌트가 함께 쓰는 모서리·모션·상태·터치 영역·그림자 기준입니다. 커스텀 UI에도 같은 값을 쓰면 zs-ui 컴포넌트와 모양이 맞습니다.
 
-## 토큰
+## 모서리 — `RADIUS` · `radiusStyle`
 
-```tsx
-import { RADIUS, SPACING, DURATION, DISABLED_OPACITY } from '@0610studio/zs-ui';
-```
+모서리 반경(pt·dp)입니다.
 
-| Export | 값 | 용도 |
-|---|---|---|
-| `RADIUS` | `xs` 4 · `sm` 6 · `md` 12 · `lg` 14 · `xl` 16 · `xxl` 22 · `sheet` 26 · `pill` 9999 | 컴포넌트 모서리 반경 단계(체크박스 `xs`, 버튼 `sm`·`md`, 입력·카드 `lg`, 스낵바 `xl`, 다이얼로그 `xxl`, 바텀시트 `sheet`) |
-| `SPACING` | `xxs` 4 · `xs` 8 · `sm` 12 · `md` 16 · `lg` 20 · `xl` 24 · `xxl` 32 · `xxxl` 40 · `screen` 16 | 패딩·마진·`gap` 간격 단계(4pt 격자). `screen`은 화면 좌우 여백 하나 |
-| `DURATION` | `press` 100 · `fast` 150 · `base` 200 · `slow` 250 · `enter` 300 (ms) | 눌림·퇴장, 포커스, 상태 전환, 이동, 오버레이 진입 애니메이션 시간 |
-| `DISABLED_OPACITY` | `0.7` | 비활성 컴포넌트의 공통 투명도 |
+| 토큰 | 값 | M3 shape scale |
+|------|----|----------------|
+| `none` | 0 | none |
+| `xs` | 4 | extraSmall |
+| `sm` | 8 | small |
+| `md` | 12 | medium |
+| `lg` | 16 | large |
+| `xl` | 20 | largeIncreased |
+| `2xl` | 28 | extraLarge |
+| `3xl` | 32 | extraLargeIncreased |
+| `4xl` | 48 | extraExtraLarge |
+| `full` | 9999 | full |
 
-토큰은 개별 화면에서 비슷한 숫자를 새로 만드는 대신, ZS-ui 컴포넌트와 시각적 리듬을 맞춰야 할 때 사용합니다.
+숫자로 시작하는 키는 `RADIUS['2xl']`처럼 대괄호로 읽습니다.
 
-## 간격 쓰는 곳
+| 토큰 | zs-ui 쓰임 |
+|------|-----------|
+| `full` | `ZSButton`·`ZSChip`·`ZSSegmentedControl`·스낵바·Android 떠 있는 탭 바 |
+| `md` (12) | `ZSTooltip` |
+| `lg` (16) | `ZSTextField`·Android `ZSSelect` 필드·`ZSCard` 기본·iOS 진행 표시 상자 |
+| `xl` (20) | `ZSBanner` |
+| `3xl` (32) | Alert |
 
-간격은 `SPACING` 단계로만 씁니다. 같은 역할에는 같은 단계를 쓰고, 묶음 안 간격은 묶음 사이 간격보다 좁게 둡니다.
-
-| 자리 | 단계 | 값 |
-|---|---|---|
-| 화면 좌우 여백(카드·목록·헤더의 바깥 끝) | `screen` | 16 |
-| 아이콘과 글자 사이, 배지 안쪽 | `xxs` | 4 |
-| 제목과 본문 사이, 한 묶음 안의 줄 사이, 붙은 버튼 사이 | `xs` | 8 |
-| 칩·태그 사이, 목록 항목 사이 | `sm` | 12 |
-| 카드 안쪽 여백, 입력칸 안쪽 좌우 | `md` | 16 |
-| 카드와 카드 사이 | `lg` | 20 |
-| 섹션과 섹션 사이 | `xl` | 24 |
-| 화면 위 큰 구획, 빈 화면 안내 위아래 | `xxl`·`xxxl` | 32·40 |
-
-```tsx
-import { SPACING } from '@0610studio/zs-ui';
-
-const styles = StyleSheet.create({
-  page: { paddingHorizontal: SPACING.screen },
-  card: { padding: SPACING.md, gap: SPACING.xs, marginBottom: SPACING.lg },
-});
-```
-
-기존 화면의 4의 배수가 아닌 값(5·10·15 등)은 화면을 고칠 때 가까운 단계로 옮깁니다. 5는 `xxs`(4), 10은 `xs`(8)나 `sm`(12) 중 역할에 맞는 쪽, 15는 `md`(16)로 옮깁니다.
-
-## 그림자 생성
-
-`createShadow`는 React Native 그림자 속성과 테마 색상을 `boxShadow` 값 배열(`BoxShadowValue[]`)로 변환합니다.
+`radiusStyle(token)`은 모서리 스타일을 반환합니다. iOS는 시스템 컨트롤과 같은 연속 곡률(`borderCurve: 'continuous'`)을 함께 넣습니다(`none`·`full` 제외).
 
 ```tsx
-import { createShadow, useTheme } from '@0610studio/zs-ui';
+import { View } from 'react-native';
+import { radiusStyle, useTheme } from '@0610studio/zs-ui';
 
-const { palette } = useTheme();
-const cardShadow = createShadow(
-  {
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-  },
-  palette.grey[100],
-);
+const { colors } = useTheme();
+<View style={[radiusStyle('lg'), { backgroundColor: colors.surface3, padding: 16 }]} />;
 ```
 
-일반적인 카드와 오버레이는 `ZSView`의 `elevationLevel`을 먼저 사용하고, 임의의 오프셋이나 블러가 필요한 경우에만 `createShadow`를 사용하세요.
+`RadiusToken` 타입(`RADIUS`의 키)을 내보냅니다.
 
-## 중복 실행 방지
+## 모션 — spring · timing
 
-`usePreventDoublePress(onPress, interval?)`는 결제나 제출처럼 중복 호출을 막아야 하는 액션에 사용합니다. 첫 호출만 통과시키고 `interval` 동안 연속 호출을 막으며, 기본 잠금 시간은 `PREVENT_DOUBLE_PRESS_INTERVAL`(2000ms)입니다.
+위치·크기가 바뀌는 움직임(`move`)은 spring, 색·투명도가 바뀌는 움직임(`fade`)은 오버슈트 없는 spring 또는 짧은 timing을 씁니다. 모든 설정은 시스템 '동작 줄이기'를 따릅니다(켜져 있으면 끝값으로 바로 갑니다).
+
+### `springConfig`
+
+```ts
+function springConfig(kind: MotionKind, speed?: MotionSpeed): WithSpringConfig;
+```
 
 ```tsx
-import {
-  PREVENT_DOUBLE_PRESS_INTERVAL,
-  usePreventDoublePress,
-} from '@0610studio/zs-ui';
+import { withSpring } from 'react-native-reanimated';
+import { springConfig } from '@0610studio/zs-ui';
 
-const handleSubmit = usePreventDoublePress(
-  () => submitForm(),
-  PREVENT_DOUBLE_PRESS_INTERVAL,
-);
+offset.value = withSpring(target, springConfig('move', 'fast'));
 ```
 
-일반 버튼의 짧은 연타 방어는 `ZSPressable`에 내장되어 있습니다. 더 긴 잠금이 필요한 경우 `ZSBlockButton`의 `preventDoublePress` 또는 이 훅을 사용하세요.
+| 플랫폼 | 값 |
+|--------|----|
+| iOS | SwiftUI 기본 spring(`spring(duration: 0.5, bounce: 0)`)을 normal로 — `duration: IOS_SPRING_DURATION[speed]`, `dampingRatio: 1`. `fade`는 항상 fast(350ms) |
+| Android | `ANDROID_SPRING[kind][speed]`의 `dampingRatio`·`stiffness`(Compose ExpressiveMotionTokens). `mass: 1`, `damping = dampingRatio × 2√stiffness` |
+
+### `IOS_SPRING_DURATION`
+
+`{ fast: 350, normal: 500, slow: 700 }`(ms). normal은 SwiftUI 기본값이고 fast·slow는 zs-ui가 정한 값입니다(HIG에 숫자 토큰이 없습니다).
+
+### `ANDROID_SPRING`
+
+| kind | fast | normal | slow |
+|------|------|--------|------|
+| `move` (M3 spatial, 오버슈트 있음) | 0.6 / 800 | 0.8 / 380 | 0.8 / 200 |
+| `fade` (M3 effects, 오버슈트 없음) | 1 / 3800 | 1 / 1600 | 1 / 800 |
+
+(dampingRatio / stiffness)
+
+### `timingConfig` · `DURATION`
+
+페이드처럼 시간 기반이 필요한 `fade` 움직임에 씁니다. `DURATION`은 `{ fast: 150, normal: 200, slow: 300 }`(ms)입니다.
+
+```tsx
+import { withTiming } from 'react-native-reanimated';
+import { timingConfig } from '@0610studio/zs-ui';
+
+opacity.value = withTiming(1, timingConfig('fast'));
+```
+
+`MotionKind`·`MotionSpeed` 타입을 내보냅니다.
+
+## 상태 — `OPACITY`
+
+M3 상태 레이어·비활성 불투명도입니다. [`withOpacity`](./colors#withopacity)와 함께 씁니다.
+
+| 키 | 값 | 용도 |
+|----|----|------|
+| `disabled` | 0.38 | 비활성 글자·아이콘 (`text` 38%) |
+| `disabledBackground` | 0.12 | 비활성 배경·외곽선 (`text` 12%) |
+| `hover` | 0.08 | |
+| `focus` | 0.1 | |
+| `pressed` | 0.1 | 누름 표시 (`ZSPressable`) |
+| `dragged` | 0.16 | |
+| `backdrop` | 0.32 | 모달 뒤를 덮는 `backdrop` 색 |
+| `disabledView` | 0.5 | 안쪽 색을 모르는 영역 전체를 흐리게 합니다(zs-ui 값). 색을 아는 컴포넌트는 `disabled`·`disabledBackground`를 씁니다 |
+
+```tsx
+const { colors } = useTheme();
+const disabledText = withOpacity(colors.text, OPACITY.disabled);
+```
+
+## 최소 터치 영역 — `MIN_TOUCH_TARGET`
+
+`{ ios: 44, android: 48 }` — iOS 44pt, Android 48dp. `ZSPressable`은 보이는 크기가 이보다 작으면 `hitSlop`을 자동으로 넓혀 이 크기를 채웁니다.
+
+## 그림자 — shadow
+
+그림자 단계입니다. 높이(dp)는 M3 elevation 0~5 단계 값 그대로입니다. 표면 높낮이는 `surface1`~`surface5`로 먼저 나타내고, 그림자는 툴팁·떠 있는 카드처럼 실제로 떠 있는 요소에만 씁니다.
+
+| 토큰 | `none` | `xs` | `sm` | `md` | `lg` | `xl` |
+|------|--------|------|------|------|------|------|
+| `SHADOW` (dp) | 0 | 1 | 3 | 6 | 8 | 12 |
+| M3 elevation 단계 | 0 | 1 | 2 | 3 | 4 | 5 |
+
+- `useTheme().shadows[token]`은 `{ boxShadow }` 스타일입니다(`none`은 빈 객체). `ZSBox shadow`가 이 값을 씁니다.
+- `createShadows(colors)`는 `shadow` 색으로 단계별 스타일(`ShadowStyles`)을 만듭니다. `colors`에 `background`가 있고 어두운 바탕이면 다크 불투명도(아래)를 씁니다.
+- `shadowFor(dp, shadowColor)`는 dp 높이를 key·ambient 두 겹 `BoxShadowValue[]`로 바꿉니다. 단계에 없는 높이가 필요할 때 씁니다.
+
+```tsx
+import { View } from 'react-native';
+import { shadowFor, useTheme } from '@0610studio/zs-ui';
+
+const { colors, shadows } = useTheme();
+
+<View style={[{ backgroundColor: colors.surface1, borderRadius: 16 }, shadows.sm]} />;
+<View style={{ boxShadow: shadowFor(4, colors.shadow) }} />;
+```
+
+`ShadowToken`(`'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'`)·`ShadowStyles` 타입을 내보냅니다.
 
 ## 관련 문서
 
-- [Palette](./palette)
-- [Typography](./typography)
-- [ZSView](../UiComponent/ZSView)
-- [ZSPressable](../UiComponent/ZSPressable)
+- [색 역할](./colors)
+- [ZSBox](../UiComponent/ZSBox) — `shadow`
+- [ZSPressable](../UiComponent/ZSPressable) — 누름 표시·최소 터치 영역·`usePreventDoublePress`

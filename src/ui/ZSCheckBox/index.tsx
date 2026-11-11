@@ -1,110 +1,115 @@
-import React, { useCallback } from 'react';
-import { Pressable, StyleSheet, ViewProps } from 'react-native';
-import ViewAtom from '../atoms/ViewAtom';
-import ZSText, { ZSTextProps } from '../ZSText';
+import React from 'react';
+import { Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import Svg, { Path, Rect } from 'react-native-svg';
 import { useTheme } from '../../context/ThemeContext';
-import { DISABLED_OPACITY, RADIUS } from '../../theme/tokens';
-import { SvgCheck } from '../../assets/SvgCheck';
+import { useUnnamedControlWarning } from '../../native/accessibility';
+import { useControllableState } from '../../model/useControllableState';
+import { withOpacity } from '../../theme/color';
+import { SPACE } from '../../theme/spacing';
+import { MIN_TOUCH_TARGET, OPACITY } from '../../theme/state';
+import ZSText from '../ZSText';
+import { MARK_ON_FILL, PressHalo, ROW_PRESS_DELAY } from '../ZSRadioGroup/markParts';
 
-// size 기본값(18) 기준 곡률·보더 비율 유지용
-const BASE_SIZE = 18;
-const BASE_BORDER_WIDTH = 1.6;
+const ROW_HEIGHT = { ios: 44, android: 56 } as const;
+export const CHECKBOX_SIZE = 20;
+const BORDER_WIDTH = 2;
+const CORNER = 4;
+const CHECK_PATH = 'M5.5 10.3L8.7 13.5L14.6 7';
+const CHECK_WIDTH = 2.2;
 
-export interface ZSCheckBoxProps extends ViewProps {
-  value: boolean;
-  onChange: (value: boolean) => void;
-  size?: number;
-  activeColor?: string;
+export interface ZSCheckboxProps {
+  value?: boolean;
+  defaultValue?: boolean;
+  onValueChange?: (value: boolean) => void;
   label?: string;
-  labelStyle?: ZSTextProps;
-  labelComponent?: React.ReactNode;
-  moreComponent?: React.ReactNode;
   disabled?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
 }
 
-function ZSCheckBox({
-  value,
-  onChange,
-  size = 18,
-  activeColor,
-  label,
-  labelStyle,
-  labelComponent,
-  moreComponent,
-  disabled = false,
-  style,
-  ...props
-}: ZSCheckBoxProps) {
-  const { palette } = useTheme();
-  const checkedColor = activeColor ?? palette.primary.main;
-
-  const handlePress = useCallback(() => {
-    if (!disabled) {
-      onChange(!value);
-    }
-  }, [disabled, onChange, value]);
-
+export function CheckboxMark({ checked, disabled = false }: { checked: boolean; disabled?: boolean }) {
+  const { colors } = useTheme();
+  const muted = withOpacity(colors.text, OPACITY.disabled);
+  const inset = BORDER_WIDTH / 2;
   return (
-    <ViewAtom style={[styles.container, disabled && styles.disabled, style]} {...props}>
-      <Pressable
-        onPress={handlePress}
-        disabled={disabled}
-        style={styles.checkContainer}
-        accessibilityRole='checkbox'
-        accessibilityState={{ checked: value, disabled }}
-      >
-        <ViewAtom
-          style={[
-            styles.box,
-            {
-              width: size,
-              height: size,
-              borderRadius: RADIUS.xs * (size / BASE_SIZE),
-              borderWidth: BASE_BORDER_WIDTH * (size / BASE_SIZE),
-              backgroundColor: value ? checkedColor : 'transparent',
-              borderColor: value ? checkedColor : palette.grey[30],
-            },
-          ]}
-        >
-          {value && (
-            <ViewAtom style={styles.checkmark}>
-              <SvgCheck size={size - 4} strokeWidth="3.5" />
-            </ViewAtom>
-          )}
-        </ViewAtom>
-        {labelComponent ?? (label !== undefined && <ZSText {...labelStyle}>{label}</ZSText>)}
-      </Pressable>
-      {moreComponent}
-    </ViewAtom>
+    <Svg width={CHECKBOX_SIZE} height={CHECKBOX_SIZE} viewBox={`0 0 ${CHECKBOX_SIZE} ${CHECKBOX_SIZE}`}>
+      {checked ? (
+        <>
+          <Rect x={0} y={0} width={CHECKBOX_SIZE} height={CHECKBOX_SIZE} rx={CORNER} fill={disabled ? muted : colors.primary} />
+          <Path d={CHECK_PATH} stroke={disabled ? colors.background : MARK_ON_FILL} strokeWidth={CHECK_WIDTH} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
+      ) : (
+        <Rect
+          x={inset}
+          y={inset}
+          width={CHECKBOX_SIZE - BORDER_WIDTH}
+          height={CHECKBOX_SIZE - BORDER_WIDTH}
+          rx={CORNER - inset}
+          stroke={disabled ? muted : colors.textSecondary}
+          strokeWidth={BORDER_WIDTH}
+          fill="none"
+        />
+      )}
+    </Svg>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  disabled: {
-    opacity: DISABLED_OPACITY,
-  },
-  checkContainer: {
-    flex: 1,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingVertical: 2,
-    gap: 12,
-  },
-  box: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmark: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+function ZSCheckbox({
+  value,
+  defaultValue = false,
+  onValueChange,
+  label,
+  disabled = false,
+  accessibilityLabel,
+  accessibilityHint,
+  style,
+  testID,
+}: ZSCheckboxProps) {
+  const { colors } = useTheme();
+  const [current, setCurrent] = useControllableState(value, defaultValue, onValueChange);
+  useUnnamedControlWarning('ZSCheckbox', label, accessibilityLabel);
+  const android = Platform.OS === 'android';
+  const touch = android ? MIN_TOUCH_TARGET.android : MIN_TOUCH_TARGET.ios;
 
-export default React.memo(ZSCheckBox);
+  return (
+    <Pressable
+      onPress={() => {
+        if (!disabled) setCurrent(!current);
+      }}
+      disabled={disabled}
+      unstable_pressDelay={ROW_PRESS_DELAY}
+      hitSlop={label ? undefined : (touch - CHECKBOX_SIZE) / 2}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: current, disabled }}
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
+      testID={testID}
+      style={[label ? [styles.row, { minHeight: android ? ROW_HEIGHT.android : ROW_HEIGHT.ios }] : styles.alone, style]}
+    >
+      {({ pressed }) => (
+        <>
+          <View style={styles.mark}>
+            {pressed ? <PressHalo markSize={CHECKBOX_SIZE} color={withOpacity(current ? colors.primary : colors.text, OPACITY.pressed)} /> : null}
+            <CheckboxMark checked={current} disabled={disabled} />
+          </View>
+          {label ? (
+            <ZSText variant="body1" color={disabled ? withOpacity(colors.text, OPACITY.disabled) : 'text'} style={styles.label}>
+              {label}
+            </ZSText>
+          ) : null}
+        </>
+      )}
+    </Pressable>
+  );
+}
+
+export default React.memo(ZSCheckbox);
+
+const styles = StyleSheet.create({
+  row: { alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', gap: SPACE.md, paddingVertical: SPACE.sm + 2 },
+  alone: { alignSelf: 'flex-start' },
+  mark: { width: CHECKBOX_SIZE, height: CHECKBOX_SIZE },
+  label: { flex: 1 },
+});

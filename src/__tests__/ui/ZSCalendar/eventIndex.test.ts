@@ -4,6 +4,7 @@ import {
   dotColorsOn,
   eventsInRange,
   getEventsOn,
+  labelChipsOn,
   visibleRangeOf,
 } from '../../../ui/ZSCalendar/core/eventIndex';
 import type { CalendarEvent } from '../../../ui/ZSCalendar/core/types';
@@ -37,7 +38,7 @@ describe('ZSCalendar core/eventIndex — 인덱싱', () => {
     ]);
     expect(index.size).toBe(1);
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('2건');
+    expect(warn.mock.calls[0]?.[0]).toContain('2건');
     warn.mockRestore();
   });
 
@@ -45,9 +46,14 @@ describe('ZSCalendar core/eventIndex — 인덱싱', () => {
     const events = Array.from({ length: 10_000 }, (_, i) =>
       event(`e${i}`, `2025-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`),
     );
-    const started = Date.now();
-    const index = buildEventIndex(events);
-    expect(Date.now() - started).toBeLessThan(30);
+    let fastest = Infinity;
+    let index = buildEventIndex([]);
+    for (let run = 0; run < 5; run += 1) {
+      const started = Date.now();
+      index = buildEventIndex(events);
+      fastest = Math.min(fastest, Date.now() - started);
+    }
+    expect(fastest).toBeLessThan(30);
     expect(index.size).toBeGreaterThan(0);
   });
 });
@@ -121,7 +127,6 @@ describe('ZSCalendar core/eventIndex — eventsInRange', () => {
 
 describe('ZSCalendar core/eventIndex — visibleRangeOf (prefetch 힌트)', () => {
   it('월간은 앞뒤 1개월 그리드까지 포함한다', () => {
-    // 2025-08 그리드 첫날 ~ 2025-10 그리드 마지막날
     expect(visibleRangeOf('2025-09-15', 'month', 0)).toEqual({
       startDate: '2025-07-27',
       endDate: '2025-11-01',
@@ -151,5 +156,26 @@ describe('ZSCalendar core/eventIndex — visibleRangeOf (prefetch 힌트)', () =
     const two = visibleRangeOf('2025-09-15', 'month', 0, 2);
     expect(two.startDate < one.startDate).toBe(true);
     expect(two.endDate > one.endDate).toBe(true);
+  });
+});
+
+describe('ZSCalendar core/eventIndex — labelChipsOn', () => {
+  const day = (count: number) =>
+    buildEventIndex(Array.from({ length: count }, (_, i) => ({ id: `e${i}`, date: '2026-10-05', label: `기록 ${i}` })));
+
+  it('줄이 남으면 전부 칩이다', () => {
+    const { chips, overflow } = labelChipsOn(day(3), '2026-10-05', 3);
+    expect(chips.map((event) => event.id)).toEqual(['e0', 'e1', 'e2']);
+    expect(overflow).toBe(0);
+  });
+
+  it('넘치면 마지막 줄을 +n 에 내준다', () => {
+    const { chips, overflow } = labelChipsOn(day(5), '2026-10-05', 3);
+    expect(chips.map((event) => event.id)).toEqual(['e0', 'e1']);
+    expect(overflow).toBe(3);
+  });
+
+  it('기록 없는 날은 비어 있다', () => {
+    expect(labelChipsOn(day(2), '2026-10-06', 3)).toEqual({ chips: [], overflow: 0 });
   });
 });

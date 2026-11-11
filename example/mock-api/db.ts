@@ -1,10 +1,5 @@
-/**
- * 시드 고정 in-memory 일기 생성기 — 별도 서버 없이 데모를 재현 가능하게.
- * 데이터 모양은 바라봄 앱의 일기(DiaryDto → toHisDetailData) 를 카드가 바로 그릴 수 있게 정리한 형태다.
- */
-
 import type { CalendarEvent } from '@0610studio/zs-ui';
-import { addDays, daysInMonth, toDateString } from '@0610studio/zs-ui';
+import { addDays, addMonths } from '@0610studio/zs-ui';
 
 export type DiaryCategory =
   | 'memo'
@@ -28,28 +23,23 @@ export interface DiaryKeyValue {
 
 export interface DiaryEntry {
   category: DiaryCategory;
-  /** 'HH:mm' — 카드에서 '오전 08시 30분' 으로 바꿔 보여준다 */
   time: string;
   memo: string;
-  /** 공유 멤버가 남긴 기록이면 작성자 */
   writer?: string;
   sticker?: StickerCode;
   keyValues: DiaryKeyValue[];
-  /** 원 단위 소비 금액 */
   price?: number;
-  /** 돌봄 습관이 자동으로 남긴 기록 */
   auto?: boolean;
 }
 
 export interface DiaryCategoryMeta {
   code: DiaryCategory;
   label: string;
-  /** 달력 점·카드 색 바 — 바라봄 diaryColor 와 같다 */
   color: string;
   sticker: StickerCode;
 }
 
-export const DIARY_CATEGORIES: ReadonlyArray<DiaryCategoryMeta> = [
+export const DIARY_CATEGORIES: readonly DiaryCategoryMeta[] = [
   { code: 'walk', label: '산책', color: '#D7B8FF', sticker: 'walk' },
   { code: 'feed', label: '급여', color: '#A7DBD1', sticker: 'fod' },
   { code: 'poopee', label: '대소변', color: '#FFD164', sticker: 'fec' },
@@ -82,7 +72,6 @@ const FEEDS = ['로얄캐닌 인도어', '오리젠 오리지널', '힐스 어�
 const MEDICAL_SUBJECTS = ['예방접종', '피부', '치과', '정기검진', '안과'];
 const TODOS = ['귀 청소', '발톱 정리', '양치', '빗질', '눈물 자국 닦기'];
 
-/** mulberry32 — 시드가 같으면 어느 기기에서도 같은 데이터가 나온다 */
 function createRandom(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
@@ -94,10 +83,9 @@ function createRandom(seed: number): () => number {
   };
 }
 
-/** 같은 달은 언제 조회해도 같은 결과 */
 const seedOfMonth = (year: number, month: number): number => year * 100 + month;
 
-const pick = <T,>(random: () => number, list: ReadonlyArray<T>): T => list[Math.floor(random() * list.length)];
+const pick = <T,>(random: () => number, list: readonly T[]): T => list[Math.floor(random() * list.length)];
 const between = (random: () => number, min: number, max: number): number => min + Math.floor(random() * (max - min + 1));
 const pad2 = (n: number): string => String(n).padStart(2, '0');
 
@@ -188,17 +176,17 @@ function buildEntry(random: () => number, meta: DiaryCategoryMeta): DiaryEntry {
   }
 }
 
-/** 한 달치 100~160건 — 하루 평균 4~5건이라 아젠다가 뷰포트를 넘겨 스크롤 전환을 볼 수 있다 */
 export function generateMonthEvents(year: number, month: number): CalendarEvent<DiaryEntry>[] {
   const random = createRandom(seedOfMonth(year, month));
   const total = 100 + Math.floor(random() * 61);
-  const lastDay = daysInMonth(year, month);
+  const monthStart = `${year}-${String(month).padStart(2, '0')}-01`;
+  const lastDay = Number(addDays(addMonths(monthStart, 1), -1).slice(8));
   const events: CalendarEvent<DiaryEntry>[] = [];
 
   for (let i = 0; i < total; i += 1) {
     const day = 1 + Math.floor(random() * lastDay);
     const meta = pick(random, DIARY_CATEGORIES);
-    const date = toDateString({ y: year, m: month, d: day });
+    const date = addDays(monthStart, day - 1);
     events.push({
       id: `${date}-${i}`,
       date,
@@ -207,7 +195,6 @@ export function generateMonthEvents(year: number, month: number): CalendarEvent<
     });
   }
 
-  // 같은 날 안에서는 시간순 — 카드 목록이 하루 흐름으로 읽힌다
   return events.sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? -1 : 1;
     const ta = a.data?.time ?? '';
@@ -216,7 +203,6 @@ export function generateMonthEvents(year: number, month: number): CalendarEvent<
   });
 }
 
-/** 구간을 덮는 달을 모두 생성해 잘라 돌려준다 */
 export function generateRangeEvents(startDate: string, endDate: string): CalendarEvent<DiaryEntry>[] {
   const events: CalendarEvent<DiaryEntry>[] = [];
   let cursor = `${startDate.slice(0, 7)}-01`;
@@ -227,7 +213,7 @@ export function generateRangeEvents(startDate: string, endDate: string): Calenda
     const month = Number(cursor.slice(5, 7));
     events.push(...generateMonthEvents(year, month).filter((e) => e.date >= startDate && e.date <= endDate));
     if (cursor === guard) break;
-    cursor = addDays(`${cursor.slice(0, 7)}-${daysInMonth(year, month)}`, 1).slice(0, 7) + '-01';
+    cursor = addMonths(cursor, 1);
   }
 
   return events;

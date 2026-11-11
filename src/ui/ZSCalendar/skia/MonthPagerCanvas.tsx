@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Canvas, Group, Paint, Picture, Skia } from '@shopify/react-native-skia';
 import Animated, {
@@ -7,8 +7,10 @@ import Animated, {
   type DerivedValue,
   type SharedValue,
 } from 'react-native-reanimated';
-import { GestureDetector, type ComposedGesture, type GestureType } from 'react-native-gesture-handler';
+import { GestureDetector, type ComposedGesture, type PanGesture } from 'react-native-gesture-handler';
 import type {
+  CalendarLocaleStrings,
+  CalendarMode,
   CalendarTheme,
   DateString,
   EventIndex,
@@ -17,16 +19,9 @@ import type {
 } from '../core';
 import WeekdayHeader from '../ui/WeekdayHeader';
 import A11yOverlay from '../ui/A11yOverlay';
-import type { CalendarPagerUnit, Pane } from './usePaneCache';
+import type { Pane } from './usePaneCache';
 import { SELECTED_CARD_SHADOW_BLEED } from './drawGrid';
 
-/**
- * 접힐 때 anchor 주가 y=0 에 오도록 pane 을 끌어올리고 나머지는 뷰포트 밖으로 밀어 자른다.
- *
- * 전환 중에는 anchor 가 아닌 행을 progress 에 비례해 흐리게 한다. Group opacity 는 기록된
- * SkPicture 에 먹지 않아 saveLayer 가 필요한데, 그 비용은 전환 중(fadeRows)·비선택 행 영역에만
- * 지불하고 정지 상태에서는 픽처를 그대로 그린다.
- */
 function PaneGroup({
   pane,
   gridWidth,
@@ -40,8 +35,8 @@ function PaneGroup({
   progress: SharedValue<number>;
   fadeRows: boolean;
 }) {
-  // 워클릿이 pane 을 통째로 캡처하면 그 안의 SkPicture 까지 직렬화하려다 죽는다
-  const { page, anchorRow, rowCount } = pane;
+  const { page, anchorRow } = pane;
+  const rowCount = pane.matrix.length;
 
   const transform = useDerivedValue(() => [
     { translateX: page * gridWidth },
@@ -49,7 +44,6 @@ function PaneGroup({
   ]);
   const restOpacity = useDerivedValue(() => progress.value);
 
-  // 비선택 행은 anchor 위·아래 두 사각형이다. Path 로 합치면 addRect 가 폐기 경고를 내고, 클립 두 번이 더 싸다
   const clips = useMemo(() => {
     if (!fadeRows || rowCount <= 1) return null;
     const below = rowCount - anchorRow - 1;
@@ -85,14 +79,6 @@ function PaneGroup({
   );
 }
 
-/**
- * Skia pane 과 같은 변환을 받아야 접힌 상태에서도 좌표가 어긋나지 않는다.
- * 현재 pane 에만 얹는다 — 이웃 pane 은 스와이프가 끝나 현재가 되기 전까지 누를 수도
- * 읽을 수도 없으므로, 셀 42개짜리 Pressable 트리를 세 벌 들고 있을 이유가 없다.
- *
- * 페이지 오프셋과 페이저 이동을 한 transform 으로 합친다(정지 시 ≈ 0). 바깥 뷰를 -page×폭 만큼
- * 밀고 안에서 되돌리면 Android 접근성이 바깥 뷰를 화면 밖으로 보고 셀 노드를 통째로 버린다.
- */
 function PaneOverlay({
   pane,
   gridWidth,
@@ -116,7 +102,7 @@ function PaneOverlay({
   selectedDate: DateString | null;
   index: EventIndex;
   onSelect: (date: DateString) => void;
-  formatLabel?: (date: DateString, eventCount: number, selected: boolean) => string;
+  formatLabel: CalendarLocaleStrings['cellLabel'];
 }) {
   const { page, anchorRow } = pane;
   const style = useAnimatedStyle(() => ({
@@ -144,34 +130,24 @@ function PaneOverlay({
 }
 
 export interface MonthPagerCanvasProps {
-  panes: ReadonlyArray<Pane>;
-  /** 단위가 바뀌면 pane 노드를 새로 만든다 — 파생 변환값이 한 프레임 늦게 따라오는 빈 프레임을 막는다 */
-  unit: CalendarPagerUnit;
-  /** 전환 중 비선택 행 페이드 */
+  panes: readonly Pane[];
+  unit: CalendarMode;
   fadeRows: boolean;
   metrics: GridLayoutMetrics;
-  /** 가장 긴 달(6주)이 잘리지 않도록 고정한다 */
   canvasRowsHeight: number;
-  /** 절대 페이지 번호로 조회하는 주 행 픽셀 높이 */
   rowsHeightByPage: DerivedValue<Record<number, number>>;
   translateX: SharedValue<number>;
-  /** 0 = 주간, 1 = 월간 */
   progress: SharedValue<number>;
-  gesture: ComposedGesture | GestureType;
+  gesture: ComposedGesture | PanGesture;
   theme: CalendarTheme;
-  weekdayLabels: ReadonlyArray<string>;
+  weekdayLabels: readonly string[];
   firstDayOfWeek: FirstDayOfWeek;
   selectedDate: DateString | null;
   index: EventIndex;
   onSelect: (date: DateString) => void;
-  /** 날짜 셀 접근성 라벨 — 로케일 문자열 */
-  formatLabel?: (date: DateString, eventCount: number, selected: boolean) => string;
+  formatLabel: CalendarLocaleStrings['cellLabel'];
 }
 
-/**
- * 3-pane 무한 페이저 + 주↔월 전환.
- * 양옆 pane 을 비워두지 않고 전부 그리므로 스와이프가 끝나는 순간 도착 페이지가 완성되어 있다.
- */
 export default function MonthPagerCanvas({
   panes,
   unit,
@@ -190,15 +166,11 @@ export default function MonthPagerCanvas({
   onSelect,
   formatLabel,
 }: MonthPagerCanvasProps) {
-  // metrics 를 워클릿에서 통째로 캡처하지 않도록 필요한 숫자만 꺼낸다
   const { gridWidth, rowHeight } = metrics;
-  // panes 는 항상 [이전, 현재, 다음] 순서다
   const currentPane = panes[Math.floor(panes.length / 2)];
   const canvasTransform = useDerivedValue(() => [{ translateX: translateX.value }]);
 
-  // 절대 페이지 좌표에서 보간하므로 JS 상태(page)가 한두 프레임 늦어도 높이가 튀지 않는다
   const containerStyle = useAnimatedStyle(() => {
-    // 요일 헤더는 이 뷰포트 밖(위)에 있으므로 높이 계산에 넣지 않는다
     const collapsed = rowHeight;
     if (gridWidth <= 0) return { height: collapsed + SELECTED_CARD_SHADOW_BLEED };
 
@@ -210,7 +182,6 @@ export default function MonthPagerCanvas({
     const high = table[lower + 1] ?? canvasRowsHeight;
     const expanded = low * (1 - ratio) + high * ratio;
 
-    // 마지막 행 카드의 그림자가 뷰포트 밖으로 잘리지 않도록 번짐만큼 더 연다
     return { height: collapsed + (expanded - collapsed) * progress.value + SELECTED_CARD_SHADOW_BLEED };
   });
 
@@ -264,6 +235,5 @@ export default function MonthPagerCanvas({
 }
 
 const styles = StyleSheet.create({
-  // 짧은 달로 넘어가는 동안 긴 달의 마지막 주가 잘려 나가야 높이 애니메이션이 자연스럽다
   viewport: { overflow: 'hidden' },
 });

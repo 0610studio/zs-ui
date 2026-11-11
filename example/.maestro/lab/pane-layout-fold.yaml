@@ -1,0 +1,110 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      true: ${STEP == 'setup'}
+    commands:
+      - launchApp:
+          clearState: false
+      - extendedWaitUntil:
+          visible: 'ZS-UI'
+          timeout: 120000
+      - runFlow: ../common/open-lab.yaml
+      - scrollUntilVisible:
+          element:
+            id: 'lab-pane-layout-card'
+          direction: DOWN
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-pane-layout-card'
+            - assertVisible:
+                id: 'lab-pane-primary-width'
+
+- runFlow:
+    when:
+      true: ${POSTURE == 'folded'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-pane-primary-width'
+            text: 'primary 411'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-pane-primary-hook'
+          text: 'usePaneLayout single 411 compact'
+      - assertNotVisible:
+          id: 'lab-pane-secondary-width'
+- runFlow:
+    when:
+      true: ${POSTURE == 'tabletop'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-pane-primary-width'
+            text: 'primary 323'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary 485'
+      - tapOn:
+          id: 'lab-pane-tabletop'
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-pane-secondary-width-top'
+            text: 'top 375'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-pane-primary-width'
+          text: 'primary 832'
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary 832'
+      - waitForAnimationToEnd
+      - takeScreenshot: q02-tabletop-on
+      - tapOn:
+          id: 'lab-pane-tabletop'
+      - assertVisible:
+          id: 'lab-pane-primary-width'
+          text: 'primary 323'
+- runFlow:
+    when:
+      true: ${POSTURE == 'half'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-pane-primary-width'
+            text: 'primary 375'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary 375'
+      - tapOn:
+          id: 'lab-pane-fraction-0.5'
+      - assertVisible:
+          id: 'lab-pane-primary-width'
+          text: 'primary 375'
+      - tapOn:
+          id: 'lab-pane-fraction-0.4'
+- runFlow:
+    when:
+      true: ${POSTURE == 'open' || POSTURE == 'reopened'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-pane-primary-width'
+            text: 'primary 300'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary 426'
+      - tapOn:
+          id: 'lab-pane-fraction-0.5'
+      - assertVisible:
+          id: 'lab-pane-primary-width'
+          text: 'primary 363'
+      - tapOn:
+          id: 'lab-pane-fraction-0.4'
+- waitForAnimationToEnd
+- takeScreenshot: q01-${POSTURE}

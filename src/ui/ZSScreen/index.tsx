@@ -1,0 +1,403 @@
+import React, { ReactNode, cloneElement, useContext, useEffect, useImperativeHandle, forwardRef, useRef, useCallback, useMemo, useState } from 'react';
+import { Platform, ViewProps, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent, TextInput, View, type HostInstance, type KeyboardEvent, type LayoutChangeEvent, type RefreshControlProps, type ScrollViewInstance } from 'react-native';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets, type Edge, type EdgeInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
+import { resolveColor, type ColorName } from '../../theme/color';
+import { useScreenCovered } from '../../context/ScreenCoverContext';
+import { SurfaceContext } from '../../context/SurfaceContext';
+import { BottomStickyContext, useBottomBarStore } from '../../context/BottomBarContext';
+import { NavigationContext } from 'expo-router/react-navigation';
+import { useHeaderOverlap } from '../../navigation/useHeaderInset';
+import { useTabBarOverlap } from '../../navigation/useTabBarInset';
+import { ZSHeaderBackground } from '../../navigation/ZSHeaderBackground';
+import useKeyboard from '../../model/useKeyboard';
+import { useWindowLayout } from '../../layout/LayoutContext';
+import { resolveContentMaxWidth } from '../../layout/windowClass';
+import type { ContentMaxWidth } from '../../layout/types';
+import { InputFocusContext } from './InputFocusContext';
+import { ScreenBottomInsetContext } from './BottomInsetContext';
+
+const KEYBOARD_ANIMATION_DELAY = 50;
+const SCROLL_VIEW_OPTIONS = {
+  keyboardShouldPersistTaps: "handled" as const,
+  automaticallyAdjustKeyboardInsets: false
+}
+
+function ContainerInsets({ enabled, children }: {
+  enabled: boolean;
+  children: (headerOverlap: number, insets: EdgeInsets, tabBarOverlap: number) => ReactNode;
+}) {
+  const headerOverlap = useHeaderOverlap(enabled);
+  const tabBarOverlap = useTabBarOverlap(enabled);
+  const insets = useSafeAreaInsets();
+  return <>{children(headerOverlap, insets, tabBarOverlap)}</>;
+}
+
+let nextBottomBarOwner = 0;
+
+function useBottomBarReport() {
+  const store = useBottomBarStore();
+  const navigation = useContext(NavigationContext);
+  const ref = useRef<HostInstance>(null);
+  const [owner] = useState(() => ++nextBottomBarOwner);
+  const active = store !== null && navigation !== undefined;
+  const stickyTop = useRef<number | null>(null);
+
+  const report = useCallback(() => {
+    if (!active || !navigation?.isFocused()) return;
+    ref.current?.measureInWindow((_x, y) => store?.set({ owner, top: stickyTop.current === null ? y : Math.min(y, stickyTop.current) }));
+  }, [active, navigation, store, owner]);
+  const reportRef = useRef(report);
+
+  useEffect(() => {
+    reportRef.current = report;
+    report();
+  }, [report]);
+
+  useEffect(() => {
+    if (!active || !navigation || !store) return undefined;
+    const release = () => {
+      if (store.get()?.owner === owner) store.set(null);
+    };
+    const offFocus = navigation.addListener('focus', () => reportRef.current());
+    const offBlur = navigation.addListener('blur', release);
+    return () => {
+      offFocus();
+      offBlur();
+      release();
+    };
+  }, [active, navigation, store, owner]);
+
+  const setSticky = useCallback((top: number | null) => {
+    stickyTop.current = top;
+    reportRef.current();
+  }, []);
+
+  return { ref, onLayout: report, active, setSticky };
+}
+
+export type ZSScreenBottomPlacement = 'full' | 'start' | 'end';
+
+export type ZSScreenProps = ViewProps & {
+  backgroundColor?: ColorName | (string & {});
+  edges?: Edge[];
+  maxContentWidth?: ContentMaxWidth;
+  scrollEnabled?: boolean;
+  refreshControl?: React.ReactElement<RefreshControlProps>;
+  bounces?: boolean;
+  topComponent?: ReactNode;
+  bottomComponent?: ReactNode;
+  bottomComponentPlacement?: ZSScreenBottomPlacement;
+  showsVerticalScrollIndicator?: boolean;
+  keyboardScrollExtraOffset?: number;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollEventThrottle?: number;
+  scrollToFocusedInput?: boolean;
+};
+
+export type ZSScreenRef = ScrollViewInstance;
+
+const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
+  {
+    backgroundColor,
+    edges,
+    maxContentWidth = 'none',
+    scrollEnabled = true,
+    refreshControl,
+    bounces,
+    topComponent,
+    bottomComponent,
+    bottomComponentPlacement = 'full',
+    showsVerticalScrollIndicator = true,
+    keyboardScrollExtraOffset = 30,
+    scrollEventThrottle = 16,
+    scrollToFocusedInput = true,
+    style,
+    children,
+    onScroll,
+    ...viewProps
+  },
+  forwardedRef
+) {
+  const { colors } = useTheme();
+  const screenCovered = useScreenCovered();
+  const bottomBar = useBottomBarReport();
+  const isIOS = Platform.OS === 'ios';
+  const { widthClass, readableMaxWidth } = useWindowLayout();
+  const contentMaxWidth = resolveContentMaxWidth(maxContentWidth, { widthClass, readableMaxWidth });
+  // 한쪽 CTA 는 넓은 창에서만 — compact 창은 한 열이라 전폭으로 둔다
+  const bottomSide = bottomComponent && bottomComponentPlacement !== 'full' && widthClass !== 'compact' ? bottomComponentPlacement : null;
+  const [bottomSideHeight, setBottomSideHeight] = useState(0);
+  const handleBottomSideLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setBottomSideHeight((prev) => (prev === height ? prev : height));
+  }, []);
+  const bottomInset = bottomSide ? bottomSideHeight : 0;
+  const isAutoEdges = edges === undefined;
+  const isIOSAutoInset = isAutoEdges && isIOS;
+  const positionRef = useRef(0);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
+  const scrollContentRef = useRef<HostInstance>(null);
+  const scrollTimeoutRef = useRef<number | null>(null);
+
+  useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollViewInstance, [scrollEnabled]);
+
+  const scrollFocusedInputIntoView = useCallback((keyboardTop: number) => {
+    const input = TextInput.State.currentlyFocusedInput();
+    const content = scrollContentRef.current;
+    if (!input || !content) return;
+    input.measureLayout(content, () => {
+      input.measureInWindow((_x, y, _width, height) => {
+        const overlap = y + height + keyboardScrollExtraOffset - keyboardTop;
+        if (overlap <= 0) return;
+        scrollViewRef.current?.scrollTo({ y: positionRef.current + overlap, animated: true });
+      });
+    }, () => {});
+  }, [keyboardScrollExtraOffset]);
+
+  const keyboardTopRef = useRef<number | null>(null);
+
+  const scheduleScrollToFocusedInput = useCallback((keyboardTop: number) => {
+    if (!scrollToFocusedInput || !scrollEnabled) return;
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = setTimeout(() => {
+      scrollTimeoutRef.current = null;
+      scrollFocusedInputIntoView(keyboardTop);
+    }, KEYBOARD_ANIMATION_DELAY);
+  }, [scrollToFocusedInput, scrollEnabled, scrollFocusedInputIntoView]);
+
+  const handleKeyboardShow = (e: KeyboardEvent) => {
+    keyboardTopRef.current = e.endCoordinates.screenY;
+    scheduleScrollToFocusedInput(e.endCoordinates.screenY);
+  };
+
+  const handleKeyboardHide = () => {
+    keyboardTopRef.current = null;
+  };
+
+  const notifyInputFocus = useCallback(() => {
+    if (keyboardTopRef.current !== null) scheduleScrollToFocusedInput(keyboardTopRef.current);
+  }, [scheduleScrollToFocusedInput]);
+
+  const { keyboardHeight } = useKeyboard({
+    handleKeyboardShow,
+    handleKeyboardHide,
+  });
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, []);
+
+  const [scrolled, setScrolled] = useState(false);
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    onScroll?.(event);
+    const y = event.nativeEvent.contentOffset.y;
+    positionRef.current = y;
+    const next = y > 0.5;
+    setScrolled((prev) => (prev === next ? prev : next));
+  }, [onScroll]);
+
+  const contentBackground = StyleSheet.flatten(style)?.backgroundColor;
+  const surfaceColor = resolveColor(colors, backgroundColor) ?? contentBackground ?? colors.background;
+  const bounce = bounces ?? refreshControl != null;
+
+  const rootStyle = useMemo(() => [
+    styles.w100,
+    { backgroundColor: surfaceColor },
+  ], [surfaceColor]);
+
+  const rootEdges = useMemo<Edge[]>(() => {
+    if (!isAutoEdges) return edges;
+    if (isIOS) return ['left', 'right'];
+    return bottomComponent ? ['left', 'right', 'top'] : ['left', 'right', 'top', 'bottom'];
+  }, [isAutoEdges, isIOS, edges, bottomComponent]);
+
+  const fixedContentEdges: Edge[] = bottomComponent ? ['top'] : ['top', 'bottom'];
+
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const handleScrollViewLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setScrollViewHeight((prev) => (prev === height ? prev : height));
+  }, []);
+
+  const scrollContentStyle = useMemo(() => [
+    styles.scrollContainerStyle,
+    { paddingBottom: keyboardHeight + bottomInset },
+  ], [keyboardHeight, bottomInset]);
+
+  const columnStyle = useMemo(() => (
+    contentMaxWidth === undefined ? undefined : { width: '100%' as const, maxWidth: contentMaxWidth, alignSelf: 'center' as const }
+  ), [contentMaxWidth]);
+
+  const containerStyle = useMemo(() => [
+    styles.w100,
+    columnStyle,
+    style
+  ], [columnStyle, style]);
+
+  const slot = (node: ReactNode) => (columnStyle && node ? <View style={columnStyle}>{node}</View> : node);
+
+  const bottomEdgeProbe = (
+    <View ref={bottomBar.ref} collapsable={false} pointerEvents="none" accessible={false} onLayout={bottomBar.onLayout} style={styles.edgeProbe} />
+  );
+
+  // 한쪽 CTA — 본문은 아래 끝까지 두고, 그 위 바닥에 절반 폭으로 띄운다. 측정 점은 CTA 윗변(스낵바 바닥)
+  const renderBottomSide = () => (
+    <View pointerEvents="box-none" style={styles.sideDock} testID="zs-screen-bottom-side">
+      {bottomEdgeProbe}
+      <View pointerEvents="box-none" style={[styles.sideRow, columnStyle, bottomSide === 'end' && styles.sideRowEnd]}>
+        <View style={styles.sideSlot} onLayout={handleBottomSideLayout}>
+          {bottomComponent}
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderTop = (headerOverlap: number) => {
+    if (!topComponent) return null;
+    if (headerOverlap > 0) return <View style={{ paddingTop: headerOverlap }}>{slot(topComponent)}</View>;
+    if (isIOSAutoInset) return <SafeAreaView edges={['top']}>{slot(topComponent)}</SafeAreaView>;
+    return slot(topComponent);
+  };
+
+  const refreshControlFor = (underHeader: number) =>
+    refreshControl && underHeader > 0 && refreshControl.props.progressViewOffset === undefined
+      ? cloneElement(refreshControl, { progressViewOffset: underHeader })
+      : refreshControl;
+
+  const fillStyle = (insets: EdgeInsets) => {
+    if (!isIOSAutoInset || scrollViewHeight <= 0) return null;
+    const insetTop = topComponent ? 0 : insets.top;
+    const insetBottom = bottomComponent ? 0 : insets.bottom;
+    return { flexGrow: 0, minHeight: Math.max(0, scrollViewHeight - insetTop - insetBottom) };
+  };
+
+  const renderBody = (underHeader: number, insets: EdgeInsets, underTabBar: number) => {
+    if (!scrollEnabled) {
+      if (isIOSAutoInset) {
+        return (
+          <SafeAreaView {...viewProps} style={[styles.flex1, containerStyle]} edges={fixedContentEdges}>
+            {children}
+          </SafeAreaView>
+        );
+      }
+      const fixedBody = (
+        <View {...viewProps} style={[styles.flex1, containerStyle]}>
+          {children}
+        </View>
+      );
+      return underHeader > 0 || underTabBar > 0
+        ? <View style={[styles.flex1, { paddingTop: underHeader, paddingBottom: underTabBar }]}>{fixedBody}</View>
+        : fixedBody;
+    }
+    return (
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.w100}
+        contentInsetAdjustmentBehavior={isIOSAutoInset ? 'automatic' : 'never'}
+        onLayout={isIOSAutoInset ? handleScrollViewLayout : undefined}
+        showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+        contentContainerStyle={[
+          scrollContentStyle,
+          fillStyle(insets),
+          underHeader > 0 ? { paddingTop: underHeader } : null,
+          underTabBar > 0 && keyboardHeight === 0 ? { paddingBottom: insets.bottom + underTabBar } : null,
+        ]}
+        scrollEventThrottle={scrollEventThrottle}
+        onScroll={handleScroll}
+        scrollsToTop={!screenCovered}
+        bounces={bounce}
+        overScrollMode={bounce ? 'auto' : 'never'}
+        refreshControl={refreshControlFor(underHeader)}
+        {...SCROLL_VIEW_OPTIONS}
+      >
+        <View {...viewProps} ref={scrollContentRef} style={[styles.flex1, containerStyle]}>
+          {children}
+        </View>
+      </ScrollView>
+    );
+  };
+
+  return (
+    <InputFocusContext.Provider value={notifyInputFocus}>
+      <ScreenBottomInsetContext.Provider value={bottomInset}>
+      <BottomStickyContext.Provider value={bottomBar.active ? bottomBar.setSticky : null}>
+      <SurfaceContext.Provider value={typeof surfaceColor === 'string' ? surfaceColor : null}>
+      <SafeAreaProvider>
+          <ContainerInsets enabled={isAutoEdges}>
+          {(headerOverlap, insets, tabBarOverlap) => {
+            const underHeader = topComponent ? 0 : headerOverlap;
+            const underTabBar = bottomComponent ? 0 : tabBarOverlap;
+            const body = renderBody(underHeader, insets, underTabBar);
+            const edgesForRoot = rootEdges.filter(
+              (edge) => !(edge === 'top' && headerOverlap > 0) && !(edge === 'bottom' && underTabBar > 0 && scrollEnabled),
+            );
+            return (
+              <SafeAreaView style={rootStyle} edges={edgesForRoot}>
+                <View style={styles.w100}>
+                  {renderTop(headerOverlap)}
+                  {isAutoEdges && bottomComponent ? (
+                    <SafeAreaView mode="margin" edges={['bottom']} style={styles.flex1}>
+                      <View style={tabBarOverlap > 0 ? [styles.flex1, { marginBottom: tabBarOverlap }] : styles.flex1}>
+                        {body}
+                        {bottomSide ? renderBottomSide() : (
+                          <>
+                            {bottomEdgeProbe}
+                            <View style={[styles.staticSlot, columnStyle]}>{bottomComponent}</View>
+                          </>
+                        )}
+                      </View>
+                    </SafeAreaView>
+                  ) : bottomSide ? (
+                    <View style={styles.flex1}>
+                      {body}
+                      {renderBottomSide()}
+                    </View>
+                  ) : (
+                    <>
+                      {body}
+                      {bottomComponent ? bottomEdgeProbe : null}
+                      {slot(bottomComponent)}
+                    </>
+                  )}
+                  {bottomBar.active && !bottomComponent ? (
+                    <View
+                      ref={bottomBar.ref}
+                      collapsable={false}
+                      pointerEvents="none"
+                      accessible={false}
+                      onLayout={bottomBar.onLayout}
+                      testID="zs-screen-bottom-probe"
+                      style={[styles.bottomProbe, { bottom: (edgesForRoot.includes('bottom') ? 0 : insets.bottom) + tabBarOverlap }]}
+                    />
+                  ) : null}
+                  {underHeader > 0 && scrollEnabled ? <ZSHeaderBackground color={surfaceColor} height={underHeader} scrolled={scrolled} /> : null}
+                </View>
+              </SafeAreaView>
+            );
+          }}
+        </ContainerInsets>
+      </SafeAreaProvider>
+      </SurfaceContext.Provider>
+      </BottomStickyContext.Provider>
+      </ScreenBottomInsetContext.Provider>
+    </InputFocusContext.Provider>
+  );
+});
+
+const styles = StyleSheet.create({
+  flex1: { flex: 1 },
+  w100: { flex: 1, width: '100%' },
+  scrollContainerStyle: { alignItems: 'center', width: '100%', flexGrow: 1 },
+  staticSlot: { position: 'static' },
+  bottomProbe: { position: 'absolute', left: 0, width: 0, height: 0 },
+  edgeProbe: { height: 0 },
+  sideDock: { position: 'absolute', left: 0, right: 0, bottom: 0 },
+  sideRow: { width: '100%', flexDirection: 'row' },
+  sideRowEnd: { justifyContent: 'flex-end' },
+  sideSlot: { width: '50%' },
+});
+
+export default ZSScreen;

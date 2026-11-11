@@ -1,125 +1,124 @@
 # 시작하기
 
-이 페이지에서는 앱 루트에 Provider를 연결하고, ZS-ui 컴포넌트와 오버레이를 사용하는 첫 화면까지 구성합니다.
-
-## 완료하면 할 수 있는 것
-
-- 테마가 적용된 `ZSContainer`와 `ZSText`로 화면을 구성합니다.
-- `ZSBlockButton`에서 `useOverlay().showAlert()`를 호출합니다.
-- Theme, UI 컴포넌트, Overlay 상세 문서로 이어서 탐색합니다.
+Expo SDK 58·React Native 0.88 프로젝트에 zs-ui 2.0.0을 설치합니다. iOS·Android를 지원합니다.
 
 ## 1. 설치
 
-ZS-ui와 필수 peer 의존성을 함께 설치합니다. 버전 범위는 패키지 `package.json`의 `peerDependencies`를 따릅니다(Expo SDK 57, React Native 0.86 이상).
+zs-ui와 peer 의존성을 함께 설치합니다. `npx expo install`이 Expo SDK 58에 맞는 버전을 고릅니다.
 
 ```bash
-npx expo install @0610studio/zs-ui \
+npx expo install @0610studio/zs-ui@2.0.0 @expo/ui expo-router expo-navigation-bar \
   @react-native-async-storage/async-storage @shopify/react-native-skia \
-  expo-navigation-bar expo-router react-native-gesture-handler \
-  react-native-reanimated react-native-worklets \
-  react-native-safe-area-context react-native-svg
+  react-native-reanimated react-native-worklets react-native-gesture-handler \
+  react-native-safe-area-context react-native-screens react-native-svg expo-blur expo-status-bar
 ```
 
-`react-native-gesture-handler`는 `ZSCalendar`를 쓰지 않아도 필요합니다. 배포물이 CommonJS 번들이라 tree-shaking이 없어, 라이브러리를 import하는 순간 모든 모듈이 평가되기 때문입니다. 앱 루트는 `GestureHandlerRootView`로 감쌉니다. react-navigation 같은 제스처 기반 라이브러리를 이미 쓰고 있다면 대부분 충족되어 있습니다.
+| peer | 버전 | 비고 |
+|------|------|------|
+| `expo` | `>=58.0.0` | |
+| `react` | `*` | |
+| `react-native` | `>=0.88.0` | |
+| `@expo/ui` | `>=58.0.22` | 시스템 컨트롤·메뉴·시트 |
+| `expo-router` | `>=58.0.26` | 탭·Stack |
+| `expo-navigation-bar` | `>=58.0.0` | Android 시스템 바 아이콘 색 |
+| `@react-native-async-storage/async-storage` | `*` | 다크 모드 선택 저장 |
+| `@shopify/react-native-skia` | `>=2.11.0` | `ZSCalendar`·`ZSSkeleton`·`ZSBorderBeam` |
+| `react-native-reanimated` | `>=4.7.0 <5.0.0` | |
+| `react-native-worklets` | `>=0.13.0 <0.14.0` | |
+| `react-native-gesture-handler` | `>=3.2.0 <4.0.0` | |
+| `react-native-safe-area-context` | `>=5.9.0` | |
+| `react-native-screens` | `>=4.30.0` | |
+| `react-native-svg` | `*` | |
+| `expo-blur` | `>=58.0.0` | 오버레이·툴팁·Android 떠 있는 탭 바·Android 헤더의 [흐림 막](../OverlayComponent/start#흐림-막) |
+| `expo-status-bar` | `>=58.0.4` | iOS 세로 바 끄기 — [LayoutProvider `barAxis`](../Layout/LayoutProvider#바-배치--baraxis) |
+| `expo-symbols` | `>=58.0.0` (선택) | Android 탭 아이콘에 Material Symbols(`md`)를 쓸 때만 |
 
-### Android 폴더블 설정
-
-폴더블 기기를 접고 펼 때 Android가 Activity를 다시 만들지 않도록 패키지의 config plugin을 등록하고 네이티브 프로젝트를 다시 생성합니다(`npx expo prebuild`). 플러그인은 MainActivity의 `configChanges`에 `screenSize`·`smallestScreenSize`·`screenLayout` 등을 더하고 `launchMode`를 `singleTask`로 설정합니다.
-
-```json
-{
-  "expo": {
-    "plugins": ["@0610studio/zs-ui"]
-  }
-}
-```
+zs-ui는 Expo Modules 네이티브 코드를 포함하므로 Expo Go가 아니라 [개발 빌드](https://docs.expo.dev/develop/development-builds/introduction/)로 실행합니다. 설치 뒤 `npx expo prebuild`(또는 `npx expo run:ios`·`npx expo run:android`)로 네이티브 프로젝트를 다시 만듭니다.
 
 ## 2. Provider 설정
 
-앱 최상위에 `ThemeProvider`와 `OverlayProvider`를 추가합니다. `ThemeProvider`가 바깥쪽이어야 합니다.
+expo-router 루트 레이아웃(`app/_layout.tsx`)에 Provider를 아래 순서로 둡니다.
+
+| Provider | 맡는 것 |
+|----------|--------|
+| `SafeAreaProvider` | safe area inset (react-native-safe-area-context) |
+| [`LayoutProvider`](../Layout/LayoutProvider) | 창 크기·크기 클래스·가독 폭·접힘선·자세 |
+| [`ThemeProvider`](./ThemeProvider) | 색 역할·글꼴·다크 모드·대비 |
+| [`OverlayProvider`](../OverlayComponent/start#overlayprovider) | Alert·시트·스낵바·진행 표시·포털 호스트. 테마 색을 읽으므로 `ThemeProvider` 안쪽에 둡니다 |
 
 ```tsx
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ThemeProvider, OverlayProvider } from '@0610studio/zs-ui';
+import { Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { LayoutProvider, ThemeProvider, OverlayProvider, useNavigationTheme, useStackTheme } from '@0610studio/zs-ui';
 
-export default function App() {
+export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <OverlayProvider>
-          {/* 앱 내용 */}
-        </OverlayProvider>
-      </ThemeProvider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <LayoutProvider>
+        <ThemeProvider colors={{ primary: '#ffa20d' }}>
+          <OverlayProvider>
+            <ThemedStack />
+          </OverlayProvider>
+        </ThemeProvider>
+      </LayoutProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function ThemedStack() {
+  const navigationTheme = useNavigationTheme();
+  const stackTheme = useStackTheme();
+  return (
+    <NavigationThemeProvider value={navigationTheme}>
+      <Stack screenOptions={{ ...stackTheme, animation: 'slide_from_right' }} />
+    </NavigationThemeProvider>
   );
 }
 ```
 
-## 3. 커스텀 테마 적용 (선택)
+- `colors.primary` 하나로 라이트·다크·고대비 색 역할을 만듭니다 — [색 역할](../Theme/colors).
+- `useNavigationTheme()`·`useStackTheme()`은 네이티브 헤더·화면 배경을 테마에 맞춥니다 — [Stack 테마 · 헤더](../Navigation/Stack). 탭은 [ZSTabNavigator](../Navigation/ZSTabNavigator)를 씁니다.
+- 브랜드 글꼴은 `ThemeProvider`의 [`fonts`·`fontAssets`](./ThemeProvider#글꼴--fonts--fontassets)로 넘깁니다.
+- `ZSCalendar`를 쓰면 `GestureHandlerRootView`가 필요합니다 — [ZSCalendar](../UiComponent/ZSCalendar).
+- 스크린 리더 기본 문구는 영어입니다. 앱 언어가 다르면 [`accessibilityLabels`](./ThemeProvider#스크린-리더-문구--accessibilitylabels)를 넘깁니다.
 
-브랜드 색상과 폰트를 지정하려면 `themeFactory`와 `themeFonts`를 전달합니다.
-
-```tsx
-import { ThemeProvider, OverlayProvider, themeFactory } from '@0610studio/zs-ui';
-
-const themeFonts = {
-  400: 'Pretendard-Regular',
-  700: 'Pretendard-Bold',
-};
-
-const customPalette = themeFactory({
-  light: { primary: { main: '#007AFF' } },
-});
-
-export default function App() {
-  return (
-    <ThemeProvider themeFonts={themeFonts} customPalette={customPalette}>
-      <OverlayProvider>
-        {/* 앱 내용 */}
-      </OverlayProvider>
-    </ThemeProvider>
-  );
-}
-```
-
-## 4. 컴포넌트 사용
-
-`useOverlay`로 오버레이를 제어하고, `ZSContainer`로 스크린을 구성합니다.
+## 3. 첫 화면
 
 ```tsx
-import { ZSContainer, ZSText, ZSBlockButton, useOverlay } from '@0610studio/zs-ui';
+import { ZSButton, ZSScreen, ZSText, useOverlay } from '@0610studio/zs-ui';
 
 export default function HomeScreen() {
   const { showAlert } = useOverlay();
 
   return (
-    <ZSContainer edges={['bottom']}>
-      <ZSText typo="heading.2" color="base">
-        ZS-ui
-      </ZSText>
-      <ZSBlockButton
-        title="저장"
-        typo="body.2"
-        intent="primary"
-        variant="solid"
-        onPress={() =>
-          showAlert({
-            title: '확인',
-            informative: '저장되었습니다.',
-          })
-        }
-      />
-    </ZSContainer>
+    <ZSScreen
+      style={{ gap: 12, padding: 20 }}
+      bottomComponent={
+        <ZSButton
+          title="알림 보기"
+          fullWidth
+          onPress={() =>
+            showAlert({
+              title: 'zs-ui',
+              message: '테마가 적용된 대화상자입니다.',
+              confirm: { label: '확인' },
+            })
+          }
+        />
+      }
+    >
+      <ZSText variant="h1" emphasized>zs-ui</ZSText>
+      <ZSText color="textSecondary">Expo용 iOS·Android UI 라이브러리</ZSText>
+    </ZSScreen>
   );
 }
 ```
 
+iOS·Android 모두 zs-ui 대화상자가 앱 테마 색으로 뜹니다 — [Alert](../OverlayComponent/Alert).
+
 ## 다음 단계
 
-- **[테마 개요](/docs/Theme/start)**: 다크 모드, 색상 팔레트, `useStyleSheetCreate`
-- **[Overlay 컴포넌트](/docs/OverlayComponent/start)**: Alert, BottomSheet, Snackbar 상세 옵션
-- **[UI 컴포넌트](/docs/UiComponent/ZSText)**: ZSText, ZSView, ZSContainer, ZSTextField 등
-- **[ThemeProvider](/docs/Provider/ThemeProvider)**: `themeFactory`와 `customPalette` 상세 설정
-- **[OverlayProvider](/docs/Provider/OverlayProvider)**: Snackbar 최대 개수, 커스텀 Loader 등
-
-> **참고**: `useAlert`, `useSnackbar` 같은 개별 context hook은 내부 구현용입니다. 오버레이 제어는 `useOverlay` 하나만 사용하세요.
+- [ThemeProvider](./ThemeProvider) — 시드 색, 다크 모드·대비, Android dynamic color
+- [오버레이 개요](../OverlayComponent/start) — Alert, BottomSheet, Snackbar, 진행 표시
+- [UI 컴포넌트](../UiComponent/ZSText) — 텍스트, 버튼, 입력, 선택, 화면 컨테이너
+- [레이아웃](../Layout/LayoutProvider) — 창 크기 클래스·접힘선·2-pane

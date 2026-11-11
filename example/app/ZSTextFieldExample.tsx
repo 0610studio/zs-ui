@@ -1,141 +1,89 @@
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
-import { ErrorComponent, ZSContainer, ZSTextField, useTheme } from '@0610studio/zs-ui';
-import type { BoxStyle } from '@0610studio/zs-ui';
+import { Platform, Pressable, StyleSheet } from 'react-native';
+import { SymbolView } from 'expo-symbols';
+import Svg, { Path } from 'react-native-svg';
+import { ZSScreen, ZSText, ZSTextField, useTheme, type ZSTextFieldVariant } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
-import CodeBlock from '../src/ui/kit/CodeBlock';
+import { PAGE_CONTENT } from '../src/ui/kit/layout';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
-/** boxStyle 하나당 기본·값·error·disabled 를 나열한다 */
-function StateSection({ boxStyle }: { boxStyle: BoxStyle }) {
-  const [value, setValue] = useState<string>('');
+const VARIANTS: ZSTextFieldVariant[] = ['outlined', 'inbox', 'underline'];
+const SEARCH_ICON_SIZE = 20;
+const SEARCH_PATH =
+  'M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z';
 
-  return (
-    <Section label={`boxStyle · ${boxStyle}`} gap={22}>
-      <ZSTextField
-        boxStyle={boxStyle}
-        label="기본 (직접 입력)"
-        value={value}
-        onChangeText={setValue}
-      />
-      <ZSTextField
-        boxStyle={boxStyle}
-        label="값 입력됨"
-        value="입력된 값"
-      />
-      <ZSTextField
-        boxStyle={boxStyle}
-        label="에러 (status=error)"
-        value=""
-        status="error"
-        errorMessage="필수 입력 항목입니다"
-      />
-      <ZSTextField
-        boxStyle={boxStyle}
-        label="비활성화 (disabled)"
-        value=""
-        disabled
-      />
-      <ZSTextField
-        boxStyle={boxStyle}
-        label="비활성화 + 값"
-        value="수정 불가 값"
-        disabled
-      />
-    </Section>
-  );
+function SearchIcon({ color }: { color: string }) {
+  if (Platform.OS === 'android') {
+    return (
+      <Svg width={SEARCH_ICON_SIZE} height={SEARCH_ICON_SIZE} viewBox="0 0 24 24">
+        <Path d={SEARCH_PATH} fill={color} />
+      </Svg>
+    );
+  }
+  return <SymbolView name={{ ios: 'magnifyingglass', android: 'search' }} tintColor={color} size={SEARCH_ICON_SIZE} />;
 }
 
-/** isTextArea 는 multiline 스타일이 필요해 별도 섹션으로 뺐다 */
-function TextAreaSection() {
-  const [memo, setMemo] = useState<string>('');
-  const textAreaInputProps = {
-    multiline: true,
-    style: { minHeight: 120, textAlignVertical: 'top' as const },
-  };
-
+function VariantSection({ variant }: { variant: ZSTextFieldVariant }) {
+  const [value, setValue] = useState('');
+  const [email, setEmail] = useState('wrong@');
   return (
-    <Section label="isTextArea" gap={22}>
+    <Section label={variant} surface="plain" gap={16}>
+      <ZSTextField variant={variant} label="이름" value={value} onChangeText={setValue} helperText="실명으로 입력하세요" required testID={`field-${variant}-name`} />
       <ZSTextField
-        label="기본 (직접 입력)"
-        value={memo}
-        onChangeText={setMemo}
-        textInputProps={textAreaInputProps}
-        isTextArea
+        variant={variant}
+        label="이메일"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        errorText={email.includes('@') && email.split('@')[1] ? undefined : '이메일 형식이 아닙니다'}
+        testID={`field-${variant}-email`}
       />
-      <ZSTextField
-        label="에러 (status=error)"
-        value=""
-        status="error"
-        errorMessage="내용을 입력해주세요"
-        textInputProps={textAreaInputProps}
-        isTextArea
-      />
-      <ZSTextField
-        label="비활성화 + 값"
-        value="수정할 수 없는 메모입니다"
-        disabled
-        textInputProps={textAreaInputProps}
-        isTextArea
-      />
+      <ZSTextField variant={variant} label="비활성" value="수정할 수 없는 값" disabled />
     </Section>
   );
 }
 
 export default function ZSTextFieldExample() {
-  const [email, setEmail] = useState<string>('');
-  const { palette } = useTheme();
+  const { colors } = useTheme();
+  const [memo, setMemo] = useState('');
+  const [secure, setSecure] = useState(true);
 
   return (
     <>
-      <Stack.Screen options={{ title: 'ZSTextField' }} />
-      <ZSContainer keyboardScrollExtraOffset={130} style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <StateSection boxStyle="outline" />
-        <StateSection boxStyle="underline" />
-        <StateSection boxStyle="inbox" />
-        <TextAreaSection />
-
-        <Section label="기타 옵션" gap={22}>
+      <ScreenHeader title="ZSTextField" />
+      <ZSScreen backgroundColor="background" keyboardScrollExtraOffset={130} style={styles.container}>
+        {VARIANTS.map((variant) => (
+          <VariantSection key={variant} variant={variant} />
+        ))}
+        <Section label="앞·뒤 요소" surface="plain" gap={16}>
           <ZSTextField
-            boxStyle="outline"
-            label="maxLength 5"
-            value={email}
-            onChangeText={setEmail}
-            textInputProps={{ maxLength: 5 }}
+            label="검색"
+            placeholder="이름·태그"
+            startAdornment={<SearchIcon color={colors.textSecondary} />}
+            testID="field-search"
           />
+          <ZSTextField variant="inbox" label="몸무게" keyboardType="decimal-pad" endAdornment={<ZSText color="textSecondary">kg</ZSText>} />
           <ZSTextField
-            boxStyle="outline"
-            label="focusColor 커스텀"
-            value=""
-            focusColor={palette.primary.darker}
+            label="비밀번호"
+            secureTextEntry={secure}
+            clearable={false}
+            endAdornment={
+              <Pressable accessibilityRole="button" accessibilityLabel={secure ? '비밀번호 보기' : '비밀번호 숨기기'} hitSlop={12} onPress={() => setSecure((on) => !on)}>
+                <ZSText variant="label" emphasized>{secure ? '보기' : '숨기기'}</ZSText>
+              </Pressable>
+            }
           />
         </Section>
-
-        <Section label="ErrorComponent" gap={10}>
-          <ErrorComponent errorMessage="에러메시지" errorColor={palette.danger.main} />
+        <Section label="여러 줄 · 글자 수" surface="plain" gap={16}>
+          <ZSTextField label="메모" value={memo} onChangeText={setMemo} multiline minRows={2} maxRows={5} maxLength={200} showCount testID="field-memo" />
+          <ZSTextField variant="underline" label="인증번호" defaultValue="" keyboardType="number-pad" maxLength={6} showCount testID="field-code" />
         </Section>
-
-        <CodeBlock
-          code={`<ZSTextField
-  boxStyle="outline"   // 'outline' | 'underline' | 'inbox'
-  label="아이디"
-  value={userId}
-  onChangeText={setUserId}
-  status="error"       // 'default' | 'error'
-  errorMessage="..."
-  disabled             // 반투명 처리 + 입력 차단
-/>`}
-        />
-      </ZSContainer>
+      </ZSScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingTop: 24,
-    paddingBottom: 90,
-    paddingHorizontal: 20,
-  },
+  container: PAGE_CONTENT,
 });

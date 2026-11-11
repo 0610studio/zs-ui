@@ -1,19 +1,18 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { DateString, EventIndex, GridLayoutMetrics } from '../core';
+import type { CalendarLocaleStrings, DateString, EventIndex, GridLayoutMetrics } from '../core';
 import { countEventsOn } from '../core';
 import CellTouchTarget from './CellTouchTarget';
 
 export interface A11yOverlayProps {
-  matrix: ReadonlyArray<ReadonlyArray<DateString>>;
+  matrix: readonly (readonly DateString[])[];
   metrics: GridLayoutMetrics;
   selectedDate: DateString | null;
   index: EventIndex;
   onSelect: (date: DateString) => void;
-  formatLabel?: (date: DateString, eventCount: number, selected: boolean) => string;
+  formatLabel: CalendarLocaleStrings['cellLabel'];
 }
 
-/** 한 pane 분량의 접근성·터치 레이어 */
 function A11yOverlay({ matrix, metrics, selectedDate, index, onSelect, formatLabel }: A11yOverlayProps) {
   return (
     <View style={StyleSheet.absoluteFill}>

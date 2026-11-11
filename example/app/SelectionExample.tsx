@@ -1,99 +1,41 @@
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
-import { ZSCheckBox, ZSContainer, ZSRadioGroup, ZSText, useTheme } from '@0610studio/zs-ui';
-import type { RadioOption } from '@0610studio/zs-ui';
+import { ZSCheckbox, ZSScreen, ZSRadioGroup, ZSText, type ZSRadioOption } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
-import CodeBlock from '../src/ui/kit/CodeBlock';
+import { PAGE_CONTENT } from '../src/ui/kit/layout';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
-const OPTIONS: RadioOption[] = [
-  { value: '답변이 필요없어요.', index: 'none' },
-  { value: '앱 알림으로 받고싶어요.', index: 'app' },
-  { value: '이메일로 받고싶어요.', index: 'email' },
+const OPTIONS: ZSRadioOption[] = [
+  { value: 'none', label: '답변이 필요없어요' },
+  { value: 'app', label: '앱 알림으로 받을게요' },
+  { value: 'email', label: '이메일로 받을게요' },
 ];
 
 export default function SelectionExample() {
-  const [responseType, setResponseType] = useState<RadioOption>();
+  const [responseType, setResponseType] = useState('app');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreeMarketing, setAgreeMarketing] = useState(true);
-  const { palette } = useTheme();
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Selection' }} />
-      <ZSContainer style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <Section label="ZSRadioGroup · 단일 선택" gap={10}>
-          <ZSRadioGroup
-            options={OPTIONS}
-            value={responseType}
-            onSelect={setResponseType}
-          />
+      <ScreenHeader title="Selection" />
+      <ZSScreen backgroundColor="background" style={styles.container}>
+        <Section label="ZSRadioGroup · 하나 고르기" surface="list">
+          <ZSRadioGroup options={OPTIONS} value={responseType} onValueChange={setResponseType} testID="radio" />
         </Section>
+        <ZSText variant="caption" color="textSecondary" testID="radio-value">{`답변: ${responseType}`}</ZSText>
 
-        <Section label="ZSRadioGroup · Grid rowCount 2" gap={10}>
-          <ZSRadioGroup
-            options={OPTIONS}
-            value={responseType}
-            onSelect={setResponseType}
-            rowCount={2}
-          />
+        <Section label="ZSCheckbox · 여러 개 고르기" surface="list">
+          <ZSCheckbox value={agreeTerms} onValueChange={setAgreeTerms} label="이용약관 동의 (필수)" testID="check-terms" />
+          <ZSCheckbox value={agreeMarketing} onValueChange={setAgreeMarketing} label="마케팅 수신 동의 (선택)" testID="check-marketing" />
+          <ZSCheckbox value onValueChange={() => undefined} label="비활성" disabled />
         </Section>
-
-        <CodeBlock
-          code={`<ZSRadioGroup
-  options={[{ value: '...', index: 'none' }]}
-  value={responseType}
-  onSelect={setResponseType}
-  rowCount={2}
-/>`}
-        />
-
-        <Section label="ZSCheckBox" gap={10}>
-          <ZSCheckBox
-            value={agreeTerms}
-            onChange={setAgreeTerms}
-            label="이용약관에 동의합니다. (필수)"
-            labelStyle={{ typo: 'body.4' }}
-            moreComponent={
-              <ZSText typo="caption.1" color="information">
-                보기
-              </ZSText>
-            }
-          />
-          <ZSCheckBox
-            value={agreeMarketing}
-            onChange={setAgreeMarketing}
-            label="마케팅 정보 수신에 동의합니다. (선택)"
-            labelStyle={{ typo: 'body.4' }}
-            activeColor={palette.secondary.main}
-          />
-          <ZSCheckBox
-            value={true}
-            onChange={() => {}}
-            label="비활성화 상태"
-            labelStyle={{ typo: 'body.4' }}
-            disabled
-          />
-        </Section>
-
-        <CodeBlock
-          code={`<ZSCheckBox
-  value={agreeTerms}
-  onChange={setAgreeTerms}
-  label="이용약관에 동의합니다. (필수)"
-  moreComponent={<ZSText>보기</ZSText>}
-/>`}
-        />
-      </ZSContainer>
+        <ZSText variant="caption" color="textSecondary" testID="check-state">{`약관 ${agreeTerms ? '동의' : '미동의'} · 마케팅 ${agreeMarketing ? '동의' : '미동의'}`}</ZSText>
+      </ZSScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingTop: 24,
-    paddingBottom: 48,
-    paddingHorizontal: 20,
-  },
+  container: PAGE_CONTENT,
 });

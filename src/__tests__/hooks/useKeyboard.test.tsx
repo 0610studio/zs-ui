@@ -20,49 +20,49 @@ describe("useKeyboard", () => {
     Object.keys(listeners).forEach(key => delete listeners[key]);
   });
 
-  it("키보드 show/hide 이벤트에 반응한다", () => {
-    const { result, unmount } = renderHook(() => useKeyboard());
+  it("키보드 show/hide 이벤트에 반응한다", async () => {
+    const { result, unmount } = await renderHook(() => useKeyboard());
 
-    act(() => {
+    await act(() => {
       listeners["keyboardWillShow"]?.({ endCoordinates: { height: 250 } });
     });
     expect(result.current.isKeyboardVisible).toBe(true);
     expect(result.current.keyboardHeight).toBe(250);
 
-    act(() => {
+    await act(() => {
       listeners["keyboardWillHide"]?.();
     });
     expect(result.current.isKeyboardVisible).toBe(false);
     expect(result.current.keyboardHeight).toBe(0);
 
-    unmount();
+    await unmount();
   });
 
-  it("handleKeyboardShow 콜백을 호출한다", () => {
+  it("handleKeyboardShow 콜백을 호출한다", async () => {
     const mockHandleKeyboardShow = jest.fn();
-    const { unmount } = renderHook(() => useKeyboard({
+    const { unmount } = await renderHook(() => useKeyboard({
       handleKeyboardShow: mockHandleKeyboardShow,
     }));
 
-    act(() => {
+    await act(() => {
       listeners["keyboardWillShow"]?.({ endCoordinates: { height: 250 } });
     });
     expect(mockHandleKeyboardShow).toHaveBeenCalledWith({ endCoordinates: { height: 250 } });
 
-    unmount();
+    await unmount();
   });
 
-  it("handleKeyboardHide 콜백을 호출한다", () => {
+  it("handleKeyboardHide 콜백을 호출한다", async () => {
     const mockHandleKeyboardHide = jest.fn();
-    const { unmount } = renderHook(() => useKeyboard({
+    const { unmount } = await renderHook(() => useKeyboard({
       handleKeyboardHide: mockHandleKeyboardHide,
     }));
 
-    act(() => {
+    await act(() => {
       listeners["keyboardWillHide"]?.();
     });
     expect(mockHandleKeyboardHide).toHaveBeenCalled();
 
-    unmount();
+    await unmount();
   });
 });

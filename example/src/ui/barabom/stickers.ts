@@ -1,7 +1,6 @@
 import type { ImageSourcePropType } from 'react-native';
 import type { StickerCode } from '../../../mock-api/db';
 
-/** 바라봄 앱 스티커 중 데모 카테고리에 쓰이는 것만 옮겨 왔다 */
 const STICKERS: Record<StickerCode, ImageSourcePropType> = {
   walk: require('../../../assets/barabom/stickers/stk_walk.png'),
   fod: require('../../../assets/barabom/stickers/stk_fod.png'),

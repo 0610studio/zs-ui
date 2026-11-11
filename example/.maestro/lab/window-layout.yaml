@@ -1,0 +1,61 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-environment-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-environment-card'
+      - tapOn:
+          id: 'lab-environment-panel-window'
+      - assertVisible:
+          id: 'lab-window-layout-measured'
+          text: 'true'
+- assertVisible:
+    id: 'lab-window-layout-orientation'
+    text: 'portrait'
+- assertVisible:
+    id: 'lab-window-layout-os'
+    text: ${maestro.platform}
+- assertVisible:
+    id: 'lab-window-layout-width-class'
+    text: ${WIDTH_CLASS_PORTRAIT}
+- takeScreenshot: w01-portrait
+
+- setOrientation: LANDSCAPE_LEFT
+- waitForAnimationToEnd
+- scrollUntilVisible:
+    element:
+      id: lab-window-layout-orientation
+    direction: DOWN
+- extendedWaitUntil:
+    visible:
+      id: 'lab-window-layout-orientation'
+      text: 'landscape'
+    timeout: 5000
+- scrollUntilVisible:
+    element:
+      id: lab-window-layout-width-class
+    direction: UP
+- assertVisible:
+    id: 'lab-window-layout-width-class'
+    text: ${WIDTH_CLASS_LANDSCAPE}
+- waitForAnimationToEnd
+- takeScreenshot: w02-landscape
+
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible:
+      id: 'lab-window-layout-orientation'
+      text: 'portrait'
+    timeout: 5000

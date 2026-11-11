@@ -26,13 +26,7 @@ const makeAnim = () => {
 
   return animation;
 };
-// 렌더 간 안정된 참조를 반환한다 — effect deps 재실행 방지
-const useSharedValue = (v) => React.useRef({
-  value: v,
-  modify(modifier) {
-    if (modifier) this.value = modifier(this.value);
-  },
-}).current;
+const useSharedValue = (v) => React.useRef({ value: v }).current;
 const useAnimatedStyle = (fn) => fn() || {};
 const useAnimatedProps = (fn) => fn() || {};
 const Easing = {
@@ -43,7 +37,6 @@ const Easing = {
   in: (fn) => fn,
 };
 const useDerivedValue = (fn) => ({ value: fn() });
-// 완료 콜백은 duration 이후 비동기로 호출한다 (fake timer 로 제어)
 const withTiming = (v, cfg, callback) => {
   if (typeof callback === 'function') {
     setTimeout(() => callback(true), (cfg && cfg.duration) || 0);
@@ -57,8 +50,6 @@ const withSpring = (v, cfg, callback) => {
   return v;
 };
 const runOnJS = (fn) => fn;
-// 실제로는 UI 스레드가 매 프레임 샘플링한다. effect 안의 shared value 변경도 잡히도록
-// 렌더 직후와 마이크로태스크에서 두 번 확인한다.
 const useAnimatedReaction = (prepare, react) => {
   const previous = React.useRef(null);
   React.useEffect(() => {

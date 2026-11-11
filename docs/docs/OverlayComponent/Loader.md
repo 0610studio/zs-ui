@@ -1,77 +1,61 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
-
 # Loader
 
-진행 중인 프로세스를 사용자에게 시각적으로 표시하여, 작업이 완료될 때까지 사용자의 행동을 제어할 수 있는 로딩 컴포넌트입니다.
+저장·결제처럼 끝날 때까지 다른 조작을 막아야 하는 작업 동안 화면 전체를 덮는 진행 표시를 띄웁니다.
 
-:::note 실제 앱 추가 검증
-웹에서 표시·숨김과 상호작용 차단을 확인할 수 있습니다. Android 하드웨어 뒤로가기를 소비하면서 Loader를 유지하는 동작은 실제 Android 앱에서 확인하세요.
+| 플랫폼 | 구현 |
+|--------|------|
+| iOS | 시스템 activity indicator(large, `textSecondary`)를 88 정사각 흐림 막 상자(모서리 16)에 |
+| Android | Material 3 Expressive `ContainedLoadingIndicator`(Compose) — 표시 `textSecondary`, 상자 `surface4` |
+
+두 플랫폼 모두 뒤를 [흐림 막](./start#흐림-막) scrim(라이트 `backdrop` 32%·다크 52% + 흐림)으로 덮고 짧게 페이드합니다. Android는 `Modal` 창이라 흐리지 않고 짙은 막(48%·다크 60%)을 깝니다.
+
+:::tip 먼저 버튼 안 진행 표시를 고려하세요
+HIG는 진행 상태를 그 동작을 시작한 컨트롤 가까이 보여 주라고 하고, M3는 오래 걸리는 작업에서 사용자가 화면을 떠날 수 있게 하라고 합니다. 버튼 하나의 작업이면 [`ZSButton loading`](../UiComponent/ZSButton)을, 콘텐츠를 불러오는 중이면 [`ZSSkeleton`](../UiComponent/ZSSkeleton)을 먼저 쓰세요.
 :::
-
-<LocalPlayground example="Loader" height={760} />
 
 ## 기본 사용법
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+import { ZSButton, useOverlay } from '@0610studio/zs-ui';
 
-function MyComponent() {
-  const { showLoader, hideOverlay } = useOverlay();
+function PayButton() {
+  const { showLoader, hideLoader } = useOverlay();
 
-  const handleShowLoader = () => {
-    showLoader();
-    
-    // 예시: 3초 후에 로더 숨기기
-    setTimeout(() => {
-      hideOverlay('loader');
-    }, 3000);
+  const pay = async () => {
+    showLoader({ accessibilityLabel: '결제하는 중' });
+    try {
+      await requestPayment();
+    } finally {
+      hideLoader();
+    }
   };
 
-  return <Button title="Loader 표시" onPress={handleShowLoader} />;
+  return <ZSButton title="결제" fullWidth preventDoublePress onPress={pay} />;
 }
 ```
 
-## API 참조
+`showLoader(props?)`는 진행 표시를 띄우고, 이미 떠 있으면 문구만 바꿉니다. `hideLoader()`로 닫습니다.
 
-### `showLoader` 함수
+## Props — `ShowLoaderProps`
 
-`showLoader` 함수는 Loader를 표시하는 데 사용됩니다. 이 함수는 인수를 받지 않으며, 호출 시 로더가 화면에 표시됩니다.
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `accessibilityLabel` | `string` | `accessibilityLabels.loading`(`'Loading'`) | 스크린 리더가 읽는 문구. 앱 전체 기본값은 [ThemeProvider `accessibilityLabels`](../Provider/ThemeProvider#스크린-리더-문구--accessibilitylabels)로 바꿉니다 |
 
-```typescript
-showLoader(): void
-```
+`ShowLoaderProps` 타입을 내보냅니다.
 
-### `hideOverlay` 함수
+## 동작
 
-`hideOverlay` 함수는 특정 유형의 오버레이를 숨기는 데 사용됩니다. Loader를 숨기기 위해서는 `'loader'`를 인수로 전달합니다.
+- 앱 창 맨 위(iOS는 react-native-screens `FullWindowOverlay`, Android는 `Modal` 창)에 그려, 열린 [BottomSheet](./BottomSheet)·formSheet 라우트까지 막습니다.
+- 떠 있는 동안 아래 화면·시트는 터치를 받지 않고, Android 뒤로가기는 소비만 합니다(닫히지 않습니다).
+- 포털·키보드 위 UI보다 위에 그립니다.
 
-```typescript
-hideOverlay(option?: HideOption): void
-```
+## 접근성
 
-`HideOption` 타입:
-- `'loader'` – Loader를 숨깁니다
-- `'all'` – 모든 오버레이를 숨깁니다 (인자를 생략할 때의 기본값)
+진행 표시는 `progressbar` 역할의 모달 요소입니다(`accessibilityViewIsModal`, `busy` 상태). 스크린 리더 포커스가 진행 표시로 옮겨지고 `accessibilityLabel`을 읽습니다.
 
-## 특징
+## 관련 문서
 
-- **전체 화면 오버레이**: 화면 전체를 덮어 다른 상호작용을 차단합니다
-- **커스터마이징 가능**: `OverlayProvider`의 `loaderComponent`로 가운데 인디케이터를 바꿀 수 있습니다
-- **간단한 API**: `showLoader()`와 `hideOverlay('loader')`로 쉽게 제어 가능
-
-## 예제
-
-비동기 작업과 함께 사용하는 기본 패턴입니다.
-
-```tsx
-const { showLoader, hideOverlay } = useOverlay();
-
-const handleAsyncOperation = async () => {
-  showLoader();
-  try {
-    await performLongOperation();
-  } finally {
-    hideOverlay('loader');
-  }
-};
-```
+- [ZSButton](../UiComponent/ZSButton) — `loading`
+- [ZSSkeleton](../UiComponent/ZSSkeleton)
+- [GlobalOverlay](./start#globaloverlay)

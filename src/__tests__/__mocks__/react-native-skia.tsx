@@ -1,4 +1,3 @@
-import React from 'react';
 import { View } from 'react-native';
 
 const stub = (name: string) =>
@@ -21,7 +20,6 @@ export const Circle = stub('circle');
 export const Path = stub('path');
 export const Text = stub('text');
 
-/** 몇 번 그렸는지 테스트에서 확인하는 용도 */
 export const drawCalls: string[] = [];
 
 const makePaint = () => ({
@@ -38,8 +36,31 @@ export const BlurStyle = { Normal: 0, Solid: 1, Outer: 2, Inner: 3 };
 
 const makePath = () => ({ addRect: () => undefined });
 
+export const paragraphStyles: Record<string, any>[] = [];
+const makeParagraphBuilder = (style: Record<string, any> = {}) => {
+  let text = '';
+  const builder = {
+    addText: (value: string) => {
+      text += value;
+      return builder;
+    },
+    pushStyle: () => builder,
+    pop: () => builder,
+    build: () => {
+      paragraphStyles.push(style);
+      return {
+        layout: () => undefined,
+        getHeight: () => (style.textStyle?.fontSize ?? 14) * 1.2,
+        paint: () => drawCalls.push(`paragraph:${text}`),
+      };
+    },
+  };
+  return builder;
+};
+
 export const Skia = {
   Paint: makePaint,
+  ParagraphBuilder: { Make: makeParagraphBuilder },
   Path: { Make: makePath },
   Color: (value: string) => value,
   XYWHRect: (x: number, y: number, width: number, height: number) => ({ x, y, width, height }),

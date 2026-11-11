@@ -10,14 +10,13 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.author         = package['author']
   s.homepage       = package['homepage']
-  s.platforms      = { :ios => '16.4', :tvos => '16.4' }
-  s.swift_version  = '5.4'
-  s.source         = { git: 'https://github.com/0610studio' }
+  s.platforms      = { :ios => '16.4' }
+  s.swift_version  = '6.0'
+  s.source         = { git: 'https://github.com/0610studio/zs-ui.git', tag: s.version.to_s }
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
 
-  # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'SWIFT_COMPILATION_MODE' => 'wholemodule'

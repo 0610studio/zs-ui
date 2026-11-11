@@ -1,0 +1,20 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- openLink: zs-ui-example://ZSCalendarAdvancedExample?date=${DATE}
+- tapOn:
+    text: '열기'
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: 'diary-calendar-grid'
+    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      id: 'diary-count'
+    timeout: 8000

@@ -1,0 +1,109 @@
+appId: kr.co.studio0610.zsui.example
+---
+- evalScript: |
+    ${
+      const pad = (n) => (n < 10 ? '0' : '') + n;
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      output.fifth = now.getFullYear() + '-' + pad(month) + '-05';
+      output.todayTitle = month + '월 ' + now.getDate() + '일 \\(.\\) · 기록 \\d+건';
+      output.fifthTitle = month + '월 5일 \\(.\\) · 기록 \\d+건';
+      output.statsTitle = now.getFullYear() + '년 ' + month + '월 기록';
+    }
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- scrollUntilVisible:
+    element:
+      id: 'calendar-foldable-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'calendar-foldable-card'
+      - extendedWaitUntil:
+          visible:
+            id: 'cf-diary-title-${PLACEMENT}'
+            text: '${output.todayTitle}'
+          timeout: 15000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          id: 'zs-tab-navigator-${MODE}'
+- waitForAnimationToEnd
+- takeScreenshot: cf01-today-${LABEL}
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'calendar-cell-${output.fifth}'
+      - assertVisible:
+          id: 'cf-diary-title-${PLACEMENT}'
+          text: '${output.fifthTitle}'
+- waitForAnimationToEnd
+- takeScreenshot: cf02-fifth-${LABEL}
+
+- runFlow:
+    file: common/tap-tab.yaml
+    env:
+      TAB: '통계'
+- extendedWaitUntil:
+    visible:
+      id: 'cf-stats-title'
+      text: '${output.statsTitle}'
+    timeout: 10000
+- assertVisible:
+    id: 'cf-stats-total'
+    text: '총 [1-9]\d*건 · 기록한 날 [1-9]\d*일'
+- waitForAnimationToEnd
+- takeScreenshot: cf03-stats-${LABEL}
+
+- runFlow:
+    file: common/tap-tab.yaml
+    env:
+      TAB: '설정'
+- extendedWaitUntil:
+    visible:
+      id: 'cf-window-class'
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: cf04-settings-${LABEL}
+
+- runFlow:
+    file: common/tap-tab.yaml
+    env:
+      TAB: '달력'
+- extendedWaitUntil:
+    visible:
+      id: 'cf-diary-title-${PLACEMENT}'
+      text: '${output.fifthTitle}'
+    timeout: 10000
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'calendar-header-title'
+      - assertVisible:
+          id: 'date-picker-sheet'
+- waitForAnimationToEnd
+- takeScreenshot: cf05-picker-${LABEL}
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'date-picker-confirm'
+      - assertNotVisible:
+          id: 'date-picker-sheet'
+- assertVisible:
+    id: 'cf-diary-title-${PLACEMENT}'
+    text: '${output.fifthTitle}'
+- waitForAnimationToEnd
+- takeScreenshot: cf06-back-${LABEL}

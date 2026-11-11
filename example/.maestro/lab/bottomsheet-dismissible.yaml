@@ -1,0 +1,76 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- scrollUntilVisible:
+    element: 'Overlay:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'Overlay:.*'
+      - assertVisible:
+          id: 'overlay-sheet-fit'
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-fit'
+      - extendedWaitUntil:
+          visible: '헤더 컴포넌트1'
+          timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: d01-default-open
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          point: 50%, 12%
+      - extendedWaitUntil:
+          notVisible: '헤더 컴포넌트1'
+          timeout: 5000
+
+- scrollUntilVisible:
+    element:
+      id: 'overlay-sheet-locked'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-locked'
+      - extendedWaitUntil:
+          visible: 'dismissible false 시트'
+          timeout: 10000
+- waitForAnimationToEnd
+- tapOn:
+    point: 50%, 12%
+- waitForAnimationToEnd
+- assertVisible: 'dismissible false 시트'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
+      - waitForAnimationToEnd
+      - assertVisible: 'dismissible false 시트'
+- takeScreenshot: d02-not-dismissed
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-close'
+      - extendedWaitUntil:
+          visible: 'onClose 발화'
+          timeout: 10000
+- assertNotVisible: 'dismissible false 시트'
+- takeScreenshot: d03-closed-onclose
+- tapOn: '확인'
+- extendedWaitUntil:
+    notVisible: 'onClose 발화'
+    timeout: 5000

@@ -1,0 +1,80 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- evalScript: |
+    ${(() => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, '0');
+      output.today = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+      output.thisMonth = d.getFullYear() + '년 ' + (d.getMonth() + 1) + '월';
+      const n = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      output.nextMonth = n.getFullYear() + '년 ' + (n.getMonth() + 1) + '월';
+    })()}
+- scrollUntilVisible:
+    element:
+      id: 'calendar-card'
+    direction: DOWN
+- tapOn:
+    id: 'calendar-card'
+- assertVisible:
+    id: 'diary-calendar-grid'
+- extendedWaitUntil:
+    visible: ${output.thisMonth}
+    timeout: 8000
+- waitForAnimationToEnd
+- takeScreenshot: g01-this-month
+
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: 'diary-calendar-grid'
+          direction: LEFT
+      - waitForAnimationToEnd
+      - assertVisible: ${output.nextMonth}
+- takeScreenshot: g02-next-month
+
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: 'diary-calendar-grid'
+          direction: RIGHT
+      - waitForAnimationToEnd
+      - assertVisible: ${output.thisMonth}
+
+- tapOn:
+    id: calendar-cell-${output.today}
+- waitForAnimationToEnd
+- takeScreenshot: g03-today-selected
+
+- assertVisible: '보기 month'
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: 'diary-calendar-grid'
+          direction: UP
+      - waitForAnimationToEnd
+      - assertVisible: '보기 week'
+- takeScreenshot: g04-week
+
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: calendar-cell-${output.today}
+          direction: DOWN
+          duration: 300
+      - waitForAnimationToEnd
+      - assertVisible: '보기 month'
+- takeScreenshot: g05-month-again

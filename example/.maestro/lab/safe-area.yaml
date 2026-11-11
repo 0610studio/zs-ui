@@ -1,0 +1,59 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- waitForAnimationToEnd
+- takeScreenshot: s01-home
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-safe-area-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-safe-area-card'
+      - assertVisible:
+          id: 'lab-safe-area-left'
+- assertVisible:
+    id: 'lab-safe-area-right'
+- assertVisible:
+    id: 'lab-safe-area-cta'
+- assertVisible:
+    id: 'lab-safe-area-insets'
+    text: 'container insets top 0 .*'
+- takeScreenshot: s02-portrait
+
+- setOrientation: LANDSCAPE_LEFT
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'lab-safe-area-left'
+- assertVisible:
+    id: 'lab-safe-area-insets'
+    text: 'container insets top 0 .*'
+- takeScreenshot: s03-landscape
+- repeat:
+    times: 2
+    commands:
+      - swipe:
+          start: 50%, 70%
+          end: 50%, 20%
+          duration: 500
+- retry:
+    maxRetries: 3
+    commands:
+      - swipe:
+          start: 50%, 70%
+          end: 50%, 20%
+          duration: 500
+      - waitForAnimationToEnd
+      - assertVisible: 'row 14'
+- takeScreenshot: s04-landscape-end
+
+- setOrientation: PORTRAIT
+- waitForAnimationToEnd

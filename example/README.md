@@ -1,59 +1,43 @@
-# ZS-UI Example
+# 예제 앱
 
-저장소 루트의 zs-ui를 pnpm 워크스페이스 링크(`workspace:*`)로 참조하는 Expo 예제 앱입니다. npm에 배포된 버전과 분리되어 있어 새 버전을 배포하기 전에 Android, iOS, 웹 동작을 확인할 수 있습니다. Metro가 루트 `src/`를 직접 번들하므로(`metro.config.js`) 소스 수정이 Fast Refresh로 바로 반영되고, 각 실행 명령은 시작 전에 워크스페이스 링크와 루트 타입 검사만 확인합니다(`scripts/sync-local-package.mjs`).
+zs-ui 2.0.0을 사용하는 Expo SDK 58 예제입니다. Metro가 저장소의 `src`를 직접 번들하므로 라이브러리 빌드 없이 수정 사항을 확인할 수 있습니다.
 
-이 저장소는 **pnpm만 사용합니다.** yarn이나 npm으로 설치하면 zs-ui가 링크가 아니라 복사본으로 들어와 react가 두 벌 로드되고 앱이 `Invalid hook call`로 죽습니다.
+## 실행
 
-아래 명령은 저장소 루트에서 `pnpm install`을 한 번 실행한 뒤 `example/` 디렉터리에서 실행합니다.
+Node.js 24, pnpm을 사용합니다. iOS는 Xcode, Android는 Android Studio와 SDK가 필요합니다. Expo Go 대신 개발 빌드로 실행합니다.
 
-## 네이티브에서 확인
-
-```bash
-pnpm run ios         # 시뮬레이터
-pnpm run ios:device  # 실기기
-pnpm run android
-```
-
-저장소 루트의 `pnpm start:ios`, `pnpm start:ios:device`, `pnpm start:android`는 설치와 실행을 한 번에 합니다.
-
-## 웹에서 확인
+저장소 루트에서 실행합니다.
 
 ```bash
-pnpm run web
+pnpm install
+pnpm start:ios
+pnpm start:ios:device
+pnpm start:android
 ```
 
-홈 화면의 `Web Example`에서 반응형 레이아웃, 테마 전환, 탭·세그먼트·칩·스위치·메시지·오버레이를 한 화면에서 확인합니다.
+앱 실행 전 `sync:local`이 워크스페이스 링크와 라이브러리 타입을 검사합니다.
 
-## 웹 프로덕션 빌드
+## 화면
+
+홈에서 컴포넌트 예제, 건강수첩, 폴더블 달력과 레이아웃 Lab을 엽니다. Lab에서는 창 크기·접힘선·입력·키보드·오버레이·화면 분할을 확인합니다.
+
+화면을 추가하려면 `app/<이름>Example.tsx`를 만들고 `app/index.tsx`에 경로를 연결합니다.
+
+## E2E
+
+Maestro와 실행 중인 개발 빌드가 필요합니다. `example` 폴더에서 실행합니다. `MAESTRO` 환경변수로 실행 파일 경로를 지정할 수 있습니다.
+
+| 명령 | 확인 항목 |
+|---|---|
+| `scripts/e2e-ios-regression.sh <udid>` | iOS 전체 회귀 |
+| `scripts/e2e-android-regression.sh <open \| folded> [device]` | Android 자세별 전체 회귀 |
+| `scripts/e2e-fold.sh <flow.yaml> [stage ...]` | 접기·펼치기 전후 상태 유지 |
+| `scripts/e2e-overlay-fold.sh <open \| folded> [device]` | 자세별 오버레이 위치 |
+
+Android 기본 기기는 `emulator-5554`입니다. 폴더블 플로우는 Galaxy Z Fold7 AVD와 접힘선 구성을 기준으로 하며, 일반 기기에는 해당 좌표 단언을 사용하지 않습니다.
 
 ```bash
-pnpm run build:web
+SCENARIO=pane DEVICE=emulator-5554 scripts/e2e-fold.sh .maestro/lab/foldable-state.yaml open folded reopened
 ```
 
-## 웹 E2E 검증
-
-브라우저 실행 파일을 최초 한 번 준비합니다.
-
-```bash
-pnpm exec agent-browser install
-```
-
-그다음 프로덕션 웹 빌드, 모바일·데스크톱 상호작용, 가로 넘침, 1열·2열 전환과 브라우저 오류를 검증합니다. WCAG A/AA 감사 결과와 화면별 스크린샷도 함께 저장합니다.
-
-```bash
-pnpm run test:e2e:web
-```
-
-빌드와 스크린샷은 기본적으로 시스템 임시 디렉터리의 `zs-ui-web-e2e/`에 저장합니다. `E2E_OUTPUT_DIR`로 위치를 바꿀 수 있습니다.
-
-```bash
-E2E_OUTPUT_DIR=/tmp/zs-ui-web-e2e pnpm run test:e2e:web
-```
-
-## 네이티브 E2E(Maestro)
-
-`ZSCalendar` 시나리오는 `.maestro/zscalendar*.yaml`에 있습니다(앱 ID `kr.co.studio0610.zsui.example`). 시뮬레이터·에뮬레이터에 예제 앱을 실행해 둔 뒤 Maestro CLI로 실행합니다.
-
-```bash
-maestro test .maestro/zscalendar.yaml
-```
+Release에서 달력·FPS 상태 표시를 사용하려면 빌드 시 `EXPO_PUBLIC_DEV_STRIP=1`을 지정합니다. 실행 결과는 `.e2e-artifacts` 또는 `.maestro/artifacts`에 생성됩니다.

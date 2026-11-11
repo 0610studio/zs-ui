@@ -1,215 +1,136 @@
-import { useCallback, memo } from 'react';
-import { StyleSheet, ViewProps } from 'react-native';
-import { RadioOption } from '../types';
-import ViewAtom from '../atoms/ViewAtom';
-import ZSText, { ZSTextProps } from '../ZSText';
-import ZSPressable from '../ZSPressable';
+import React from 'react';
+import { Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '../../context/ThemeContext';
-import { DISABLED_OPACITY, RADIUS } from '../../theme/tokens';
-import { SvgCheck } from '../../assets/SvgCheck';
+import { withOpacity } from '../../theme/color';
+import { SPACE } from '../../theme/spacing';
+import { OPACITY } from '../../theme/state';
+import { useControllableState } from '../../model/useControllableState';
+import ZSText from '../ZSText';
+import { MARK_ON_FILL, PressHalo, ROW_PRESS_DELAY } from './markParts';
 
-const ROW_WIDTH: Record<1 | 2 | 3, '100%' | '50%' | '33.33%'> = {
-  1: '100%',
-  2: '50%',
-  3: '33.33%',
-};
-
-interface RadioRowProps {
-  option: RadioOption;
-  index: number;
-  optionCount: number;
-  rowCount: 1 | 2 | 3;
-  isSelected: boolean;
-  isFullWidth: boolean;
-  setColor: string;
-  innerColor: string;
-  selectColor: string;
-  valueStyle?: ZSTextProps;
-  selectStyle?: ZSTextProps;
-  selectLabel: string;
-  onSelect: (option: RadioOption) => void;
-}
-
-const RadioRow = memo(function RadioRow({
-  option,
-  index,
-  optionCount,
-  rowCount,
-  isSelected,
-  isFullWidth,
-  setColor,
-  innerColor,
-  selectColor,
-  valueStyle,
-  selectStyle,
-  selectLabel,
-  onSelect,
-}: RadioRowProps) {
-  const isLastCol = (index + 1) % rowCount === 0;
-  const isLastRow = Math.ceil((index + 1) / rowCount) === Math.ceil(optionCount / rowCount);
-
-  return (
-    <ViewAtom
-      style={[
-        styles.cell,
-        {
-          width: ROW_WIDTH[rowCount],
-          paddingRight: isFullWidth ? 0 : isLastCol ? 0 : 3,
-          paddingLeft: isFullWidth ? 0 : isLastCol ? 3 : 0,
-          paddingBottom: isLastRow ? 0 : 10,
-        },
-      ]}
-    >
-      <ZSPressable
-        onPress={() => onSelect(option)}
-        pressedBackgroundColor="transparent"
-        fullWidth
-        accessibilityRole='radio'
-        accessibilityState={{ checked: isSelected }}
-      >
-        <ViewAtom style={[styles.row, { borderColor: setColor, backgroundColor: innerColor }]}>
-          {!isFullWidth && (
-            <ViewAtom style={[styles.radioOuter, { borderColor: setColor }]}>
-              <ViewAtom style={[styles.radioInner, { backgroundColor: setColor }]} />
-            </ViewAtom>
-          )}
-
-          <ViewAtom style={styles.label}>
-            <ZSText {...valueStyle}>{option.value}</ZSText>
-          </ViewAtom>
-
-          {isFullWidth && (
-            <ViewAtom style={[styles.selectButton, { backgroundColor: selectColor }]}>
-              {isSelected ? (
-                <SvgCheck size={18} />
-              ) : (
-                <ZSText typo="body.5" numberOfLines={1} {...selectStyle}>
-                  {selectLabel}
-                </ZSText>
-              )}
-            </ViewAtom>
-          )}
-        </ViewAtom>
-      </ZSPressable>
-    </ViewAtom>
-  );
-});
-
-interface ZSRadioGroupProps extends ViewProps {
-  options: RadioOption[];
-  value?: RadioOption;
-  onSelect: (value: RadioOption) => void;
-  containerStyle?: ViewProps;
-  valueStyle?: ZSTextProps;
-  selectStyle?: ZSTextProps;
-  selectLabel?: string;
+export interface ZSRadioOption<T extends string | number = string> {
+  value: T;
+  label: string;
   disabled?: boolean;
-  rowCount?: 1 | 2 | 3;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
-function ZSRadioGroup({
+export const RADIO_ROW_HEIGHT = { ios: 44, android: 56 } as const;
+export const RADIO_SIZE = 20;
+const RING_WIDTH = 2;
+const DOT_RADIUS = 4;
+const LABEL_GAP = SPACE.md;
+
+export interface ZSRadioGroupProps<T extends string | number = string> {
+  options: ZSRadioOption<T>[];
+  value?: T | null;
+  defaultValue?: T | null;
+  onValueChange?: (value: T, index: number) => void;
+  disabled?: boolean;
+  columns?: number;
+  accessibilityLabel?: string;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+}
+
+export function RadioMark({ selected, disabled = false }: { selected: boolean; disabled?: boolean }) {
+  const { colors } = useTheme();
+  const muted = withOpacity(colors.text, OPACITY.disabled);
+  const center = RADIO_SIZE / 2;
+  return (
+    <Svg width={RADIO_SIZE} height={RADIO_SIZE} viewBox={`0 0 ${RADIO_SIZE} ${RADIO_SIZE}`}>
+      {selected ? (
+        <>
+          <Circle cx={center} cy={center} r={center} fill={disabled ? muted : colors.primary} />
+          <Circle cx={center} cy={center} r={DOT_RADIUS} fill={disabled ? colors.background : MARK_ON_FILL} />
+        </>
+      ) : (
+        <Circle cx={center} cy={center} r={center - RING_WIDTH / 2} stroke={disabled ? muted : colors.textSecondary} strokeWidth={RING_WIDTH} fill="none" />
+      )}
+    </Svg>
+  );
+}
+
+function ZSRadioGroup<T extends string | number = string>({
   options,
   value,
-  onSelect,
-  containerStyle,
-  valueStyle,
+  defaultValue,
+  onValueChange,
   disabled = false,
-  selectStyle,
-  selectLabel = '선택',
-  rowCount = 1,
-  ...props
-}: ZSRadioGroupProps) {
-  const { palette } = useTheme();
-  const isFullWidth = rowCount === 1;
+  columns = 1,
+  accessibilityLabel,
+  style,
+  testID,
+}: ZSRadioGroupProps<T>) {
+  const { colors } = useTheme();
+  const [current, setCurrent] = useControllableState<T | null>(value, defaultValue === undefined ? (options[0]?.value ?? null) : defaultValue);
+  const perRow = Math.max(1, Math.floor(columns));
+  const rowHeight = Platform.OS === 'android' ? RADIO_ROW_HEIGHT.android : RADIO_ROW_HEIGHT.ios;
+  const disabledColor = withOpacity(colors.text, OPACITY.disabled);
 
-  const handleSelect = useCallback((option: RadioOption) => {
-    if (!disabled) {
-      onSelect(option);
-    }
-  }, [disabled, onSelect]);
+  const select = (option: ZSRadioOption<T>, index: number) => {
+    if (disabled || option.disabled) return;
+    setCurrent(option.value);
+    onValueChange?.(option.value, index);
+  };
 
   return (
-    <ViewAtom
-      style={[
-        styles.container,
-        {
-          flexDirection: isFullWidth ? 'column' : 'row',
-          flexWrap: isFullWidth ? 'nowrap' : 'wrap',
-          opacity: disabled ? DISABLED_OPACITY : 1,
-        },
-      ]}
-      {...containerStyle}
-      {...props}
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel={accessibilityLabel}
+      style={[styles.group, perRow > 1 ? styles.grid : null, style]}
+      testID={testID}
     >
       {options.map((option, index) => {
-        const isSelected = value?.index === option.index;
-        const setColor = isSelected ? palette.primary.light : palette.background.neutral;
-
+        const enabled = !disabled && !option.disabled;
+        const selected = option.value === current;
         return (
-          <RadioRow
-            key={option.index}
-            option={option}
-            index={index}
-            optionCount={options.length}
-            rowCount={rowCount}
-            isSelected={isSelected}
-            isFullWidth={isFullWidth}
-            setColor={setColor}
-            innerColor={isSelected ? palette.background.layer1 : 'transparent'}
-            selectColor={isSelected ? palette.primary.main : palette.background.layer2}
-            valueStyle={valueStyle}
-            selectStyle={selectStyle}
-            selectLabel={selectLabel}
-            onSelect={handleSelect}
-          />
+          <Pressable
+            key={option.value}
+            onPress={() => select(option, index)}
+            disabled={!enabled}
+            unstable_pressDelay={ROW_PRESS_DELAY}
+            accessibilityRole="radio"
+            accessibilityLabel={option.accessibilityLabel ?? option.label}
+            accessibilityHint={option.accessibilityHint}
+            accessibilityState={{ checked: selected, disabled: !enabled }}
+            testID={testID ? `${testID}-${option.value}` : undefined}
+            style={[
+              styles.row,
+              { minHeight: rowHeight },
+              perRow > 1
+                ? { width: `${100 / perRow}%` }
+                : index === 0
+                  ? null
+                  : { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+            ]}
+          >
+            {({ pressed }) => (
+              <>
+                <View style={styles.mark}>
+                  {pressed ? <PressHalo markSize={RADIO_SIZE} color={withOpacity(selected ? colors.primary : colors.text, OPACITY.pressed)} /> : null}
+                  <RadioMark selected={selected} disabled={!enabled} />
+                </View>
+                <ZSText variant="body1" emphasized={selected} color={enabled ? 'text' : disabledColor} style={styles.label}>
+                  {option.label}
+                </ZSText>
+              </>
+            )}
+          </Pressable>
         );
       })}
-    </ViewAtom>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  cell: {},
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderWidth: 1,
-    paddingLeft: 10,
-    paddingRight: 15,
-    borderRadius: RADIUS.pill,
-  },
-  radioOuter: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  label: {
-    flex: 1,
-    paddingLeft: 10,
-    paddingRight: 12,
-    minWidth: 0,
-  },
-  selectButton: {
-    paddingHorizontal: 10,
-    borderRadius: RADIUS.pill,
-    minWidth: 42,
-    minHeight: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-});
+export default React.memo(ZSRadioGroup) as typeof ZSRadioGroup;
 
-export default memo(ZSRadioGroup);
+const styles = StyleSheet.create({
+  group: { alignSelf: 'stretch' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: LABEL_GAP, paddingVertical: SPACE.sm + 2 },
+  mark: { width: RADIO_SIZE, height: RADIO_SIZE },
+  label: { flex: 1 },
+});

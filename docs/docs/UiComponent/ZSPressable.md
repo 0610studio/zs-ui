@@ -1,78 +1,67 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
-
 # ZSPressable
 
-커스텀 스타일과 애니메이션이 적용된 프레서블 컴포넌트입니다. 클릭/롱클릭 이벤트를 다루고, 배경색·그림자·애니메이션 옵션을 간단히 조합할 수 있습니다.
+누를 수 있는 영역입니다. 누름 표시는 플랫폼 관례를 따르고, 보이는 크기가 작아도 터치 영역은 최소 크기를 채우며, 연타를 막는 쓰로틀이 들어 있습니다.
 
-<LocalPlayground example="ZSPressable" />
+| 플랫폼 | 구현 |
+|--------|------|
+| iOS | `pressedColor` 10% 하이라이트를 위에 덮습니다. 누르는 순간 바로 켜지고, 손을 떼면 fade spring([모션 토큰](../Theme/tokens#모션--spring--timing))으로 사라집니다 |
+| Android | ripple(M3 상태 레이어) — `pressedColor` 10% |
 
 ## 기본 사용법
 
 ```tsx
 import { ZSPressable, ZSText } from '@0610studio/zs-ui';
 
-<ZSPressable
-  onPress={() => console.log('Pressed')}
-  style={{
-    padding: 20,
-    borderRadius: 10,
-  }}
->
-  <ZSText typo="body.2">버튼</ZSText>
+<ZSPressable radius="lg" backgroundColor="surface4" style={{ padding: 20 }} onPress={openDetail}>
+  <ZSText>상세 보기</ZSText>
 </ZSPressable>
 ```
 
-## Props
+## Props — `ZSPressableProps`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `onPress` | `(value?: any) => void` | `undefined` | 버튼 클릭 시 실행될 콜백 함수 |
-| `onLongPress` | `(value?: any) => void` | `undefined` | 버튼을 길게 누를 때 실행될 콜백 함수 |
-| `pressedBackgroundColor` | `string` | 테마 `grey[50]` + 10% 투명도 | 눌렸을 때 버튼의 배경 색상 |
-| `pressedBackgroundBorderRadius` | `number` | `16` | 눌렸을 때의 버튼의 둥근 모서리 반경 |
-| `isAnimation` | `boolean` | `true` | `true`면 `FadeInDown` 진입과 `FadeOut` 퇴장 애니메이션 적용. 눌림 스케일은 이 값과 관계없이 동작합니다 |
-| `elevationLevel` | `ShadowLevel` | `undefined` | 버튼의 그림자 깊이를 설정 (0~9 단계) |
-| `fullWidth` | `boolean` | `false` | 버튼이 부모 요소의 전체 너비를 차지하도록 설정 |
-| `color` | `ViewColorOptions` | `undefined` | 배경색 옵션 (테마 팔레트 기반). 값은 [ZSView의 배경색 옵션](./ZSView#배경색-옵션-viewcoloroptions)을 참고하세요 |
-| `isLoading` | `boolean` | `false` | `true`일 때 클릭/롱클릭이 비활성화되고 버튼이 흐리게 표시됩니다. |
-| `preventDoublePress` | `boolean` | `false` | `true`일 때 기본 디바운스(300ms) 대신 2초 잠금을 적용합니다. 결제·제출처럼 중복 실행이 위험한 액션에 사용합니다 |
-| `disabled` | `boolean` | `false` | `true`일 때 클릭/롱클릭이 비활성화되고 버튼이 흐리게 표시됩니다. |
-| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `onPress` | `() => void` | `undefined` | 누를 때 |
+| `onLongPress` | `() => void` | `undefined` | 길게 누를 때 |
+| `backgroundColor` | `ColorName \| string` | `undefined` | 배경 색 역할 또는 직접 지정한 색 |
+| `radius` | `RadiusToken` | `'none'` | 모서리. 누름 표시도 이 모양으로 잘립니다 |
+| `pressedColor` | `ColorName \| string` | `'text'` | 누름 표시 색 — 색 역할 이름 또는 직접 지정한 색 |
+| `loading` | `boolean` | `false` | 처리 중 — 누를 수 없고 흐리게 보이며 `busy` 상태를 알립니다 |
+| `preventDoublePress` | `boolean` | `false` | `true`면 2초간 중복 실행을 막습니다(결제·제출) — [중복 실행 방지](#중복-실행-방지) |
+| `disabled` | `boolean` | `false` | 누를 수 없고 50%로 흐리게 보입니다 |
+| `hitSlop` | `Insets \| number` | 자동 | 주지 않으면 [최소 터치 영역](#최소-터치-영역)을 채우도록 넓힙니다 |
+| `accessibilityRole` | `AccessibilityRole` | `'button'` | |
+| `style` | `StyleProp<ViewStyle>` | `undefined` | |
+| `...props` | `PressableProps` | `undefined` | React Native `Pressable` 속성(`style`·`children` 함수 형태 제외) |
 
-## 특징
+`ZSPressableProps` 타입을 내보냅니다.
 
-- **스케일 애니메이션**: 눌렸을 때 0.96배로 축소되는 애니메이션 효과
-- **배경색 변경**: 눌렸을 때 배경색이 변경되는 시각적 피드백
-- **연타 방어 기본 내장**: 마지막 press 이후 **300ms** 동안 재호출을 무시합니다. `onPress`·`onLongPress` 가 이 잠금을 공유합니다
-- **그림자 지원**: `elevationLevel`로 `boxShadow` 기반 그림자 적용 (iOS·Android 동일 렌더)
-- **전체 너비 모드**: `fullWidth`로 전체 너비 버튼 구성 가능
+## 최소 터치 영역
+
+보이는 크기가 iOS 44pt·Android 48dp(`MIN_TOUCH_TARGET`)보다 작으면 `hitSlop`을 자동으로 넓혀 그 크기를 채웁니다. 작은 아이콘 버튼도 따로 계산하지 않습니다.
+
+```tsx
+<ZSPressable radius="full" accessibilityLabel="닫기" onPress={close} style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center' }}>
+  <CloseIcon size={14} />
+</ZSPressable>
+```
 
 ## 중복 실행 방지
 
-결제·주문 제출처럼 두 번 실행되면 안 되는 액션에는 `preventDoublePress` 로 잠금을 2초로 늘립니다.
+- 기본: 처음 누름은 바로 실행하고 300ms 안의 연타는 버립니다. `onPress`·`onLongPress`가 같은 잠금을 씁니다.
+- `preventDoublePress`: 2초(`PREVENT_DOUBLE_PRESS_INTERVAL`) 동안 다시 실행하지 않습니다.
+
+버튼 밖에서 같은 잠금이 필요하면 `usePreventDoublePress`를 씁니다. 첫 호출만 통과시키고 `interval`(기본 `PREVENT_DOUBLE_PRESS_INTERVAL`, 2000ms) 동안 다시 부르지 않습니다. 돌려주는 핸들러는 identity가 고정되고, `onPress`가 없으면 `undefined`를 반환합니다.
 
 ```tsx
-<ZSPressable preventDoublePress onPress={submitOrder}>
-  <ZSText typo="body.2">결제하기</ZSText>
-</ZSPressable>
+import { PREVENT_DOUBLE_PRESS_INTERVAL, usePreventDoublePress } from '@0610studio/zs-ui';
+
+const handleSubmit = usePreventDoublePress(() => submitForm(), PREVENT_DOUBLE_PRESS_INTERVAL);
+
+<Pressable onPress={handleSubmit} />;
 ```
 
-`ZSPressable` 을 쓰지 않는 커스텀 버튼에는 같은 잠금을 `usePreventDoublePress` 훅으로 적용합니다. 사용법은 [공통 토큰과 유틸리티](../Theme/tokens#중복-실행-방지)를 참고하세요.
+## 관련 문서
 
-## 예제
-
-테마 색상과 롱클릭을 함께 사용하는 변형 예시입니다.
-
-```tsx
-<ZSPressable
-  color="primary.50"
-  elevationLevel={2}
-  onPress={() => console.log('Pressed')}
-  onLongPress={() => console.log('Long Pressed')}
-  style={{ padding: 20 }}
->
-  <ZSText typo="body.2" color="white">
-    테마 액션 버튼
-  </ZSText>
-</ZSPressable>
-```
+- [ZSButton](./ZSButton) — 라벨이 있는 버튼
+- [토큰](../Theme/tokens) — `OPACITY`·`MIN_TOUCH_TARGET`·`RADIUS`

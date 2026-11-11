@@ -1,48 +1,58 @@
-import { GlobalOverlay } from "../../model/globalOverlay";
-import { setGlobalOverlayRef } from "../../model/globalOverlay";
+import { GlobalOverlay, setGlobalOverlayRef } from '../../model/globalOverlay';
+import type { OverlayContextProps } from '../../model/types';
 
-describe("GlobalOverlay", () => {
-  it("ref 미설정 시 에러를 던진다", () => {
-    expect(() => GlobalOverlay.showAlert({ title: "t" })).toThrow();
-    expect(() => GlobalOverlay.showSnackBar({ message: "m" })).toThrow();
-    expect(() => GlobalOverlay.showBottomSheet({ component: null as any })).toThrow();
-    expect(() => GlobalOverlay.showPopOverMenu({ px: 0, py: 0, component: null as any })).toThrow();
-    expect(() => GlobalOverlay.showModality({ component: null as any })).toThrow();
-    expect(() => GlobalOverlay.showLoader()).toThrow();
-    expect(() => GlobalOverlay.hideOverlay("all")).toThrow();
+describe('GlobalOverlay', () => {
+  afterEach(() => setGlobalOverlayRef(null));
+
+  it('OverlayProvider 가 없으면 무엇을 부르든 설정 안내 에러를 던진다', () => {
+    const calls = [
+      () => GlobalOverlay.showAlert({ title: 't', confirm: { label: '확인' } }),
+      () => GlobalOverlay.showBottomSheet({ component: null }),
+      () => GlobalOverlay.hideBottomSheet(),
+      () => GlobalOverlay.showSnackbar({ message: 'm' }),
+      () => GlobalOverlay.showLoader(),
+      () => GlobalOverlay.hideLoader(),
+    ];
+    calls.forEach((call) => expect(call).toThrow('Please make sure OverlayProvider is properly set up'));
   });
 
-  it("ref 설정 후 내부 메서드로 위임한다", () => {
-    const ref = {
+  it('ref 가 있으면 같은 인자로 위임한다', () => {
+    const ref: OverlayContextProps = {
       showAlert: jest.fn(),
-      showSnackBar: jest.fn(),
       showBottomSheet: jest.fn(),
-      showPopOverMenu: jest.fn(),
-      showModality: jest.fn(),
+      hideBottomSheet: jest.fn(),
+      showSnackbar: jest.fn(() => true),
       showLoader: jest.fn(),
-      hideOverlay: jest.fn(),
-    } as any;
+      hideLoader: jest.fn(),
+    };
     setGlobalOverlayRef(ref);
 
-    GlobalOverlay.showAlert({ title: "t" });
-    GlobalOverlay.showSnackBar({ message: "m" });
-    GlobalOverlay.showBottomSheet({ component: null as any });
-    GlobalOverlay.showPopOverMenu({ px: 0, py: 0, component: null as any });
-    GlobalOverlay.showModality({ component: null as any });
-    GlobalOverlay.showLoader();
-    GlobalOverlay.hideOverlay("all");
+    const alert = { title: 't', confirm: { label: '확인' } };
+    const sheet = { component: null, options: { dismissible: false } };
+    GlobalOverlay.showAlert(alert);
+    GlobalOverlay.showBottomSheet(sheet);
+    GlobalOverlay.hideBottomSheet();
+    const queued = GlobalOverlay.showSnackbar({ message: 'm' });
+    GlobalOverlay.showLoader({ accessibilityLabel: '결제 중' });
+    GlobalOverlay.hideLoader();
 
-    expect(ref.showAlert).toHaveBeenCalled();
-    expect(ref.showSnackBar).toHaveBeenCalled();
-    expect(ref.showBottomSheet).toHaveBeenCalled();
-    expect(ref.showPopOverMenu).toHaveBeenCalled();
-    expect(ref.showModality).toHaveBeenCalled();
-    expect(ref.showLoader).toHaveBeenCalled();
-    expect(ref.hideOverlay).toHaveBeenCalledWith("all");
+    expect(ref.showAlert).toHaveBeenCalledWith(alert);
+    expect(ref.showBottomSheet).toHaveBeenCalledWith(sheet);
+    expect(ref.hideBottomSheet).toHaveBeenCalledTimes(1);
+    expect(ref.showSnackbar).toHaveBeenCalledWith({ message: 'm' });
+    expect(queued).toBe(true);
+    expect(ref.showLoader).toHaveBeenCalledWith({ accessibilityLabel: '결제 중' });
+    expect(ref.hideLoader).toHaveBeenCalledTimes(1);
+  });
 
+  it('showSnackbar 가 돌려준 값을 그대로 돌려준다', () => {
+    setGlobalOverlayRef({ showSnackbar: jest.fn(() => false) } as unknown as OverlayContextProps);
+    expect(GlobalOverlay.showSnackbar({ message: 'm' })).toBe(false);
+  });
+
+  it('ref 를 비우면 다시 에러다', () => {
+    setGlobalOverlayRef({ showLoader: jest.fn() } as unknown as OverlayContextProps);
     setGlobalOverlayRef(null);
+    expect(() => GlobalOverlay.showLoader()).toThrow();
   });
 });
-
-
-

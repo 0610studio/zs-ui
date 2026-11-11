@@ -1,0 +1,15 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: 'Next:'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          id: '.*:id/key_pos_ime_action'
+- waitForAnimationToEnd

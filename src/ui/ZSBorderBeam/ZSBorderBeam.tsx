@@ -1,71 +1,57 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native";
-import { Blur, Canvas, Group, RoundedRect, SweepGradient, vec } from "@shopify/react-native-skia";
+import { Platform, StyleSheet, View, type LayoutChangeEvent, type ViewProps } from "react-native";
+import { Blur, Canvas, Group, Path, RoundedRect, SweepGradient, vec, type AnimatedProp } from "@shopify/react-native-skia";
 import {
   Easing,
   cancelAnimation,
   interpolate,
   useDerivedValue,
+  useReducedMotion,
   useSharedValue,
   withDelay,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
 import { useTheme } from "../../context/ThemeContext";
-import { IS_WEB, warnWebUnsupported } from "../../model/webUnsupported";
+import { RADIUS } from "../../theme/radius";
+import { withAlpha } from "../hexColor";
+import { continuousRoundedRectPath } from "./continuousCorner";
 
 const FULL_ROTATION_RADIANS = Math.PI * 2;
 const DEFAULT_GLOW_INTENSITY = 0.5;
 const GLOW_PULSE_DURATION = 2400;
 
-/** glow 세밀 제어용 (숫자 하나로 충분하면 glow={0~1}) */
 export interface ZSBorderBeamGlowConfig {
-  /** stroke 바깥으로 퍼지는 폭(px) */
   width?: number;
   blur?: number;
-  /** 숨쉬는 한 사이클(ms) */
   pulseDuration?: number;
   minOpacity?: number;
   maxOpacity?: number;
 }
 
 export interface ZSBorderBeamProps extends ViewProps {
-  children?: React.ReactNode;
-  /** 꼬리 → 머리 순. 지정 시 colorFrom/colorTo 무시 */
   colors?: string[];
-  /** 기본: palette.primary.main */
   colorFrom?: string;
-  /** 기본: palette.secondary.main */
   colorTo?: string;
-  /** 0~1. 1이면 둘레 전체 그라디언트 링 */
   beamLength?: number;
-  /** 광선이 지나지 않는 구간의 테두리. 'none'이면 숨김 (기본: colorFrom 12% 알파) */
   trackColor?: string;
-  /** false=없음 · 0~1=폭·blur·불투명도 일괄 스케일(기본 0.5) · config=세밀 제어 */
   glow?: boolean | number | ZSBorderBeamGlowConfig;
-  /** 한 바퀴 도는 시간(ms) */
   duration?: number;
   delay?: number;
   reverse?: boolean;
-  /** false면 숨기고 애니메이션 정지 */
   active?: boolean;
   borderWidth?: number;
   borderRadius?: number;
-  style?: StyleProp<ViewStyle>;
 }
 
-/** #RGB / #RRGGBB hex 에만 알파를 붙이고, 그 외는 null */
-const withAlpha = (color: string, alphaHex: string): string | null => {
-  if (/^#[0-9a-fA-F]{6}$/.test(color)) return `${color}${alphaHex}`;
-  if (/^#[0-9a-fA-F]{3}$/.test(color)) {
-    const [r, g, b] = color.slice(1);
-    return `#${r}${r}${g}${g}${b}${b}${alphaHex}`;
-  }
-  return null;
-};
-
-/** hue 를 유지한 완전 투명 색 — blur 시 색 번짐이 자연스럽다 */
 const transparentize = (color: string): string => withAlpha(color, "00") ?? "#00000000";
+
+interface FrameStrokeProps {
+  strokeWidth: AnimatedProp<number>;
+  color?: string;
+  opacity?: AnimatedProp<number>;
+  children?: React.ReactNode;
+}
 
 interface GlowSettings {
   width: number;
@@ -113,20 +99,20 @@ function ZSBorderBeam({
   reverse = false,
   active = true,
   borderWidth = 2,
-  borderRadius = 14,
+  borderRadius = RADIUS.lg,
   style,
   ...props
 }: ZSBorderBeamProps) {
-  const { palette } = useTheme();
+  const { colors: roles } = useTheme();
+  const reduceMotion = useReducedMotion();
   const [layout, setLayout] = useState({ width: 0, height: 0 });
   const rotationProgress = useSharedValue(0);
   const glowProgress = useSharedValue(0);
 
-  const from = colorFrom || palette.primary.main;
-  const to = colorTo || palette.secondary.main;
+  const from = colorFrom || roles.primary;
+  const to = colorTo || roles.tertiary;
   const glowSettings = resolveGlow(glow);
 
-  // 꼬리(투명)→머리(선명) 후 짧게 컷오프. beamLength < 1 이면 positions 로 둘레 일부에 압축한다.
   const beam = useMemo(() => {
     const length = Math.min(Math.max(beamLength, 0.05), 1);
     const base =
@@ -151,11 +137,7 @@ function ZSBorderBeam({
     trackColor === "none" ? null : trackColor ?? withAlpha(from, "1F") ?? "#8080801F";
 
   useEffect(() => {
-    if (IS_WEB) warnWebUnsupported("ZSBorderBeam");
-  }, []);
-
-  useEffect(() => {
-    if (IS_WEB || !active) return;
+    if (!active || reduceMotion) return;
 
     rotationProgress.value = 0;
     rotationProgress.value = withDelay(
@@ -164,11 +146,11 @@ function ZSBorderBeam({
     );
 
     return () => cancelAnimation(rotationProgress);
-  }, [active, duration, delay, reverse]);
+  }, [active, duration, delay, reverse, reduceMotion]);
 
   const glowPulseDuration = glowSettings?.pulseDuration;
   useEffect(() => {
-    if (IS_WEB || !active || !glowPulseDuration) return;
+    if (!active || !glowPulseDuration || reduceMotion) return;
 
     glowProgress.value = 0;
     glowProgress.value = withDelay(
@@ -177,7 +159,7 @@ function ZSBorderBeam({
     );
 
     return () => cancelAnimation(glowProgress);
-  }, [active, delay, glowPulseDuration]);
+  }, [active, delay, glowPulseDuration, reduceMotion]);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -194,6 +176,20 @@ function ZSBorderBeam({
   const frameWidth = Math.max(layout.width - borderWidth, 0);
   const frameHeight = Math.max(layout.height - borderWidth, 0);
   const frameRadius = Math.min(Math.max(borderRadius - borderWidth / 2, 0), Math.min(frameWidth, frameHeight) / 2);
+  const continuousFrame = useMemo(
+    () => (Platform.OS === "ios" ? continuousRoundedRectPath(frameX, frameY, frameWidth, frameHeight, frameRadius) : null),
+    [frameX, frameY, frameWidth, frameHeight, frameRadius]
+  );
+  const frameStroke = ({ children: shader, ...paint }: FrameStrokeProps) =>
+    continuousFrame ? (
+      <Path path={continuousFrame} style="stroke" {...paint}>
+        {shader}
+      </Path>
+    ) : (
+      <RoundedRect x={frameX} y={frameY} width={frameWidth} height={frameHeight} r={frameRadius} style="stroke" {...paint}>
+        {shader}
+      </RoundedRect>
+    );
 
   const centerVector = useMemo(() => vec(canvasWidth / 2, canvasHeight / 2), [canvasWidth, canvasHeight]);
   const direction = reverse ? -1 : 1;
@@ -212,15 +208,6 @@ function ZSBorderBeam({
     interpolate(glowProgress.value, [0, 1], [borderWidth + glowWidth * 0.6, borderWidth + glowWidth])
   );
 
-  // CanvasKit 미로딩 환경에서 Skia Canvas 가 크래시한다. 분기는 rules-of-hooks 때문에 모든 hook 뒤에 둔다.
-  if (IS_WEB) {
-    return (
-      <View style={[styles.container, style]} {...props}>
-        <View style={[styles.content, { borderRadius }]}>{children}</View>
-      </View>
-    );
-  }
-
   const beamGradient = (
     <SweepGradient
       origin={centerVector}
@@ -233,7 +220,7 @@ function ZSBorderBeam({
 
   return (
     <View style={[styles.container, style]} {...props}>
-      <View onLayout={handleLayout} style={[styles.content, { borderRadius }]}>
+      <View onLayout={handleLayout} style={[styles.content, { borderRadius }, Platform.OS === "ios" ? styles.continuous : null]}>
         {children}
       </View>
 
@@ -251,48 +238,16 @@ function ZSBorderBeam({
             },
           ]}
         >
-          {resolvedTrackColor && (
-            <RoundedRect
-              x={frameX}
-              y={frameY}
-              width={frameWidth}
-              height={frameHeight}
-              r={frameRadius}
-              style="stroke"
-              strokeWidth={borderWidth}
-              color={resolvedTrackColor}
-            />
-          )}
+          {resolvedTrackColor && frameStroke({ strokeWidth: borderWidth, color: resolvedTrackColor })}
 
           {glowSettings && (
             <Group>
-              <RoundedRect
-                x={frameX}
-                y={frameY}
-                width={frameWidth}
-                height={frameHeight}
-                r={frameRadius}
-                style="stroke"
-                strokeWidth={glowStrokeWidth}
-                opacity={glowOpacity}
-              >
-                {beamGradient}
-              </RoundedRect>
+              {frameStroke({ strokeWidth: glowStrokeWidth, opacity: glowOpacity, children: beamGradient })}
               <Blur blur={glowSettings.blur} />
             </Group>
           )}
 
-          <RoundedRect
-            x={frameX}
-            y={frameY}
-            width={frameWidth}
-            height={frameHeight}
-            r={frameRadius}
-            style="stroke"
-            strokeWidth={borderWidth}
-          >
-            {beamGradient}
-          </RoundedRect>
+          {frameStroke({ strokeWidth: borderWidth, children: beamGradient })}
         </Canvas>
       )}
     </View>
@@ -312,5 +267,8 @@ const styles = StyleSheet.create({
   content: {
     position: "relative",
     overflow: "hidden",
+  },
+  continuous: {
+    borderCurve: "continuous",
   },
 });

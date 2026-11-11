@@ -1,0 +1,63 @@
+appId: kr.co.studio0610.zsui.example
+---
+- evalScript: |
+    ${
+      const month = new Date().getMonth() + 1;
+      const pad = (n) => (n < 10 ? '0' : '') + n;
+      output.fifth = new Date().getFullYear() + '-' + pad(month) + '-05';
+      output.fifthTitle = month + '월 5일 \\(.\\) · 기록 \\d+건';
+    }
+- runFlow:
+    when:
+      true: ${STEP == 'setup'}
+    commands:
+      - launchApp:
+          clearState: false
+      - setOrientation: PORTRAIT
+      - extendedWaitUntil:
+          visible: 'ZS-UI'
+          timeout: 120000
+      - scrollUntilVisible:
+          element:
+            id: 'calendar-foldable-card'
+          direction: DOWN
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'calendar-foldable-card'
+            - extendedWaitUntil:
+                visible:
+                  id: 'cf-calendar'
+                timeout: 15000
+      - tapOn:
+          id: 'calendar-cell-${output.fifth}'
+      - runFlow:
+          file: common/tap-tab.yaml
+          env:
+            TAB: '설정'
+      - tapOn:
+          id: 'cf-setting-tabletop'
+      - runFlow:
+          file: common/tap-tab.yaml
+          env:
+            TAB: '달력'
+
+- runFlow:
+    when:
+      true: ${STEP == 'verify' || STEP == 'setup'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: "${POSTURE == 'folded' || POSTURE == 'tabletop' ? 'zs-tab-navigator-bar' : 'zs-tab-navigator-rail'}"
+          timeout: 10000
+      - extendedWaitUntil:
+          visible:
+            id: "${POSTURE == 'folded' ? 'cf-diary-title-inline' : 'cf-diary-title-side'}"
+            text: '${output.fifthTitle}'
+          timeout: 10000
+      - assertVisible:
+          id: 'cf-pane-primary'
+          text: "${POSTURE == 'folded' ? 'single 411' : POSTURE == 'half' ? 'primary 279' : POSTURE == 'tabletop' ? 'primary 832' : 'primary 315'}"
+      - waitForAnimationToEnd
+      - takeScreenshot: ff01-${POSTURE}

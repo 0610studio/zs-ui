@@ -1,0 +1,49 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-tabs-stack-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-tabs-stack-card'
+      - assertVisible:
+          id: 'tabs-stack-feed-input'
+- assertVisible:
+    id: 'zs-tab-item-profile'
+
+- tapOn:
+    id: 'tabs-stack-feed-input'
+- extendedWaitUntil:
+    visible:
+      id: '.*:id/key_pos_ime_action'
+    timeout: 10000
+- runFlow:
+    when:
+      true: ${MODE == 'bar'}
+    commands:
+      - assertNotVisible:
+          id: 'zs-tab-item-profile'
+- runFlow:
+    when:
+      true: ${MODE == 'rail'}
+    commands:
+      - assertVisible:
+          id: 'zs-tab-item-profile'
+- waitForAnimationToEnd
+- takeScreenshot: k01-keyboard-${MODE}
+
+- hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: 'zs-tab-item-profile'
+    timeout: 10000

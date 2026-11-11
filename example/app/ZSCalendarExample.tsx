@@ -1,23 +1,26 @@
-import { useState } from 'react';
-import { FlatList, Platform, StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ZSCalendar, ZSText, useCalendarAgenda, todayDateString, type CalendarEvent, type DateString } from '@0610studio/zs-ui';
-import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
+import { ZSCalendar, ZSScreen, ZSText, useCalendarAgenda, useTheme, todayDateString, type CalendarEvent, type DateString } from '@0610studio/zs-ui';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
-type Memo = { title: string };
+type Kind = 'activity' | 'meal' | 'health';
+type Memo = { title: string; kind: Kind };
 
-/** 달력 점과 아래 목록이 같은 배열에서 나온다 — 날짜별로 다시 묶을 필요가 없다 */
+const KIND_COLOR = { activity: 'success', meal: 'info', health: 'error' } as const;
+
 const today = todayDateString();
+const month = today.slice(0, 8);
 const EVENTS: CalendarEvent<Memo>[] = [
-  { id: '1', date: today, color: '#D7B8FF', data: { title: '산책 30분' } },
-  { id: '2', date: today, color: '#A7DBD1', data: { title: '아침 급여 45g' } },
-  { id: '3', date: `${today.slice(0, 8)}05` as DateString, color: '#FF9761', data: { title: '병원 예방접종' } },
-  { id: '4', date: `${today.slice(0, 8)}18` as DateString, color: '#FFD164', data: { title: '목욕' } },
+  { id: '1', date: today, data: { title: '산책 30분', kind: 'activity' } },
+  { id: '2', date: today, data: { title: '아침 급여 45g', kind: 'meal' } },
+  { id: '3', date: `${month}05` as DateString, data: { title: '병원 예방접종', kind: 'health' } },
+  { id: '4', date: `${month}18` as DateString, data: { title: '목욕', kind: 'activity' } },
 ];
+const FIRST_PICK = ([`${month}05`, `${month}18`] as DateString[]).find((date) => date !== today) ?? today;
 
-/** ZSCalendar 의 children 이면 인자 없이 선택한 날짜의 일정을 받고, 스크롤로 주↔월 전환도 된다 */
 function MemoList() {
+  const { colors } = useTheme();
   const { items, bindScroll } = useCalendarAgenda<Memo>();
   return (
     <FlatList
@@ -25,49 +28,43 @@ function MemoList() {
       data={items}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.list}
-      ListEmptyComponent={<ZSText typo="caption.1" color="secondary" style={styles.empty}>기록이 없습니다</ZSText>}
+      ListEmptyComponent={<ZSText variant="label" color="textSecondary" style={styles.empty}>기록이 없습니다</ZSText>}
       renderItem={({ item }) => (
         <View style={styles.row}>
-          <View style={[styles.dot, { backgroundColor: item.color }]} />
-          <ZSText typo="body.3">{item.data?.title}</ZSText>
+          <View style={[styles.dot, { backgroundColor: item.data ? colors[KIND_COLOR[item.data.kind]] : colors.textSecondary }]} />
+          <ZSText variant="body2">{item.data?.title}</ZSText>
         </View>
       )}
     />
   );
 }
 
-/** 기본 예제 — 이벤트 배열 하나와 선택 날짜 상태만으로 동작하는 최소 구성 */
 export default function ZSCalendarExample() {
-  const [selectedDate, setSelectedDate] = useState<DateString>(today);
-
-  if (Platform.OS === 'web') {
-    return (
-      <>
-        <Stack.Screen options={{ title: 'ZSCalendar' }} />
-        <WebUnsupportedNotice component="ZSCalendar" />
-      </>
-    );
-  }
+  const { colors } = useTheme();
+  const [selectedDate, setSelectedDate] = useState<DateString>(FIRST_PICK);
+  const events = useMemo(() => EVENTS.map((event) => ({ ...event, color: event.data ? colors[KIND_COLOR[event.data.kind]] : undefined })), [colors]);
 
   return (
     <GestureHandlerRootView style={styles.root}>
-      <Stack.Screen options={{ title: 'ZSCalendar' }} />
-      <ZSCalendar<Memo>
-        style={styles.root}
-        events={EVENTS}
-        selectedDate={selectedDate}
-        onDateChange={setSelectedDate}
-        testID="basic-calendar"
-      >
-        <MemoList />
-      </ZSCalendar>
+      <ScreenHeader title="ZSCalendar" />
+      <ZSScreen scrollEnabled={false} maxContentWidth="none" backgroundColor="background">
+        <ZSCalendar<Memo>
+          style={styles.root}
+          events={events}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          testID="basic-calendar"
+        >
+          <MemoList />
+        </ZSCalendar>
+      </ZSScreen>
     </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  list: { padding: 16, gap: 12 },
+  list: { padding: 20, gap: 12 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   empty: { textAlign: 'center', paddingVertical: 24 },

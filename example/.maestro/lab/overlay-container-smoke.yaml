@@ -1,0 +1,123 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'ZSScreen:.*'
+      - assertVisible: '입력 필드'
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '필드 1'
+      - assertVisible: 'CTA 버튼'
+- waitForAnimationToEnd
+- takeScreenshot: r01-container-keyboard
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          start: 1%, 50%
+          end: 85%, 50%
+          duration: 400
+      - assertVisible: 'ZSScreen:.*'
+
+- scrollUntilVisible:
+    element: 'Overlay:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'Overlay:.*'
+      - assertVisible:
+          id: 'overlay-alert-confirm'
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-alert-confirm'
+      - assertVisible: '변경 내용을 저장할까요?'
+- waitForAnimationToEnd
+- takeScreenshot: r02-alert
+- tapOn: '취소'
+- extendedWaitUntil:
+    notVisible: '변경 내용을 저장할까요?'
+    timeout: 5000
+
+- scrollUntilVisible:
+    element:
+      id: 'overlay-sheet-snap'
+    direction: DOWN
+    centerElement: true
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-snap'
+      - extendedWaitUntil:
+          visible: '닉네임'
+          timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: r03-sheet-snap
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '닫기'
+      - extendedWaitUntil:
+          notVisible: '닉네임'
+          timeout: 5000
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'overlay-sheet-snap'
+- takeScreenshot: r04-sheet-closed
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-snap'
+      - extendedWaitUntil:
+          visible: '닉네임'
+          timeout: 10000
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'sheet-overlay-replace'
+      - extendedWaitUntil:
+          visible: '교체된 시트'
+          timeout: 10000
+- assertNotVisible: '닉네임'
+- takeScreenshot: r05-sheet-replaced
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'sheet-replaced-close'
+      - extendedWaitUntil:
+          notVisible: '교체된 시트'
+          timeout: 10000
+- assertVisible:
+    id: 'overlay-sheet-snap'
+
+- scrollUntilVisible:
+    element:
+      id: open-form-sheet
+    direction: DOWN
+- tapOn:
+    id: open-form-sheet
+- assertVisible:
+    id: form-sheet-title
+- tapOn:
+    id: form-sheet-title
+- inputText: Fold form
+- tapOn:
+    id: form-sheet-save
+- assertVisible:
+    id: open-form-sheet

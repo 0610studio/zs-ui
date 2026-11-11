@@ -1,194 +1,79 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
+# ZSSkeleton
 
-# ZSSkeleton & ZSSkeletonBox
+콘텐츠를 불러오는 동안 자리를 유지하고 광택 효과를 표시합니다.
 
-로딩 상태를 시각적으로 표현하기 위한 스켈레톤 UI 컴포넌트입니다. `ZSSkeleton`은 기존 컴포넌트에 shimmer 효과를 적용하는 래퍼 컴포넌트이고, `ZSSkeletonBox`는 고정 높이의 박스 형태 스켈레톤 컴포넌트입니다.
+| 컴포넌트 | 용도 |
+|----------|------|
+| `ZSSkeleton` | 실제 콘텐츠를 감싸 `loading` 동안 흐리게 두고 광택을 덮습니다 |
+| `ZSSkeleton.Box` | 고정 높이의 자리 표시 상자 — 광택이 지나갑니다(원 자리는 면만) |
 
-shimmer 밴드는 `@shopify/react-native-skia` 캔버스에 그리고 Reanimated 로 반복 이동시킵니다. 두 컴포넌트 모두 peer 로 `@shopify/react-native-skia` 가 필요합니다.
-
-:::warning 웹 미지원
-shimmer 효과는 iOS·Android 전용입니다. 라이브러리는 웹에서도 깨지지 않게 효과 없이 정적으로 렌더링합니다 — `ZSSkeleton` 은 자식을 반투명하게만 표시하고, `ZSSkeletonBox` 는 배경색 박스만 표시합니다. 다만 아래 미리보기는 그 반쪽 화면 대신 미지원 안내만 띄우므로, shimmer 속도·밴드·투명도는 `example`의 실제 iOS·Android 앱에서 확인하세요.
-:::
-
-<LocalPlayground example="ZSSkeleton" />
-
-## ZSSkeleton
-
-기존 컴포넌트를 감싸서 로딩 상태일 때 shimmer 효과를 적용하는 래퍼 컴포넌트입니다. `isFetching` prop을 통해 로딩 상태를 제어할 수 있습니다.
-
-### 기본 사용법
+## 기본 사용법
 
 ```tsx
+import { View } from 'react-native';
 import { ZSSkeleton, ZSText } from '@0610studio/zs-ui';
 
-export default function App() {
-  return (
-    <ZSSkeleton isFetching={true}>
-      <ZSText typo="heading.1">로딩 중인 텍스트</ZSText>
-    </ZSSkeleton>
-  );
-}
-```
-
-### Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `isFetching` | `boolean` | `undefined` | 로딩 상태 여부. `true`일 때 shimmer 효과가 적용됩니다 |
-| `style` | `StyleProp<ViewStyle>` | `undefined` | 컨테이너의 추가 스타일 |
-| `children` | `React.ReactNode` | `undefined` | 스켈레톤 효과를 적용할 자식 컴포넌트 |
-| `overlayColor` | `string` | 테마 `background.base` | shimmer 하이라이트 색상 |
-| `overlayOpacity` | `number` | `0.6` | shimmer 밴드 중심의 최대 불투명도 (0~1) |
-| `duration` | `number` | `1100` | shimmer 밴드가 한 번 지나가는 시간 (ms) |
-| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
-
-### 특징
-
-- **조건부 렌더링**: `isFetching`이 `false`일 때는 자식 컴포넌트를 그대로 렌더링합니다
-- **Shimmer 애니메이션**: 로딩 중일 때 좌우로 이동하는 shimmer 효과가 적용되고, 자식은 50% 불투명도로 비칩니다
-- **테마 통합**: 테마 시스템과 통합되어 기본 색상이 자동으로 적용됩니다
-- **유연한 사용**: 어떤 컴포넌트든 감싸서 스켈레톤 효과를 적용할 수 있습니다
-
-## ZSSkeletonBox
-
-고정 높이의 박스 형태 스켈레톤 컴포넌트입니다. 항상 shimmer 효과가 적용되며, 다양한 크기와 스타일의 스켈레톤 박스를 만들 수 있습니다.
-
-### 기본 사용법
-
-```tsx
-import { ZSSkeletonBox } from '@0610studio/zs-ui';
-
-export default function App() {
-  return (
-    <ZSSkeletonBox height={100} />
-  );
-}
-```
-
-### Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `height` | `number` | 필수 | 스켈레톤 박스의 높이 |
-| `style` | `StyleProp<ViewStyle>` | `undefined` | 박스의 추가 스타일 |
-| `overlayColor` | `string` | 테마 `background.layer1` | shimmer 하이라이트 색상 |
-| `overlayOpacity` | `number` | `0.7` | shimmer 밴드 중심의 최대 불투명도 (0~1) |
-| `duration` | `number` | `1100` | shimmer 밴드가 한 번 지나가는 시간 (ms) |
-| `color` | `ViewColorOptions` | `'neutral'` | 박스의 배경색 (테마 팔레트 기반) |
-| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
-
-`color`에 쓸 수 있는 값은 [ZSView의 배경색 옵션](./ZSView#배경색-옵션-viewcoloroptions)과 같습니다.
-
-### 특징
-
-- **고정 높이**: `height` prop으로 정확한 높이를 지정할 수 있습니다
-- **지속적인 애니메이션**: 항상 shimmer 효과가 적용되어 로딩 상태를 명확하게 표현합니다
-- **테마 통합**: `ZSView`를 기반으로 하여 테마 시스템과 완전히 통합됩니다
-- **다양한 형태**: `style` prop을 통해 원형, 둥근 모서리 등 다양한 형태로 커스터마이징 가능합니다
-
-## 예제
-
-### ZSSkeleton 조건부 렌더링
-
-```tsx
-function DataComponent({ data, isLoading }) {
-  return (
-    <ZSSkeleton isFetching={isLoading}>
-      {data ? (
-        <ZSText typo="body.2">{data.title}</ZSText>
-      ) : (
-        <ZSText typo="body.2">데이터 없음</ZSText>
-      )}
-    </ZSSkeleton>
-  );
-}
-```
-
-### ZSSkeleton 커스텀 오버레이 색상
-
-```tsx
-<ZSSkeleton 
-  isFetching={true} 
-  overlayColor="#f0f0f0"
->
-  <ZSText typo="body.2">커스텀 색상 스켈레톤</ZSText>
-</ZSSkeleton>
-```
-
-### shimmer 속도·세기 조절
-
-```tsx
-{/* 느리고 옅은 shimmer */}
-<ZSSkeleton isFetching duration={1800} overlayOpacity={0.35}>
-  <ZSText typo="body.2">천천히 반짝이는 스켈레톤</ZSText>
+<ZSSkeleton loading={isFetching}>
+  <ZSText variant="h4" emphasized>{profile?.name ?? '이름'}</ZSText>
+  <ZSText color="textSecondary">{profile?.bio ?? '소개 문구가 들어갑니다'}</ZSText>
 </ZSSkeleton>
 
-<ZSSkeletonBox height={80} duration={1800} overlayOpacity={0.4} />
+<View style={{ gap: 12 }}>
+  <ZSSkeleton.Box height={180} radius="lg" />
+  <ZSSkeleton.Box height={20} style={{ width: '60%' }} />
+  <ZSSkeleton.Box height={48} radius="full" style={{ width: 48 }} />
+</View>
 ```
 
-### ZSSkeletonBox 다양한 형태
+- `ZSSkeleton`은 `loading`이 `false`면 `children`만 그립니다. `true`면 `children`을 50% 불투명도로 두고 그 위에 광택을 덮습니다.
+- 두 컴포넌트 모두 폭은 부모 폭입니다.
 
-```tsx
-{/* 직사각형 박스 */}
-<ZSSkeletonBox height={100} style={{ borderRadius: 10 }} />
+## Props — `ZSSkeletonProps`
 
-{/* 원형 박스 */}
-<ZSSkeletonBox height={80} style={{ borderRadius: 40, width: 80 }} />
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `loading` | `boolean` | `true` | `true`면 흐리게 + 광택, `false`면 `children`만 |
+| `shimmerColor` | `string` | 라이트 `colors.background` · 다크 `colors.text` | 광택 색 |
+| `shimmerOpacity` | `number` | `0.6` | 광택 띠 중심 불투명도(0~1). `shimmerColor`가 hex(`#RRGGBB`)일 때 적용됩니다 |
+| `duration` | `number` | `1100` | 한 번 지나가는 시간(ms). iOS 동작 줄이기에서는 맥박이 한 번 밝아지는 시간 |
+| `...props` | `ViewProps` | `undefined` | `style`·`children` 등 |
 
-{/* 둥근 모서리 박스 */}
-<ZSSkeletonBox height={50} style={{ borderRadius: 25 }} />
-```
+## Props — `ZSSkeletonBoxProps`
 
-### ZSSkeletonBox 배경색 변경
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `height` | `number` | Required | 높이 |
+| `backgroundColor` | `ColorName \| string` | `'surface4'` | 자리 표시 색 |
+| `radius` | `RadiusToken` | `'sm'` | 모서리. `'full'`이고 `style.width`가 `height`와 같으면(아이콘·아바타 같은 원 자리) 광택 없이 면만 그립니다 |
+| `shimmerColor` | `string` | 라이트 `colors.surface2` · 다크 자리 색(기본 `surface4`)을 `text` 쪽으로 12% 밝힌 색 | 광택 색 |
+| `shimmerOpacity` | `number` | `0.7` | 광택 띠 중심 불투명도(0~1). `shimmerColor`가 hex(`#RRGGBB`)일 때 적용됩니다 |
+| `duration` | `number` | `1100` | 한 번 지나가는 시간(ms). iOS 동작 줄이기에서는 맥박이 한 번 밝아지는 시간 |
+| `...props` | `ViewProps` | `undefined` | `style` 등 |
 
-```tsx
-<ZSSkeletonBox height={100} color="layer1" />
-<ZSSkeletonBox height={100} color="primary.10" />
-<ZSSkeletonBox height={100} color="grey.20" />
-```
+`ZSSkeletonProps`·`ZSSkeletonBoxProps` 타입을 내보냅니다.
 
-### 실제 사용 예제
+## 광택 모양
 
-```tsx
-import { ZSSkeleton, ZSSkeletonBox, ZSText, ZSView } from '@0610studio/zs-ui';
+`ZSSkeleton`의 광택은 안쪽 `ZSText`의 글자 줄 모양으로만 지나가므로 글자 끝 너머 빈 자리에 띠가 생기지 않습니다.
 
-function CardSkeleton({ isLoading }) {
-  return (
-    <ZSView style={{ padding: 20, borderRadius: 10 }}>
-      <ZSSkeleton isFetching={isLoading}>
-        <ZSText typo="heading.2">카드 제목</ZSText>
-      </ZSSkeleton>
-      
-      <ZSSkeletonBox 
-        height={150} 
-        style={{ borderRadius: 8, marginTop: 10 }} 
-      />
-      
-      <ZSSkeleton isFetching={isLoading}>
-        <ZSText typo="body.2" style={{ marginTop: 10 }}>
-          카드 설명 텍스트
-        </ZSText>
-      </ZSSkeleton>
-    </ZSView>
-  );
-}
-```
+| 안쪽 내용 | 광택 |
+|-----------|------|
+| `ZSText` | 글자 줄 모양으로 자름 |
+| `ZSText`가 없음(React Native `Text`·이미지·View) | 감싼 영역 전체 |
+| `ZSText`와 다른 내용이 섞임 | 글자 줄에만 — 이미지 같은 다른 내용은 흐리게만 둡니다. 따로 광택이 필요하면 `ZSSkeleton`을 나누거나 `ZSSkeleton.Box`로 자리를 잡으세요 |
 
-### 리스트 아이템 스켈레톤
+버튼 라벨처럼 다른 zs-ui 컴포넌트 안의 `ZSText`도 줄 모양으로 셉니다.
 
-```tsx
-function ListItemSkeleton() {
-  return (
-    <ZSView style={{ flexDirection: 'row', padding: 15 }}>
-      <ZSSkeletonBox 
-        height={60} 
-        style={{ borderRadius: 30, width: 60 }} 
-      />
-      <ZSView style={{ marginLeft: 15, flex: 1 }}>
-        <ZSSkeletonBox height={20} style={{ borderRadius: 4, marginBottom: 8 }} />
-        <ZSSkeletonBox height={16} style={{ borderRadius: 4, width: '70%' }} />
-      </ZSView>
-    </ZSView>
-  );
-}
-```
+## 접근성
+
+- `loading` 동안 `busy` 상태를 알립니다.
+- 시스템 '동작 줄이기'가 켜져 있으면 광택 띠가 지나가지 않습니다(HIG Accessibility).
+
+| | iOS | Android |
+|---|-----|---------|
+| 동작 줄이기 | 띠가 지나가는 대신 광택 자리([광택 모양](#광택-모양)) 전체가 `duration`에 걸쳐 느리게 밝아졌다 같은 시간에 돌아옵니다(이동 없는 불투명도 맥박) | 광택 없이 멈춘 자리 표시만 둡니다('애니메이션 삭제'를 따릅니다) |
+
+## 관련 문서
+
+- [Loader](../OverlayComponent/Loader) — 화면을 막는 진행 표시
+- [토큰](../Theme/tokens) — `RADIUS`

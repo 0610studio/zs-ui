@@ -2,8 +2,8 @@
   "expo": {
     "name": "zs-ui-example",
     "slug": "zs-ui-example",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "version": "2.0.0",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
@@ -11,7 +11,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "kr.co.studio0610.zsui.example"
+      "bundleIdentifier": "kr.co.studio0610.zsui.example",
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "resize",
@@ -19,13 +22,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "kr.co.studio0610.zsui.example"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "kr.co.studio0610.zsui.example",
+      "predictiveBackGestureEnabled": true
     },
     "plugins": [
-      "../app.plugin.js",
       "expo-router",
       "expo-system-ui",
       [

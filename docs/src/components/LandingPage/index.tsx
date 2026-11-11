@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   BookOpen,
   Layers3,
-  PlayCircle,
   Sparkles,
   TabletSmartphone,
   Type,
@@ -22,7 +21,7 @@ type Scene = {
   detail: string;
   accent: string;
   auraLabel: string;
-  stats: Array<{ label: string; value: string }>;
+  stats: { label: string; value: string }[];
   principles: string[];
   icon: LucideIcon;
 };
@@ -33,7 +32,7 @@ const INSTALL_COMMAND = 'npx expo install @0610studio/zs-ui';
 
 const introHero: HeroScene = {
   eyebrow: '@0610studio/zs-ui',
-  stageTitle: 'ZS-UI',
+  stageTitle: 'zs-ui',
   accent: '화면을 만드는 기준을 하나의 시스템으로.',
   auraLabel: 'Expo UI toolkit',
   icon: Waves,
@@ -42,78 +41,78 @@ const introHero: HeroScene = {
 const scenes: Scene[] = [
   {
     eyebrow: 'Capability 01',
-    title: '상태를 흩뜨리지 않는 오버레이',
-    stageTitle: '오버레이 컴포넌트',
-    description: 'Alert, BottomSheet, Snackbar와 Loader를 같은 호출 방식으로 제어합니다.',
-    detail: 'OverlayProvider 하나로 화면마다 반복되던 표시 상태와 닫기 흐름을 줄입니다.',
-    accent: 'One overlay flow for feedback and actions.',
-    auraLabel: 'Unified overlays',
+    title: '함수로 여는 오버레이',
+    stageTitle: '오버레이',
+    description: 'Alert·시트·스낵바·진행 표시를 useOverlay로 호출합니다.',
+    detail: '시트는 시스템 UI를 사용하고, Alert·스낵바는 두 플랫폼에서 앱 테마에 맞춰 그립니다.',
+    accent: 'One API for alerts, sheets and notifications.',
+    auraLabel: 'Native overlays',
     stats: [
       { label: 'Provider', value: 'OverlayProvider' },
       { label: 'Control', value: 'useOverlay' },
-      { label: 'Pattern', value: 'show* / hide' },
+      { label: 'Render', value: 'iOS · Android' },
     ],
-    principles: ['함수 호출 중심 제어', '화면별 상태 중복 감소', '일관된 피드백 흐름'],
+    principles: ['함수 호출 중심 제어', '테마에 맞춘 색과 글꼴', '화면별 상태 중복 감소'],
     icon: Sparkles,
   },
   {
     eyebrow: 'Capability 02',
-    title: '공유되는 텍스트 계층',
-    stageTitle: '타이포그래피 스케일',
-    description: 'heading부터 caption까지 6개 그룹과 6개 단계로 읽기 흐름을 맞춥니다.',
-    detail: 'ZSText와 useTheme.typography가 같은 타입과 토큰을 사용합니다.',
-    accent: 'A 6 × 6 scale for consistent hierarchy.',
+    title: '플랫폼 글꼴 역할',
+    stageTitle: '글꼴 역할',
+    description: 'h1부터 overline까지 11개 variant로 글꼴을 고르고, iOS에서는 Dynamic Type 텍스트 스타일을 따릅니다.',
+    detail: '두 플랫폼이 같은 크기표를 쓰며, ZSText와 useTheme().typography가 같은 역할을 제공합니다.',
+    accent: 'Shared typography, system font scaling.',
     auraLabel: 'Readable hierarchy',
     stats: [
-      { label: 'Groups', value: '6' },
-      { label: 'Levels', value: '6 each' },
-      { label: 'Access', value: 'ZSText / useTheme' },
+      { label: 'Roles', value: '11' },
+      { label: 'iOS', value: 'Dynamic Type' },
+      { label: 'Android', value: 'System font scale' },
     ],
-    principles: ['일관된 텍스트 계층', '컴포넌트와 스타일 공유', '폰트 교체를 Provider에서 관리'],
+    principles: ['역할 이름으로 고르기', '글자 크기 설정 존중', '브랜드 글꼴은 Provider에서'],
     icon: Type,
   },
   {
     eyebrow: 'Capability 03',
-    title: '폴더블까지 반응하는 화면',
-    stageTitle: '폴더블 대응',
-    description: 'Android 폴더블의 접힘과 펼침 상태를 감지하고 넓어진 화면을 활용합니다.',
-    detail: 'ZSContainer의 rightComponent로 펼침 상태의 두 영역 레이아웃을 구성합니다.',
-    accent: 'Fold-aware layout for devices that open wider.',
-    auraLabel: 'Foldable ready',
+    title: '창 크기와 접힘선에 맞춰 반응하는 화면',
+    stageTitle: '적응형 레이아웃',
+    description: 'iPad·폴더블·데스크톱 창까지 플랫폼 공식 크기 클래스와 접힘선으로 화면을 나눕니다.',
+    detail: 'LayoutProvider와 ZSPaneLayout으로 넓은 창의 2-pane과 접힘선 경계 분할을 구성합니다.',
+    accent: 'Adaptive layout from phones to foldables and tablets.',
+    auraLabel: 'Adaptive ready',
     stats: [
-      { label: 'Hook', value: 'useFoldingState' },
-      { label: 'Layout', value: 'rightComponent' },
-      { label: 'Platform', value: 'Android' },
+      { label: 'Hook', value: 'useWindowLayout' },
+      { label: 'Layout', value: 'ZSPaneLayout' },
+      { label: 'Platform', value: 'iOS · Android' },
     ],
-    principles: ['폴딩 상태 감지', '두 영역 레이아웃 지원', '일반 화면과 같은 컨테이너 사용'],
+    principles: ['공식 크기 클래스 기준', '화면을 가르는 접힘선에서 분할', 'Android 바 ↔ 레일 자동 전환'],
     icon: TabletSmartphone,
   },
   {
     eyebrow: 'Capability 04',
-    title: '라이트와 다크를 같은 기준으로',
-    stageTitle: '일관된 Theme',
-    description: '팔레트, 타이포그래피와 화면 색상을 ThemeProvider에서 앱 전체에 적용합니다.',
-    detail: 'useTheme와 themeFactory로 시스템 모드와 제품별 색상 체계를 함께 관리합니다.',
-    accent: 'One theme system across every screen.',
+    title: '시드 색 하나로 만드는 테마',
+    stageTitle: '색 역할',
+    description: '브랜드 시드 색 하나로 라이트·다크·고대비 Material 3 색 역할을 만듭니다.',
+    detail: 'ThemeProvider colors로 시드를 넘기고, 컴포넌트는 background·text·primaryContainer 같은 이름으로 색을 고릅니다.',
+    accent: 'One seed, every mode and contrast.',
     auraLabel: 'Consistent theme',
     stats: [
       { label: 'Provider', value: 'ThemeProvider' },
-      { label: 'Mode', value: 'Light / Dark' },
-      { label: 'Factory', value: 'themeFactory' },
+      { label: 'Mode', value: 'Light / Dark / Contrast' },
+      { label: 'Roles', value: 'Material 3' },
     ],
-    principles: ['앱 전체 팔레트 공유', '시스템 모드 대응', '제품별 토큰 확장'],
+    principles: ['역할 이름으로 고르기', '다크·고대비 자동 대응', '네이티브 헤더까지 같은 테마'],
     icon: BookOpen,
   },
   {
     eyebrow: 'Capability 05',
     title: '화면 구조를 한 번에',
     stageTitle: '공통 화면 구조',
-    description: 'SafeArea, 스크롤, 상태바와 키보드 대응을 ZSContainer에 모았습니다.',
+    description: 'SafeArea, 스크롤, 투명 헤더와 키보드 대응을 ZSScreen에 모았습니다.',
     detail: '입력 화면과 일반 화면을 같은 뼈대로 구성해 반복되는 레이아웃 결정을 줄입니다.',
     accent: 'One container for the screen foundation.',
     auraLabel: 'Screen foundation',
     stats: [
-      { label: 'Root', value: 'ZSContainer' },
+      { label: 'Root', value: 'ZSScreen' },
       { label: 'Keyboard', value: 'Auto scroll' },
       { label: 'Layout', value: 'Header / Footer' },
     ],
@@ -125,7 +124,7 @@ const scenes: Scene[] = [
 export default function LandingPage() {
   const { siteConfig } = useDocusaurusContext();
   const [activeScene, setActiveScene] = useState<number | null>(null);
-  const stepRefs = useRef<Array<HTMLElement | null>>([]);
+  const stepRefs = useRef<(HTMLElement | null)[]>([]);
   const configuredVersion = siteConfig.customFields?.zsUiVersion;
   const version = typeof configuredVersion === 'string' ? configuredVersion : 'current';
 
@@ -221,16 +220,16 @@ export default function LandingPage() {
                 <div className={styles.centerDockBody}>
                   <div className={styles.dockCopy}>
                     <p className={styles.centerDockKicker}>Current · v{version}</p>
-                    <strong>45개 공개 API와 로컬 앱 Playground</strong>
+                    <strong>iOS·Android 네이티브 우선 UI 툴킷</strong>
                   </div>
                   <div className={styles.dockActions}>
                     <Link to="/docs/Provider/start" className={styles.primaryAction}>
                       시작하기
                       <ArrowUpRight size={17} strokeWidth={2.2} aria-hidden="true" />
                     </Link>
-                    <Link to="/docs/Playground" className={styles.secondaryAction}>
-                      <PlayCircle size={17} strokeWidth={2.2} aria-hidden="true" />
-                      Playground
+                    <Link to="/docs/intro" className={styles.secondaryAction}>
+                      <BookOpen size={17} strokeWidth={2.2} aria-hidden="true" />
+                      API 문서
                     </Link>
                   </div>
                   <code className={styles.installCommand}>{INSTALL_COMMAND}</code>

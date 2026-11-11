@@ -1,0 +1,72 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      true: ${STEP == 'setup'}
+    commands:
+      - launchApp:
+          clearState: false
+      - setOrientation: PORTRAIT
+      - extendedWaitUntil:
+          visible: 'ZS-UI'
+          timeout: 120000
+      - runFlow: ../common/open-lab.yaml
+      - scrollUntilVisible:
+          element:
+            id: 'lab-environment-card'
+          direction: DOWN
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-environment-card'
+            - tapOn:
+                id: 'lab-environment-panel-window'
+            - assertVisible:
+                id: 'lab-window-layout-measured'
+                text: 'true'
+
+- runFlow:
+    when:
+      true: ${POSTURE == 'folded'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-window-layout-width-class'
+            text: 'compact'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-window-layout-height-class'
+          text: 'expanded'
+      - assertVisible:
+          id: 'lab-window-layout-size'
+          text: '411 × 960'
+      - assertVisible:
+          id: 'lab-window-layout-min-width-dp'
+          text: '0'
+      - assertVisible:
+          id: 'lab-window-layout-min-height-dp'
+          text: '900'
+- runFlow:
+    when:
+      true: ${POSTURE != 'folded'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-window-layout-width-class'
+            text: 'medium'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-window-layout-height-class'
+          text: 'medium'
+      - assertVisible:
+          id: 'lab-window-layout-size'
+          text: '750 × 832'
+      - assertVisible:
+          id: 'lab-window-layout-min-width-dp'
+          text: '600'
+      - assertVisible:
+          id: 'lab-window-layout-min-height-dp'
+          text: '480'
+- waitForAnimationToEnd
+- takeScreenshot: l01-${POSTURE}

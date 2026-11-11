@@ -1,0 +1,28 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-environment-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-environment-card'
+      - tapOn:
+          id: 'lab-environment-panel-window'
+      - assertVisible:
+          id: 'lab-window-layout-measured'
+          text: 'true'
+- assertVisible:
+    id: 'lab-window-layout-readable'
+    text: ${READABLE}
+- waitForAnimationToEnd
+- takeScreenshot: readable-${LABEL}

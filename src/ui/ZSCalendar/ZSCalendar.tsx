@@ -1,29 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Gesture } from 'react-native-gesture-handler';
-import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
+import React, { useEffect, useMemo } from 'react';
+import { StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
+import { useCompetingGestures } from 'react-native-gesture-handler';
+import { useDerivedValue } from 'react-native-reanimated';
 import { useTheme } from '../../context/ThemeContext';
+import { capFontScale } from '../../theme/fontScale';
 import {
-  DEFAULT_MAX_CONTENT_WIDTH,
-  addDays,
+  DEFAULT_WEEKDAY_HEADER_HEIGHT,
   addMonths,
   buildEventIndex,
   computeGridLayout,
-  isSameMonth,
-  monthsBetween,
   resolveCalendarLocale,
   resolveCalendarTheme,
-  resolveWeekMonth,
   rotateWeekdays,
   startOfMonth,
-  startOfWeek,
-  todayDateString,
   visibleRangeOf,
-  weeksBetween,
   weeksInMonth,
   type CalendarEvent,
-  type CalendarLabels,
+  type CalendarEventDisplay,
   type CalendarLocaleCode,
   type CalendarLocaleStrings,
   type CalendarMode,
@@ -35,30 +28,29 @@ import {
 import { ZSCalendarContext, type ZSCalendarContextValue } from './context';
 import CalendarHeader, { type CalendarHeaderContext } from './ui/CalendarHeader';
 import MonthPagerCanvas from './skia/MonthPagerCanvas';
-import { buildCalendarFonts, resolveCalendarFontSources, useCalendarFontProvider, CALENDAR_FONT_FAMILY, type CalendarFontSources } from './skia/fonts';
-import { usePaneCache, type CalendarPagerUnit } from './skia/usePaneCache';
+import { buildCalendarFonts, resolveCalendarFontSources, useCalendarFontProvider, type CalendarFontSources } from './skia/fonts';
+import { usePaneCache } from './skia/usePaneCache';
 import { SELECTED_CARD_SHADOW_BLEED } from './skia/drawGrid';
 import { useHorizontalPager } from './gestures/useHorizontalPager';
 import { useModeTransition } from './gestures/useModeTransition';
-import { useContainerWidth } from './hooks/useContainerWidth';
+import { useContainerSize } from './hooks/useContainerSize';
 import { useCalendarAnnouncements } from './hooks/useCalendarAnnouncements';
-import { useControllableState } from './hooks/useControllableState';
+import { useCalendarPaging, useCalendarPagingSync } from './hooks/useCalendarPaging';
+import { useToday } from './hooks/useToday';
+import { useControllableState } from '../../model/useControllableState';
 
-/** 6주짜리 달도 잘리지 않도록 캔버스 높이를 최대 주 수로 고정한다 */
 const MAX_WEEK_ROWS = 6;
 const HEIGHT_TABLE_SPAN = 3;
 
 export interface ZSCalendarProps<T = unknown> {
-  /** 달력 dot 과 아젠다 리스트가 공유하는 단일 소스 */
-  events?: ReadonlyArray<CalendarEvent<T>>;
-  /** 앞뒤 페이지까지 포함한 범위 — 이 범위만 prefetch 하면 도착 시점에 dot 이 이미 있다 */
+  events?: readonly CalendarEvent<T>[];
+  eventDisplay?: CalendarEventDisplay;
   onVisibleRangeChange?: (range: DateRange) => void;
 
   selectedDate?: DateString | null;
   defaultSelectedDate?: DateString | null;
   onDateChange?: (date: DateString) => void;
 
-  /** 'YYYY-MM-DD' — 항상 해당 월의 1일로 정규화된다 */
   visibleMonth?: DateString;
   defaultVisibleMonth?: DateString;
   onMonthChange?: (month: DateString) => void;
@@ -67,42 +59,24 @@ export interface ZSCalendarProps<T = unknown> {
   defaultMode?: CalendarMode;
   onModeChange?: (mode: CalendarMode) => void;
 
-  /** 팔레트에서 파생된 기본값을 덮어쓴다 */
-  calendarTheme?: CalendarThemeOverride;
-  /** 미주입 시 ThemeProvider 의 `themeFontAssets`(400·700) 를 쓰고, 그것도 없으면 시스템 폰트다 */
+  theme?: CalendarThemeOverride;
   fonts?: CalendarFontSources;
-  /** 0=일요일, 1=월요일 */
   firstDayOfWeek?: FirstDayOfWeek;
-  /**
-   * 요일·월 제목·접근성 라벨·스크린리더 안내의 언어. 'ko' | 'en' 또는 문자열 묶음을 직접 넘긴다.
-   * 기본은 한국어.
-   */
   locale?: CalendarLocaleCode | CalendarLocaleStrings;
-  /** locale 위에 요일·월 제목만 덮어쓴다 */
-  labels?: CalendarLabels;
-  /** 태블릿용 상한. false 면 제한 없음 */
   maxContentWidth?: number | false;
-  /** 기본 헤더를 통째로 교체한다 */
   renderHeader?: (context: CalendarHeaderContext) => React.ReactNode;
   onTitlePress?: () => void;
-  /** 끄면 월간 고정 — 팬도 리스트 스크롤도 전환하지 않는다 */
   enableModeTransition?: boolean;
-  /** 끄면 아젠다 리스트 스크롤이 월간↔주간을 바꾸지 않는다. 팬 제스처는 그대로 */
   enableScrollModeTransition?: boolean;
-  /** 스크린리더에 월 이동·모드 전환을 알린다 */
   announceChanges?: boolean;
   style?: StyleProp<ViewStyle>;
-  /** Provider 안에서 렌더된다 — 여기서만 useCalendarAgenda 가 인자 없이 동작한다 */
   children?: React.ReactNode;
   testID?: string;
 }
 
-/**
- * Skia 그리드 · 3-pane 페이저 · 주↔월 전환을 묶은 달력.
- * ThemeProvider 와 GestureHandlerRootView 하위에서 동작한다.
- */
 function ZSCalendar<T = unknown>({
   events,
+  eventDisplay = 'dot',
   onVisibleRangeChange,
   selectedDate: selectedDateProp,
   defaultSelectedDate,
@@ -113,12 +87,11 @@ function ZSCalendar<T = unknown>({
   mode: modeProp,
   defaultMode = 'month',
   onModeChange,
-  calendarTheme: calendarThemeOverride,
+  theme: calendarThemeOverride,
   fonts: fontSources,
   firstDayOfWeek = 0,
   locale = 'ko',
-  labels,
-  maxContentWidth = DEFAULT_MAX_CONTENT_WIDTH,
+  maxContentWidth = false,
   renderHeader,
   onTitlePress,
   enableModeTransition = true,
@@ -128,8 +101,8 @@ function ZSCalendar<T = unknown>({
   children,
   testID,
 }: ZSCalendarProps<T>) {
-  const { palette, fontAssets } = useTheme();
-  const today = useMemo(() => todayDateString(), []);
+  const { colors, mode: colorMode, fontAssets, maxFontSizeMultiplier } = useTheme();
+  const today = useToday();
 
   const [selectedDate, setSelectedDate] = useControllableState<DateString | null>(
     selectedDateProp,
@@ -145,77 +118,47 @@ function ZSCalendar<T = unknown>({
   );
   const [mode, setModeState] = useControllableState<CalendarMode>(modeProp, defaultMode, onModeChange);
 
-  /**
-   * 페이지 단위는 모드를 따라간다(월간=한 달, 주간=한 주). 다만 접힘·펼침 애니메이션은
-   * 월 그리드가 있어야 하므로, progress 가 0 을 벗어나는 순간 월 단위로 갈아탄다.
-   */
-  const [unit, setUnit] = useState<CalendarPagerUnit>(defaultMode === 'week' ? 'week' : 'month');
-  const [page, setPage] = useState(0);
+  const paging = useCalendarPaging({ visibleMonth, selectedDate, firstDayOfWeek, initialMode: mode });
+  const { unit, page, baseMonth, baseWeek, weekAnchor, currentWeekStart, derivedMonth, rowCount } = paging;
 
-  /**
-   * 페이지 0 이 가리키는 달 / 주. 단위를 갈아탈 때 페이지 번호는 그대로 두고 이 원점만 옮긴다 —
-   * 번호를 바꾸면 translateX 를 다시 맞춰야 하고, 그 값이 UI 스레드에 한 프레임 늦게 닿아
-   * 빈 프레임이 한 번 보인다.
-   */
-  const [baseMonth, setBaseMonth] = useState(visibleMonth);
-  const [baseWeekRaw, setBaseWeek] = useState(() => startOfWeek(visibleMonth, firstDayOfWeek));
-  const baseWeek = useMemo(() => startOfWeek(baseWeekRaw, firstDayOfWeek), [baseWeekRaw, firstDayOfWeek]);
-  /**
-   * 접히는 순간의 주와 그때 보던 달. 경계 주(04-27~05-03 처럼 두 달에 걸친 주)는 어느 달의
-   * 그리드에도 들어가 주만 보고는 정할 수 없어, 그 한 주에 한해 떠나온 달을 들고 간다.
-   * 다른 주로 넘어가면 과반 규칙으로 돌아간다 — 주 이동까지 붙들면 되돌아온 주의 달이 어긋난다.
-   */
-  const [weekAnchor, setWeekAnchor] = useState(() => ({
-    week: startOfWeek(visibleMonth, firstDayOfWeek),
-    month: startOfMonth(visibleMonth),
-  }));
-
-  const { width, onLayout } = useContainerWidth();
+  const isLabel = eventDisplay === 'label';
+  const { width, height: gridHostHeight, onLayout } = useContainerSize({ measureHeight: isLabel });
   const index = useMemo(() => buildEventIndex(events), [events]);
-
-  const metrics = useMemo(
-    () => computeGridLayout({ containerWidth: width, rowCount: MAX_WEEK_ROWS, maxContentWidth }),
-    [width, maxContentWidth],
-  );
   const theme = useMemo(
-    () => resolveCalendarTheme(palette, calendarThemeOverride),
-    [palette, calendarThemeOverride],
+    () => resolveCalendarTheme(colors, colorMode, calendarThemeOverride),
+    [colors, colorMode, calendarThemeOverride],
   );
-  // 앱이 ThemeProvider 에 폰트 파일을 넘겼으면 달력 숫자도 같은 글꼴로 — 컴포넌트마다 다시 주입하지 않는다
   const themeFontSources = useMemo(() => resolveCalendarFontSources(fontAssets), [fontAssets]);
   const fontProvider = useCalendarFontProvider(fontSources ?? themeFontSources);
-  const fonts = useMemo(
+  const strings = useMemo(() => resolveCalendarLocale(locale), [locale]);
+  const weekdayLabels = useMemo(() => rotateWeekdays(strings.weekdays, firstDayOfWeek), [strings.weekdays, firstDayOfWeek]);
+
+  const fixedWeek = !enableModeTransition && mode === 'week';
+  const availableRowsHeight = isLabel && gridHostHeight > 0
+    ? gridHostHeight - DEFAULT_WEEKDAY_HEADER_HEIGHT - SELECTED_CARD_SHADOW_BLEED
+    : undefined;
+  const fillRowCount = isLabel ? (fixedWeek ? 1 : rowCount) : undefined;
+  const { fontScale: systemFontScale = 1 } = useWindowDimensions();
+  const fontScale = capFontScale(systemFontScale, maxFontSizeMultiplier);
+  const metrics = useMemo(
     () =>
-      buildCalendarFonts({
-        dayFontSize: metrics.dayFontSize,
-        fontProvider,
-        fontFamily: fontProvider ? CALENDAR_FONT_FAMILY : undefined,
+      computeGridLayout({
+        containerWidth: width,
+        rowCount: MAX_WEEK_ROWS,
+        maxContentWidth,
+        eventDisplay,
+        availableRowsHeight,
+        fillRowCount,
+        fontScale,
       }),
+    [width, maxContentWidth, eventDisplay, availableRowsHeight, fillRowCount, fontScale],
+  );
+  const fonts = useMemo(
+    () => buildCalendarFonts({ dayFontSize: metrics.dayFontSize, fontProvider }),
     [metrics.dayFontSize, fontProvider],
   );
-  const strings = useMemo(() => resolveCalendarLocale(locale, labels), [locale, labels]);
-  const weekdayLabels = useMemo(() => rotateWeekdays(strings.weekdays, firstDayOfWeek), [strings.weekdays, firstDayOfWeek]);
-  // 주간 단위면 페이지 자체, 월간 단위면 접혔을 때 남을 주
-  const currentWeekStart = useMemo(() => {
-    if (unit === 'week') return addDays(baseWeek, page * 7);
-    const month = startOfMonth(addMonths(baseMonth, page));
-    // 선택일이 이 달의 날짜일 때만 그 주를 남긴다. 다른 달이면(달만 넘겨봤다면) 이 달의 첫 주
-    return selectedDate && isSameMonth(selectedDate, month)
-      ? startOfWeek(selectedDate, firstDayOfWeek)
-      : startOfWeek(startOfMonth(month), firstDayOfWeek);
-  }, [unit, page, baseWeek, baseMonth, selectedDate, firstDayOfWeek]);
 
-  // 헤더·범위의 기준 달. 주간에서는 접힌 그 주만 떠나온 달을 쓰고, 나머지 주는 과반을 따른다
-  const derivedMonth = useMemo(
-    () =>
-      unit === 'week'
-        ? resolveWeekMonth(currentWeekStart, weekAnchor.week, weekAnchor.month)
-        : startOfMonth(addMonths(baseMonth, page)),
-    [unit, currentWeekStart, weekAnchor, baseMonth, page],
-  );
-  const rowCount = useMemo(() => weeksInMonth(derivedMonth, firstDayOfWeek), [derivedMonth, firstDayOfWeek]);
-
-  const { getPane } = usePaneCache({
+  const getPane = usePaneCache({
     unit,
     baseMonth,
     baseWeek,
@@ -234,7 +177,6 @@ function ZSCalendar<T = unknown>({
   const heightTable = useMemo(() => {
     const table: Record<number, number> = {};
     for (let offset = -HEIGHT_TABLE_SPAN; offset <= HEIGHT_TABLE_SPAN; offset += 1) {
-      // 주간 페이지는 언제나 1행 — 펼치는 동안에는 이미 월 단위다
       table[page + offset] =
         unit === 'week'
           ? metrics.rowHeight
@@ -242,10 +184,9 @@ function ZSCalendar<T = unknown>({
     }
     return table;
   }, [unit, baseMonth, page, firstDayOfWeek, metrics.rowHeight]);
-  const rowsHeightByPage = useDerivedValue(() => heightTable, [heightTable]);
+  const rowsHeightByPage = useDerivedValue(() => heightTable);
 
-  const handlePageChange = useCallback((nextPage: number) => setPage(nextPage), []);
-  const pager = useHorizontalPager({ pageWidth: metrics.gridWidth, onPageChange: handlePageChange });
+  const pager = useHorizontalPager({ pageWidth: metrics.gridWidth, onPageChange: paging.setPage });
 
   const transition = useModeTransition({
     expandDistance: Math.max(rowCount - 1, 1) * metrics.rowHeight,
@@ -255,91 +196,13 @@ function ZSCalendar<T = unknown>({
     scrollEnabled: enableScrollModeTransition,
   });
   const { progress, setMode: driveMode } = transition;
-
-  // 워클릿·이펙트 순서에 휘둘리지 않도록 전환 시점 상태를 ref 로 들고 한 번에 바꾼다
-  const unitStateRef = useRef({ unit, page, currentWeekStart, baseWeek, baseMonth, derivedMonth, firstDayOfWeek });
-  unitStateRef.current = { unit, page, currentWeekStart, baseWeek, baseMonth, derivedMonth, firstDayOfWeek };
-
-  // 화면은 그대로, 현재 페이지 번호가 새 단위에서도 같은 주/달을 가리키도록 원점을 잡는다
-  const switchUnit = useCallback((next: CalendarPagerUnit) => {
-    const current = unitStateRef.current;
-    if (current.unit === next) return;
-
-    // 단위가 바뀌어도 내세우는 달은 그대로다 — 과반으로 다시 판정하면 경계 주에서 달이 밀린다
-    if (next === 'week') {
-      setWeekAnchor({ week: current.currentWeekStart, month: current.derivedMonth });
-      setBaseWeek(addDays(current.currentWeekStart, -7 * current.page));
-    } else {
-      setBaseMonth(addMonths(current.derivedMonth, -current.page));
-    }
-    setUnit(next);
-  }, []);
-
-  // progress 가 0 을 벗어나면 월 단위로, 정확히 0 이면 주 단위로
-  useAnimatedReaction(
-    () => progress.value > 0.001,
-    (needsMonthGrid, previous) => {
-      if (previous !== null && needsMonthGrid === previous) return;
-      scheduleOnRN(switchUnit, needsMonthGrid ? 'month' : 'week');
-    },
-    [switchUnit],
-  );
-
-  // 전환 도중에만 비선택 주를 페이드한다. 정지 상태에서는 레이어 없이 그린다
-  const [midTransition, setMidTransition] = useState(false);
-  useAnimatedReaction(
-    () => progress.value > 0.001 && progress.value < 0.999,
-    (mid, previous) => {
-      if (mid !== previous) scheduleOnRN(setMidTransition, mid);
-    },
-    [],
-  );
-  // 주간에서 펼치기 시작하면 월 그리드가 올라오는 커밋과 같은 프레임부터 페이드가 걸려야 한다 —
-  // 그 순간 mode 는 아직 'week' 이므로 반응의 한 프레임 지연에 기대지 않는다
-  const fadeRows = unit === 'month' && (midTransition || mode !== 'month');
-
-  // 페이지 이동은 visibleMonth 로 반영하고, 밖에서 바꾸면 페이저가 따라온다
-  const lastMonthRef = useRef(visibleMonth);
   const { goToPage, stepPage } = pager;
-  useEffect(() => {
-    if (derivedMonth !== lastMonthRef.current) {
-      lastMonthRef.current = derivedMonth;
-      setVisibleMonth(derivedMonth);
-      return;
-    }
-    if (visibleMonth === derivedMonth) return;
 
-    lastMonthRef.current = visibleMonth;
-    const current = unitStateRef.current;
-    let target: number;
-    if (current.unit === 'week') {
-      // 밖에서 달을 바꾸면 그 달의 첫 주로 가되, 그 주가 내세울 달도 같이 옮긴다
-      const week = startOfWeek(visibleMonth, current.firstDayOfWeek);
-      target = weeksBetween(current.baseWeek, week);
-      setWeekAnchor({ week, month: startOfMonth(visibleMonth) });
-    } else {
-      target = monthsBetween(current.baseMonth, visibleMonth);
-    }
-    setPage(target);
-    goToPage(target);
-  }, [derivedMonth, visibleMonth, setVisibleMonth, goToPage]);
+  const fadeRows = useCalendarPagingSync(paging, { progress, mode, driveMode, goToPage, visibleMonth, setVisibleMonth });
 
-  // mode 를 밖에서 바꾸면 progress 를 스프링으로 몰아준다
-  const lastModeRef = useRef(mode);
-  useEffect(() => {
-    if (lastModeRef.current === mode) return;
-    lastModeRef.current = mode;
-    // 펼칠 때는 월 그리드가 먼저 있어야 한다. 접을 때는 progress 가 0 에 닿은 뒤 위 반응이 처리
-    if (mode === 'month') switchUnit('month');
-    driveMode(mode);
-  }, [mode, driveMode, switchUnit]);
+  const competing = useCompetingGestures(pager.gesture, transition.gesture);
+  const gesture = enableModeTransition ? competing : pager.gesture;
 
-  const gesture = useMemo(
-    () => (enableModeTransition ? Gesture.Race(pager.gesture, transition.gesture) : pager.gesture),
-    [enableModeTransition, pager.gesture, transition.gesture],
-  );
-
-  // 주간의 기준은 달의 1일이 아니라 보이는 주다
   const visibleRange = useMemo(
     () => visibleRangeOf(unit === 'week' ? currentWeekStart : derivedMonth, unit, firstDayOfWeek, 1),
     [unit, currentWeekStart, derivedMonth, firstDayOfWeek],
@@ -350,9 +213,11 @@ function ZSCalendar<T = unknown>({
 
   useCalendarAnnouncements(derivedMonth, mode, announceChanges, strings);
 
-  const selectDate = useCallback((date: DateString) => setSelectedDate(date), [setSelectedDate]);
+  const defaultHeaderStyle = useMemo(
+    () => (maxContentWidth === false ? undefined : { maxWidth: maxContentWidth }),
+    [maxContentWidth],
+  );
 
-  // pager 객체는 매 렌더 새로 만들어지므로 함수 참조에만 의존한다
   const headerContext: CalendarHeaderContext = useMemo(
     () => ({
       visibleMonth: derivedMonth,
@@ -370,11 +235,11 @@ function ZSCalendar<T = unknown>({
       visibleMonth: derivedMonth,
       mode,
       visibleRange,
-      selectDate,
+      selectDate: setSelectedDate,
       setMode: driveMode,
       bindScroll: transition.bindScroll,
     }),
-    [index, selectedDate, derivedMonth, mode, visibleRange, selectDate, driveMode, transition.bindScroll],
+    [index, selectedDate, derivedMonth, mode, visibleRange, setSelectedDate, driveMode, transition.bindScroll],
   );
 
   return (
@@ -388,17 +253,18 @@ function ZSCalendar<T = unknown>({
             monthTitle={strings.monthTitle}
             prevMonthLabel={strings.prevMonth}
             nextMonthLabel={strings.nextMonth}
+            style={defaultHeaderStyle}
           />
         )}
 
-        <View onLayout={onLayout} style={styles.gridHost} testID={testID ? `${testID}-grid` : undefined}>
+        <View onLayout={onLayout} style={isLabel ? styles.gridHostFill : styles.gridHost} testID={testID ? `${testID}-grid` : undefined}>
           {width > 0 && (
             <MonthPagerCanvas
               panes={panes}
               unit={unit}
               fadeRows={fadeRows}
               metrics={metrics}
-              canvasRowsHeight={metrics.rowHeight * MAX_WEEK_ROWS + SELECTED_CARD_SHADOW_BLEED}
+              canvasRowsHeight={metrics.rowHeight * (fixedWeek ? 1 : MAX_WEEK_ROWS) + SELECTED_CARD_SHADOW_BLEED}
               rowsHeightByPage={rowsHeightByPage}
               translateX={pager.translateX}
               progress={progress}
@@ -408,7 +274,7 @@ function ZSCalendar<T = unknown>({
               firstDayOfWeek={firstDayOfWeek}
               selectedDate={selectedDate}
               index={index}
-              onSelect={selectDate}
+              onSelect={setSelectedDate}
               formatLabel={strings.cellLabel}
             />
           )}
@@ -423,6 +289,7 @@ function ZSCalendar<T = unknown>({
 const styles = StyleSheet.create({
   root: { width: '100%' },
   gridHost: { width: '100%' },
+  gridHostFill: { width: '100%', flexGrow: 1, flexShrink: 1, overflow: 'hidden' },
 });
 
 export default ZSCalendar;

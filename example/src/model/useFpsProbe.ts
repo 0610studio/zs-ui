@@ -5,17 +5,12 @@ import { scheduleOnRN } from 'react-native-worklets';
 export interface FpsSample {
   ui: number;
   js: number;
-  /** reset 이후 가장 낮았던 1초 창 */
   uiMin: number;
   jsMin: number;
 }
 
 const WINDOW_MS = 1000;
 
-/**
- * 1초 창마다 UI·JS 스레드 프레임 수를 센다 — 데모·e2e 성능 계측용.
- * UI 쪽은 Reanimated 프레임 콜백(UI 런타임), JS 쪽은 requestAnimationFrame 으로 각 스레드가 실제로 돈 프레임만 잡힌다.
- */
 export function useFpsProbe(enabled: boolean): { sample: FpsSample; reset: () => void } {
   const [sample, setSample] = useState<FpsSample>({ ui: 0, js: 0, uiMin: 0, jsMin: 0 });
   const uiMinRef = useRef(Number.POSITIVE_INFINITY);

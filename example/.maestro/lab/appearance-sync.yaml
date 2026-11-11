@@ -1,0 +1,77 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-environment-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-environment-card'
+      - assertVisible:
+          id: 'lab-environment-expo'
+- scrollUntilVisible:
+    element:
+      id: 'lab-environment-use-system'
+    direction: DOWN
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-environment-use-system'
+      - assertVisible:
+          id: 'lab-environment-theme-source'
+          text: 'system'
+- assertVisible:
+    id: 'lab-environment-native-scheme'
+    text: ${SYSTEM}
+- assertVisible:
+    id: 'lab-environment-theme-mode'
+    text: ${SYSTEM}
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '(라이트|다크) 모드로 전환'
+      - assertVisible:
+          id: 'lab-environment-theme-source'
+          text: 'manual'
+- copyTextFrom:
+    id: 'lab-environment-theme-mode'
+- assertVisible:
+    id: 'lab-environment-native-scheme'
+    text: ${maestro.copiedText}
+- waitForAnimationToEnd
+- takeScreenshot: a01-manual-opposite-${LABEL}
+
+- tapOn: '(라이트|다크) 모드로 전환'
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'lab-environment-theme-mode'
+    text: ${SYSTEM}
+- assertVisible:
+    id: 'lab-environment-native-scheme'
+    text: ${SYSTEM}
+- takeScreenshot: a02-manual-same-${LABEL}
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-environment-use-system'
+      - assertVisible:
+          id: 'lab-environment-theme-source'
+          text: 'system'
+- assertVisible:
+    id: 'lab-environment-native-scheme'
+    text: ${SYSTEM}
+- takeScreenshot: a03-system-${LABEL}

@@ -1,0 +1,126 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-pane-layout-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-pane-layout-card'
+      - assertVisible:
+          id: 'lab-pane-primary-width'
+          text: 'primary ${PRIMARY_PORTRAIT}'
+- assertVisible:
+    id: 'lab-pane-primary-hook'
+    text: 'usePaneLayout ${PRIMARY_ROLE} ${PRIMARY_PORTRAIT} ${PRIMARY_PORTRAIT_CLASS}'
+
+- runFlow:
+    when:
+      true: ${SPLIT_PORTRAIT == 'true'}
+    commands:
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary ${SECONDARY_PORTRAIT}'
+      - assertVisible:
+          id: 'lab-pane-secondary-hook'
+          text: 'usePaneLayout secondary ${SECONDARY_PORTRAIT} ${SECONDARY_PORTRAIT_CLASS}'
+- runFlow:
+    when:
+      true: ${SPLIT_PORTRAIT != 'true'}
+    commands:
+      - assertNotVisible:
+          id: 'lab-pane-secondary-width'
+- waitForAnimationToEnd
+- takeScreenshot: p01-portrait-${LABEL}
+
+- setOrientation: LANDSCAPE_LEFT
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'lab-pane-primary-width'
+    text: 'primary ${PRIMARY_LANDSCAPE}'
+- assertVisible:
+    id: 'lab-pane-primary-hook'
+    text: 'usePaneLayout ${LANDSCAPE_ROLE} ${PRIMARY_LANDSCAPE} ${PRIMARY_LANDSCAPE_CLASS}'
+- runFlow:
+    when:
+      true: ${SPLIT_LANDSCAPE == 'true'}
+    commands:
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary ${SECONDARY_LANDSCAPE}'
+      - assertVisible:
+          id: 'lab-pane-secondary-hook'
+          text: 'usePaneLayout secondary ${SECONDARY_LANDSCAPE} ${SECONDARY_LANDSCAPE_CLASS}'
+- runFlow:
+    when:
+      true: ${SPLIT_LANDSCAPE != 'true'}
+    commands:
+      - assertNotVisible:
+          id: 'lab-pane-secondary-width'
+- takeScreenshot: p02-landscape-${LABEL}
+
+- runFlow:
+    when:
+      true: ${SPLIT_LANDSCAPE == 'true'}
+    commands:
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-pane-fraction-0.5'
+            - assertVisible:
+                id: 'lab-pane-primary-width'
+                text: 'primary ${HALF_PRIMARY}'
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary ${HALF_SECONDARY}'
+      - assertVisible:
+          id: 'lab-pane-primary-hook'
+          text: 'usePaneLayout primary ${HALF_PRIMARY} ${HALF_CLASS}'
+      - assertVisible:
+          id: 'lab-pane-secondary-hook'
+          text: 'usePaneLayout secondary ${HALF_SECONDARY} ${HALF_CLASS}'
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-pane-item-2'
+            - assertVisible:
+                id: 'lab-pane-detail-title'
+                text: '항목 2 상세'
+      - waitForAnimationToEnd
+      - takeScreenshot: p03-landscape-half-${LABEL}
+
+- setOrientation: PORTRAIT
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      true: ${SPLIT_PORTRAIT != 'true'}
+    commands:
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-pane-compact-stack'
+            - scrollUntilVisible:
+                element:
+                  id: 'lab-pane-secondary-width'
+                direction: DOWN
+      - waitForAnimationToEnd
+      - assertVisible:
+          id: 'lab-pane-secondary-width'
+          text: 'secondary ${PRIMARY_PORTRAIT}'
+      - takeScreenshot: p04-portrait-stack-${LABEL}
+      - scrollUntilVisible:
+          element:
+            id: lab-pane-secondary-end
+          direction: DOWN

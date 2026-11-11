@@ -1,97 +1,41 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { ZSContainer, ZSSwitch, ZSText, useTheme } from '@0610studio/zs-ui';
+import { ZSCheckbox, ZSScreen, ZSSwitch, ZSText } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
-import CodeBlock from '../src/ui/kit/CodeBlock';
+import { PAGE_CONTENT, ROW_INSET } from '../src/ui/kit/layout';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
 export default function SwitchExample() {
-  const { palette } = useTheme();
-  const [basicActive, setBasicActive] = useState(true);
-  const [customActive, setCustomActive] = useState(false);
-  const [largeActive, setLargeActive] = useState(true);
-  const [smallActive, setSmallActive] = useState(false);
+  const [wifi, setWifi] = useState(true);
+  const [push, setPush] = useState(false);
 
   return (
     <>
-      <Stack.Screen options={{ title: 'ZSSwitch' }} />
-      <ZSContainer style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <Section label="기본" gap={4}>
-          <View style={styles.switchRow}>
-            <ZSText typo="body.2">기본 (primary)</ZSText>
-            <ZSSwitch
-              isActive={basicActive}
-              onToggle={() => setBasicActive(!basicActive)}
-            />
-          </View>
-          <View style={styles.switchRow}>
-            <ZSText typo="body.2">비활성화 (disabled)</ZSText>
-            <ZSSwitch
-              isActive
-              disabled
-              onToggle={() => console.log('disabled 상태에서는 호출되지 않음')}
-            />
+      <ScreenHeader title="ZSSwitch" />
+      <ZSScreen backgroundColor="background" style={styles.container}>
+        {/* 행 여백은 스위치가 직접 갖는다(contentInset) — 누름 효과가 묶음 끝에서 끝까지 퍼진다 */}
+        <Section label="목록 행" surface="list" flushRows>
+          <ZSSwitch label="Wi-Fi" value={wifi} onValueChange={setWifi} contentInset={ROW_INSET} testID="switch-wifi" />
+          <ZSSwitch label="푸시 알림" value={push} onValueChange={setPush} contentInset={ROW_INSET} testID="switch-push" />
+          <ZSSwitch label="비활성" value onValueChange={() => undefined} contentInset={ROW_INSET} disabled />
+        </Section>
+        <ZSText variant="caption" color="textSecondary" testID="switch-state">{`Wi-Fi ${wifi ? '켬' : '끔'} · 푸시 ${push ? '켬' : '끔'}`}</ZSText>
+        <Section label="라벨 없음" gap={12} direction="row">
+          <ZSSwitch accessibilityLabel="Wi-Fi" value={wifi} onValueChange={setWifi} />
+          <ZSSwitch accessibilityLabel="푸시 알림" value={push} onValueChange={setPush} />
+        </Section>
+        <Section label="비제어 · defaultValue" surface="list" flushRows>
+          <ZSSwitch label="블루투스" defaultValue contentInset={ROW_INSET} testID="switch-uncontrolled" />
+          <View style={styles.inset}>
+            <ZSCheckbox label="자동 업데이트" defaultValue={false} testID="check-uncontrolled" />
           </View>
         </Section>
-
-        <Section label="커스텀 색상" gap={4}>
-          <View style={styles.switchRow}>
-            <ZSText typo="body.2">트랙 · 썸 색상 지정</ZSText>
-            <ZSSwitch
-              isActive={customActive}
-              onToggle={() => setCustomActive(!customActive)}
-              trackColorInactive="#ffcccc"
-              trackColorActive="#ff6b6b"
-              thumbColor="#ffffff"
-            />
-          </View>
-        </Section>
-
-        <Section label="크기" gap={4}>
-          <View style={styles.switchRow}>
-            <ZSText typo="body.2">크기 100</ZSText>
-            <ZSSwitch
-              isActive={largeActive}
-              onToggle={() => setLargeActive(!largeActive)}
-              width={100}
-            />
-          </View>
-          <View style={styles.switchRow}>
-            <ZSText typo="body.2">크기 30</ZSText>
-            <ZSSwitch
-              isActive={smallActive}
-              onToggle={() => setSmallActive(!smallActive)}
-              width={30}
-            />
-          </View>
-        </Section>
-
-        <CodeBlock
-          code={`<ZSSwitch
-  isActive={isActive}
-  onToggle={() => setIsActive(!isActive)}
-  width={50}
-  trackColorActive="#ff6b6b"
-  disabled={false}
-/>`}
-        />
-      </ZSContainer>
+      </ZSScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingTop: 24,
-    paddingBottom: 90,
-    paddingHorizontal: 20,
-  },
-  switchRow: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
+  container: PAGE_CONTENT,
+  inset: { paddingHorizontal: ROW_INSET },
 });

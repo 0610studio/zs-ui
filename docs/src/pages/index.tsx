@@ -1,14 +1,13 @@
 import Layout from '@theme/Layout';
-import LandingPage  from '@site/src/components/LandingPage';
-
+import LandingPage from '@site/src/components/LandingPage';
 
 export default function Home(): JSX.Element {
   return (
     <Layout
-      title="ZS-ui · React Native Expo UI Toolkit"
+      title="zs-ui · Expo UI"
       noFooter
       wrapperClassName="homepageLayout"
-      description="Declarative overlays, consistent screen containers, theme customization, and foldable-ready UI components for Expo apps.">
+      description="Expo SDK 58용 iOS·Android UI 라이브러리. 컴포넌트, 오버레이, 테마와 적응형 레이아웃을 제공합니다.">
         <LandingPage />
     </Layout>
   );

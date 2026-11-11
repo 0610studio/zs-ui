@@ -1,98 +1,112 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, View, type HostInstance, type ViewProps, type ViewStyle } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
-  FadeInDown,
-  FadeInUp,
-  FadeOutDown,
-  FadeOutUp,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withRepeat,
   withTiming,
+  useReducedMotion,
 } from "react-native-reanimated";
+import Svg, { Path } from "react-native-svg";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ZSText from "../ZSText";
 import { useTheme } from "../../context/ThemeContext";
-import { createShadow } from "../../theme/elevation";
-import { DURATION, RADIUS } from "../../theme/tokens";
+import { useControllableState } from "../../model/useControllableState";
+import { enterTransition, exitTransition } from "../../overlay/transitions";
+import { Veil, useVeilMaterial } from "../../overlay/veil";
+import { resolveColor, type ColorName } from "../../theme/color";
+import { radiusStyle } from "../../theme/radius";
+import { SPACE } from "../../theme/spacing";
+import type { TextVariant } from "../../theme/typeScale";
 import { SvgX } from "../../assets/SvgX";
-import { SvgTooltipTail } from "../../assets/SvgTooltipTail";
-import type { ShadowStyle, TypoOptions } from "../../theme/types";
+import ZSPressable from "../ZSPressable";
 
 const FLOATING_START_DELAY = 220;
 const FLOATING_ANIMATION_DURATION = 1100;
 const FLOATING_OFFSET = 2;
-const TAIL_WIDTH = 12;
-const TAIL_HEIGHT = 7;
-const CLOSE_HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
-/** boxShadow 로 변환해 iOS·Android 가 동일하게 렌더된다 */
-const BUBBLE_SHADOW: ShadowStyle = {
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.16,
-  shadowRadius: 8,
-};
+export const TOOLTIP_TAIL_WIDTH = 18;
+export const TOOLTIP_TAIL_HEIGHT = 8;
+const TAIL_PATH = "M0 0h18l-6.6 6.6a3.4 3.4 0 0 1-4.8 0z";
+const TAIL_OVERLAP = StyleSheet.hairlineWidth;
+export const TOOLTIP_MIN_HEIGHT = 40;
+export const TOOLTIP_CLOSE_SIZE = 32;
+const CLOSE_ICON = 16;
+export const TOOLTIP_TOP_CLEARANCE = SPACE.md;
+
+const ENTERING = {
+  top: enterTransition({ translateY: SPACE.sm, speed: 'fast' }),
+  bottom: enterTransition({ translateY: -SPACE.sm, speed: 'fast' }),
+} as const;
+const EXITING = {
+  top: exitTransition({ translateY: SPACE.xs }),
+  bottom: exitTransition({ translateY: -SPACE.xs }),
+} as const;
 
 export type ZSTooltipPlacement = 'top' | 'bottom';
-export type ZSTooltipTailAlign = 'start' | 'center' | 'end';
+export type ZSTooltipArrowAlign = 'start' | 'center' | 'end';
 
 export interface ZSTooltipProps extends ViewProps {
-  /** children 지정 시 children 우선 */
   message?: string;
-  children?: React.ReactNode;
-  /** 미지정 시 내부 상태로 동작 */
   visible?: boolean;
-  initialVisible?: boolean;
+  defaultVisible?: boolean;
   onClose?: () => void;
-  /** top 이면 꼬리가 아래를 향한다 (기본: top) */
   placement?: ZSTooltipPlacement;
   showClose?: boolean;
-  /** 위아래로 떠다니는 애니메이션 */
   floating?: boolean;
-  /** 기본: 테마 반전 색 */
-  backgroundColor?: string;
-  /** 기본: palette.background.base */
-  textColor?: string;
-  typo?: TypoOptions;
-  tailAlign?: ZSTooltipTailAlign;
-  /** start/end 정렬 시 가장자리~꼬리 간격 */
-  tailOffset?: number;
+  backgroundColor?: ColorName | (string & {});
+  textColor?: ColorName | (string & {});
+  textVariant?: TextVariant;
+  arrowAlign?: ZSTooltipArrowAlign;
+  arrowOffset?: number;
   closeAccessibilityLabel?: string;
-  style?: StyleProp<ViewStyle>;
+}
+
+function mirroredBelow(style: ViewStyle): ViewStyle | null {
+  if (style.position !== 'absolute' || style.bottom === undefined || style.top !== undefined) return null;
+  const { bottom, marginBottom, marginTop, ...rest } = style;
+  return { ...rest, top: bottom, ...(marginBottom !== undefined ? { marginTop: marginBottom } : null), ...(marginTop !== undefined ? { marginBottom: marginTop } : null) };
 }
 
 function ZSTooltip({
   message,
   children,
   visible,
-  initialVisible = true,
+  defaultVisible = true,
   onClose,
   placement = 'top',
-  showClose = false,
+  showClose = true,
   floating = false,
   backgroundColor,
   textColor,
-  typo = 'body.4',
-  tailAlign = 'start',
-  tailOffset = 16,
-  closeAccessibilityLabel = '툴팁 닫기',
+  textVariant = 'caption',
+  arrowAlign = 'start',
+  arrowOffset = 16,
+  closeAccessibilityLabel,
   style,
   ...props
 }: ZSTooltipProps) {
-  const { palette } = useTheme();
-  const bubbleShadow = useMemo(() => createShadow(BUBBLE_SHADOW, palette.grey[100]), [palette.grey]);
-  const [internalVisible, setInternalVisible] = useState(initialVisible);
-  const isVisible = visible ?? internalVisible;
+  const { colors, shadows, accessibilityLabels } = useTheme();
+  const reduceMotion = useReducedMotion();
+  const insets = useSafeAreaInsets();
+  const [isVisible, setVisible] = useControllableState(visible, defaultVisible);
+  const [flipped, setFlipped] = useState(false);
+  const bubbleRef = useRef<HostInstance>(null);
   const floatingTranslateY = useSharedValue(0);
 
-  // 테마 반전 표면: light 는 어두운 말풍선 + 밝은 텍스트, dark 는 반대
-  const bubbleColor = backgroundColor ?? palette.grey[90];
-  const contentColor = textColor ?? palette.background.base;
+  const solid = backgroundColor !== undefined;
+  const veil = useVeilMaterial('inv');
+  const bubbleColor = resolveColor(colors, backgroundColor) ?? colors.backgroundInverse;
+  const contentColor = resolveColor(colors, textColor) ?? colors.textInverse;
+  const tailColor = solid ? bubbleColor : veil.fill;
+
+  if (!isVisible && flipped) setFlipped(false);
 
   useEffect(() => {
-    if (!floating || !isVisible) return;
+    if (!floating || !isVisible || reduceMotion) return;
 
     floatingTranslateY.value = 0;
     floatingTranslateY.value = withDelay(
@@ -110,70 +124,80 @@ function ZSTooltip({
     return () => {
       cancelAnimation(floatingTranslateY);
     };
-  }, [floating, isVisible, floatingTranslateY]);
+  }, [floating, isVisible, reduceMotion, floatingTranslateY]);
 
   const floatingStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: floatingTranslateY.value }],
   }));
 
   const handleClose = () => {
-    if (visible === undefined) setInternalVisible(false);
+    setVisible(false);
     onClose?.();
   };
 
   if (!isVisible) return null;
 
-  const isTop = placement === 'top';
+  const flat = StyleSheet.flatten(style) ?? {};
+  const below = placement === 'top' ? mirroredBelow(flat) : null;
+  const shownPlacement: ZSTooltipPlacement = flipped && below ? 'bottom' : placement;
+  const isTop = shownPlacement === 'top';
 
-  const tail = (
-    <View
-      pointerEvents='none'
-      style={[
-        tailAlign === 'center'
-          ? styles.tailCenter
-          : tailAlign === 'end'
-            ? { alignSelf: 'flex-end', marginRight: tailOffset }
-            : { alignSelf: 'flex-start', marginLeft: tailOffset },
-        // 꼬리 사이 헤어라인 틈 방지 오버랩 · bottom 은 180도 회전
-        isTop ? styles.tailTop : styles.tailBottom,
-      ]}
-    >
-      <SvgTooltipTail width={TAIL_WIDTH} height={TAIL_HEIGHT} color={bubbleColor} />
-    </View>
-  );
+  const measurePlacement = () => {
+    if (!below || flipped) return;
+    bubbleRef.current?.measureInWindow?.((_x: number, y: number) => {
+      if (y < insets.top + TOOLTIP_TOP_CLEARANCE) setFlipped(true);
+    });
+  };
+
+  const tailPosition: ViewStyle =
+    arrowAlign === 'center'
+      ? styles.tailCenter
+      : arrowAlign === 'end'
+        ? { right: arrowOffset }
+        : { left: arrowOffset };
+  const tailStyle = [styles.tail, tailPosition, isTop ? styles.tailBelow : styles.tailAbove];
+  const bubbleArea = isTop ? styles.bubbleAreaTop : styles.bubbleAreaBottom;
 
   return (
     <Animated.View
-      entering={(isTop ? FadeInUp : FadeInDown).duration(DURATION.fast).easing(Easing.out(Easing.quad))}
-      exiting={(isTop ? FadeOutDown : FadeOutUp).duration(DURATION.fast).easing(Easing.in(Easing.quad))}
+      entering={ENTERING[shownPlacement]}
+      exiting={EXITING[shownPlacement]}
       pointerEvents='box-none'
-      style={[styles.container, { boxShadow: bubbleShadow }, style]}
+      style={[styles.container, flipped && below ? below : style]}
       {...props}
     >
-      <Animated.View style={floatingStyle}>
-        {!isTop && tail}
-        <View style={[styles.bubble, { backgroundColor: bubbleColor }]}>
+      <Animated.View style={[isTop ? styles.spaceBelow : styles.spaceAbove, floatingStyle]}>
+        {solid ? (
+          <View pointerEvents='none' style={[bubbleArea, radiusStyle('md'), { backgroundColor: bubbleColor }, shadows.md]} />
+        ) : (
+          <Veil kind='inv' radius='md' pointerEvents='none' style={bubbleArea} />
+        )}
+        <View pointerEvents='none' style={tailStyle} testID='zs-tooltip-arrow'>
+          <Svg width={TOOLTIP_TAIL_WIDTH} height={TOOLTIP_TAIL_HEIGHT} viewBox={`0 0 ${TOOLTIP_TAIL_WIDTH} ${TOOLTIP_TAIL_HEIGHT}`}>
+            <Path d={TAIL_PATH} fill={tailColor} />
+          </Svg>
+        </View>
+        <View ref={bubbleRef} onLayout={measurePlacement} style={[styles.bubble, showClose ? styles.bubbleWithClose : null]}>
           <View style={styles.contentRow}>
             {children ?? (
-              <ZSText typo={typo} style={[styles.message, { color: contentColor }]}>
+              <ZSText variant={textVariant} emphasized style={[styles.message, { color: contentColor }]}>
                 {message}
               </ZSText>
             )}
             {showClose && (
-              <Pressable
-                accessibilityLabel={closeAccessibilityLabel}
-                accessibilityRole='button'
-                hitSlop={CLOSE_HIT_SLOP}
+              <ZSPressable
+                accessibilityLabel={closeAccessibilityLabel ?? accessibilityLabels.closeTooltip}
                 onPress={handleClose}
+                radius='full'
+                pressedColor={contentColor}
                 style={styles.closeButton}
                 testID='zs-tooltip-close'
               >
-                <SvgX size={10} color={contentColor} />
-              </Pressable>
+                <SvgX size={CLOSE_ICON} color={contentColor} />
+              </ZSPressable>
             )}
           </View>
         </View>
-        {isTop && tail}
       </Animated.View>
     </Animated.View>
   );
@@ -187,15 +211,19 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
   },
   bubble: {
-    borderRadius: RADIUS.lg,
     maxWidth: '100%',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    minHeight: TOOLTIP_MIN_HEIGHT,
+    justifyContent: 'center',
+    paddingHorizontal: SPACE.md,
+    paddingVertical: SPACE.sm,
+  },
+  bubbleWithClose: {
+    paddingEnd: SPACE.xs,
   },
   contentRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 6,
+    gap: SPACE.xs,
   },
   message: {
     flexShrink: 1,
@@ -203,17 +231,44 @@ const styles = StyleSheet.create({
   closeButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 20,
-    height: 20,
+    marginStart: 'auto',
+    width: TOOLTIP_CLOSE_SIZE,
+    height: TOOLTIP_CLOSE_SIZE,
+  },
+  spaceBelow: {
+    paddingBottom: TOOLTIP_TAIL_HEIGHT,
+  },
+  spaceAbove: {
+    paddingTop: TOOLTIP_TAIL_HEIGHT,
+  },
+  bubbleAreaTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: TOOLTIP_TAIL_HEIGHT,
+  },
+  bubbleAreaBottom: {
+    position: 'absolute',
+    top: TOOLTIP_TAIL_HEIGHT,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  tail: {
+    position: 'absolute',
+    width: TOOLTIP_TAIL_WIDTH,
+    height: TOOLTIP_TAIL_HEIGHT,
   },
   tailCenter: {
-    alignSelf: 'center',
+    left: '50%',
+    marginLeft: -TOOLTIP_TAIL_WIDTH / 2,
   },
-  tailTop: {
-    marginTop: -0.5,
+  tailBelow: {
+    bottom: TAIL_OVERLAP,
   },
-  tailBottom: {
-    marginBottom: -0.5,
+  tailAbove: {
+    top: TAIL_OVERLAP,
     transform: [{ rotate: '180deg' }],
   },
 });

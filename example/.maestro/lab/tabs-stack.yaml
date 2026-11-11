@@ -1,0 +1,122 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-tabs-stack-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-tabs-stack-card'
+      - assertVisible:
+          id: 'tabs-stack-feed-title'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          id: 'zs-tab-navigator-${MODE}'
+- waitForAnimationToEnd
+- takeScreenshot: t01-start-${LABEL}
+
+- tapOn:
+    id: 'tabs-stack-feed-plus'
+- tapOn:
+    id: 'tabs-stack-feed-plus'
+- assertVisible:
+    id: 'tabs-stack-feed-count'
+    text: '2'
+- tapOn:
+    id: 'tabs-stack-feed-open'
+- assertVisible:
+    id: 'tabs-stack-feed-detail'
+    text: '피드 상세 1'
+- tapOn:
+    id: 'tabs-stack-feed-next'
+- assertVisible:
+    id: 'tabs-stack-feed-detail'
+    text: '피드 상세 2'
+- waitForAnimationToEnd
+- takeScreenshot: t02-feed-detail-${LABEL}
+
+- runFlow:
+    file: ../common/tap-tab.yaml
+    env:
+      TAB: '프로필'
+- assertVisible:
+    id: 'tabs-stack-profile-title'
+- tapOn:
+    id: 'tabs-stack-profile-plus'
+- assertVisible:
+    id: 'tabs-stack-profile-count'
+    text: '1'
+
+- runFlow:
+    file: ../common/tap-tab.yaml
+    env:
+      TAB: '피드'
+- assertVisible:
+    id: 'tabs-stack-feed-detail'
+    text: '피드 상세 2'
+
+- runFlow:
+    file: ../common/go-back.yaml
+- assertVisible:
+    id: 'tabs-stack-feed-detail'
+    text: '피드 상세 1'
+
+- runFlow:
+    file: ../common/tap-tab.yaml
+    env:
+      TAB: '피드'
+- assertVisible:
+    id: 'tabs-stack-feed-count'
+    text: '2'
+
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - runFlow:
+          file: ../common/tap-tab.yaml
+          env:
+            TAB: '프로필'
+      - assertVisible:
+          id: 'tabs-stack-profile-count'
+          text: '1'
+      - back
+      - assertVisible:
+          id: 'tabs-stack-feed-count'
+          text: '2'
+      - back
+      - assertVisible:
+          id: 'lab-tabs-stack-card'
+
+- stopApp
+- openLink: 'zs-ui-example://lab/tabs-stack/profile/detail?n=3'
+- extendedWaitUntil:
+    visible:
+      id: 'tabs-stack-profile-detail'
+    timeout: 60000
+- assertVisible:
+    id: 'tabs-stack-profile-detail'
+    text: '프로필 상세 3'
+- waitForAnimationToEnd
+- takeScreenshot: t03-deeplink-${LABEL}
+- runFlow:
+    file: ../common/go-back.yaml
+- assertVisible:
+    id: 'tabs-stack-profile-title'
+- scrollUntilVisible:
+    element:
+      id: tabs-stack-profile-end
+    direction: DOWN
+- takeScreenshot: t04-scroll-end-${LABEL}

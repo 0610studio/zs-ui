@@ -1,12 +1,9 @@
-/** 달력 dot 과 아젠다 리스트가 같은 배열에서 파생된다 — 1회 순회 후 조회는 전부 O(1) */
-
 import { addDays, addMonths, compareDate, diffDays, isValidDateString, startOfMonth, startOfWeek, weeksInMonth } from './date';
-import type { CalendarEvent, DateRange, DateString, EventIndex, FirstDayOfWeek } from './types';
+import type { CalendarEvent, CalendarMode, DateRange, DateString, EventIndex, FirstDayOfWeek } from './types';
 
-const EMPTY: ReadonlyArray<never> = [];
+const EMPTY: readonly never[] = [];
 
-/** 잘못된 date 는 건너뛴다 — 응답 한 건 때문에 달력 전체가 죽는 것보다 낫다 */
-export function buildEventIndex<T>(events: ReadonlyArray<CalendarEvent<T>> | undefined): EventIndex<T> {
+export function buildEventIndex<T>(events: readonly CalendarEvent<T>[] | undefined): EventIndex<T> {
   const index = new Map<DateString, CalendarEvent<T>[]>();
   if (!events || events.length === 0) return index;
 
@@ -27,22 +24,21 @@ export function buildEventIndex<T>(events: ReadonlyArray<CalendarEvent<T>> | und
   return index;
 }
 
-export function getEventsOn<T>(index: EventIndex<T>, date: DateString): ReadonlyArray<CalendarEvent<T>> {
-  return index.get(date) ?? (EMPTY as ReadonlyArray<CalendarEvent<T>>);
+export function getEventsOn<T>(index: EventIndex<T>, date: DateString): readonly CalendarEvent<T>[] {
+  return index.get(date) ?? (EMPTY as readonly CalendarEvent<T>[]);
 }
 
 export const countEventsOn = <T>(index: EventIndex<T>, date: DateString): number =>
-  index.get(date)?.length ?? 0;
+  getEventsOn(index, date).length;
 
-/** 중복 색은 합치고 maxDots 개로 자른다 */
 export function dotColorsOn<T>(
   index: EventIndex<T>,
   date: DateString,
   maxDots: number,
   fallbackColor: string,
 ): string[] {
-  const events = index.get(date);
-  if (!events || events.length === 0 || maxDots <= 0) return [];
+  const events = getEventsOn(index, date);
+  if (events.length === 0 || maxDots <= 0) return [];
 
   const colors: string[] = [];
   for (const event of events) {
@@ -54,7 +50,18 @@ export function dotColorsOn<T>(
   return colors;
 }
 
-/** 날짜 오름차순으로 평탄화. 같은 날 안에서는 입력 순서를 유지한다 */
+export function labelChipsOn<T>(
+  index: EventIndex<T>,
+  date: DateString,
+  lines: number,
+): { chips: readonly CalendarEvent<T>[]; overflow: number } {
+  const events = getEventsOn(index, date);
+  if (lines <= 0) return { chips: EMPTY, overflow: events.length };
+  if (events.length <= lines) return { chips: events, overflow: 0 };
+  const visible = lines - 1;
+  return { chips: events.slice(0, visible), overflow: events.length - visible };
+}
+
 export function eventsInRange<T>(
   index: EventIndex<T>,
   { startDate, endDate }: DateRange,
@@ -64,11 +71,9 @@ export function eventsInRange<T>(
   const span = diffDays(startDate, endDate);
   const result: CalendarEvent<T>[] = [];
 
-  // 구간이 인덱스보다 작은 게 일반적이라, 전체 정렬 대신 구간 길이만큼만 훑는다
   if (span + 1 <= index.size) {
     for (let offset = 0; offset <= span; offset += 1) {
-      const bucket = index.get(addDays(startDate, offset));
-      if (bucket) result.push(...bucket);
+      result.push(...getEventsOn(index, addDays(startDate, offset)));
     }
     return result;
   }
@@ -78,17 +83,13 @@ export function eventsInRange<T>(
     if (compareDate(key, startDate) >= 0 && compareDate(key, endDate) <= 0) keys.push(key);
   });
   keys.sort();
-  for (const key of keys) result.push(...(index.get(key) ?? []));
+  for (const key of keys) result.push(...getEventsOn(index, key));
   return result;
 }
 
-/**
- * 페이저가 실제로 그리는 구간 — 현재 페이지와 앞뒤 각 1페이지.
- * 이 범위만 prefetch 하면 스와이프 도착 시점에 dot 이 이미 그려져 있다.
- */
 export function visibleRangeOf(
   anchorDate: DateString,
-  mode: 'week' | 'month',
+  mode: CalendarMode,
   firstDayOfWeek: FirstDayOfWeek = 0,
   neighborPages = 1,
 ): DateRange {
@@ -100,7 +101,6 @@ export function visibleRangeOf(
     };
   }
 
-  // 그리드의 첫 칸과 마지막 칸만 필요하다 — 매트릭스를 통째로 만들 이유가 없다
   const firstMonth = startOfMonth(addMonths(anchorDate, -neighborPages));
   const lastMonth = startOfMonth(addMonths(anchorDate, neighborPages));
   const lastGridStart = startOfWeek(lastMonth, firstDayOfWeek);

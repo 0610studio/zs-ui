@@ -1,0 +1,14 @@
+appId: kr.co.studio0610.zsui.example
+---
+- scrollUntilVisible:
+    element:
+      id: 'lab-entry'
+    direction: DOWN
+    timeout: 30000
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-entry'
+      - assertVisible:
+          id: 'lab-environment-card'

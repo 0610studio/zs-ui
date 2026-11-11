@@ -1,51 +1,19 @@
-import { Pressable, StyleSheet, View } from 'react-native';
-import { ZSText, useTheme } from '@0610studio/zs-ui';
+import { ZSSegmentedControl } from '@0610studio/zs-ui';
 
 type Props<T extends string> = {
   options: readonly T[];
   value: T;
-  onChange: (value: T) => void;
+  onValueChange: (value: T) => void;
+  testID?: string;
 };
 
-export default function Segmented<T extends string>({ options, value, onChange }: Props<T>) {
-  const { palette } = useTheme();
-
+export default function Segmented<T extends string>({ options, value, onValueChange, testID }: Props<T>) {
   return (
-    <View style={[styles.track, { backgroundColor: palette.background.layer2 }]}>
-      {options.map((option) => {
-        const active = option === value;
-        return (
-          <Pressable
-            key={option}
-            style={[styles.item, active && [styles.activeItem, { backgroundColor: palette.background.base }]]}
-            onPress={() => onChange(option)}
-          >
-            <ZSText typo={active ? 'subTitle.3' : 'label.3'} color={active ? 'base' : 'secondary'}>
-              {option}
-            </ZSText>
-          </Pressable>
-        );
-      })}
-    </View>
+    <ZSSegmentedControl
+      options={options.map((option) => ({ label: option, value: option }))}
+      value={value}
+      onValueChange={onValueChange}
+      testID={testID}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  track: {
-    width: '100%',
-    flexDirection: 'row',
-    borderRadius: 12,
-    padding: 4,
-    gap: 4,
-  },
-  item: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 9,
-    borderRadius: 9,
-  },
-  activeItem: {
-    boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.08)',
-  },
-});

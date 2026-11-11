@@ -1,12 +1,7 @@
 import type * as SkiaModule from '@shopify/react-native-skia';
 import type * as FontsModule from '../../../ui/ZSCalendar/skia/fonts';
 
-/**
- * RN Skia matchFont 의 기본 family 'System' 은 Android 시스템 폰트 매니저에 없어 typeface 가 null 이 되고
- * 날짜 숫자가 통째로 사라진다 — 플랫폼별로 존재하는 family 를 반드시 명시해야 한다.
- */
 describe('ZSCalendar skia/fonts — 시스템 폰트 family', () => {
-  // resetModules 뒤에는 모듈 인스턴스가 새로 생기므로 spy 도 같은 인스턴스에 걸어야 한다
   const load = (os: 'android' | 'ios') => {
     jest.resetModules();
     jest.doMock('react-native', () => ({ Platform: { OS: os } }));
@@ -38,7 +33,7 @@ describe('ZSCalendar skia/fonts — 시스템 폰트 family', () => {
   it('폰트 provider 를 주면 등록한 family 와 provider 로 매칭한다', () => {
     const { fonts, matchFont } = load('android');
     const provider = { __provider: true } as unknown as SkiaModule.SkTypefaceFontProvider;
-    fonts.buildCalendarFonts({ dayFontSize: 13, fontProvider: provider, fontFamily: fonts.CALENDAR_FONT_FAMILY });
+    fonts.buildCalendarFonts({ dayFontSize: 13, fontProvider: provider });
     expect(matchFont).toHaveBeenCalledWith(expect.objectContaining({ fontFamily: fonts.CALENDAR_FONT_FAMILY }), provider);
   });
 });

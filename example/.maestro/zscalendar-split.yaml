@@ -1,0 +1,54 @@
+appId: kr.co.studio0610.zsui.example
+---
+# 넓은 창(펼친 Fold7 등)의 달력 심화 — 왼쪽 달력(라벨 칩) | 오른쪽 그날 기록 2열, 주간 전환은 끈다.
+# 한 열 동작(주간 전환·아래 목록)은 zscalendar·week·month-context·fps 가 접힌 화면에서 본다.
+- runFlow:
+    file: common/open-calendar-advanced.yaml
+    env:
+      DATE: '2026-09-02'
+- assertVisible: '보기 month'
+- assertVisible:
+    id: 'diary-side-title'
+    text: '9월 2일 \(수\) · 기록 \d+건'
+- waitForAnimationToEnd
+- takeScreenshot: s01-split-month
+
+# 달력 칸이 화면 절반이라 가운데에서 끌면 Maestro 끝점(화면 폭 10%)까지 거리가 넘김 기준을 겨우 넘는다 — 금요일 칸에서 끈다
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: 'calendar-cell-2026-09-18'
+          direction: LEFT
+      - waitForAnimationToEnd
+      - assertVisible: '2026년 10월'
+- takeScreenshot: s02-next-month
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: 'diary-calendar-grid'
+          direction: RIGHT
+      - waitForAnimationToEnd
+      - assertVisible: '2026년 9월'
+
+- tapOn:
+    id: 'calendar-cell-2026-09-11'
+- assertVisible:
+    id: 'diary-side-title'
+    text: '9월 11일 \(금\) · 기록 \d+건'
+- assertVisible: '2026-09-11 · 일정 \d+건'
+- takeScreenshot: s03-side-follows-selection
+
+# 넓은 창에서는 위로 끌어도 월 보기를 그대로 둔다
+- swipe:
+    from:
+      id: 'diary-calendar-grid'
+    direction: UP
+- waitForAnimationToEnd
+- assertVisible: '보기 month'
+- assertVisible:
+    id: 'calendar-cell-2026-09-26'
+- takeScreenshot: s04-no-week-transition

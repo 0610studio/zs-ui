@@ -1,144 +1,72 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
-
 # ZSChip
 
-선택 상태를 토글하는 칩 컴포넌트입니다. 필터·태그 선택에 사용합니다.
-
-콘텐츠 폭으로 렌더링(hug)되므로 `flexWrap` 부모 안에 여러 개를 나열하면 자동으로 줄바꿈됩니다.
-
-<LocalPlayground example="ZSChip" />
+목록을 거르는 필터 칩입니다. 하나만 두지 않고 여러 개를 묶어 씁니다. 두 플랫폼 모두 zs-ui가 같은 모양으로 그립니다 — 높이 36의 캡슐이고, 선택하면 앞에 체크 표시가 붙고(`checkIcon`) 라벨이 강조 굵기가 됩니다.
 
 ## 기본 사용법
 
 ```tsx
+import { View } from 'react-native';
 import { ZSChip } from '@0610studio/zs-ui';
-import { useState } from 'react';
-
-function MyFilter() {
-  const [selected, setSelected] = useState(false);
-
-  return (
-    <ZSChip
-      label="산책"
-      selected={selected}
-      onChange={setSelected}
-    />
-  );
-}
-```
-
-## Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `label` | `string` | 필수 | 칩 라벨 |
-| `selected` | `boolean` | `undefined` | 선택 상태를 외부에서 제어할 때 사용 (미지정 시 내부 상태로 토글) |
-| `initialSelected` | `boolean` | `false` | 비제어 모드의 초기 선택 상태 |
-| `onChange` | `(selected: boolean) => void` | `undefined` | 토글 시 다음 선택 상태를 전달 |
-| `intent` | `'primary' \| 'danger' \| 'warning' \| 'success' \| 'information' \| 'grey'` | `'primary'` | 선택 상태의 색상 계열 |
-| `variant` | `'pastel' \| 'solid' \| 'stroke'` | `'pastel'` | 선택 상태의 스타일 |
-| `textSize` | `TypoSubStyle` | `'3'` | 라벨 typo 크기 (`'1'`~`'6'`). 패딩과 체크 아이콘 크기도 함께 결정됩니다 |
-| `checkIcon` | `boolean` | `false` | `true`면 선택 시 라벨 앞에 체크 아이콘 표시 |
-| `leftIcon` | `React.ReactNode` | `undefined` | 라벨 왼쪽 커스텀 요소 |
-| `disabled` | `boolean` | `false` | 비활성화 |
-| `style` | `StyleProp<ViewStyle>` | `undefined` | 칩 본체 추가 스타일 |
-| `...props` | `ViewProps` | `undefined` | React Native `View`의 모든 기본 속성 |
-
-## Variant
-
-선택 상태일 때의 표현만 달라집니다. **미선택 상태는 세 variant 모두 동일**하게 `background.base` 배경 + `grey.30` 테두리입니다.
-
-| Variant | 선택 시 배경 | 선택 시 테두리 | 선택 시 텍스트 |
-|---------|-------------|---------------|---------------|
-| `pastel` (기본) | `intent.10` | `intent.30` | `intent.60` (`grey` 는 `grey.70`) |
-| `solid` | `intent.50` | `intent.50` | 흰색 (`warning` 만 검정) |
-| `stroke` | `background.base` (미선택과 동일) | `intent.50` | `intent.50` (`warning` 은 `warning.60`, `grey` 는 `grey.60`) |
-
-```tsx
-<ZSChip label="pastel" variant="pastel" initialSelected />
-<ZSChip label="solid" variant="solid" initialSelected />
-<ZSChip label="stroke" variant="stroke" initialSelected />
-```
-
-## 특징
-
-- **색상 전환 애니메이션**: 배경·테두리 색이 200ms 동안 보간되며 전환됩니다
-- **press 피드백**: 누르는 동안 0.96배로 살짝 축소됩니다
-- **hug 레이아웃**: 콘텐츠 폭으로 렌더링되어 `flexWrap` 부모에서 자연스럽게 줄바꿈됩니다
-- **pill 형태**: 좌우가 완전히 둥근 형태로 고정입니다
-- **접근성**: `button` 역할과 `accessibilityState.selected` 를 부여합니다
-
-## 예제
-
-### 다중 선택 필터
-
-```tsx
-const OPTIONS = ['산책', '간식', '돌봄', '병원'];
-const [selected, setSelected] = useState<string[]>([]);
 
 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-  {OPTIONS.map((option) => (
-    <ZSChip
-      key={option}
-      label={option}
-      selected={selected.includes(option)}
-      onChange={(next) =>
-        setSelected(next ? [...selected, option] : selected.filter((v) => v !== option))
-      }
-      checkIcon
-    />
-  ))}
+  <ZSChip label="즐겨찾기" selected={favorite} onSelectedChange={setFavorite} />
+  <ZSChip label="사진 있음" selected={withPhoto} onSelectedChange={setWithPhoto} />
 </View>
 ```
 
-### 단일 선택 (라디오처럼)
+## Props — `ZSChipProps`
+
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `label` | `string` | Required | 라벨 |
+| `selected` | `boolean` | `undefined` | 선택 여부(제어) |
+| `defaultSelected` | `boolean` | `false` | 비제어 초기값 |
+| `onSelectedChange` | `(selected: boolean) => void` | `undefined` | 바뀐 선택 |
+| `color` | `PaletteColor` | `'primary'` | 선택 면 색. 고르면 이 색 main 면에 on 색 글자·체크 |
+| `checkIcon` | `boolean` | `true` | 선택 시 앞에 체크 표시 |
+| `icon` | `ReactNode` | `undefined` | 앞 아이콘 — 선택되어 체크가 보이면 체크가 대신합니다. `false`·`''`도 아이콘 없음으로 봅니다(`icon={cond && <Icon />}`) |
+| `disabled` | `boolean` | `false` | |
+| `style` | `StyleProp<ViewStyle>` | `undefined` | |
+| `testID` | `string` | `undefined` | |
+
+`ZSChipProps` 타입을 내보냅니다.
+
+## 제어·비제어
+
+`selected`를 주지 않으면 비제어로 토글하고, 처음 값은 `defaultSelected`(기본 `false`)입니다.
 
 ```tsx
-const [selected, setSelected] = useState('전체');
-
-<View style={{ flexDirection: 'row', gap: 8 }}>
-  {['전체', '진행중', '완료'].map((option) => (
-    <ZSChip
-      key={option}
-      label={option}
-      selected={selected === option}
-      onChange={() => setSelected(option)}
-      variant="solid"
-    />
-  ))}
-</View>
+<ZSChip label="이번 주" defaultSelected onSelectedChange={(selected) => track(selected)} />
 ```
 
-> 값 하나를 고르는 세그먼트 형태가 더 맞다면 [ZSSegmented](./ZSSegmented.md)를, 콘텐츠를 전환하는 탭이라면 [ZSTab](./ZSTab.md)을 고려하세요.
+## 색
 
-### intent 별 표현
+| 상태 | 컨테이너 | 글자·아이콘 | 외곽선 |
+|------|---------|-----------|-------|
+| 선택 안 됨 | `surface2` | `text` | `border` 1 |
+| 선택 | `color` main(`primary`) | `color` on(`onPrimary`), 강조 굵기 | 없음(두께 1은 투명으로 남아 크기가 바뀌지 않습니다) |
+| 비활성 | 선택이면 `text` 12%, 아니면 `surface2` | `text` 38% | 선택 안 됨이면 `text` 12% |
+
+밝은 시드의 `primary` 면은 바탕과 대비가 낮습니다. 선택은 면 색 말고 체크와 굵기로도 드러납니다.
 
 ```tsx
-<ZSChip label="기본" intent="primary" initialSelected />
-<ZSChip label="위험" intent="danger" initialSelected />
-<ZSChip label="완료" intent="success" initialSelected />
-<ZSChip label="주의" intent="warning" initialSelected />
+<ZSChip label="오류만" color="error" defaultSelected />
+<ZSChip label="체크 없이" checkIcon={false} defaultSelected />
 ```
 
-### 아이콘과 함께
+## 선택 전환
 
-```tsx
-{/* 선택 시 체크 아이콘 자동 표시 */}
-<ZSChip label="필터 적용" checkIcon selected={selected} onChange={setSelected} />
+`checkIcon`이 `true`일 때의 움직임입니다.
 
-{/* 항상 표시되는 커스텀 아이콘 */}
-<ZSChip
-  label="위치"
-  leftIcon={<MyPinIcon size={14} />}
-  selected={selected}
-  onChange={setSelected}
-/>
-```
+- 면 색은 바로 바뀝니다(섞인 중간색이 보이지 않습니다).
+- 앞 아이콘이 없으면 선택할 때 체크 자리가 열리며 칩 폭이 늘고, 체크는 페이드·확대로 들어옵니다. 폭 변화는 move spring([모션 토큰](../Theme/tokens#모션--spring--timing))이라 줄바꿈된 칩 행도 튀지 않고 함께 움직입니다.
+- 앞 아이콘이 있으면 폭은 그대로이고 아이콘과 체크가 같은 자리에서 맞바뀝니다.
 
-### 크기 변경
+## 접근성
 
-```tsx
-<ZSChip label="큰 칩" textSize="1" />
-<ZSChip label="기본" textSize="3" />
-<ZSChip label="작은 칩" textSize="6" />
-```
+`checkbox` 역할과 `checked` 상태를 알립니다. 라벨은 한 줄이고 글자 확대는 1.6배와 [앱 상한](../Theme/typography#앱-전체-상한--maxfontsizemultiplier) 중 작은 쪽까지입니다. 큰 글자에서는 칩 높이가 늘어나고, 터치 영역은 44pt·48dp를 채웁니다.
+
+## 관련 문서
+
+- [ZSSegmentedControl](./ZSSegmentedControl) — 하나만 고르는 보기 전환
+- [ZSButton](./ZSButton)

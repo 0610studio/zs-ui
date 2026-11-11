@@ -1,0 +1,16 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          id: 'zs-tab-item-.*'
+          containsDescendants:
+            - text: ${TAB}
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          text: ${TAB}

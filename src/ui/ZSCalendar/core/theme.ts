@@ -1,46 +1,83 @@
-/** 기본값을 전부 팔레트에서 파생하므로 다크 모드를 캘린더가 따로 처리하지 않는다 */
-
-import type { Theme } from '../../../theme/types';
-import { transparency } from '../../../theme/palette';
+import { withOpacity, type ColorMode, type ThemeColors } from '../../../theme/color';
 
 export interface CalendarTheme {
-  /** 투명하게 두면 컨테이너 배경이 비친다 */
   background: string;
   dayText: string;
-  /** 인접 달 날짜 숫자 */
   outsideDayText: string;
   sundayText: string;
   saturdayText: string;
-  /** 선택 카드 배경 — 라이트는 `background.base`, 다크는 `grey[20]`. 팔레트에서 정해지므로 override 대상이 아니다 */
   selectedBackground: string;
   selectedText: string;
-  /** 오늘 배경 — 글자색 4% 로 옅게 채운 원. 배경에서 파생되므로 override 대상이 아니다 */
-  todayRing: string;
+  todayBackground: string;
   todayText: string;
   weekdayText: string;
-  /** color 미지정 이벤트의 dot */
   dotColor: string;
 }
 
-export type CalendarThemeOverride = Partial<Omit<CalendarTheme, 'selectedBackground' | 'todayRing'>>;
+export type CalendarThemeOverride = Partial<Omit<CalendarTheme, 'selectedBackground' | 'todayBackground'>>;
 
-/** 소비자가 준 override 가 항상 이긴다 */
-export function resolveCalendarTheme(palette: Theme, override?: CalendarThemeOverride): CalendarTheme {
-  const base: CalendarTheme = {
+export interface ResolvedCalendarTheme extends CalendarTheme {
+  chipTextDark: string;
+  chipTextLight: string;
+}
+
+export function resolveCalendarTheme(colors: ThemeColors, mode: ColorMode, override?: CalendarThemeOverride): ResolvedCalendarTheme {
+  const base: ResolvedCalendarTheme = {
     background: 'transparent',
-    // text.primary 는 브랜드 강조색이라 본문 색인 text.base 를 쓴다
-    dayText: palette.text.base,
-    outsideDayText: palette.text.disabled,
-    sundayText: palette.danger[50],
-    saturdayText: palette.information[50],
-    // 라이트에서는 배경과 같은 흰 카드가 그림자만으로 떠 보인다. 다크에서는 그림자가 묻히므로 회색으로 띄운다
-    selectedBackground: palette.mode === 'dark' ? palette.grey[20] : palette.background.base,
-    selectedText: palette.primary.main,
-    // 본문 글자색을 4% 만 깔아 라이트·다크 어디서든 배경보다 한 톤 짙어진다
-    todayRing: `${palette.text.base}${transparency['4%']}`,
-    todayText: palette.text.base,
-    weekdayText: palette.text.secondary,
-    dotColor: palette.primary.main,
+    dayText: colors.text,
+    outsideDayText: withOpacity(colors.text, 0.38),
+    sundayText: colors.error,
+    saturdayText: colors.text,
+    selectedBackground: mode === 'dark' ? colors.surface5 : colors.surface1,
+    selectedText: colors.primaryMark,
+    todayBackground: colors.surface4,
+    todayText: colors.text,
+    weekdayText: colors.textSecondary,
+    dotColor: colors.textSecondary,
+    chipTextDark: mode === 'dark' ? colors.textInverse : colors.text,
+    chipTextLight: mode === 'dark' ? colors.text : colors.textInverse,
   };
-  return override ? { ...base, ...override } : base;
+  if (!override) return base;
+  const theme = { ...base, ...override };
+  if (override.saturdayText === undefined) theme.saturdayText = theme.dayText;
+  return theme;
+}
+
+export const weekdayColor = (weekday: number, theme: CalendarTheme, fallback: string): string =>
+  weekday === 0 ? theme.sundayText : weekday === 6 ? theme.saturdayText : fallback;
+
+export function weekdayHeaderColor(weekday: number, theme: CalendarTheme): string {
+  const color = weekdayColor(weekday, theme, theme.weekdayText);
+  return color === theme.dayText ? theme.weekdayText : color;
+}
+
+function parseHex(color: string): [number, number, number] | null {
+  const hex = color.trim().replace(/^#/, '');
+  if (!/^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(hex)) return null;
+  const full = hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex.slice(0, 6);
+  return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255) as [number, number, number];
+}
+
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  const linear = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+}
+
+export function contrastRatio(a: string, b: string): number {
+  const rgbA = parseHex(a);
+  const rgbB = parseHex(b);
+  if (!rgbA || !rgbB) return 0;
+  const [high, low] = [relativeLuminance(rgbA), relativeLuminance(rgbB)].sort((x, y) => y - x) as [number, number];
+  return (high + 0.05) / (low + 0.05);
+}
+
+const CHIP_TEXT_MIN_CONTRAST = 4.5;
+
+export function readableChipTextColor(background: string, dark: string, light: string): string {
+  if (!parseHex(background)) return dark;
+  const darkContrast = contrastRatio(dark, background);
+  const lightContrast = contrastRatio(light, background);
+  const best = darkContrast >= lightContrast ? dark : light;
+  if (Math.max(darkContrast, lightContrast) >= CHIP_TEXT_MIN_CONTRAST) return best;
+  return contrastRatio('#000000', background) >= contrastRatio('#ffffff', background) ? '#000000' : '#ffffff';
 }

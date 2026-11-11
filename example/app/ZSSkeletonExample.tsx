@@ -1,79 +1,43 @@
 import { useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { ZSContainer, ZSSkeleton, ZSSkeletonBox, ZSSwitch, ZSText, useTheme } from '@0610studio/zs-ui';
+import { StyleSheet } from 'react-native';
+import { ZSScreen, ZSSkeleton, ZSSwitch, ZSText } from '@0610studio/zs-ui';
 import Section from '../src/ui/kit/Section';
-import CodeBlock from '../src/ui/kit/CodeBlock';
-import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
+import { PAGE_CONTENT } from '../src/ui/kit/layout';
+import ScreenHeader from '../src/ui/ScreenHeader';
 
 export default function ZSSkeletonExample() {
   const [isFetching, setIsFetching] = useState(true);
-  const { palette } = useTheme();
-
-  if (Platform.OS === 'web') {
-    return (
-      <>
-        <Stack.Screen options={{ title: 'ZSSkeleton' }} />
-        <WebUnsupportedNotice component="ZSSkeleton · ZSSkeletonBox" />
-      </>
-    );
-  }
 
   return (
     <>
-      <Stack.Screen options={{ title: 'ZSSkeleton' }} />
-      <ZSContainer style={[styles.container, { backgroundColor: palette.background.layer2 }]}>
-        <Section gap={0}>
-          <View style={styles.toggleRow}>
-            <View style={{ gap: 2 }}>
-              <ZSText typo="subTitle.2">isFetching</ZSText>
-              <ZSText typo="caption.1" color="secondary">끄면 실제 콘텐츠가 표시됩니다</ZSText>
-            </View>
-            <ZSSwitch isActive={isFetching} onToggle={() => setIsFetching(!isFetching)} />
-          </View>
+      <ScreenHeader title="ZSSkeleton" />
+      <ZSScreen backgroundColor="background" style={styles.container}>
+        <Section surface="list">
+          <ZSSwitch label="loading — 끄면 실제 콘텐츠" value={isFetching} onValueChange={setIsFetching} />
         </Section>
 
-        <Section label="Text Skeleton" gap={12}>
-          <ZSSkeleton isFetching={isFetching}>
-            <ZSText typo="heading.1" color='danger.100'>fetching DATA</ZSText>
+        <Section label="글자 · ZSSkeleton" surface="plain" gap={12}>
+          <ZSSkeleton loading={isFetching}>
+            <ZSText variant="h1" emphasized>fetching DATA</ZSText>
           </ZSSkeleton>
-          <ZSSkeleton isFetching={isFetching}>
-            <ZSText typo="heading.3" color='primary'>fetching DATA</ZSText>
+          <ZSSkeleton loading={isFetching}>
+            <ZSText variant="h2" emphasized color="textSecondary">fetching DATA</ZSText>
           </ZSSkeleton>
-          <ZSSkeleton isFetching={isFetching}>
-            <ZSText typo="heading.6">fetching DATA</ZSText>
+          <ZSSkeleton loading={isFetching}>
+            <ZSText variant="h4" emphasized>fetching DATA</ZSText>
           </ZSSkeleton>
         </Section>
 
-        <Section label="Box Skeleton" gap={12}>
-          <ZSSkeletonBox height={100} style={{ borderRadius: 10 }} />
-          <ZSSkeletonBox height={50} style={{ borderRadius: 25 }} />
-          <ZSSkeletonBox height={80} style={{ borderRadius: 40, width: 80 }} />
+        <Section label="상자 · ZSSkeleton.Box" surface="plain" gap={12}>
+          <ZSSkeleton.Box height={100} radius="md" />
+          <ZSSkeleton.Box height={50} radius="full" />
+          <ZSSkeleton.Box height={80} radius="full" style={{ width: 80 }} />
         </Section>
-
-        <CodeBlock
-          code={`<ZSSkeleton isFetching={isFetching}>
-  <ZSText typo="heading.1">fetching DATA</ZSText>
-</ZSSkeleton>
-
-<ZSSkeletonBox height={100} style={{ borderRadius: 10 }} />`}
-        />
-      </ZSContainer>
+      </ZSScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingTop: 24,
-    paddingBottom: 48,
-    paddingHorizontal: 20,
-  },
-  toggleRow: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  container: PAGE_CONTENT,
 });

@@ -27,13 +27,6 @@ describe('ZSCalendar core/locale', () => {
     expect(resolveCalendarLocale('fr' as never)).toBe(CALENDAR_LOCALES.ko);
   });
 
-  it('labels 는 locale 위에 요일·월 제목만 덮어쓴다 — 접근성 문구는 로케일을 따른다', () => {
-    const resolved = resolveCalendarLocale('en', { monthTitle: (y, m) => `${m}/${y}` });
-    expect(resolved.monthTitle(2026, 9)).toBe('9/2026');
-    expect(resolved.weekdays).toEqual(CALENDAR_LOCALES.en.weekdays);
-    expect(resolved.prevMonth).toBe('Previous month');
-  });
-
   it('문자열 묶음을 직접 넘기면 그대로 쓴다', () => {
     const custom = { ...CALENDAR_LOCALES.en, monthView: 'Monat' };
     expect(resolveCalendarLocale(custom).monthView).toBe('Monat');

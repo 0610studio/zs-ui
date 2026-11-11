@@ -1,0 +1,128 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      true: ${STEP == 'setup'}
+    commands:
+      - launchApp:
+          clearState: false
+      - extendedWaitUntil:
+          visible: 'ZS-UI'
+          timeout: 120000
+      - runFlow: ../common/open-lab.yaml
+      - scrollUntilVisible:
+          element:
+            id: 'lab-environment-card'
+          direction: DOWN
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-environment-card'
+            - tapOn:
+                id: 'lab-environment-panel-fold'
+            - assertVisible:
+                id: 'lab-display-posture'
+
+- runFlow:
+    when:
+      true: ${POSTURE == 'open' || POSTURE == 'reopened'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-display-posture'
+            text: 'flat'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-display-fold-rect'
+          text: '374.9, 0 · 0 × 832'
+      - assertVisible:
+          id: 'lab-display-fold-orientation'
+          text: 'vertical'
+      - assertVisible:
+          id: 'lab-display-fold-state'
+          text: 'flat'
+      - assertVisible:
+          id: 'lab-display-fold-active'
+          text: 'false'
+- runFlow:
+    when:
+      true: ${POSTURE == 'folded'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-display-fold'
+            text: 'none'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-display-posture'
+          text: 'unknown'
+- runFlow:
+    when:
+      true: ${POSTURE == 'half'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-display-posture'
+            text: 'book'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-display-fold-state'
+          text: 'halfOpened'
+      - assertVisible:
+          id: 'lab-display-fold-active'
+          text: 'true'
+      - assertVisible:
+          id: 'lab-display-fold-orientation'
+          text: 'vertical'
+- runFlow:
+    when:
+      true: ${POSTURE == 'tabletop'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: 'lab-display-posture'
+            text: 'tabletop'
+          timeout: 10000
+      - assertVisible:
+          id: 'lab-display-fold-orientation'
+          text: 'horizontal'
+      - assertVisible:
+          id: 'lab-display-fold-rect'
+          text: '0, 374.9 · 832 × 0'
+      - assertVisible:
+          id: 'lab-display-fold-active'
+          text: 'true'
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: 'lab-display-hinge-angle'
+          text: 'null'
+- runFlow:
+    when:
+      platform: Android
+      true: ${POSTURE == 'open' || POSTURE == 'reopened'}
+    commands:
+      - assertVisible:
+          id: 'lab-display-hinge-angle'
+          text: '180'
+- runFlow:
+    when:
+      platform: Android
+      true: ${POSTURE == 'half' || POSTURE == 'tabletop'}
+    commands:
+      - assertVisible:
+          id: 'lab-display-hinge-angle'
+          text: '90'
+- runFlow:
+    when:
+      platform: Android
+      true: ${POSTURE == 'folded'}
+    commands:
+      - assertVisible:
+          id: 'lab-display-hinge-angle'
+          text: '0'
+- waitForAnimationToEnd
+- takeScreenshot: d01-${POSTURE}

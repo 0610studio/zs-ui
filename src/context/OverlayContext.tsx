@@ -1,324 +1,179 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
-import { Keyboard, TextProps, TouchableOpacityProps, useWindowDimensions } from 'react-native';
-import { BackHandlerProvider } from './BackHandlerContext';
-import { AlertContext, SnackbarContext, BottomSheetContext, PopOverContext, ModalityContext, LoaderContext, OverlayContext } from '../model/useOverlay';
-import { AlertActions, BottomSheetHeight, BottomSheetOptions, HideOption, ModalityProps, OverlayProviderProps, PopOverMenuProps, ShowAlertProps, ShowBottomSheetProps, ShowSnackBarProps, SnackItem } from '../model/types';
-import AlertOverlay from '../overlay/AlertOverlay';
-import SnackbarNotify from '../overlay/SnackbarNotify';
-import BottomSheetOverlay from '../overlay/BottomSheetOverlay';
-import LoadingNotify from '../overlay/LoadingNotify';
-import PopOverMenu from '../overlay/PopOver/PopOverMenu';
-import Modality from '../overlay/Modality';
-import { PortalProvider } from '../overlay/ZSPortal';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { BackHandler, Keyboard, Platform, StyleSheet, View, type HostInstance } from 'react-native';
+import BottomSheet from '@expo/ui/community/bottom-sheet';
+import { ScreenCoverContext } from './ScreenCoverContext';
+import { BottomBarStoreContext, createBottomBarStore } from './BottomBarContext';
+import { useTheme } from './ThemeContext';
+import { OverlayContext } from '../model/useOverlay';
 import { setGlobalOverlayRef } from '../model/globalOverlay';
+import type { OverlayContextProps, ShowAlertProps, ShowBottomSheetProps, ShowLoaderProps, ShowSnackbarProps } from '../model/types';
+import { PortalProvider } from '../overlay/ZSPortal';
+import AlertDialog from '../overlay/AlertDialog';
+import AndroidBottomSheet from '../overlay/AndroidBottomSheet';
+import { SheetBottom } from '../overlay/SheetBottom';
+import { SheetContent } from '../overlay/SheetContent';
+import { SheetHeader } from '../overlay/SheetHeader';
+import SnackbarHost, { type SnackbarEntry, type SnackbarPosition } from '../overlay/SnackbarHost';
+import Loader from '../overlay/Loader';
+import { VeilScreen, VeilTargetContext } from '../overlay/veil';
 
-const MemoizedAlertOverlay = memo(AlertOverlay);
-const MemoizedSnackbarNotify = memo(SnackbarNotify);
-const MemoizedBottomSheetOverlay = memo(BottomSheetOverlay);
-const MemoizedLoadingNotify = memo(LoadingNotify);
-const MemoizedPopOverMenu = memo(PopOverMenu);
-const MemoizedModality = memo(Modality);
-const EMPTY_ALERT_ACTIONS = {} as AlertActions;
+export interface OverlayProviderProps {
+  children: ReactNode;
+  snackbarPosition?: SnackbarPosition;
+}
 
-export function OverlayProvider({
-  customSnackbar,
-  maxSnackbarCount = 3,
-  loaderComponent,
-  children
-}: OverlayProviderProps) {
-  const { height: defaultBottomSheetMaxHeight } = useWindowDimensions();
+const SHEET_PADDING = Platform.OS === 'android' ? 16 : 20;
 
-  const [title, setTitle] = useState<string>('');
-  const [informative, setInformative] = useState<string>('');
-  const [alertVisible, setAlertVisible] = useState<boolean>(false);
-  const [actions, setActions] = useState<AlertActions>();
-  const [isBackgroundTouchClose, setIsBackgroundTouchClose] = useState<boolean>(true);
-  const [titleStyle, setTitleStyle] = useState<TextProps['style']>();
-  const [informativeStyle, setInformativeStyle] = useState<TextProps['style']>();
-  const [secondaryButtonStyle, setSecondaryButtonStyle] = useState<TouchableOpacityProps['style']>();
-  const [primaryButtonStyle, setPrimaryButtonStyle] = useState<TouchableOpacityProps['style']>();
-  const [secondaryButtonTextStyle, setSecondaryButtonTextStyle] = useState<TextProps['style']>();
+const MAX_SNACKBARS = 3;
 
-  const [snackItemStack, setSnackItemStack] = useState<SnackItem[]>([]);
+let nextAlertId = 0;
+let nextSnackbarId = 0;
 
-  const [bottomSheetVisible, setBottomSheetVisible] = useState<boolean>(false);
-  const [bottomSheetComponent, setBottomSheetComponent] = useState<ReactNode>(null);
-  const [bottomSheetHeader, setBottomSheetHeader] = useState<ReactNode>(null);
-  const [bottomSheetOptions, setBottomSheetOptions] = useState<BottomSheetOptions>();
-  const [bottomSheetHeight, setBottomSheetHeight] = useState<BottomSheetHeight>(300);
-  const [bottomSheetMaxHeight, setBottomSheetMaxHeight] = useState<number>(defaultBottomSheetMaxHeight);
+interface QueuedAlert {
+  id: number;
+  props: ShowAlertProps;
+}
 
-  const [loaderVisible, setLoaderVisible] = useState<boolean>(false);
+export function OverlayProvider({ children, snackbarPosition = 'top' }: OverlayProviderProps) {
+  const { colors, accessibilityLabels } = useTheme();
+  const screenTarget = useRef<HostInstance>(null);
+  const [alertQueue, setAlertQueue] = useState<QueuedAlert[]>([]);
+  const currentAlert = alertQueue[0] ?? null;
+  const [activeSheet, setSheet] = useState<{ id: number; props: ShowBottomSheetProps } | null>(null);
+  const sheet = activeSheet?.props ?? null;
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [loader, setLoader] = useState<ShowLoaderProps | null>(null);
+  const [snackbars, setSnackbars] = useState<SnackbarEntry[]>([]);
+  const sheetCloseRef = useRef<(() => void) | undefined>(undefined);
+  const sheetIdRef = useRef(0);
+  const [bottomBar] = useState(createBottomBarStore);
 
-  const [popOverVisible, setPopOverVisible] = useState<boolean>(false);
-  const [popOverLocation, setPopOverLocation] = useState<{ px: PopOverMenuProps['px'], py: PopOverMenuProps['py'] }>({ px: 0, py: 0 });
-  const [popOverComponent, setPopOverComponent] = useState<ReactNode>(false);
-
-  const [modalityVisible, setModalityVisible] = useState<boolean>(false);
-  const [modalityComponent, setModalityComponent] = useState<ReactNode>(false);
-  const [modalityFoldableSingleScreen, setModalityFoldableSingleScreen] = useState<boolean>(false);
-
-  const showAlert = useCallback(({
-    title,
-    informative,
-    actions,
-    isBackgroundTouchClose = true,
-    titleStyle,
-    informativeStyle,
-    secondaryButtonStyle,
-    primaryButtonStyle,
-    secondaryButtonTextStyle,
-  }: ShowAlertProps) => {
+  const showAlert = useCallback((props: ShowAlertProps) => {
     Keyboard.dismiss();
-    setTitle(title || '');
-    setInformative(informative || '');
-    setActions(actions || {} as AlertActions);
-    setIsBackgroundTouchClose(isBackgroundTouchClose);
-    setAlertVisible(true);
-
-    setTitleStyle(titleStyle);
-    setInformativeStyle(informativeStyle);
-    setSecondaryButtonStyle(secondaryButtonStyle);
-    setPrimaryButtonStyle(primaryButtonStyle);
-    setSecondaryButtonTextStyle(secondaryButtonTextStyle);
+    setAlertQueue((queue) => [...queue, { id: nextAlertId++, props }]);
   }, []);
 
-  // 어떤 경로로 닫히든 onClose 가 1회만 발화하도록 ref 로 보관한다
-  const bottomSheetCloseRef = useRef<(() => void) | undefined>(undefined);
+  const closeAlert = useCallback(() => setAlertQueue((queue) => queue.slice(1)), []);
 
-  const showBottomSheet = useCallback(({
-    headerComponent,
-    component,
-    options,
-  }: ShowBottomSheetProps) => {
+  const showBottomSheet = useCallback((props: ShowBottomSheetProps) => {
     Keyboard.dismiss();
-    bottomSheetCloseRef.current = options?.onClose;
-    setBottomSheetComponent(component);
-    setBottomSheetHeader(headerComponent);
-    setBottomSheetOptions(options);
-    setBottomSheetHeight(options?.height ?? 300);
-    setBottomSheetMaxHeight(options?.maxHeight ?? defaultBottomSheetMaxHeight);
-    setBottomSheetVisible(true);
-  }, [defaultBottomSheetMaxHeight]);
+    const replaced = sheetCloseRef.current;
+    sheetCloseRef.current = props.options?.onClose;
+    setSheet({ id: ++sheetIdRef.current, props });
+    setSheetOpen(true);
+    replaced?.();
+  }, []);
 
-  const dismissBottomSheet = useCallback(() => {
-    const onClose = bottomSheetCloseRef.current;
-    bottomSheetCloseRef.current = undefined;
-    setBottomSheetVisible(false);
+  const hideBottomSheet = useCallback(() => setSheetOpen(false), []);
+
+  const handleSheetClose = useCallback((id: number) => {
+    if (id !== sheetIdRef.current) return;
+    sheetIdRef.current += 1;
+    setSheetOpen(false);
+    setSheet(null);
+    const onClose = sheetCloseRef.current;
+    sheetCloseRef.current = undefined;
     onClose?.();
   }, []);
 
-  const setBottomSheetVisibleGuarded = useCallback((visible: boolean) => {
-    if (visible) {
-      setBottomSheetVisible(true);
-      return;
-    }
-    dismissBottomSheet();
-  }, [dismissBottomSheet]);
-
-  const showLoader = useCallback(() => {
-    setLoaderVisible(true);
+  const showSnackbar = useCallback((props: ShowSnackbarProps) => {
+    setSnackbars((items) => [...items, { ...props, id: nextSnackbarId++ }].slice(-MAX_SNACKBARS));
+    return true;
   }, []);
 
-  const showPopOverMenu = useCallback(({
-    px,
-    py,
-    component
-  }: PopOverMenuProps) => {
-    Keyboard.dismiss();
-    setPopOverLocation({ px, py });
-    setPopOverComponent(component);
-    setPopOverVisible(true);
-  }, []);
+  const hideSnackbar = useCallback((id: number) => setSnackbars((items) => items.filter((item) => item.id !== id)), []);
 
-  const showModality = useCallback(({
-    component,
-    foldableSingleScreen
-  }: ModalityProps) => {
-    Keyboard.dismiss();
-    setModalityComponent(component);
-    setModalityVisible(true);
-    setModalityFoldableSingleScreen(foldableSingleScreen || false);
-  }, []);
+  const showLoader = useCallback((props?: ShowLoaderProps) => setLoader(props ?? {}), []);
+  const hideLoader = useCallback(() => setLoader(null), []);
 
-  const showSnackBar = useCallback(({
-    message,
-    type = 'success',
-    index = Date.now(),
-    snackbarDuration = 3500
-  }: ShowSnackBarProps) => {
-    setSnackItemStack((prev) => {
-      const newStack = [...prev, { message, type, index: index, snackbarDuration: snackbarDuration }];
-      return newStack.length > maxSnackbarCount ? newStack.slice(1) : newStack;
+  const sheetDismissible = sheet?.options?.dismissible ?? true;
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    if (!sheetOpen && !loader) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (!loader && sheetDismissible) setSheetOpen(false);
+      return true;
     });
-  }, [maxSnackbarCount]);
+    return () => subscription.remove();
+  }, [sheetOpen, loader, sheetDismissible]);
 
-  const hideSnackBar = useCallback((index: number) => {
-    setSnackItemStack((prev) => prev.filter((item) => item.index !== index));
-  }, []);
-
-  const hideOverlay = useCallback((option: HideOption = 'all') => {
-    Keyboard.dismiss();
-    switch (option) {
-      case 'alert':
-        setAlertVisible(false);
-        break;
-      case 'modal':
-        setModalityVisible(false);
-        break;
-      case 'snack':
-        setSnackItemStack([]);
-        break;
-      case 'bottomSheet':
-        dismissBottomSheet();
-        break;
-      case 'loader':
-        setLoaderVisible(false);
-        break;
-      case 'popOver':
-        setPopOverVisible(false);
-        break;
-      case 'all':
-        setModalityVisible(false);
-        setAlertVisible(false);
-        setSnackItemStack([]);
-        setLoaderVisible(false);
-        setPopOverVisible(false);
-        dismissBottomSheet();
-        break;
-      default:
-        break;
-    };
-  }, [dismissBottomSheet]);
-
-  // 각 오버레이가 BackHandlerContext 에 우선순위로 등록해 back 한 번에 하나만 닫힌다
-
-  const overlayContextValue = useMemo(() => ({
-    hideOverlay,
-    showAlert,
-    showSnackBar,
-    showBottomSheet,
-    showPopOverMenu,
-    showModality,
-    showLoader,
-  }), [hideOverlay, showAlert, showSnackBar, showBottomSheet, showPopOverMenu, showModality, showLoader]);
+  const value = useMemo<OverlayContextProps>(
+    () => ({ showAlert, showBottomSheet, hideBottomSheet, showSnackbar, showLoader, hideLoader }),
+    [showAlert, showBottomSheet, hideBottomSheet, showSnackbar, showLoader, hideLoader],
+  );
 
   useEffect(() => {
-    setGlobalOverlayRef(overlayContextValue);
+    setGlobalOverlayRef(value);
+    return () => setGlobalOverlayRef(null);
+  }, [value]);
 
-    return () => {
-      setGlobalOverlayRef(null);
-    };
-  }, [overlayContextValue]);
-
-  const alertContextValue = useMemo(() => ({
-    alertVisible,
-    setAlertVisible,
-  }), [
-    alertVisible,
-    setAlertVisible,
-  ]);
-
-  const snackbarContextValue = useMemo(() => ({
-    snackItemStack,
-    hideSnackBar,
-  }), [
-    snackItemStack,
-    hideSnackBar,
-  ]);
-
-  const bottomSheetContextValue = useMemo(() => ({
-    bottomSheetVisible,
-    setBottomSheetVisible: setBottomSheetVisibleGuarded,
-    height: bottomSheetHeight,
-    setHeight: setBottomSheetHeight,
-    maxHeight: bottomSheetMaxHeight,
-  }), [
-    bottomSheetVisible,
-    setBottomSheetVisibleGuarded,
-    bottomSheetHeight,
-    setBottomSheetHeight,
-    bottomSheetMaxHeight,
-  ]);
-
-  const popOverContextValue = useMemo(() => ({
-    popOverVisible,
-    setPopOverVisible,
-  }), [
-    popOverVisible,
-    setPopOverVisible,
-  ]);
-
-  const modalityContextValue = useMemo(() => ({
-    modalityVisible,
-    setModalityVisible,
-  }), [
-    modalityVisible,
-    setModalityVisible,
-  ]);
-
-  const loaderContextValue = useMemo(() => ({
-    loaderVisible,
-    setLoaderVisible,
-  }), [
-    loaderVisible,
-    setLoaderVisible,
-  ]);
+  const snapPoints = sheet?.options?.snapPoints?.map((point) => (point === 'half' ? '50%' : point === 'full' ? '100%' : point));
+  const padding = sheet?.options?.contentPadding ?? SHEET_PADDING;
+  const contentPadding = { paddingHorizontal: padding };
+  const fillsSheet = (snapPoints?.length ?? 0) > 0;
+  // 헤더는 끌기 막이(SheetContent) 밖 — 손잡이처럼 시트를 끈다
+  const sheetHeader =
+    sheet && (sheet.header != null || sheet.headerRight != null) ? <SheetHeader header={sheet.header} headerRight={sheet.headerRight} paddingHorizontal={padding} /> : null;
+  const sheetMain = !sheet ? null : sheet.bottomComponent ? (
+    <SheetContent testID="zs-bottom-sheet" style={fillsSheet ? styles.fill : undefined}>
+      <View style={[contentPadding, fillsSheet ? styles.body : null]}>{sheet.component}</View>
+      <SheetBottom testID="zs-bottom-sheet-bottom" style={[contentPadding, styles.bottomSlot, Platform.OS === 'android' && { backgroundColor: colors.surface2 }]}>
+        {sheet.bottomComponent}
+        {Platform.OS === 'android' ? <View pointerEvents="none" style={[styles.bottomCover, { backgroundColor: colors.surface2 }]} /> : null}
+      </SheetBottom>
+    </SheetContent>
+  ) : (
+    <SheetContent testID="zs-bottom-sheet" style={contentPadding}>
+      {sheet.component}
+    </SheetContent>
+  );
+  const sheetBody = sheetMain ? (
+    <>
+      {sheetHeader}
+      {sheetMain}
+    </>
+  ) : null;
+  // 시트는 별도 창이므로 앱 화면의 blur target을 공유하지 않습니다.
+  const sheetContent = sheetBody ? <VeilTargetContext.Provider value={null}>{sheetBody}</VeilTargetContext.Provider> : null;
 
   return (
-    <OverlayContext.Provider value={overlayContextValue}>
-      <BackHandlerProvider>
-      <AlertContext.Provider value={alertContextValue}>
-        <SnackbarContext.Provider value={snackbarContextValue}>
-          <BottomSheetContext.Provider value={bottomSheetContextValue}>
-            <PopOverContext.Provider value={popOverContextValue}>
-              <ModalityContext.Provider value={modalityContextValue}>
-                <LoaderContext.Provider value={loaderContextValue}>
-                  <PortalProvider>
-                    {children}
-
-                    <MemoizedModality modalityComponent={modalityComponent} foldableSingleScreen={modalityFoldableSingleScreen} />
-
-                    <MemoizedBottomSheetOverlay
-                      headerComponent={bottomSheetHeader}
-                      component={bottomSheetComponent}
-                      options={bottomSheetOptions}
-                    />
-
-                    <MemoizedPopOverMenu
-                      px={popOverLocation?.px}
-                      py={popOverLocation?.py}
-                      component={popOverComponent}
-                    />
-
-                    <MemoizedAlertOverlay
-                      title={title}
-                      informative={informative}
-                      actions={actions || EMPTY_ALERT_ACTIONS}
-                      isBackgroundTouchClose={isBackgroundTouchClose}
-                      titleStyle={titleStyle}
-                      informativeStyle={informativeStyle}
-                      secondaryButtonStyle={secondaryButtonStyle}
-                      primaryButtonStyle={primaryButtonStyle}
-                      secondaryButtonTextStyle={secondaryButtonTextStyle}
-                    />
-
-                    <MemoizedSnackbarNotify
-                      customSnackbar={customSnackbar}
-                    />
-
-                    <MemoizedLoadingNotify
-                      loaderComponent={loaderComponent}
-                    />
-                  </PortalProvider>
-                </LoaderContext.Provider>
-              </ModalityContext.Provider>
-            </PopOverContext.Provider>
-          </BottomSheetContext.Provider>
-        </SnackbarContext.Provider>
-      </AlertContext.Provider>
-      </BackHandlerProvider>
+    <OverlayContext.Provider value={value}>
+      <VeilTargetContext.Provider value={screenTarget}>
+        <PortalProvider>
+          <VeilScreen target={screenTarget}>
+            <ScreenCoverContext.Provider value={loader !== null || sheetOpen}>
+              <BottomBarStoreContext.Provider value={bottomBar}>{children}</BottomBarStoreContext.Provider>
+            </ScreenCoverContext.Provider>
+          </VeilScreen>
+          {activeSheet && Platform.OS === 'android' ? (
+            <AndroidBottomSheet
+              key={activeSheet.id}
+              open={sheetOpen}
+              snapPoints={snapPoints}
+              dismissible={sheetDismissible}
+              containerColor={colors.surface2}
+              onClose={() => handleSheetClose(activeSheet.id)}
+            >
+              {sheetContent}
+            </AndroidBottomSheet>
+          ) : null}
+          {activeSheet && Platform.OS !== 'android' ? (
+            <BottomSheet key={activeSheet.id} index={sheetOpen ? 0 : -1} snapPoints={snapPoints} enablePanDownToClose={sheetDismissible} onClose={() => handleSheetClose(activeSheet.id)}>
+              {sheetContent}
+            </BottomSheet>
+          ) : null}
+          {currentAlert ? <AlertDialog key={currentAlert.id} alert={currentAlert.props} onClose={closeAlert} /> : null}
+          <SnackbarHost items={snackbars} onHide={hideSnackbar} position={snackbarPosition} bottomBar={bottomBar} />
+          <Loader visible={loader !== null} accessibilityLabel={loader?.accessibilityLabel ?? accessibilityLabels.loading} />
+        </PortalProvider>
+      </VeilTargetContext.Provider>
     </OverlayContext.Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  fill: { flex: 1 },
+  body: { flex: 1, overflow: 'hidden' },
+  bottomSlot: { paddingTop: 12, paddingBottom: 12 },
+  bottomCover: { position: 'absolute', bottom: -118, left: 0, right: 0, height: 120 },
+});

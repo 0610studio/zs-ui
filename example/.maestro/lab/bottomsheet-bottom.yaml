@@ -1,0 +1,68 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- scrollUntilVisible:
+    element: 'Overlay:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'Overlay:.*'
+      - assertVisible:
+          id: 'overlay-sheet-fit'
+
+- scrollUntilVisible:
+    element:
+      id: 'overlay-sheet-bottom-fit'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-bottom-fit'
+      - extendedWaitUntil:
+          visible: '메모 남기기'
+          timeout: 10000
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'overlay-sheet-cta'
+- takeScreenshot: b01-fit
+- tapOn:
+    id: 'sheet-bottom-memo'
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'overlay-sheet-cta'
+- takeScreenshot: b02-fit-keyboard
+- tapOn:
+    id: 'overlay-sheet-cta'
+- extendedWaitUntil:
+    notVisible: '메모 남기기'
+    timeout: 5000
+
+- scrollUntilVisible:
+    element:
+      id: 'overlay-sheet-bottom-snap'
+    direction: DOWN
+    centerElement: true
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'overlay-sheet-bottom-snap'
+      - extendedWaitUntil:
+          visible: '지역 선택'
+          timeout: 10000
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'overlay-sheet-cta'
+- takeScreenshot: b03-half
+- tapOn:
+    id: 'overlay-sheet-cta'
+- extendedWaitUntil:
+    notVisible: '지역 선택'
+    timeout: 5000

@@ -1,41 +1,36 @@
 {
   "name": "docs",
-  "version": "0.0.6",
-  "private": false,
+  "version": "2.0.0",
+  "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
-    "playground:build": "node scripts/build-local-playground.mjs",
     "validate:coverage": "node scripts/validate-doc-coverage.mjs",
     "check": "pnpm run typecheck && pnpm run validate:coverage && pnpm run build",
-    "start": "pnpm run playground:build && docusaurus start",
-    "build": "pnpm run playground:build && docusaurus build",
-    "swizzle": "docusaurus swizzle",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
-    "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids",
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "3.6.1",
-    "@docusaurus/preset-classic": "3.6.1",
-    "@giscus/react": "^3.0.0",
-    "@mdx-js/react": "^3.0.0",
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@easyops-cn/docusaurus-search-local": "0.55.3",
+    "@mdx-js/react": "^3.1.1",
     "lucide-react": "^0.456.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "prism-react-renderer": "^2.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.6.1",
-    "@docusaurus/theme-classic": "3.6.1",
-    "@docusaurus/tsconfig": "3.6.1",
-    "@docusaurus/types": "3.6.1",
+    "@docusaurus/module-type-aliases": "3.10.2",
+    "@docusaurus/theme-classic": "3.10.2",
+    "@docusaurus/tsconfig": "3.10.2",
+    "@docusaurus/types": "3.10.2",
     "@types/node": "26.4.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
-    "typescript": "~5.6.2",
-    "webpack": "~5.97.1"
+    "typescript": "~5.6.3",
+    "webpack": "~5.112.2"
   },
   "browserslist": {
     "production": [
@@ -50,6 +45,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=20.0"
   }
 }

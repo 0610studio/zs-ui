@@ -1,210 +1,103 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
-
 # ZSTextField
 
-Reanimated를 사용하여 다양한 스타일 애니메이션을 제공하는 텍스트 입력 필드 컴포넌트입니다. 플로팅 라벨, 포커스 애니메이션, 에러 상태 표시 등의 기능을 포함합니다.
-
-:::note 플랫폼 입력 검증
-웹에서 값 입력과 기본 포커스 애니메이션을 확인할 수 있습니다. iOS·Android 소프트 키보드, IME 조합 입력, 자동완성, 폰트 렌더링과 `ZSContainer`의 키보드 스크롤 연동은 실제 앱에서 확인하세요.
-:::
-
-<LocalPlayground example="ZSTextField" height={820} />
+라벨·안내 문구·오류·글자 수를 갖춘 텍스트 입력입니다. 입력은 React Native `TextInput`이고 둘레 모양은 zs-ui가 그려 iOS·Android에서 같습니다. 라벨은 비어 있으면 칸 안에 있다가 포커스·값이 있으면 떠오릅니다.
 
 ## 기본 사용법
 
 ```tsx
-import { ZSTextField } from '@0610studio/zs-ui';
 import { useState } from 'react';
+import { ZSTextField } from '@0610studio/zs-ui';
 
-function MyComponent() {
-  const [value, setValue] = useState('');
-
-  return (
-    <ZSTextField
-      label="닉네임"
-      value={value}
-      onChangeText={setValue}
-      boxStyle="outline"
-    />
-  );
+function NameField() {
+  const [name, setName] = useState('');
+  return <ZSTextField label="이름" value={name} onChangeText={setName} helperText="실명으로 입력하세요" required />;
 }
 ```
 
-## Props
+라벨은 필수입니다(M3·HIG — placeholder로 라벨을 대신하지 않습니다). `placeholder`는 라벨이 떠오른 뒤에만 보입니다.
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `typo` | `TypoOptions` | `'body.2'` | 텍스트 스타일을 정의. 테마에 따라 자동 적용 |
-| `status` | `'default' \| 'error'` | `'default'` | 입력 상태를 설정. 에러 시 라벨 및 테두리 색상이 변경됨 |
-| `value` | `string` | 필수 | 텍스트 필드의 입력 값 |
-| `onChangeText` | `(text: string) => void` | `undefined` | 텍스트 변경 이벤트 핸들러 |
-| `label` | `string` | `'Placeholder'` | 텍스트 필드의 라벨 텍스트 |
-| `inputBgColor` | `string` | 테마 `background.base` (`inbox`는 `background.layer1`) | 입력 필드의 배경색 |
-| `labelBgColor` | `string` | 테마 `background.base` (`inbox`는 `background.layer1`) | 라벨의 배경색 |
-| `labelColor` | `string` | 테마 `text.secondary` | 값이 입력되어 있고 포커스가 없을 때의 라벨 색상 |
-| `placeHolderColor` | `string` | 테마 `grey[40]` (`disabled`면 `grey[70]`) | 값이 비어 있고 포커스가 없을 때(라벨이 입력 자리에 있을 때)의 라벨 색상. `textInputProps.placeholder` 글자색에는 적용되지 않습니다 |
-| `fontSize` | `number` | `undefined` | 타입에만 선언되어 있고 적용되지 않습니다. 글자 크기는 `typo`로 정합니다 |
-| `borderColor` | `string` | 테마 `grey[30]` | 테두리 색상 |
-| `borderRadius` | `number` | `14` | 테두리의 라운딩 반경 |
-| `focusColor` | `string` | 테마 `primary.main` | 포커스 상태의 테두리·라벨 색상 |
-| `errorColor` | `string` | 테마 `danger.main` | 에러 상태에서의 테두리 및 라벨 색상 |
-| `paddingHorizontal` | `number` | `15` | 텍스트 필드의 좌우 여백 |
-| `borderWidth` | `number` | `1.2` | 테두리 두께 |
-| `errorMessage` | `string` | `undefined` | 에러 상태에서 표시할 메시지 |
-| `textInputProps` | `TextInputProps` | `undefined` | React Native `TextInput` 속성. `onFocus`·`onBlur`·`onChangeText`는 내부 처리 뒤에 이어서 호출되고 `style`은 내부 스타일 뒤에 병합됩니다. `value`·`allowFontScaling`은 같은 이름의 prop이 우선하고, `autoCorrect`·`spellCheck`(항상 `false`)와 `selectionColor`는 바꿀 수 없습니다 |
-| `boxStyle` | `'outline' \| 'underline' \| 'inbox'` | `'outline'` | 텍스트 필드 스타일 |
-| `innerBoxStyle` | `'top' \| 'middle' \| 'bottom'` | `undefined` | 텍스트 필드가 그룹일 때 스타일을 정의 |
-| `disabled` | `boolean` | `false` | 텍스트 필드 비활성화 여부 |
-| `allowFontScaling` | `boolean` | `true` | 텍스트 크기 자동 조정 허용 여부 |
-| `isTextArea` | `boolean` | `false` | 텍스트 영역 레이아웃 여부. 입력과 라벨을 위쪽에 정렬합니다. 여러 줄 입력은 `textInputProps.multiline`으로 켭니다 |
+## Props — `ZSTextFieldProps`
 
-## 특징
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `label` | `string` | Required | 항상 보이는 라벨 |
+| `variant` | `ZSTextFieldVariant` | `'outlined'` | `'outlined' \| 'inbox' \| 'underline'` — [variant](#variant) |
+| `value` | `string` | `undefined` | 주면 제어 모드 |
+| `defaultValue` | `string` | `undefined` | 비제어 모드 초기값 |
+| `onChangeText` | `(text: string) => void` | `undefined` | 값 변경. 지우기 버튼도 이것으로 `''`를 넘깁니다 |
+| `helperText` | `string` | `undefined` | 필드 아래 안내 문구 |
+| `errorText` | `string` | `undefined` | 있으면 오류 상태 — 안내 문구 대신 보입니다 |
+| `required` | `boolean` | `false` | 라벨 뒤 `*` |
+| `clearable` | `boolean` | `true` | 값이 있고 포커스일 때 지우기 버튼 |
+| `clearAccessibilityLabel` | `string` | `'Clear text'` | 지우기 버튼의 스크린 리더 이름. 앱 전체 기본값은 [ThemeProvider `accessibilityLabels.clearText`](../Provider/ThemeProvider#스크린-리더-문구--accessibilitylabels)로 바꿉니다 |
+| `showCount` | `boolean` | `false` | `maxLength`와 함께 `현재/최대` 글자 수 |
+| `disabled` | `boolean` | `false` | 편집 불가(`editable={false}`)와 비활성 색 |
+| `multiline` | `boolean` | `false` | 여러 줄 입력 |
+| `minRows` | `number` | `1` | `multiline` 최소 줄 수 |
+| `maxRows` | `number` | `undefined` | `multiline` 최대 줄 수 — 넘으면 칸 안에서 스크롤합니다. 없으면 계속 늘어납니다 |
+| `startAdornment` | `ReactNode` | `undefined` | 입력 앞 요소(아이콘 등). 있으면 라벨이 늘 떠 있습니다 |
+| `endAdornment` | `ReactNode` | `undefined` | 입력 뒤 요소(단위·비밀번호 보기 버튼 등) |
+| `maxFontSizeMultiplier` | `number` | 앱 상한 | 글자 확대 상한. 주지 않으면 [앱 상한](../Theme/typography#앱-전체-상한--maxfontsizemultiplier)(기본 2배). 라벨·칸 높이도 같은 배율로 맞춥니다 |
+| `style` | `StyleProp<ViewStyle>` | `undefined` | 바깥 컨테이너 스타일 |
+| `inputStyle` | `TextInputProps['style']` | `undefined` | `TextInput` 스타일 |
+| `...props` | `TextInputProps` | `undefined` | `placeholder`·`keyboardType`·`maxLength`·`onFocus`·`onBlur`·`returnKeyType` 등(`style`·`editable` 제외) |
 
-- **플로팅 라벨**: 입력 시 라벨이 위로 이동하는 애니메이션
-- **포커스 애니메이션**: 포커스 시 테두리 색상이 부드럽게 변경됩니다
-- **에러 상태**: 에러 메시지와 함께 시각적 피드백 제공
-- **다양한 스타일**: `outline`, `underline`, `inbox` 세 가지 스타일 지원
-- **그룹 필드**: 여러 필드를 하나의 그룹으로 묶을 수 있습니다
+`ref`는 `TextInput` 인스턴스(`ZSTextFieldRef`)입니다 — `ref.current?.focus()`. `ZSTextFieldProps`·`ZSTextFieldRef`·`ZSTextFieldVariant` 타입을 내보냅니다.
 
-## BoxStyle
+## variant
 
-텍스트 필드의 스타일을 선택할 수 있습니다:
+높이는 기본 글자 크기에서 한 줄 칸의 높이이고, 글자 크기 설정이 커지면 함께 늘어납니다. 모서리는 두 플랫폼 모두 16(`lg`)이고, 좌우 안쪽 여백(`underline` 제외)은 두 플랫폼 모두 16이라 iOS [ZSSelect](./ZSSelect)의 라벨·값과 글자 시작선이 맞습니다.
 
-- **`outline`**: 전체 테두리가 있는 박스 스타일 (기본값)
-- **`underline`**: 하단 테두리만 있는 스타일
-- **`inbox`**: 내부에 라벨이 들어가는 박스 스타일
+| `variant` | 모양 | iOS 높이 | Android 높이 |
+|-----------|------|---------|-------------|
+| `outlined` (기본) | 테두리 박스. 떠오른 라벨이 위 테두리에 걸리고 그 자리의 선이 비워집니다(배경을 깔지 않아 어떤 배경 위에서도 됩니다) | 52pt | 56dp |
+| `inbox` | 테두리 박스 + 바탕색 면(`background`). 라벨이 칸 안 위쪽으로 떠오릅니다 | 56pt | 56dp |
+| `underline` | 아래 선만. 라벨이 입력 줄 위로 떠오르고 좌우 여백이 없습니다 | 52pt | 52dp |
 
-## 예제
+## 제어·비제어
 
-### Outline 스타일
+`value`를 주면 제어, 주지 않으면 `defaultValue`로 시작하는 비제어입니다. 필드가 많은 폼에서는 비제어가 가볍습니다 — 키 입력마다 부모가 다시 그려지지 않습니다. 값은 `onChangeText`나 `onEndEditing`으로 받습니다.
 
 ```tsx
-<ZSTextField
-  boxStyle="outline"
-  label="아이디"
-  value={userId}
-  onChangeText={setUserId}
-/>
+<ZSTextField label="이메일" value={email} onChangeText={setEmail} />
+
+const codeRef = useRef('');
+<ZSTextField label="인증번호" defaultValue="" onChangeText={(text) => (codeRef.current = text)} maxLength={6} showCount />
 ```
 
-### Underline 스타일
+## 상태
 
 ```tsx
-<ZSTextField
-  boxStyle="underline"
-  label="닉네임"
-  value={nickname}
-  onChangeText={setNickname}
-/>
+<ZSTextField label="이메일" value={email} onChangeText={setEmail} keyboardType="email-address" errorText={emailError} />
+
+<ZSTextField label="메모" value={memo} onChangeText={setMemo} multiline minRows={2} maxRows={5} maxLength={200} showCount />
+
+<ZSTextField variant="inbox" label="몸무게" keyboardType="decimal-pad" endAdornment={<ZSText color="textSecondary">kg</ZSText>} />
+
+<ZSTextField variant="underline" label="아이디" value="zs-ui" disabled />
 ```
 
-### Inbox 스타일
+| 상태 | 테두리·선 | 라벨 |
+|------|-----------|------|
+| 기본 | `borderStrong` 1(세 variant 같음) | `textSecondary` |
+| 포커스 | `text` 2 | `text` |
+| 오류 | `error` 2 + 끝에 오류 아이콘 | `error` |
+| 비활성 | `text` 12% 1 — 오류 문구가 있어도 같습니다 | 글자·라벨 `text` 38% |
 
-```tsx
-<ZSTextField
-  boxStyle="inbox"
-  label="이메일"
-  value={email}
-  onChangeText={setEmail}
-/>
-```
+포커스·오류 테두리(2)는 기본 테두리(1) 위에 겹쳐 그립니다. 두께가 끊겨 바뀌지 않고, 위 테두리의 색·불투명도만 짧게 페이드합니다.
 
-### 에러 상태
+- 포커스 테두리·라벨·커서·선택 손잡이는 `text`입니다. 얇은 표시라 `primary`로 그리지 않습니다([색 규칙](../Theme/colors#색-규칙--채움과-얇은-표시)). 오류면 `error`입니다. Android 선택 영역은 같은 색 40%입니다.
+- 값·라벨·placeholder는 `body1` 강조 굵기 하나로 그립니다.
+- placeholder는 `textSecondary`를 칸 면 쪽으로 조금 옅게 옮긴 회색입니다. 값보다 옅고 라벨과도 갈리며, 칸 면 위 4.5:1을 지킵니다.
 
-```tsx
-<ZSTextField
-  label="비밀번호"
-  value={password}
-  onChangeText={setPassword}
-  status="error"
-  errorMessage="비밀번호는 8자 이상이어야 합니다"
-/>
-```
+## 접근성
 
-### 그룹 필드 (InnerBoxStyle)
+- 이름은 `accessibilityLabel`(기본 `label`), 힌트는 오류 문구 또는 안내 문구입니다. 그려진 라벨 글자는 스크린 리더에서 숨겨 두 번 읽히지 않습니다.
+- 오류 문구가 새로 생기거나 바뀌면 스크린 리더가 읽습니다. iOS(VoiceOver)는 라벨과 오류 문구를 이어 읽고, 앞 안내를 끊지 않고 차례로 읽어 여러 칸에 한꺼번에 오류가 생겨도 모두 들립니다. 처음 그릴 때부터 있던 문구는 읽지 않습니다. Android(TalkBack)는 `accessibilityLiveRegion="polite"`로 읽습니다.
+- 지우기 버튼은 보이는 원보다 넓은 터치 영역(iOS 44pt·Android 48dp)을 갖고, 누르면 [ZSPressable](./ZSPressable)과 같은 누름 표시(iOS 하이라이트·Android ripple)가 보입니다.
 
-여러 필드를 하나의 그룹으로 묶을 때 사용합니다:
+## 관련 문서
 
-```tsx
-<ZSTextField
-  label="상단 필드"
-  value={value1}
-  onChangeText={setValue1}
-  innerBoxStyle="top"
-/>
-
-<ZSTextField
-  label="중간 필드"
-  value={value2}
-  onChangeText={setValue2}
-  innerBoxStyle="middle"
-/>
-
-<ZSTextField
-  label="하단 필드"
-  value={value3}
-  onChangeText={setValue3}
-  innerBoxStyle="bottom"
-/>
-```
-
-### 텍스트 영역 (TextArea)
-
-```tsx
-<ZSTextField
-  label="메시지"
-  value={message}
-  onChangeText={setMessage}
-  isTextArea={true}
-  textInputProps={{
-    multiline: true,
-    numberOfLines: 4,
-  }}
-/>
-```
-
-### 커스텀 스타일링
-
-```tsx
-<ZSTextField
-  label="커스텀 필드"
-  value={value}
-  onChangeText={setValue}
-  inputBgColor="#f5f5f5"
-  labelBgColor="#ffffff"
-  focusColor="#007AFF"
-  borderRadius={20}
-  paddingHorizontal={20}
-  textInputProps={{
-    style: { color: '#333' },
-    placeholder: '입력하세요',
-  }}
-/>
-```
-
-### Ref 사용
-
-```tsx
-import { useRef } from 'react';
-import { ZSTextField, ZSTextFieldRef } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const inputRef = useRef<ZSTextFieldRef>(null);
-
-  const handleFocus = () => {
-    inputRef.current?.focus();
-  };
-
-  return (
-    <>
-      <ZSTextField
-        ref={inputRef}
-        label="입력 필드"
-        value={value}
-        onChangeText={setValue}
-      />
-      <Button title="포커스" onPress={handleFocus} />
-    </>
-  );
-}
-```
+- [ZSScreen](./ZSScreen) — 키보드 자동 스크롤
+- [ZSKeyboardStickyView](./ZSKeyboardStickyView) — 키보드 위 버튼
+- [ZSSelect](./ZSSelect) — 목록에서 고르기

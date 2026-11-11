@@ -1,0 +1,57 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-readable-content-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-readable-content-card'
+      - assertVisible:
+          id: 'lab-readable-content-width'
+          text: 'content ${READABLE_PORTRAIT}'
+- assertVisible:
+    id: 'lab-readable-cta'
+- waitForAnimationToEnd
+- takeScreenshot: c01-portrait-${LABEL}
+
+- setOrientation: LANDSCAPE_LEFT
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'lab-readable-content-width'
+    text: 'content ${READABLE_LANDSCAPE}'
+- takeScreenshot: c02-landscape-readable-${LABEL}
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-readable-mode-fixed'
+      - assertVisible:
+          id: 'lab-readable-content-width'
+          text: 'content ${FIXED_LANDSCAPE}'
+- waitForAnimationToEnd
+- takeScreenshot: c03-landscape-fixed-${LABEL}
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-readable-mode-none'
+      - assertVisible:
+          id: 'lab-readable-content-width'
+          text: 'content ${NONE_LANDSCAPE}'
+- waitForAnimationToEnd
+- takeScreenshot: c04-landscape-none-${LABEL}
+
+- setOrientation: PORTRAIT
+- waitForAnimationToEnd

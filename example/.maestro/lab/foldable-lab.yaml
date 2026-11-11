@@ -1,0 +1,79 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible: ZS-UI
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- assertVisible:
+    id: foldable-history-count
+    text: '기록 [1-8]개'
+- tapOn:
+    id: foldable-history-clear
+- assertVisible:
+    id: foldable-history-count
+    text: 기록 0개
+- openLink: zs-ui-example:///lab/visual
+- assertVisible:
+    id: lab-visual-frame
+- tapOn:
+    id: lab-visual-flash
+- assertVisible: 조명 켜짐
+- scrollUntilVisible:
+    element:
+      id: lab-visual-mode-tutorial
+    direction: UP
+- tapOn:
+    id: lab-visual-mode-tutorial
+- tapOn:
+    id: lab-visual-next
+- assertVisible:
+    id: lab-visual-step
+    text: 2 / 3
+- scrollUntilVisible:
+    element:
+      id: lab-visual-end
+    direction: DOWN
+- assertVisible:
+    id: lab-visual-next
+- scrollUntilVisible:
+    element:
+      id: lab-visual-mode-qr
+    direction: UP
+- tapOn:
+    id: lab-visual-mode-qr
+- assertVisible: 조명 켜짐
+- openLink: zs-ui-example:///lab/keyboard
+- tapOn:
+    id: lab-keyboard-field-1
+- inputText: abc
+- assertVisible: 아이디는 4자 이상 입력하세요.
+- tapOn: CTA 버튼
+- tapOn:
+    id: lab-keyboard-mode-rn
+- assertVisible: abc
+- openLink: zs-ui-example:///lab/overlay-placement
+- scrollUntilVisible:
+    element:
+      id: lab-overlay-long-sheet
+    direction: DOWN
+- tapOn:
+    id: lab-overlay-long-sheet
+- scrollUntilVisible:
+    element:
+      id: lab-overlay-sheet-end
+    direction: DOWN
+- scrollUntilVisible:
+    element:
+      id: lab-overlay-sheet-close
+    direction: DOWN
+- tapOn:
+    id: lab-overlay-sheet-close
+- scrollUntilVisible:
+    element:
+      id: lab-overlay-close-count
+    direction: UP
+- assertVisible:
+    id: lab-overlay-close-count
+    text: 시트 닫힘 1회

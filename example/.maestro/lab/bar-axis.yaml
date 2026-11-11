@@ -1,0 +1,78 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-bar-axis-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-bar-axis-card'
+      - assertVisible:
+          id: 'lab-bar-axis-value'
+
+- tapOn: 'vertical'
+- extendedWaitUntil:
+    visible:
+      id: 'lab-bar-axis-value'
+      text: 'vertical'
+    timeout: 10000
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'lab-bar-axis-insets'
+    text: ${INSETS_V}
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          id: 'zs-tab-navigator-${MODE_V}'
+- takeScreenshot: b01-vertical-${LABEL}
+
+- tapOn: 'horizontal'
+- extendedWaitUntil:
+    visible:
+      id: 'lab-bar-axis-value'
+      text: 'horizontal'
+    timeout: 10000
+- waitForAnimationToEnd
+- assertVisible:
+    id: 'lab-bar-axis-insets'
+    text: ${INSETS_H}
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          id: 'zs-tab-navigator-${MODE_H}'
+- takeScreenshot: b02-horizontal-${LABEL}
+
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-bar-axis-card'
+    direction: DOWN
+- tapOn:
+    id: 'lab-bar-axis-card'
+- assertVisible:
+    id: 'lab-bar-axis-value'
+    text: 'horizontal'
+
+- tapOn: 'vertical'
+- extendedWaitUntil:
+    visible:
+      id: 'lab-bar-axis-value'
+      text: 'vertical'
+    timeout: 10000

@@ -1,55 +1,39 @@
-jest.mock("../context/OverlayContext", () => ({ OverlayProvider: ({ children }: any) => children }));
-jest.mock("../context/ThemeContext", () => ({
-  ThemeProvider: ({ children }: any) => children,
-  useTheme: () => ({ palette: {} }),
-}));
-jest.mock("../overlay", () => ({
-  AlertOverlay: () => null,
-  BottomSheetOverlay: () => null,
-  SnackbarNotify: () => null,
-  useOverlay: () => ({}),
-  PopOverButton: () => null,
-  PopOverMenu: () => null,
-  ZSPortal: () => null,
-}));
-jest.mock("../ui/ZSTextField/ui/ErrorComponent", () => () => null);
-jest.mock("../ui/ZSContainer", () => () => null);
-jest.mock("../ui/ZSPressable", () => () => null);
-jest.mock("../ui/ZSText", () => () => null);
-jest.mock("../ui/ZSTextField", () => () => null);
-jest.mock("../ui/ZSRadioGroup", () => () => null);
-jest.mock("../ui/ZSView", () => () => null);
-jest.mock("../ui/atoms/AnimatedWrapper", () => () => null);
-jest.mock("../ui/atoms/TextAtom", () => () => null);
-jest.mock("../ui/ZSAboveKeyboard", () => () => null);
+import * as zsUi from '../index';
 
-describe("index exports", () => {
-  it("모든 주요 심볼을 export 한다", async () => {
-    const mod = await import("../index");
-    expect(mod).toHaveProperty("GlobalOverlay");
-    expect(mod).toHaveProperty("useTheme");
-    expect(mod).toHaveProperty("ThemeProvider");
-    expect(mod).toHaveProperty("OverlayProvider");
-    expect(mod).toHaveProperty("useFoldingState");
-    expect(mod).toHaveProperty("themeFactory");
-    expect(mod).toHaveProperty("ZSContainer");
-    expect(mod).toHaveProperty("ZSText");
-    expect(mod).toHaveProperty("ZSTextField");
-    expect(mod).toHaveProperty("ZSRadioGroup");
-    expect(mod).toHaveProperty("ZSPressable");
-    expect(mod).toHaveProperty("ZSView");
-    expect(mod).toHaveProperty("AnimatedWrapper");
-    expect(mod).toHaveProperty("TextAtom");
-    expect(mod).toHaveProperty("ErrorComponent");
-    expect(mod).toHaveProperty("ZSAboveKeyboard");
-    expect(mod).toHaveProperty("AlertOverlay");
-    expect(mod).toHaveProperty("BottomSheetOverlay");
-    expect(mod).toHaveProperty("SnackbarNotify");
-    expect(mod).toHaveProperty("useOverlay");
-    expect(mod).toHaveProperty("PopOverButton");
-    expect(mod).toHaveProperty("PopOverMenu");
-    expect(mod).toHaveProperty("ZSPortal");
+const EXPORTS = {
+  provider: ['ThemeProvider', 'useTheme', 'OverlayProvider', 'useOverlay', 'GlobalOverlay', 'LayoutProvider'],
+  layout: ['useWindowLayout', 'useDisplayFeatures', 'useDevicePosture', 'usePaneLayout', 'useBarAxis'],
+  navigation: ['ZSTabNavigator', 'useStackTheme', 'useNavigationTheme', 'useHeaderInset', 'useTabBarInset', 'ZSHeaderBackground', 'useHeaderButtonColors'],
+  tokens: [
+    'createThemeColors', 'DEFAULT_COLORS', 'getPaletteColors', 'resolveColor', 'withOpacity',
+    'TYPE_SCALE', 'TEXT_VARIANTS', 'createTypography', 'fontFamilyFor',
+    'RADIUS', 'radiusStyle',
+    'ANDROID_SPRING', 'IOS_SPRING_DURATION', 'DURATION', 'springConfig', 'timingConfig',
+    'OPACITY', 'MIN_TOUCH_TARGET',
+    'SHADOW', 'createShadows', 'shadowFor',
+  ],
+  components: [
+    'ZSText', 'ZSBox', 'ZSCard', 'ZSPressable', 'ZSButton', 'ZSTextField', 'ZSSelect', 'ZSSwitch', 'ZSCheckbox', 'ZSRadioGroup',
+    'ZSSegmentedControl', 'ZSSegmentedPages', 'ZSChip', 'ZSMenu', 'ZSBanner', 'ZSTooltip', 'ZSSkeleton', 'ZSBorderBeam', 'ZSScreen', 'useScreenBottomInset',
+    'ZSPaneLayout', 'ZSTopBar', 'ZSKeyboardStickyView', 'ZSPortal',
+  ],
+  calendar: [
+    'ZSCalendar', 'useCalendarAgenda', 'CALENDAR_LOCALES', 'buildEventIndex', 'eventsInRange', 'getEventsOn',
+    'addDays', 'addMonths', 'compareDate', 'isValidDateString', 'startOfMonth', 'todayDateString',
+  ],
+  utils: ['usePreventDoublePress', 'PREVENT_DOUBLE_PRESS_INTERVAL', 'useStyles'],
+};
+
+describe('index exports', () => {
+  it('공개 API 를 빠짐없이, 그 밖의 것은 내보내지 않는다', () => {
+    expect(Object.keys(zsUi).sort()).toEqual(Object.values(EXPORTS).flat().sort());
+  });
+
+  it.each(Object.entries(EXPORTS))('%s 심볼이 모두 정의돼 있다', (_group, names) => {
+    names.forEach((name) => expect(zsUi[name as keyof typeof zsUi]).toBeDefined());
+  });
+
+  it('ZSSkeleton.Box 로 자리 표시 상자를 함께 낸다', () => {
+    expect(zsUi.ZSSkeleton.Box).toBeDefined();
   });
 });
-
-

@@ -1,341 +1,408 @@
-import { useMemo, useCallback, useState, forwardRef, useEffect, useRef } from 'react';
-import { LayoutChangeEvent, Platform, StyleProp, TextInput, TextInputProps, TextStyle } from 'react-native';
-import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withTiming, ReduceMotion } from 'react-native-reanimated';
-import ButtonClose from './ui/ButtonClose';
-import ErrorComponent from './ui/ErrorComponent';
-import { TypoOptions, TypoStyle, TypoSubStyle } from '../../theme/types';
-import { extractStyle } from '../../model/utils';
+import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState, type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from 'react';
+import {
+  AccessibilityInfo,
+  I18nManager,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  useWindowDimensions,
+  type LayoutChangeEvent,
+  type StyleProp,
+  type TextInputInstance,
+  type TextInputProps,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
+import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useTheme } from '../../context/ThemeContext';
-import { DISABLED_OPACITY, DURATION, RADIUS } from '../../theme/tokens';
-import ViewAtom from '../atoms/ViewAtom';
+import { withOpacity } from '../../theme/color';
+import { timingConfig } from '../../theme/motion';
+import { SPACE } from '../../theme/spacing';
+import { MIN_TOUCH_TARGET, OPACITY } from '../../theme/state';
+import { capFontScale } from '../../theme/fontScale';
+import { SvgX } from '../../assets/SvgX';
+import SvgExclamation from '../../assets/SvgExclamation';
+import ZSPressable from '../ZSPressable';
+import ZSText from '../ZSText';
+import { useNotifyInputFocus } from '../ZSScreen/InputFocusContext';
+import FieldBorder, { type BorderColors } from './FieldBorder';
+import { FieldActiveContext } from './FieldActiveContext';
+import { adornmentTranslateY, FIELD_SPEC, fieldGeometry, floatTranslateY, labelOverhangReserve, labelSlot, type ZSTextFieldVariant } from './geometry';
+import { placeholderColor } from './placeholderColor';
 
-export type BoxStyle = 'outline' | 'underline' | 'inbox';
+export type { ZSTextFieldVariant } from './geometry';
 
-const ANIM_DURATION = DURATION.fast;
-const TIMING_CONFIG = { duration: ANIM_DURATION, reduceMotion: ReduceMotion.System };
-
-interface TextFieldProps {
-  typo?: TypoOptions;
-  status?: 'default' | 'error';
-  value: string;
-  onChangeText?: (text: string) => void;
-  inputBgColor?: string;
-  labelBgColor?: string;
-  label?: string;
-  labelColor?: string;
-  placeHolderColor?: string;
-  fontSize?: number;
-  borderColor?: string;
-  borderRadius?: number;
-  focusColor?: string;
-  errorColor?: string;
-  paddingHorizontal?: number;
-  borderWidth?: number;
-  errorMessage?: string;
-  textInputProps?: TextInputProps;
-  boxStyle?: BoxStyle;
-  innerBoxStyle?: 'top' | 'middle' | 'bottom';
+export interface ZSTextFieldProps extends Omit<TextInputProps, 'style' | 'editable'> {
+  label: string;
+  variant?: ZSTextFieldVariant;
+  value?: string;
+  helperText?: string;
+  errorText?: string;
+  required?: boolean;
+  clearable?: boolean;
+  clearAccessibilityLabel?: string;
+  showCount?: boolean;
   disabled?: boolean;
-  allowFontScaling?: boolean;
-  isTextArea?: boolean;
+  minRows?: number;
+  maxRows?: number;
+  startAdornment?: ReactNode;
+  endAdornment?: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  inputStyle?: TextInputProps['style'];
 }
 
-export type ZSTextFieldRef = TextInput;
+export type ZSTextFieldRef = TextInputInstance;
 
-const ZSTextField = forwardRef<ZSTextFieldRef, TextFieldProps>(({
-  typo = 'body.2',
-  status = 'default',
-  value,
-  onChangeText,
-  label = 'Placeholder',
-  labelColor,
-  placeHolderColor,
-  inputBgColor,
-  labelBgColor,
-  borderWidth = 1.2,
-  borderColor,
-  focusColor,
-  errorColor,
-  borderRadius = RADIUS.lg,
-  paddingHorizontal = 15,
-  errorMessage,
-  textInputProps,
-  boxStyle = 'outline',
-  innerBoxStyle,
-  disabled = false,
-  allowFontScaling = true,
-  isTextArea = false,
-}, ref) => {
-  const { typography, palette } = useTheme();
-  const [primaryStyle, subStyle] = typo.split('.') as [TypoStyle, TypoSubStyle];
-  const fErrorColor = errorColor || palette.danger.main;
+const ADORNMENT_GAP = SPACE.md;
+const ANDROID_SELECTION_OPACITY = 0.4;
+const CLEAR_SIZE = 20;
 
-  const fontSize = extractStyle(typography[primaryStyle][subStyle], 'fontSize') as number || 17;
-  const fontFamily = extractStyle(typography[primaryStyle][subStyle], 'fontFamily') as string || '';
-  const inputVerticalOffset = Platform.OS === 'android' ? 4 : 8;
+function estimateLabelWidth(text: string, fontSize: number): number {
+  let width = 0;
+  for (const char of text) width += /[ᄀ-ᇿ　-鿿가-힯＀-￯]/.test(char) ? fontSize : fontSize * 0.58;
+  return width;
+}
 
-  const isError = status === 'error';
-  const hasValue = value !== '';
+function numberStyle(style: TextStyle, key: 'fontSize' | 'lineHeight', fallback: number): number {
+  const value = style[key];
+  return typeof value === 'number' ? value : fallback;
+}
 
-  const floatProgress = useSharedValue(hasValue ? 1 : 0);
-  const focusProgress = useSharedValue(0);
-  const errorProgress = useSharedValue(isError ? 1 : 0);
-  const boxHeightValue = useSharedValue(0);
-
-  const [isFocusedForUI, setIsFocusedForUI] = useState<boolean>(false);
-
-  const isFocusedRef = useRef(false);
-  const hasValueRef = useRef(hasValue);
-  hasValueRef.current = hasValue;
-
-  useEffect(() => {
-    const target = hasValue ? 1 : 0;
-    if (!isFocusedRef.current && floatProgress.value !== target) {
-      floatProgress.value = withTiming(target, TIMING_CONFIG);
-    }
-  }, [hasValue]);
-
-  useEffect(() => {
-    const target = isError ? 1 : 0;
-    if (errorProgress.value !== target) {
-      errorProgress.value = withTiming(target, TIMING_CONFIG);
-    }
-  }, [isError]);
-
-  const animationConstants = useMemo(() => ({
-    baseFontSize: fontSize + (boxStyle === 'inbox' ? 1 : 0),
-    targetFontSize: boxStyle === 'inbox' ? 10 : 11,
-    baseTop: isTextArea ? 12 : 0,
-    targetTopOffset: boxStyle === 'inbox' ? 17 : 2,
-  }), [fontSize, boxStyle, isTextArea]);
-
-  const colorConfig = useMemo(() => ({
-    primaryColor: focusColor || palette.primary.main,
-    defaultBorderColor: borderColor || palette.grey[30],
-    defaultLabelColor: labelColor || palette.text.secondary,
-    // DISABLED_OPACITY 가 전체에 곱해지므로 플레이스홀더색을 진하게 보정한다
-    placeholderColor: placeHolderColor || (disabled ? palette.grey[70] : palette.grey[40]),
-    errorColor: fErrorColor,
-  }), [focusColor, palette.primary.main, borderColor, palette.grey, labelColor, palette.text.secondary, placeHolderColor, fErrorColor, disabled]);
-
-  const nonFocusLabelColor = useMemo(
-    () => (hasValue ? colorConfig.defaultLabelColor : colorConfig.placeholderColor),
-    [hasValue, colorConfig.defaultLabelColor, colorConfig.placeholderColor]
-  );
-
-  const animatedLabelStyle = useAnimatedStyle(() => {
-    const progress = floatProgress.value;
-
-    const labelTranslateY = interpolate(
-      progress,
-      [0, 1],
-      [
-        0,
-        isTextArea ? -24 : -(boxHeightValue.value / 2) - 1 + animationConstants.targetTopOffset - animationConstants.baseTop,
-      ],
-      'clamp'
-    );
-
-    const labelScale = interpolate(
-      progress,
-      [0, 1],
-      [1, animationConstants.targetFontSize / animationConstants.baseFontSize],
-      'clamp'
-    );
-
-    const focusedColor = interpolateColor(focusProgress.value, [0, 1], [nonFocusLabelColor, colorConfig.primaryColor]);
-    const color = interpolateColor(errorProgress.value, [0, 1], [focusedColor, colorConfig.errorColor]);
-
-    return {
-      color,
-      transform: [
-        { translateY: labelTranslateY },
-        { scale: labelScale },
-      ],
-    };
-  }, [animationConstants, isTextArea, nonFocusLabelColor, colorConfig.primaryColor, colorConfig.errorColor]);
-
-  const animatedBorderStyle = useAnimatedStyle(() => {
-    const focusedColor = interpolateColor(focusProgress.value, [0, 1], [colorConfig.defaultBorderColor, colorConfig.primaryColor]);
-    const borderColor = interpolateColor(errorProgress.value, [0, 1], [focusedColor, colorConfig.errorColor]);
-    return { borderColor };
-  }, [colorConfig.defaultBorderColor, colorConfig.primaryColor, colorConfig.errorColor]);
-
-  const handleLayout = useCallback((event: LayoutChangeEvent) => {
-    const { height } = event.nativeEvent.layout;
-    if (boxHeightValue.value !== height) {
-      boxHeightValue.value = height;
-    }
-  }, []);
-
-  const handleFocus = useCallback<NonNullable<TextInputProps['onFocus']>>((event) => {
-    isFocusedRef.current = true;
-    if (floatProgress.value !== 1) {
-      floatProgress.value = withTiming(1, TIMING_CONFIG);
-    }
-    if (focusProgress.value !== 1) {
-      focusProgress.value = withTiming(1, TIMING_CONFIG);
-    }
-    setIsFocusedForUI(true);
-    textInputProps?.onFocus?.(event);
-  }, [textInputProps?.onFocus]);
-
-  const handleBlur = useCallback<NonNullable<TextInputProps['onBlur']>>((event) => {
-    isFocusedRef.current = false;
-    const target = hasValueRef.current ? 1 : 0;
-    if (floatProgress.value !== target) {
-      floatProgress.value = withTiming(target, TIMING_CONFIG);
-    }
-    if (focusProgress.value !== 0) {
-      focusProgress.value = withTiming(0, TIMING_CONFIG);
-    }
-    setIsFocusedForUI(false);
-    textInputProps?.onBlur?.(event);
-  }, [textInputProps?.onBlur]);
-
-  /** inbox 배경을 base 로 두면 값이 빌 때 outline 과 똑같아져 boxStyle 구분이 사라진다. */
-  const defaultFieldBgColor = boxStyle === 'inbox'
-    ? palette.background.layer1
-    : palette.background.base;
-
-  const styleConfig = useMemo(() => {
-    const baseStyle = {
-      width: '100%' as const,
-      justifyContent: isTextArea ? 'flex-start' as const : 'center' as const,
-      borderRadius,
-      paddingHorizontal,
-      backgroundColor: inputBgColor || defaultFieldBgColor,
-      paddingTop: boxStyle === 'inbox' ? 13 : 0,
-    };
-
-    let borderStyle = {};
-    if (boxStyle === 'outline' || boxStyle === 'inbox') {
-      borderStyle = { borderWidth };
-    } else if (boxStyle === 'underline') {
-      borderStyle = {
-        borderBottomWidth: borderWidth,
-        // CSS 는 radius 있는 단일 bottom border 를 양 끝에서 말아 올리므로 웹은 radius 를 뺀다
-        ...(Platform.OS === 'web' ? { borderRadius: 0 } : {}),
-      };
-    }
-
-    let innerStyle = {};
-    if (innerBoxStyle === 'top') {
-      innerStyle = {
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        borderBottomWidth: borderWidth / 2
-      };
-    } else if (innerBoxStyle === 'middle') {
-      innerStyle = {
-        borderRadius: 0,
-        borderTopWidth: borderWidth / 2,
-        borderBottomWidth: borderWidth / 2
-      };
-    } else if (innerBoxStyle === 'bottom') {
-      innerStyle = {
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-        borderTopWidth: borderWidth / 2
-      };
-    }
-
-    return { ...baseStyle, ...borderStyle, ...innerStyle };
-  }, [isTextArea, borderRadius, paddingHorizontal, inputBgColor, borderWidth, boxStyle, innerBoxStyle, defaultFieldBgColor]);
-
-  const labelTextStyle: StyleProp<TextStyle> = useMemo(() => ({
-    fontSize,
-    top: animationConstants.baseTop,
-    left: paddingHorizontal,
-    transformOrigin: 'left center',
-    backgroundColor: labelBgColor || defaultFieldBgColor,
-    paddingHorizontal: boxStyle === 'outline' ? 5 : 0,
-    paddingVertical: 2,
-    textAlignVertical: 'center' as const,
-    fontFamily,
-    borderRadius: boxStyle === 'outline' ? 5 : 0,
-    ...(Platform.OS === 'android' ? { overflow: 'hidden' as const } : {}),
-  }), [fontSize, animationConstants.baseTop, paddingHorizontal, labelBgColor, defaultFieldBgColor, boxStyle, fontFamily]);
-
-  const boxStyleArray = useMemo(
-    () => [styleConfig, animatedBorderStyle],
-    [styleConfig, animatedBorderStyle]
-  );
-
-  const labelStyleArray = useMemo(
-    () => [labelTextStyle, animatedLabelStyle],
-    [labelTextStyle, animatedLabelStyle]
-  );
-
-  const handleTextChange = useCallback((text: string) => {
-    onChangeText?.(text);
-    textInputProps?.onChangeText?.(text);
-  }, [onChangeText, textInputProps?.onChangeText]);
-
-  const textInputStyle = useMemo(() => [
+const ZSTextField: ForwardRefExoticComponent<ZSTextFieldProps & RefAttributes<ZSTextFieldRef>> = forwardRef<ZSTextFieldRef, ZSTextFieldProps>(
+  (
     {
-      paddingTop: 7 + inputVerticalOffset,
-      paddingBottom: 5 + inputVerticalOffset,
-      // DISABLED_OPACITY 가 전체에 곱해지므로 값 텍스트색을 최대 대비로 보정한다
-      color: disabled ? palette.grey[90] : palette.text.base,
-      fontSize,
-      width: '100%' as const,
-      paddingRight: 25,
-      fontFamily,
-      ...(Platform.OS === 'web' ? { outline: 'none' } : {}),
+      label,
+      variant = 'outlined',
+      value,
+      defaultValue,
+      onChangeText,
+      helperText,
+      errorText,
+      required = false,
+      clearable = true,
+      clearAccessibilityLabel,
+      showCount = false,
+      disabled = false,
+      minRows = 1,
+      maxRows,
+      startAdornment,
+      endAdornment,
+      style,
+      inputStyle,
+      multiline = false,
+      maxLength,
+      maxFontSizeMultiplier,
+      placeholder,
+      onFocus,
+      onBlur,
+      testID,
+      ...inputProps
     },
-    textInputProps?.style,
-  ], [disabled, palette.grey, palette.text.base, fontSize, fontFamily, inputVerticalOffset, textInputProps?.style]);
+    forwardedRef,
+  ) => {
+    const { colors, typography, accessibilityLabels, maxFontSizeMultiplier: appMaxFontSizeMultiplier } = useTheme();
+    const { fontScale = 1 } = useWindowDimensions();
+    const maxMultiplier = maxFontSizeMultiplier ?? appMaxFontSizeMultiplier;
+    const platform = Platform.OS === 'android' ? 'android' : 'ios';
+    const notifyInputFocus = useNotifyInputFocus();
+    const inputRef = useRef<TextInputInstance | null>(null);
+    const isRTL = I18nManager.isRTL;
 
-  // 빈 문자열이 View 자식으로 렌더되면 web 이 'Unexpected text node' 경고를 낸다
-  const shouldShowCloseButton = Boolean(value) && isFocusedForUI;
-  const shouldShowError = status === 'error' && errorMessage !== undefined && errorMessage !== '';
+    const controlled = value !== undefined;
+    const [uncontrolledHasValue, setUncontrolledHasValue] = useState(() => (defaultValue ?? '') !== '');
+    const [uncontrolledLength, setUncontrolledLength] = useState(() => (defaultValue ?? '').length);
+    const hasValue = controlled ? value !== '' : uncontrolledHasValue;
+    const length = controlled ? value.length : uncontrolledLength;
 
-  return (
-    <ViewAtom style={{ alignSelf: 'stretch', width: '100%', opacity: disabled ? DISABLED_OPACITY : 1 }}>
-      <Animated.View
-        style={boxStyleArray}
-        onLayout={handleLayout}
-        pointerEvents={disabled ? 'none' : 'auto'}
+    const [inputFocused, setFocused] = useState(false);
+    const opened = useContext(FieldActiveContext);
+    const focused = inputFocused || opened;
+    const isError = Boolean(errorText);
+    const floated = focused || hasValue || startAdornment != null;
+
+    const bodyStyle = typography.body1;
+    const valueStyle = typography.emphasized.body1;
+    const fontSize = numberStyle(bodyStyle, 'fontSize', 16);
+    const scale = capFontScale(fontScale, maxMultiplier);
+    const baseLineHeight = numberStyle(bodyStyle, 'lineHeight', fontSize * 1.4);
+    const lineHeight = baseLineHeight * scale;
+    const labelScale = numberStyle(typography.caption, 'fontSize', 12) / fontSize;
+    const labelLineHeight = numberStyle(typography.caption, 'lineHeight', 16) * scale;
+    const geometry = useMemo(
+      () => fieldGeometry(variant, platform, { lineHeight, labelScale, labelLineHeight }, multiline),
+      [variant, platform, lineHeight, labelScale, labelLineHeight, multiline],
+    );
+    const labelReserve = labelOverhangReserve(variant, { lineHeight, labelScale, labelLineHeight }, baseLineHeight);
+    const slot = useMemo(() => labelSlot(variant, geometry, multiline), [variant, geometry, multiline]);
+    const labelText = required ? `${label} *` : label;
+    // 입력 중 글꼴 속성이 바뀌면 iOS 한글 조합이 끊길 수 있습니다.
+    const textStyle = useMemo<TextStyle>(() => {
+      if (platform !== 'ios' || multiline) return valueStyle;
+      const { lineHeight: _lineHeight, ...rest } = valueStyle;
+      return rest;
+    }, [platform, multiline, valueStyle]);
+
+    const float = useSharedValue(floated ? 1 : 0);
+    const focus = useSharedValue(0);
+    const error = useSharedValue(isError ? 1 : 0);
+    const [initialLabelWidth] = useState(() => estimateLabelWidth(labelText, fontSize * scale));
+    const labelWidth = useSharedValue(initialLabelWidth);
+    const labelHeight = useSharedValue(0);
+    const labelOffset = useSharedValue(geometry.restTop - slot.top);
+
+    useEffect(() => {
+      float.value = withTiming(floated ? 1 : 0, timingConfig('fast'));
+    }, [float, floated]);
+    useEffect(() => {
+      focus.value = withTiming(focused ? 1 : 0, timingConfig('fast'));
+    }, [focus, focused]);
+    useEffect(() => {
+      error.value = withTiming(isError ? 1 : 0, timingConfig('fast'));
+    }, [error, isError]);
+
+    const disabledColor = withOpacity(colors.text, OPACITY.disabled);
+    const accent = isError ? colors.error : colors.text;
+    const borderColors = useMemo<BorderColors>(
+      () =>
+        disabled
+          ? { rest: withOpacity(colors.text, OPACITY.disabledBackground), active: colors.text, error: colors.error }
+          : { rest: colors.borderStrong, active: colors.text, error: colors.error },
+      [disabled, colors],
+    );
+    const fill = variant === 'inbox' ? (disabled ? withOpacity(colors.text, 0.04) : colors.background) : undefined;
+    const placeholderTextColor = useMemo(() => placeholderColor(colors.textSecondary, colors.background), [colors.textSecondary, colors.background]);
+
+    const restLabelColor = disabled ? disabledColor : colors.textSecondary;
+    const focusLabelColor = disabled ? disabledColor : colors.text;
+    const errorLabelColor = disabled ? disabledColor : colors.error;
+    const labelAnimatedStyle = useAnimatedStyle(() => {
+      const progress = float.value;
+      const height = labelHeight.value || lineHeight;
+      const restTop = slot.top + labelOffset.value;
+      return {
+        color: interpolateColor(error.value, [0, 1], [interpolateColor(focus.value, [0, 1], [restLabelColor, focusLabelColor]) as string, errorLabelColor]) as string,
+        transform: [{ translateY: progress * floatTranslateY(geometry, restTop, height, labelScale) }, { scale: 1 + progress * (labelScale - 1) }],
+      };
+    });
+
+    const adornmentAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ translateY: multiline ? 0 : adornmentTranslateY(geometry, slot, float.value) }],
+    }));
+
+    const handleLabelLayout = useCallback(
+      (event: LayoutChangeEvent) => {
+        const { y, width, height } = event.nativeEvent.layout;
+        labelOffset.value = y;
+        labelWidth.value = width;
+        labelHeight.value = height;
+      },
+      [labelOffset, labelWidth, labelHeight],
+    );
+
+    const handleChangeText = useCallback(
+      (text: string) => {
+        if (!controlled) {
+          setUncontrolledHasValue(text !== '');
+          if (showCount) setUncontrolledLength(text.length);
+        }
+        onChangeText?.(text);
+      },
+      [controlled, showCount, onChangeText],
+    );
+
+    const handleFocus = useCallback<NonNullable<TextInputProps['onFocus']>>(
+      (event) => {
+        setFocused(true);
+        notifyInputFocus?.();
+        onFocus?.(event);
+      },
+      [notifyInputFocus, onFocus],
+    );
+    const handleBlur = useCallback<NonNullable<TextInputProps['onBlur']>>(
+      (event) => {
+        setFocused(false);
+        onBlur?.(event);
+      },
+      [onBlur],
+    );
+
+    const handleClear = useCallback(() => {
+      if (!controlled) inputRef.current?.clear();
+      handleChangeText('');
+    }, [controlled, handleChangeText]);
+
+    const setRefs = useCallback(
+      (node: TextInputInstance | null) => {
+        inputRef.current = node;
+        if (typeof forwardedRef === 'function') forwardedRef(node);
+        else if (forwardedRef) forwardedRef.current = node;
+      },
+      [forwardedRef],
+    );
+
+    const announcedError = useRef(errorText);
+    useEffect(() => {
+      const previous = announcedError.current;
+      announcedError.current = errorText;
+      if (Platform.OS !== 'ios' || !errorText || errorText === previous) return;
+      AccessibilityInfo.announceForAccessibilityWithOptions(`${label}, ${errorText}`, { queue: true });
+    }, [errorText, label]);
+
+    const showClear = clearable && hasValue && focused && !disabled;
+    const helper = errorText ?? helperText;
+    const count = showCount && maxLength !== undefined ? `${length}/${maxLength}` : undefined;
+    const contentInset = { paddingTop: geometry.paddingTop, paddingBottom: geometry.paddingBottom };
+    const focusInput = useCallback(() => inputRef.current?.focus(), []);
+    const adornmentInset = multiline ? { paddingTop: geometry.paddingTop } : null;
+
+    const clearTarget = Platform.OS === 'android' ? MIN_TOUCH_TARGET.android : MIN_TOUCH_TARGET.ios;
+    const trailing = showClear ? (
+      <ZSPressable
+        accessibilityLabel={clearAccessibilityLabel ?? accessibilityLabels.clearText}
+        onPress={handleClear}
+        radius="full"
+        style={[styles.clearTarget, { width: clearTarget, height: clearTarget, margin: -(clearTarget - CLEAR_SIZE) / 2 }]}
       >
-        <TextInput
-          {...textInputProps}
-          ref={ref}
-          style={textInputStyle}
-          value={value}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onChangeText={handleTextChange}
-          allowFontScaling={allowFontScaling}
-          selectionColor={palette.grey[50]}
-          autoCorrect={false}
-          spellCheck={false}
-        />
+        <View style={[styles.clearButton, { backgroundColor: withOpacity(colors.textSecondary, 0.4) }]}>
+          <SvgX size={10} color={colors.background} />
+        </View>
+      </ZSPressable>
+    ) : isError ? (
+      <SvgExclamation size={20} backgroundColor={colors.error} exclamationColor={colors.onError} />
+    ) : null;
 
-        <ViewAtom
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            ...(Platform.OS === 'web' ? { left: 0 } : {}),
-          }}
-        >
-          <Animated.Text allowFontScaling={allowFontScaling} style={labelStyleArray}>
-            {label}
-          </Animated.Text>
-        </ViewAtom>
-
-        {shouldShowCloseButton && (
-          <ButtonClose marginTop={isTextArea ? 13 : undefined} onChangeText={onChangeText} />
-        )}
-      </Animated.View>
-
-      {shouldShowError && (
-        <ErrorComponent errorMessage={errorMessage} errorColor={fErrorColor} />
-      )}
-    </ViewAtom>
-  );
-});
+    return (
+      <View style={[styles.root, labelReserve > 0 ? { paddingTop: labelReserve } : null, style]}>
+        <View style={[styles.row, { paddingHorizontal: geometry.paddingHorizontal, alignItems: multiline ? 'flex-start' : 'center' }]}>
+          <FieldBorder
+            variant={variant}
+            radius={variant === 'underline' ? 'none' : FIELD_SPEC[platform].radius}
+            colors={borderColors}
+            fill={fill}
+            disabled={disabled}
+            focus={focus}
+            error={error}
+            float={float}
+            labelWidth={labelWidth}
+            labelScale={labelScale}
+            paddingHorizontal={geometry.paddingHorizontal}
+            isRTL={isRTL}
+          />
+          {startAdornment != null ? <Animated.View style={[styles.adornment, adornmentInset, adornmentAnimatedStyle]}>{startAdornment}</Animated.View> : null}
+          <Wrapper multiline={multiline} disabled={disabled} inset={contentInset} onPress={focusInput}>
+            <TextInput
+              {...inputProps}
+              ref={setRefs}
+              testID={testID}
+              value={value}
+              defaultValue={defaultValue}
+              onChangeText={handleChangeText}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              editable={!disabled}
+              multiline={multiline}
+              maxLength={maxLength}
+              maxFontSizeMultiplier={maxMultiplier}
+              accessibilityLabel={inputProps.accessibilityLabel ?? label}
+              accessibilityHint={inputProps.accessibilityHint ?? helper}
+              placeholder={floated ? placeholder : undefined}
+              placeholderTextColor={placeholderTextColor}
+              selectionColor={Platform.OS === 'android' ? withOpacity(accent, ANDROID_SELECTION_OPACITY) : accent}
+              cursorColor={accent}
+              selectionHandleColor={accent}
+              style={[
+                textStyle,
+                styles.input,
+                multiline ? styles.multilineInput : contentInset,
+                {
+                  color: disabled ? disabledColor : colors.text,
+                  textAlignVertical: multiline ? 'top' : 'center',
+                  height: multiline ? undefined : geometry.paddingTop + geometry.paddingBottom + lineHeight,
+                  minHeight: multiline ? lineHeight * minRows : undefined,
+                  maxHeight: multiline && maxRows !== undefined ? lineHeight * maxRows : undefined,
+                },
+                inputStyle,
+              ]}
+            />
+          </Wrapper>
+          {trailing != null || endAdornment != null ? (
+            <Animated.View style={[styles.adornment, styles.trailing, adornmentInset, adornmentAnimatedStyle]}>
+              {trailing}
+              {endAdornment}
+            </Animated.View>
+          ) : null}
+          <View
+            pointerEvents="none"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={[
+              styles.labelSlot,
+              { top: slot.top, bottom: slot.bottom, left: geometry.paddingHorizontal, right: geometry.paddingHorizontal, justifyContent: slot.center ? 'center' : 'flex-start' },
+            ]}
+          >
+            <Animated.Text
+              numberOfLines={1}
+              maxFontSizeMultiplier={maxMultiplier}
+              onLayout={handleLabelLayout}
+              style={[textStyle, styles.label, { transformOrigin: isRTL ? 'right top' : 'left top' }, labelAnimatedStyle]}
+            >
+              {labelText}
+            </Animated.Text>
+          </View>
+        </View>
+        {helper || count ? (
+          <View style={[styles.supporting, { paddingHorizontal: geometry.paddingHorizontal }]}>
+            {helper ? (
+              <ZSText
+                variant="caption"
+                color={disabled ? disabledColor : isError ? 'error' : 'textSecondary'}
+                style={styles.helper}
+                accessibilityLiveRegion={isError ? 'polite' : undefined}
+              >
+                {helper}
+              </ZSText>
+            ) : (
+              <View style={styles.helper} />
+            )}
+            {count ? (
+              <ZSText variant="caption" color="textSecondary">
+                {count}
+              </ZSText>
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+    );
+  },
+);
 
 ZSTextField.displayName = 'ZSTextField';
 
+function Wrapper({ multiline, disabled, inset, onPress, children }: { multiline: boolean; disabled: boolean; inset: ViewStyle; onPress: () => void; children: ReactNode }) {
+  if (!multiline) return <>{children}</>;
+  return (
+    <Pressable accessible={false} disabled={disabled} onPress={onPress} style={[styles.multilineSlot, inset]}>
+      {children}
+    </Pressable>
+  );
+}
+
 export default ZSTextField;
+
+const styles = StyleSheet.create({
+  root: { alignSelf: 'stretch' },
+  row: { flexDirection: 'row' },
+  input: { flex: 1, paddingHorizontal: 0, includeFontPadding: false },
+  multilineSlot: { flex: 1 },
+  multilineInput: { flex: 0, paddingTop: 0, paddingBottom: 0 },
+  adornment: { justifyContent: 'center', marginEnd: ADORNMENT_GAP },
+  trailing: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, marginEnd: 0, marginStart: ADORNMENT_GAP },
+  clearTarget: { alignItems: 'center', justifyContent: 'center' },
+  clearButton: { width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, alignItems: 'center', justifyContent: 'center' },
+  labelSlot: { position: 'absolute', alignItems: 'flex-start' },
+  label: { includeFontPadding: false },
+  supporting: { flexDirection: 'row', gap: SPACE.sm, paddingTop: SPACE.xs },
+  helper: { flex: 1 },
+});

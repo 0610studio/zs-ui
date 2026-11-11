@@ -1,15 +1,10 @@
-# Dependencies
 /node_modules
 
-# Production
 /build
-/static/playground
 
-# Generated files
 .docusaurus
 .cache-loader
 
-# Misc
 .DS_Store
 .env.local
 .env.development.local

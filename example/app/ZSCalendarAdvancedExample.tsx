@@ -1,75 +1,43 @@
-import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   ZSCalendar,
-  ZSContainer,
+  ZSPaneLayout,
   ZSPressable,
   ZSText,
   useCalendarAgenda,
+  usePaneLayout,
   useOverlay,
   getEventsOn,
+  isValidDateString,
   startOfMonth,
   todayDateString,
   useTheme,
+  type CalendarEvent,
   type CalendarHeaderContext,
   type CalendarMode,
-  type CalendarThemeOverride,
   type DateRange,
   type DateString,
+  type EventIndex,
 } from '@0610studio/zs-ui';
-import type { DiaryEntry } from '../mock-api/db';
+import { categoryMeta, type DiaryEntry } from '../mock-api/db';
 import { useCalendarDataSource } from '../src/model/useCalendarDataSource';
 import FpsProbe from '../src/ui/FpsProbe';
-import { AgendaItem } from '../src/ui/barabom/AgendaItem';
 import BarabomCalendarHeader from '../src/ui/barabom/CalendarHeader';
-import DatePickerSheet from '../src/ui/barabom/DatePickerSheet';
-import { BARABOM_IMAGES } from '../src/ui/barabom/stickers';
-import WebUnsupportedNotice from '../src/ui/kit/WebUnsupportedNotice';
+import DatePickerSheet, { DATE_SHEET_TITLE } from '../src/ui/barabom/DatePickerSheet';
+import { DiaryList } from '../src/ui/barabom/DiaryList';
+import RecipeHeader from '../src/ui/recipe/RecipeHeader';
 
-/** 바라봄 CALENDAR_COLORS — 팔레트에서 나오지 않는 요일 색만 여기 둔다. 선택 카드·오늘 원은 ZSCalendar 기본 그림이다 */
-const BARABOM_CALENDAR_THEME: CalendarThemeOverride = {
-  sundayText: '#FF7575',
-  saturdayText: '#8AA7FF',
-  weekdayText: '#949494',
-};
-
-/** ZSCalendar 의 children 이라 인자 없이 컨텍스트에서 받는다 */
-function DiaryList({ loading }: { loading: boolean }) {
-  const { palette } = useTheme();
-  // 달력 점과 같은 인덱스에서 나온다
-  const { items, bindScroll } = useCalendarAgenda<DiaryEntry>();
-
-  return (
-    <View style={[styles.listContainer, { backgroundColor: palette.grey[20] }]}>
-      {/* 달력 아래로 카드가 스며드는 흰 그라디언트 — 다크 모드에서는 tint 로 배경색을 따라간다 */}
-      <View pointerEvents="none" style={styles.gradientContainer}>
-        <Image source={BARABOM_IMAGES.GRADIENT_WHITE} resizeMode="stretch" style={[styles.gradientImage, { tintColor: palette.background.base }]} />
-      </View>
-
-      <FlatList
-        {...bindScroll}
-        testID="diary-list"
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        data={items}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          <ZSText typo="caption.1" color="secondary" style={styles.empty}>
-            {loading ? '불러오는 중…' : '이 날짜에는 기록이 없습니다'}
-          </ZSText>
-        }
-        renderItem={({ item }) => (item.data ? <AgendaItem item={item.data} /> : null)}
-      />
-    </View>
-  );
+function CalendarDiaryList({ loading }: { loading: boolean }) {
+  const agenda = useCalendarAgenda<DiaryEntry>();
+  return <DiaryList agenda={agenda} loading={loading} />;
 }
 
-/**
- * 개발용 상태 띠 — 화면 디자인이 아니라 계측·e2e 용이다.
- * 달력과 리스트 사이에 두면 바라봄의 흐름이 끊겨서 FPS 줄과 함께 맨 위에 둔다.
- */
+const DEV_STRIP_MAX_FONT_SCALE = 2;
+const SHOW_DEV_STRIP = __DEV__ || process.env.EXPO_PUBLIC_DEV_STRIP === '1';
+
 function DevStrip({
   selectedDate,
   count,
@@ -85,32 +53,34 @@ function DevStrip({
   scrollTransition: boolean;
   onToggleScrollTransition: () => void;
 }) {
-  const { palette } = useTheme();
+  const { colors } = useTheme();
   return (
-    <View style={[styles.devStrip, { backgroundColor: palette.background.layer2 }]}>
-      <FpsProbe />
+    <View style={[styles.devStrip, { backgroundColor: colors.surface2 }]}>
+      <FpsProbe maxFontSizeMultiplier={DEV_STRIP_MAX_FONT_SCALE} />
       <View style={styles.devRow}>
-        <ZSText typo="caption.2" color="secondary" testID="diary-count">
+        <ZSText variant="overline" color="textSecondary" maxFontSizeMultiplier={DEV_STRIP_MAX_FONT_SCALE} testID="diary-count">
           {`${selectedDate ?? '날짜를 선택하세요'} · 일정 ${count}건`}
         </ZSText>
         <View style={styles.devRowRight}>
           {loading && <ActivityIndicator size="small" testID="diary-loading" />}
-          <ZSText typo="caption.2" color="secondary" testID="diary-mode">{`보기 ${mode}`}</ZSText>
-          {/* 리스트 스크롤이 달력을 접는 연동을 끄고 켠다 — 팬 제스처는 영향 없다 */}
+          <ZSText variant="overline" color="textSecondary" maxFontSizeMultiplier={DEV_STRIP_MAX_FONT_SCALE} testID="diary-mode">{`보기 ${mode}`}</ZSText>
           <Pressable
             onPress={onToggleScrollTransition}
             hitSlop={6}
             accessibilityRole="switch"
             accessibilityState={{ checked: scrollTransition }}
-            // iOS 는 이 라벨만 접근성 트리에 올리므로 표시 문구와 같게 둬야 스크린리더·e2e 가 상태를 읽는다
             accessibilityLabel={scrollTransition ? '스크롤 전환 켬' : '스크롤 전환 끔'}
             testID="scroll-transition-toggle"
             style={[
               styles.toggleChip,
-              { borderColor: scrollTransition ? palette.primary[40] : palette.grey[30], backgroundColor: scrollTransition ? palette.primary[10] : 'transparent' },
+              { borderColor: scrollTransition ? colors.primary : colors.border, backgroundColor: scrollTransition ? colors.primary : 'transparent' },
             ]}
           >
-            <ZSText typo="caption.4" style={{ color: scrollTransition ? palette.primary.dark : palette.text.secondary }}>
+            <ZSText
+              variant="overline"
+              maxFontSizeMultiplier={DEV_STRIP_MAX_FONT_SCALE}
+              style={{ color: scrollTransition ? colors.onPrimary : colors.textSecondary }}
+            >
               {scrollTransition ? '스크롤 전환 켬' : '스크롤 전환 끔'}
             </ZSText>
           </Pressable>
@@ -120,44 +90,30 @@ function DevStrip({
   );
 }
 
-/**
- * 심화 예제 — 바라봄 일기 달력 화면을 그대로 옮겼다.
- * mock API 지연·오류·재시도, 커스텀 헤더, 바텀시트 날짜 선택기, 스크롤 전환 토글, FPS 계측까지 들어 있다.
- * 가장 짧은 사용법은 ZSCalendarExample 을 본다.
- */
 export default function ZSCalendarAdvancedExample() {
-  if (Platform.OS === 'web') {
-    return (
-      <>
-        <Stack.Screen options={{ title: 'ZSCalendar 심화' }} />
-        <WebUnsupportedNotice component="ZSCalendar" />
-      </>
-    );
-  }
-
   return <ZSCalendarAdvancedScreen />;
 }
 
 function ZSCalendarAdvancedScreen() {
-  const { palette } = useTheme();
+  const { colors } = useTheme();
 
-  // 빈 목록으로 시작하면 연동이 보이지 않는다
-  const [selectedDate, setSelectedDate] = useState<DateString | null>(() => todayDateString());
-  // 날짜 선택기로 다른 달을 고르면 그리드도 그 달로 가야 하므로 보이는 달을 밖에서 쥔다
-  const [visibleMonth, setVisibleMonth] = useState<DateString>(() => startOfMonth(todayDateString()));
+  const { date } = useLocalSearchParams<{ date?: string }>();
+  const baseDate = isValidDateString(date) ? date : todayDateString();
+
+  const [selectedDate, setSelectedDate] = useState<DateString | null>(() => baseDate);
+  const [visibleMonth, setVisibleMonth] = useState<DateString>(() => startOfMonth(baseDate));
   const [mode, setMode] = useState<CalendarMode>('month');
-  const { showBottomSheet, hideOverlay } = useOverlay();
+  const { showBottomSheet, hideBottomSheet } = useOverlay();
   const [scrollTransition, setScrollTransition] = useState(true);
   const toggleScrollTransition = useCallback(() => setScrollTransition((on) => !on), []);
 
   const source = useCalendarDataSource();
   const { ensureRange } = source;
 
-  // 앞뒤 페이지까지 포함한 범위를 받아 그대로 fetch 한다
   const handleVisibleRangeChange = useCallback((range: DateRange) => ensureRange(range), [ensureRange]);
 
   const events = useMemo(() => {
-    const flat: Array<{ id: string; date: DateString; color?: string; data?: DiaryEntry }> = [];
+    const flat: { id: string; date: DateString; color?: string; data?: DiaryEntry }[] = [];
     source.index.forEach((bucket) => flat.push(...bucket));
     return flat;
   }, [source.index]);
@@ -168,95 +124,174 @@ function ZSCalendarAdvancedScreen() {
   );
 
   const handleDateChange = useCallback((date: DateString) => setSelectedDate(date), []);
-  // 바라봄처럼 연월을 누르면 바텀시트 날짜 선택기 — 고른 날을 선택하고 그 달로 이동한다
   const handleTitlePress = useCallback(() => {
     showBottomSheet({
-      options: { height: 'auto' },
+      header: DATE_SHEET_TITLE,
       component: (
         <DatePickerSheet
-          initialDate={selectedDate ?? todayDateString()}
+          initialDate={selectedDate ?? baseDate}
           onConfirm={(date) => {
             setSelectedDate(date);
             setVisibleMonth(startOfMonth(date));
-            hideOverlay('bottomSheet');
+            hideBottomSheet();
           }}
         />
       ),
     });
-  }, [showBottomSheet, hideOverlay, selectedDate]);
+  }, [showBottomSheet, hideBottomSheet, selectedDate]);
 
-  const renderHeader = useCallback(
-    (context: CalendarHeaderContext) => <BarabomCalendarHeader {...context} petName="바라봄" hasUnread />,
-    [],
-  );
+  const devStrip = SHOW_DEV_STRIP ? (
+    <DevStrip
+      selectedDate={selectedDate}
+      count={selectedCount}
+      mode={mode}
+      loading={source.status === 'loading'}
+      scrollTransition={scrollTransition}
+      onToggleScrollTransition={toggleScrollTransition}
+    />
+  ) : null;
+
+  const errorBox =
+    source.status === 'error' ? (
+      <View style={[styles.errorBox, { backgroundColor: colors.errorContainer }]} testID="diary-error">
+        <ZSText variant="label" style={{ color: colors.onErrorContainer, flex: 1 }} numberOfLines={2}>
+          {source.error}
+        </ZSText>
+        <ZSPressable onPress={source.retry} testID="diary-retry" accessibilityRole="button" accessibilityLabel="다시 시도">
+          <View style={[styles.retryButton, { backgroundColor: colors.error }]}>
+            <ZSText variant="overline" color="onError">재시도</ZSText>
+          </View>
+        </ZSPressable>
+      </View>
+    ) : null;
 
   return (
     <GestureHandlerRootView style={styles.root}>
-      <Stack.Screen options={{ title: 'ZSCalendar 심화' }} />
-      <ZSContainer scrollViewDisabled style={[styles.container, { backgroundColor: palette.background.base }]}>
-        {(__DEV__ || process.env.EXPO_PUBLIC_DEV_STRIP === '1') && (
-          <DevStrip
-            selectedDate={selectedDate}
-            count={selectedCount}
-            mode={mode}
+      <RecipeHeader title="ZSCalendar 심화" />
+      <ZSPaneLayout
+        primaryFraction={0.5}
+        backgroundColor="background"
+        primary={
+          <CalendarPane
+            devStrip={devStrip}
+            errorBox={errorBox}
+            events={events}
             loading={source.status === 'loading'}
+            onVisibleRangeChange={handleVisibleRangeChange}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+            visibleMonth={visibleMonth}
+            onMonthChange={setVisibleMonth}
+            mode={mode}
+            onModeChange={setMode}
+            onTitlePress={handleTitlePress}
             scrollTransition={scrollTransition}
-            onToggleScrollTransition={toggleScrollTransition}
           />
-        )}
-
-        {source.status === 'error' && (
-          <View style={[styles.errorBox, { backgroundColor: palette.danger[10] }]} testID="diary-error">
-            <ZSText typo="caption.1" style={{ color: palette.danger[70], flex: 1 }} numberOfLines={2}>
-              {source.error}
-            </ZSText>
-            <ZSPressable onPress={source.retry} testID="diary-retry" accessibilityRole="button" accessibilityLabel="다시 시도">
-              <View style={[styles.retryButton, { backgroundColor: palette.danger[50] }]}>
-                <ZSText typo="caption.2" color="white">재시도</ZSText>
-              </View>
-            </ZSPressable>
-          </View>
-        )}
-
-        <ZSCalendar<DiaryEntry>
-          testID="diary-calendar"
-          style={styles.calendar}
-          events={events}
-          onVisibleRangeChange={handleVisibleRangeChange}
-          selectedDate={selectedDate}
-          onDateChange={handleDateChange}
-          visibleMonth={visibleMonth}
-          onMonthChange={setVisibleMonth}
-          mode={mode}
-          onModeChange={setMode}
-          calendarTheme={BARABOM_CALENDAR_THEME}
-          renderHeader={renderHeader}
-          onTitlePress={handleTitlePress}
-          enableScrollModeTransition={scrollTransition}
-        >
-          <DiaryList loading={source.status === 'loading'} />
-        </ZSCalendar>
-      </ZSContainer>
+        }
+        secondary={<SideDiary index={source.index} selectedDate={selectedDate} loading={source.status === 'loading'} />}
+      />
     </GestureHandlerRootView>
+  );
+}
+
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+function formatDayTitle(date: DateString): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return `${m}월 ${d}일 (${WEEKDAYS[new Date(y, m - 1, d).getDay()]})`;
+}
+
+const renderHeader = (context: CalendarHeaderContext) => <BarabomCalendarHeader {...context} petName="바라봄" hasUnread />;
+
+function CalendarPane({
+  devStrip,
+  errorBox,
+  events,
+  loading,
+  onVisibleRangeChange,
+  selectedDate,
+  onDateChange,
+  visibleMonth,
+  onMonthChange,
+  mode,
+  onModeChange,
+  onTitlePress,
+  scrollTransition,
+}: {
+  devStrip: ReactNode;
+  errorBox: ReactNode;
+  events: CalendarEvent<DiaryEntry>[];
+  loading: boolean;
+  onVisibleRangeChange: (range: DateRange) => void;
+  selectedDate: DateString | null;
+  onDateChange: (date: DateString) => void;
+  visibleMonth: DateString;
+  onMonthChange: (month: DateString) => void;
+  mode: CalendarMode;
+  onModeChange: (mode: CalendarMode) => void;
+  onTitlePress: () => void;
+  scrollTransition: boolean;
+}) {
+  const { role, heightClass } = usePaneLayout();
+  const single = role === 'single';
+  const roomy = heightClass !== 'compact';
+  const labelEvents = useMemo(() => (single ? events : events.map(withChipLabel)), [single, events]);
+  return (
+    <View style={styles.root}>
+      {devStrip}
+      {errorBox}
+      <ZSCalendar<DiaryEntry>
+        testID="diary-calendar"
+        style={styles.calendar}
+        events={labelEvents}
+        onVisibleRangeChange={onVisibleRangeChange}
+        selectedDate={selectedDate}
+        onDateChange={onDateChange}
+        visibleMonth={visibleMonth}
+        onMonthChange={onMonthChange}
+        mode={single ? mode : roomy ? 'month' : 'week'}
+        onModeChange={single ? onModeChange : undefined}
+        enableModeTransition={single}
+        eventDisplay={single || !roomy ? 'dot' : 'label'}
+        renderHeader={renderHeader}
+        onTitlePress={onTitlePress}
+        enableScrollModeTransition={scrollTransition}
+      >
+        {single ? <CalendarDiaryList loading={loading} /> : null}
+      </ZSCalendar>
+    </View>
+  );
+}
+
+function withChipLabel(event: CalendarEvent<DiaryEntry>): CalendarEvent<DiaryEntry> {
+  const memo = event.data?.memo.trim().split('\n')[0];
+  return { ...event, label: memo || (event.data ? categoryMeta(event.data.category).label : undefined) };
+}
+
+function SideDiary({ index, selectedDate, loading }: { index: EventIndex<DiaryEntry>; selectedDate: DateString | null; loading: boolean }) {
+  const agenda = useCalendarAgenda<DiaryEntry>({ index, selectedDate: selectedDate ?? todayDateString() });
+  return (
+    <DiaryList
+      agenda={agenda}
+      loading={loading}
+      header={
+        <ZSText variant="subtitle1" emphasized accessibilityRole="header" style={styles.sideTitle} testID="diary-side-title">
+          {`${formatDayTitle(selectedDate ?? todayDateString())} · 기록 ${agenda.items.length}건`}
+        </ZSText>
+      }
+      testID="diary-list-side"
+    />
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  container: { flex: 1 },
+  sideTitle: { paddingHorizontal: 18 },
   calendar: { flex: 1 },
-  // 그리드 아래 여백은 ZSCalendar 가 그림자 번짐만큼 이미 두므로 따로 주지 않는다
-  listContainer: { flex: 1, position: 'relative' },
-  gradientContainer: { width: '100%', height: 35, position: 'absolute', top: 0, zIndex: 999 },
-  gradientImage: { width: '100%', height: 30 },
-  list: { flex: 1 },
-  // InfiniteScrollFlatList.scrollViewContent 와 같은 리듬 — 카드 사이 20, 위 30, 아래 70
-  listContent: { flexGrow: 1, gap: 20, paddingTop: 30, paddingBottom: 70 },
   devStrip: { paddingHorizontal: 12, paddingVertical: 6, gap: 4 },
-  devRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 },
-  devRowRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  devRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', rowGap: 4, columnGap: 8, paddingHorizontal: 4 },
+  devRowRight: { flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, alignItems: 'center', justifyContent: 'flex-end', gap: 8, marginLeft: 'auto' },
   toggleChip: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 },
   errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 10, padding: 10, marginHorizontal: 16, marginTop: 12 },
   retryButton: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
-  empty: { paddingVertical: 16, textAlign: 'center' },
 });

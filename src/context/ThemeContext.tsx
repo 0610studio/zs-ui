@@ -1,86 +1,58 @@
-import React, { createContext, useContext, useMemo, useReducer, useEffect, useCallback, useRef } from 'react';
-import { Platform, useColorScheme } from 'react-native';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AccessibilityInfo, AppState, Appearance, Platform, StatusBar, useColorScheme } from 'react-native';
+import { requireOptionalNativeModule } from 'expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationBar } from 'expo-navigation-bar';
-import palette from '../theme/palette';
-import { Theme, ThemeFontAssets, ThemeFonts, TypographyVariantsProps } from '../theme/types';
-import typography from '../theme/typography';
-import elevation, { ElevationStyles } from '../theme/elevation';
+import { createThemeColors, DEFAULT_COLORS, type ColorMode, type ThemeColors, type ThemeColorOptions } from '../theme/color';
+import { createTypography, type ThemeFontAssets, type ThemeFonts, type TypographyStyles } from '../theme/typeScale';
+import { createShadows, type ShadowStyles } from '../theme/shadow';
+import { DEFAULT_ACCESSIBILITY_LABELS, type AccessibilityLabels } from '../theme/accessibilityLabels';
+import { DEFAULT_MAX_FONT_SIZE_MULTIPLIER } from '../theme/fontScale';
 
-export interface FoldableConfig {
-  /** 단일 화면 콘텐츠 최대 가로 길이(px). 미주입·false 면 전폭으로 늘린다. */
-  unfoldedSinglePaneMaxWidth?: number | false;
-}
+export type ColorSchemePreference = 'system' | 'light' | 'dark';
+export type ContrastPreference = 'system' | 'standard' | 'high';
 
 export interface ThemeProviderProps {
-  themeFonts?: ThemeFonts;
-  /**
-   * `themeFonts` 와 같은 굵기 키로 폰트 파일(`require(...)`)을 넘긴다.
-   * Skia 캔버스는 fontFamily 이름만으로 커스텀 폰트를 찾지 못하므로(특히 Android) 파일이 필요한 컴포넌트가 여기서 읽는다.
-   */
-  themeFontAssets?: ThemeFontAssets;
   children: React.ReactNode;
-  isDarkModeEnabled?: boolean;
-  customPalette?: (config: { mode?: 'light' | 'dark'; themeColors?: { light?: Theme; dark?: Theme } }) => Theme;
-  foldable?: FoldableConfig;
-}
-
-export interface ThemeProps {
-  palette: Palette;
-  typography: TypographyVariantsProps;
-  elevation: ElevationStyles;
-  foldable: FoldableConfig;
-  /** ThemeProvider 에 넘긴 굵기별 폰트 파일. 없으면 undefined */
+  colors?: ThemeColorOptions;
+  fonts?: ThemeFonts;
   fontAssets?: ThemeFontAssets;
+  darkMode?: boolean;
+  contrast?: ContrastPreference;
+  dynamicColor?: boolean;
+  syncNativeAppearance?: boolean;
+  accessibilityLabels?: Partial<AccessibilityLabels>;
+  /** 글자 확대 상한. 0은 무제한입니다. */
+  maxFontSizeMultiplier?: number;
 }
 
-export interface Palette extends Theme {
-  mode: 'light' | 'dark';
-  isUsingSystemColorScheme: boolean;
-  setUseSystemColorScheme: (useSystem: boolean) => void;
+export interface ThemeContextValue {
+  colors: ThemeColors;
+  typography: TypographyStyles;
+  shadows: ShadowStyles;
+  mode: ColorMode;
+  contrastLevel: number;
+  seedColor: string;
+  fonts?: ThemeFonts;
+  fontAssets?: ThemeFontAssets;
+  colorSchemePreference: ColorSchemePreference;
+  setColorSchemePreference: (preference: ColorSchemePreference) => void;
   toggleTheme: () => void;
+  accessibilityLabels: AccessibilityLabels;
+  maxFontSizeMultiplier: number;
 }
 
-const ThemeContext = createContext<ThemeProps | null>(null);
-type ThemeMode = 'light' | 'dark';
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-type ThemeState = {
-  mode: ThemeMode;
-  isUsingSystemColorScheme: boolean;
-};
+const STORAGE_KEY = '@zs-ui/color-scheme';
 
-type ThemeAction =
-  | { type: 'HYDRATE'; state: ThemeState }
-  | { type: 'SYNC_SYSTEM_MODE'; systemMode: ThemeMode }
-  | { type: 'SET_USE_SYSTEM_COLOR_SCHEME'; useSystem: boolean; systemMode: ThemeMode }
-  | { type: 'TOGGLE_THEME' };
-
-const getSystemMode = (systemColorScheme: ReturnType<typeof useColorScheme>): ThemeMode =>
-  systemColorScheme === 'dark' ? 'dark' : 'light';
-
-function themeReducer(state: ThemeState, action: ThemeAction): ThemeState {
-  switch (action.type) {
-    case 'HYDRATE':
-      return action.state;
-    case 'SYNC_SYSTEM_MODE':
-      return state.isUsingSystemColorScheme
-        ? { ...state, mode: action.systemMode }
-        : state;
-    case 'SET_USE_SYSTEM_COLOR_SCHEME':
-      return {
-        ...state,
-        isUsingSystemColorScheme: action.useSystem,
-        mode: action.useSystem ? action.systemMode : state.mode,
-      };
-    case 'TOGGLE_THEME':
-      return {
-        isUsingSystemColorScheme: false,
-        mode: state.mode === 'light' ? 'dark' : 'light',
-      };
-    default:
-      return state;
-  }
+interface ZsUiNativeModule {
+  getDynamicSeedColor?: () => string | null;
+  getContrast?: () => number | null;
+  addListener?: (event: 'onContrastChange', listener: (event: { contrast: number }) => void) => { remove: () => void };
 }
+
+const nativeModule = (): ZsUiNativeModule | null => requireOptionalNativeModule<ZsUiNativeModule>('ZsUi');
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
@@ -88,124 +60,192 @@ export const useTheme = () => {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
-}
+};
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ themeFonts, themeFontAssets, children, isDarkModeEnabled = true, customPalette, foldable }) => {
-  const systemColorScheme = useColorScheme();
-  const systemMode = getSystemMode(systemColorScheme);
-  const [themeState, dispatchTheme] = useReducer(
-    themeReducer,
-    {
-      isUsingSystemColorScheme: isDarkModeEnabled,
-      mode: isDarkModeEnabled ? systemMode : 'light',
-    }
-  );
-  const { isUsingSystemColorScheme, mode } = themeState;
-
-  // hydrate 는 1회만 — systemMode 변경마다 AsyncStorage 를 다시 읽지 않도록 ref 로 참조한다.
-  // 이후 시스템 모드 동기화는 아래 SYNC_SYSTEM_MODE effect 가 담당한다.
-  const systemModeRef = useRef(systemMode);
-  systemModeRef.current = systemMode;
+function useSystemContrast(enabled: boolean): number {
+  const [level, setLevel] = useState(0);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadSettings = async () => {
-      try {
-        if (!isMounted) return;
-
-        if (!isDarkModeEnabled) {
-          dispatchTheme({
-            type: 'HYDRATE',
-            state: {
-              isUsingSystemColorScheme: false,
-              mode: 'light',
-            },
-          });
-          return;
-        }
-
-        const storedUseSystemColorScheme = await AsyncStorage.getItem('useSystemColorScheme');
-        const storedMode = await AsyncStorage.getItem('themeMode');
-
-        if (!isMounted) return;
-
-        const isUsingSystemColorScheme = storedUseSystemColorScheme === null
-          ? true
-          : storedUseSystemColorScheme === 'true';
-        const savedMode = storedMode === 'dark' || storedMode === 'light' ? storedMode : undefined;
-
-        dispatchTheme({
-          type: 'HYDRATE',
-          state: {
-            isUsingSystemColorScheme,
-            mode: isUsingSystemColorScheme ? systemModeRef.current : savedMode ?? systemModeRef.current,
-          },
-        });
-      } catch (error) {
-        console.error('Failed to load theme settings', error);
-      }
+    if (!enabled) return;
+    let mounted = true;
+    let changed = false;
+    const subscriptions: { remove: () => void }[] = [];
+    const readFailed = (error: unknown) => {
+      if (mounted) console.warn('[zs-ui] 시스템 대비를 읽지 못했습니다', error);
     };
 
-    loadSettings();
+    if (Platform.OS === 'ios') {
+      AccessibilityInfo.isDarkerSystemColorsEnabled()
+        .then((on) => { if (mounted && !changed) setLevel(on ? 1 : 0); })
+        .catch(readFailed);
+      subscriptions.push(AccessibilityInfo.addEventListener('darkerSystemColorsChanged', (on) => {
+        changed = true;
+        if (mounted) setLevel(on ? 1 : 0);
+      }));
+    } else if (Platform.OS === 'android') {
+      const module = nativeModule();
+      let userContrast = module?.getContrast?.() ?? null;
+      let highText = false;
+      const apply = () => mounted && setLevel(highText ? 1 : Math.max(0, userContrast ?? 0));
+      AccessibilityInfo.isHighTextContrastEnabled()
+        .then((on) => {
+          if (!mounted || changed) return;
+          highText = on;
+          apply();
+        })
+        .catch(readFailed);
+      subscriptions.push(AccessibilityInfo.addEventListener('highTextContrastChanged', (on) => { changed = true; highText = on; apply(); }));
+      const listener = module?.addListener?.('onContrastChange', ({ contrast }) => { userContrast = contrast; apply(); });
+      if (listener) subscriptions.push(listener);
+      apply();
+    }
 
     return () => {
-      isMounted = false;
+      mounted = false;
+      subscriptions.forEach((subscription) => subscription.remove());
     };
-  }, [isDarkModeEnabled]);
+  }, [enabled]);
+
+  return enabled ? level : 0;
+}
+
+function useDynamicSeed(enabled: boolean): string | null {
+  const read = () => (enabled && Platform.OS === 'android' ? nativeModule()?.getDynamicSeedColor?.() ?? null : null);
+  const [seed, setSeed] = useState<string | null>(read);
 
   useEffect(() => {
-    dispatchTheme({ type: 'SYNC_SYSTEM_MODE', systemMode });
-  }, [systemMode]);
-
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      NavigationBar.setStyle(mode);
+    if (!enabled || Platform.OS !== 'android') {
+      setSeed(null);
+      return;
     }
-  }, [mode])
+    setSeed(read());
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setSeed(read());
+    });
+    return () => subscription.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
 
-  const toggleTheme = useCallback(async () => {
-    const newMode = mode === 'light' ? 'dark' : 'light';
-    dispatchTheme({ type: 'TOGGLE_THEME' });
-    await AsyncStorage.multiSet([
-      ['useSystemColorScheme', 'false'],
-      ['themeMode', newMode],
-    ]);
+  return seed;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  children,
+  colors: seeds,
+  fonts,
+  fontAssets,
+  darkMode = true,
+  contrast = 'system',
+  dynamicColor = false,
+  syncNativeAppearance = true,
+  accessibilityLabels: labelOverrides,
+  maxFontSizeMultiplier = DEFAULT_MAX_FONT_SIZE_MULTIPLIER,
+}) => {
+  const systemScheme = useColorScheme();
+  const [preference, setPreference] = useState<ColorSchemePreference>(darkMode ? 'system' : 'light');
+  const preferenceRevision = useRef(0);
+  const restoreRevision = preferenceRevision.current;
+
+  useEffect(() => {
+    const revision = restoreRevision;
+    if (!darkMode) {
+      setPreference('light');
+      return;
+    }
+    if (revision !== preferenceRevision.current) return;
+    setPreference('system');
+    let mounted = true;
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((stored) => {
+        if (mounted && revision === preferenceRevision.current && (stored === 'light' || stored === 'dark' || stored === 'system')) setPreference(stored);
+      })
+      .catch((error) => console.error('[zs-ui] 테마 설정을 읽지 못했습니다', error));
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- darkMode 변경 때만 복원한다.
+  }, [darkMode]);
+
+  const mode: ColorMode = !darkMode ? 'light' : preference === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : preference;
+
+  const systemContrast = useSystemContrast(contrast === 'system');
+  const contrastLevel = contrast === 'high' ? 1 : contrast === 'standard' ? 0 : systemContrast;
+  const dynamicSeed = useDynamicSeed(dynamicColor);
+
+  const seedKey = JSON.stringify(seeds ?? null);
+  const seedColor = dynamicSeed ?? seeds?.primary ?? DEFAULT_COLORS.primary;
+  const colors = useMemo(
+    () =>
+      createThemeColors(
+        { ...DEFAULT_COLORS, ...seeds, ...(dynamicSeed ? { primary: dynamicSeed } : null) },
+        { mode, contrastLevel },
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [seedKey, dynamicSeed, mode, contrastLevel],
+  );
+  const typography = useMemo(() => createTypography(fonts), [fonts]);
+  const shadows = useMemo(() => createShadows(colors), [colors]);
+  const labelKey = JSON.stringify(labelOverrides ?? null);
+  const accessibilityLabels = useMemo<AccessibilityLabels>(
+    () => ({ ...DEFAULT_ACCESSIBILITY_LABELS, ...labelOverrides }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [labelKey],
+  );
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    NavigationBar.setStyle(mode);
+    StatusBar.setBarStyle(mode === 'dark' ? 'light-content' : 'dark-content');
   }, [mode]);
 
-  const handleSetUseSystemColorScheme = useCallback(async (useSystem: boolean) => {
-    dispatchTheme({ type: 'SET_USE_SYSTEM_COLOR_SCHEME', useSystem, systemMode });
-    await AsyncStorage.setItem('useSystemColorScheme', useSystem.toString());
-  }, [systemMode]);
+  const appliedAppearanceRef = useRef(false);
+  useEffect(() => {
+    if (!syncNativeAppearance) {
+      if (appliedAppearanceRef.current) {
+        Appearance.setColorScheme('auto');
+        appliedAppearanceRef.current = false;
+      }
+      return;
+    }
+    Appearance.setColorScheme(!darkMode ? 'light' : preference === 'system' ? 'auto' : preference);
+    appliedAppearanceRef.current = true;
+  }, [syncNativeAppearance, darkMode, preference]);
 
-  const unfoldedSinglePaneMaxWidth = foldable?.unfoldedSinglePaneMaxWidth;
+  useEffect(() => () => {
+    if (appliedAppearanceRef.current) Appearance.setColorScheme('auto');
+    appliedAppearanceRef.current = false;
+  }, []);
 
-  // 인라인 customPalette 가 매 렌더 컨텍스트를 재생성해 useTheme 구독자 전체를 리렌더시키지
-  // 않도록, 함수 identity 대신 ref 로 최신 함수를 참조한다.
-  const customPaletteRef = useRef(customPalette);
-  customPaletteRef.current = customPalette;
-  const hasCustomPalette = Boolean(customPalette);
-
-  const themeValue = useMemo(() => {
-    const paletteFactory = customPaletteRef.current;
-    const currentPalette = paletteFactory ? paletteFactory({ mode }) : palette({ mode });
-    return {
-      palette: {
-        isUsingSystemColorScheme,
-        setUseSystemColorScheme: handleSetUseSystemColorScheme,
-        toggleTheme,
-        ...currentPalette,
-      },
-      typography: typography({ themeFonts }),
-      elevation: elevation(currentPalette),
-      foldable: { unfoldedSinglePaneMaxWidth },
-      fontAssets: themeFontAssets,
-    };
-  }, [mode, isUsingSystemColorScheme, themeFonts, themeFontAssets, hasCustomPalette, handleSetUseSystemColorScheme, toggleTheme, unfoldedSinglePaneMaxWidth]);
-
-  return (
-    <ThemeContext.Provider value={themeValue}>
-      {children}
-    </ThemeContext.Provider>
+  const setColorSchemePreference = useCallback(
+    (next: ColorSchemePreference) => {
+      if (!darkMode) return;
+      preferenceRevision.current += 1;
+      setPreference(next);
+      AsyncStorage.setItem(STORAGE_KEY, next).catch((error) => console.error('[zs-ui] 테마 설정을 저장하지 못했습니다', error));
+    },
+    [darkMode],
   );
-}
+
+  const toggleTheme = useCallback(() => setColorSchemePreference(mode === 'dark' ? 'light' : 'dark'), [mode, setColorSchemePreference]);
+
+  const value = useMemo<ThemeContextValue>(
+    () => ({
+      colors,
+      typography,
+      shadows,
+      mode,
+      contrastLevel,
+      seedColor,
+      fonts,
+      fontAssets,
+      colorSchemePreference: preference,
+      setColorSchemePreference,
+      toggleTheme,
+      accessibilityLabels,
+      maxFontSizeMultiplier,
+    }),
+    [colors, typography, shadows, mode, contrastLevel, seedColor, fonts, fontAssets, preference, setColorSchemePreference, toggleTheme, accessibilityLabels, maxFontSizeMultiplier],
+  );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+};

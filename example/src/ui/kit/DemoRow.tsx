@@ -1,54 +1,51 @@
 import { StyleSheet, View } from 'react-native';
 import { ZSPressable, ZSText, useTheme } from '@0610studio/zs-ui';
+import ContentIcon from './ContentIcon';
+import { GAP, ROW_HEIGHT, ROW_INSET } from './layout';
 
 type Props = {
   title: string;
   caption: string;
-  dotColor: string;
   onPress: () => void;
-  /** 마지막 행이면 하단 구분선을 생략한다 */
-  isLast?: boolean;
+  destructive?: boolean;
+  testID?: string;
 };
 
-export default function DemoRow({ title, caption, dotColor, onPress, isLast = false }: Props) {
-  const { palette } = useTheme();
+export default function DemoRow({ title, caption, onPress, destructive = false, testID }: Props) {
+  const { colors } = useTheme();
 
   return (
-    <ZSPressable fullWidth onPress={onPress}>
-      <View
-        style={[
-          styles.row,
-          !isLast && { borderBottomWidth: 1, borderBottomColor: palette.grey[20] },
-        ]}
-      >
-        <View style={[styles.dot, { backgroundColor: dotColor }]} />
+    <ZSPressable onPress={onPress} testID={testID} accessibilityRole="button" style={styles.pressable}>
+      <View style={styles.row}>
         <View style={styles.textWrap}>
-          <ZSText typo="subTitle.2">{title}</ZSText>
-          <ZSText typo="caption.1" color="secondary">{caption}</ZSText>
+          <ZSText variant="subtitle1" color={destructive ? 'error' : 'text'}>
+            {title}
+          </ZSText>
+          <ZSText variant="caption" color="textSecondary">
+            {caption}
+          </ZSText>
         </View>
-        <ZSText typo="heading.6" style={{ color: palette.grey[50] }}>›</ZSText>
+        <ContentIcon name="chevronRight" size={20} color={colors.textSecondary} />
       </View>
     </ZSPressable>
   );
 }
 
 const styles = StyleSheet.create({
+  pressable: {
+    marginHorizontal: -ROW_INSET,
+    paddingHorizontal: ROW_INSET,
+  },
   row: {
     width: '100%',
+    minHeight: ROW_HEIGHT.double,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 4,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    flexShrink: 0,
+    gap: GAP.md,
+    paddingVertical: GAP.md,
   },
   textWrap: {
     flex: 1,
-    gap: 2,
+    gap: GAP.xxs,
   },
 });

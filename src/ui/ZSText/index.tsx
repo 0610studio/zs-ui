@@ -1,28 +1,29 @@
-import React from "react";
-import { TextProps } from "react-native";
-import { useTheme } from "../../context/ThemeContext";
-import { TypoColorOptions, TypoOptions, TypoStyle, TypoSubStyle } from "../../theme/types";
-import { resolveTextColor } from "../../theme/resolveColor";
-import TextAtom from "../atoms/TextAtom";
+import React from 'react';
+import { Platform, Text, type TextProps } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { resolveColor, type ColorName } from '../../theme/color';
+import { IOS_TEXT_STYLE, type TextVariant } from '../../theme/typeScale';
+import { useSkeletonTextLayout } from '../ZSSkeleton/SkeletonShapes';
 
 export interface ZSTextProps extends TextProps {
-  typo?: TypoOptions;
-  color?: TypoColorOptions;
+  variant?: TextVariant;
+  emphasized?: boolean;
+  color?: ColorName | (string & {});
 }
 
-function ZSText({
-  typo = 'body.2',
-  color = 'base',
-  ...props
-}: ZSTextProps) {
-  const { palette, typography } = useTheme();
-  const [s01, s02] = typo.split('.') as [TypoStyle, TypoSubStyle];
-  const textColor = resolveTextColor(palette, color);
+function ZSText({ variant = 'body1', emphasized = false, color = 'text', style, onTextLayout, maxFontSizeMultiplier, ...props }: ZSTextProps) {
+  const { colors, typography, maxFontSizeMultiplier: appMaxFontSizeMultiplier } = useTheme();
+  const typeStyle = emphasized ? typography.emphasized[variant] : typography[variant];
+  const handleTextLayout = useSkeletonTextLayout(onTextLayout);
 
   return (
-    <TextAtom {...props} style={[typography[s01][s02], { color: textColor }, props.style]}>
-      {props.children}
-    </TextAtom>
+    <Text
+      {...(Platform.OS === 'ios' ? { dynamicTypeRamp: IOS_TEXT_STYLE[variant], lineBreakStrategyIOS: 'hangul-word' as const } : null)}
+      {...props}
+      maxFontSizeMultiplier={maxFontSizeMultiplier ?? appMaxFontSizeMultiplier}
+      onTextLayout={handleTextLayout}
+      style={[typeStyle, { color: resolveColor(colors, color) }, style]}
+    />
   );
 }
 

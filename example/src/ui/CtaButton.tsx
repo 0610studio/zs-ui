@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
-import { useTheme, ZSPressable, ZSText } from '@0610studio/zs-ui';
+import { OPACITY, useTheme, withOpacity, ZSPressable, ZSText } from '@0610studio/zs-ui';
 
 interface CtaButtonProps {
   primaryButtonText: string;
@@ -23,8 +23,8 @@ function CtaButton({
   onSecondaryButtonPress,
   onDisabledPress,
 }: CtaButtonProps) {
-  const { palette } = useTheme();
-  const ctaBackgroundColor = backgroundColor || palette.background.base;
+  const { colors } = useTheme();
+  const ctaBackgroundColor = backgroundColor || colors.surface1;
 
   return (
     <View style={[styles.container, { backgroundColor: ctaBackgroundColor }]}>
@@ -33,7 +33,7 @@ function CtaButton({
           {
             secondaryButtonText && (
               <ZSPressable hitSlop={5} style={styles.leftSubButton} onPress={() => { onSecondaryButtonPress?.() }}>
-                <ZSText typo='label.1' color='secondary'>{secondaryButtonText}</ZSText>
+                <ZSText variant='body2' color='textSecondary'>{secondaryButtonText}</ZSText>
               </ZSPressable>
             )
           }
@@ -41,7 +41,8 @@ function CtaButton({
           <View style={styles.flex1}>
             <ZSPressable
               style={styles.button}
-              color={disabled ? 'grey.30' : 'primary'}
+              radius="full"
+              backgroundColor={disabled ? withOpacity(colors.text, OPACITY.disabledBackground) : 'primary'}
               onPress={() => {
                 if (disabled) {
                   onDisabledPress?.();
@@ -49,15 +50,16 @@ function CtaButton({
                   onPrimaryButtonPress();
                 }
               }}>
-              <ZSText typo='subTitle.1' color={disabled ? 'grey.70' : 'white'}>{primaryButtonText}</ZSText>
+              <ZSText variant='subtitle1' emphasized color={disabled ? withOpacity(colors.text, OPACITY.disabled) : 'onPrimary'}>{primaryButtonText}</ZSText>
             </ZSPressable>
           </View>
         </View>
 
-        {bottomComponent && bottomComponent}
+        {bottomComponent}
       </View>
 
       <LinearGradient
+        pointerEvents="none"
         style={styles.background}
         colors={[`${ctaBackgroundColor}00`, `${ctaBackgroundColor}dd`, ctaBackgroundColor]}
         start={{ x: 0, y: 0 }}
@@ -84,14 +86,14 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: 15,
     flexDirection: 'column',
-    paddingHorizontal: 14,
+    paddingHorizontal: 20,
   },
   button: {
     width: '100%',
+    minHeight: 56,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 16,
-    borderRadius: 14,
   },
   background: {
     width: '100%',

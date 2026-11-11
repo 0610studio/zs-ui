@@ -1,0 +1,75 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- runFlow: ../common/open-lab.yaml
+- scrollUntilVisible:
+    element:
+      id: 'lab-zs-tab-navigator-card'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-zs-tab-navigator-card'
+      - assertVisible:
+          id: 'lab-zs-tab-navigator-index-title'
+- assertVisible:
+    id: 'lab-zs-tab-navigator-unread'
+    text: '채팅 미읽음 3'
+- waitForAnimationToEnd
+- takeScreenshot: t01-index
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '채팅'
+      - assertVisible:
+          id: 'lab-zs-tab-navigator-chat-title'
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-zs-tab-navigator-read-all'
+      - assertVisible:
+          id: 'lab-zs-tab-navigator-chat-title'
+- waitForAnimationToEnd
+- takeScreenshot: t02-read-all
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '설정'
+      - assertVisible:
+          id: 'lab-zs-tab-navigator-settings-title'
+- waitForAnimationToEnd
+- takeScreenshot: t03-settings
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '기록'
+      - assertVisible:
+          id: 'lab-zs-tab-navigator-unread'
+          text: '채팅 미읽음 0'
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn:
+          id: 'lab-zs-tab-navigator-badge-plus'
+      - assertVisible:
+          id: 'lab-zs-tab-navigator-unread'
+          text: '채팅 미읽음 1'
+- waitForAnimationToEnd
+- takeScreenshot: t04-badge-one
+
+- swipe:
+    start: 50%, 70%
+    end: 50%, 30%
+    duration: 400
+- waitForAnimationToEnd
+- takeScreenshot: t05-minimized

@@ -1,0 +1,93 @@
+appId: kr.co.studio0610.zsui.example
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: '테마 예제:.*'
+      - assertVisible: 'Theme'
+- waitForAnimationToEnd
+- takeScreenshot: smoke-theme
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          start: 1%, 50%
+          end: 85%, 50%
+          duration: 400
+      - assertVisible: '테마 예제:.*'
+
+- scrollUntilVisible:
+    element: 'ZSTextField:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'ZSTextField:.*'
+      - assertVisible: 'ZSTextField'
+- waitForAnimationToEnd
+- takeScreenshot: smoke-textfield
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          start: 1%, 50%
+          end: 85%, 50%
+          duration: 400
+      - assertVisible: 'ZSTextField:.*'
+
+- scrollUntilVisible:
+    element: 'ZSButton:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'ZSButton:.*'
+      - assertVisible: 'ZSButton'
+- waitForAnimationToEnd
+- takeScreenshot: smoke-button
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          start: 1%, 50%
+          end: 85%, 50%
+          duration: 400
+      - assertVisible: 'ZSButton:.*'
+
+- scrollUntilVisible:
+    element: 'Overlay:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'Overlay:.*'
+      - assertVisible: 'Overlay'
+- waitForAnimationToEnd
+- takeScreenshot: smoke-overlay
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          start: 1%, 50%
+          end: 85%, 50%
+          duration: 400
+      - assertVisible: 'Overlay:.*'
+
+- scrollUntilVisible:
+    element:
+      id: 'calendar-basic-card'
+    direction: DOWN
+- tapOn:
+    id: 'calendar-basic-card'
+- extendedWaitUntil:
+    visible: '\d{4}년 \d{1,2}월'
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: smoke-calendar

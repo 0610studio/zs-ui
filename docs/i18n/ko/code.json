@@ -1,0 +1,32 @@
+{
+  "theme.SearchBar.label": {
+    "message": "검색"
+  },
+  "theme.SearchBar.noResultsText": {
+    "message": "검색 결과가 없습니다."
+  },
+  "theme.SearchBar.searchInContext": {
+    "message": "\"{context}\" 안의 모든 결과 보기"
+  },
+  "theme.SearchBar.seeAll": {
+    "message": "모든 결과 보기"
+  },
+  "theme.SearchBar.seeAllOutsideContext": {
+    "message": "\"{context}\" 밖의 모든 결과 보기"
+  },
+  "theme.SearchPage.documentsFound.plurals": {
+    "message": "{count}개의 문서를 찾았습니다."
+  },
+  "theme.SearchPage.emptyResultsTitle": {
+    "message": "문서를 검색합니다."
+  },
+  "theme.SearchPage.existingResultsTitle": {
+    "message": "\"{query}\" 검색 결과"
+  },
+  "theme.SearchPage.noResultsText": {
+    "message": "검색 결과가 없습니다."
+  },
+  "theme.SearchPage.searchContext.everywhere": {
+    "message": "전체"
+  }
+}

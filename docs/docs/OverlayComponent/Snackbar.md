@@ -1,145 +1,93 @@
-import LocalPlayground from '@site/src/components/LocalPlayground';
-
 # Snackbar
 
-화면 상단에 일시적인 메시지를 표시하여 사용자에게 정보를 전달하는 컴포넌트입니다. 여러 개의 Snackbar를 동시에 표시할 수 있으며, 자동으로 사라집니다.
+저장 완료처럼 짧은 결과를 잠깐 알립니다. iOS와 Android가 같은 모양·같은 동작입니다.
 
-<LocalPlayground example="Snackbar" />
+| 플랫폼 | 구현 |
+|--------|------|
+| iOS·Android | zs-ui가 그리는 스낵바 — 기본은 화면 위(기기 상태바 바로 아래)에 최대 3개까지 쌓이고, 시간이 지나거나 누르거나 옆으로 밀면 닫힙니다. `OverlayProvider snackbarPosition="bottom"`이면 M3 자리(아래 고정 영역·탭 바·키보드 위)에 뜹니다 |
 
-## SnackbarNotify 렌더러
-
-`SnackbarNotify`는 `OverlayProvider`가 스낵바 큐와 최대 표시 개수를 렌더링하는 내부 호스트입니다. 직접 마운트하는 대신 `showSnackBar()`를 호출하고, 전체 스낵바를 즉시 비울 때는 `hideOverlay('snack')`을 사용하세요. 모양을 교체하려면 `OverlayProvider`의 `customSnackbar`를 전달합니다.
+모양은 두 플랫폼 같습니다 — 높이 60(한 줄)의 캡슐, [흐림 막](./start#흐림-막) 면, 문구 `subtitle2` `text`.
 
 ## 기본 사용법
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+import { ZSButton, useOverlay } from '@0610studio/zs-ui';
 
-function MyComponent() {
-  const { showSnackBar } = useOverlay();
+function SaveButton() {
+  const { showSnackbar } = useOverlay();
 
-  const handleShowSnackbar = () => {
-    showSnackBar({
-      message: '작업이 완료되었습니다.',
-      type: 'success',
-    });
+  const onSave = async () => {
+    await save();
+    showSnackbar({ message: '저장했습니다', type: 'success' });
   };
 
-  return <Button title="Snackbar 표시" onPress={handleShowSnackbar} />;
+  return <ZSButton title="저장" onPress={onSave} />;
 }
 ```
 
-## API 참조
+## Props — `ShowSnackbarProps`
 
-### `showSnackBar` 함수
+| Prop | Type | Default | 설명 |
+|------|------|---------|------|
+| `message` | `string` | Required | 문구 — 한두 줄로 짧게 |
+| `type` | `'success' \| 'error'` | `undefined` | 문구 앞 상태 아이콘 — `success`는 `success` 원 안 체크, `error`는 `error` 원 안 느낌표. 면 색은 바뀌지 않습니다. 주지 않으면 아이콘 없음 |
+| `action` | `{ label: string; onPress: () => void }` | `undefined` | 동작 버튼 하나. 있으면 `duration`과 관계없이 동작을 누르거나 스낵바를 눌러 닫을 때까지 남습니다 |
+| `duration` | `'short' \| 'long'` | `'short'` | 동작이 없을 때 표시 시간 — `short` 4초, `long` 10초 |
 
-```typescript
-showSnackBar(props: ShowSnackBarProps): void
-```
+`ShowSnackbarProps` 타입을 내보냅니다.
 
-### `ShowSnackBarProps` 인터페이스
+## 반환값
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `message` | `string` | 필수 | Snackbar에 표시할 메시지 |
-| `type` | `SnackType` | `'success'` | Snackbar의 유형 (`'success'`, `'error'`, `''`). 기본 Snackbar는 `'error'`가 아니면 성공 스타일로 표시합니다 |
-| `index` | `number` | `Date.now()` | Snackbar의 고유 식별자 |
-| `snackbarDuration` | `number` | `3500` | Snackbar가 표시될 지속 시간 (밀리초) |
+`showSnackbar(props): boolean` — 항상 `true`를 반환합니다.
 
-### `SnackType` 타입
-
-```typescript
-type SnackType = 'success' | 'error' | '';
-```
-
-## 특징
-
-- **자동 사라짐**: 지정된 시간 후 자동으로 사라집니다
-- **다중 표시**: 여러 개의 Snackbar를 동시에 표시할 수 있습니다
-- **커스터마이징**: `OverlayProvider`에서 커스텀 Snackbar 컴포넌트를 사용할 수 있습니다
-
-## 예제
-
-### 에러 메시지
+## 동작 버튼 — 실행 취소
 
 ```tsx
-import { useOverlay } from '@0610studio/zs-ui';
-
-function MyComponent() {
-  const { showSnackBar } = useOverlay();
-
-  const handleError = () => {
-    showSnackBar({
-      message: '오류가 발생했습니다.',
-      type: 'error',
-    });
-  };
-
-  return <Button title="에러 메시지" onPress={handleError} />;
-}
+showSnackbar({
+  message: '기록을 보관했습니다',
+  action: { label: '실행 취소', onPress: () => restore(id) },
+});
 ```
 
-### 커스텀 지속 시간
+동작은 하나만 둡니다(M3). 동작 버튼은 높이 44의 `primary` 채움 캡슐에 `onPrimary` 강조 라벨입니다. 동작을 누르면 스낵바를 닫고 `onPress`를 호출합니다. 스낵바의 문구 부분을 누르면 동작 없이 닫힙니다.
 
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+## 옆으로 밀어 닫기
 
-function MyComponent() {
-  const { showSnackBar } = useOverlay();
+왼쪽·오른쪽으로 밀거나 문구 영역을 누르면 동작을 실행하지 않고 닫힙니다. 동작 버튼을 누르면 닫은 뒤 `action.onPress`를 호출합니다.
 
-  const handleShowMessage = () => {
-    showSnackBar({
-      message: '5초 동안 표시됩니다.',
-      type: 'success',
-      snackbarDuration: 5000,
-    });
-  };
+## 자리와 개수
 
-  return <Button title="메시지 표시" onPress={handleShowMessage} />;
-}
-```
+자리는 앱 전체에 한 번 정합니다 — [`OverlayProvider snackbarPosition`](./start#overlayprovider). 어느 자리든 스낵바는 자기 자리만 차지해, 떠 있어도 스낵바 밖의 상단 바 버튼·화면·아래 고정 버튼이 그대로 눌립니다.
 
-### 고유 ID 지정
+### 위 — `'top'`(기본)
 
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+- 첫 스낵바 윗변은 기기 상태바(창 위 safe area) 끝에서 8 아래입니다. 두 플랫폼 같고, 상단 바(헤더)와 상관없이 그 위를 덮습니다.
+- 16 위에서 내려오며 나타납니다.
 
-function MyComponent() {
-  const { showSnackBar } = useOverlay();
+### 아래 — `'bottom'`(M3)
 
-  const handleShowMessage = () => {
-    showSnackBar({
-      message: '메시지',
-      type: 'success',
-      index: 12345,
-    });
-  };
+- 바닥은 다음 가운데 가장 높은 것이고, 그 위 8에 섭니다(MDC 스낵바 여백).
+  - 창 아래 safe area(홈 표시줄·Android 내비게이션 바)
+  - 지금 보이는 `ZSScreen` 화면이 알린 아래 가림 — `bottomComponent`(예: 화면 아래 고정 버튼, [ZSKeyboardStickyView](../UiComponent/ZSKeyboardStickyView) CTA)가 있으면 그 윗변, 없으면 화면 아래 safe area·겹친 탭 바가 시작하는 곳
+  - 열린 키보드의 윗변
+- `ZSScreen`을 쓰지 않는 화면·시트 안·내비게이터 밖에서는 창 아래 safe area와 키보드만 봅니다.
+- 16 아래에서 올라오며 나타납니다.
 
-  return <Button title="메시지 표시" onPress={handleShowMessage} />;
-}
-```
+### 두 자리 공통
 
-### 커스텀 Snackbar 컴포넌트
+- 좌우는 safe area와 12의 여백 안입니다. 아이폰 듀오의 레일처럼 옆 inset이 있으면 그 안쪽입니다. 넓은 창에서는 폭이 가독 폭(640)을 넘지 않고 가운데에 섭니다.
+- 이어서 부르면 8 간격으로 쌓이고 새 스낵바가 아래에 섭니다. 최대 3개까지 보이고, 넘치면 가장 오래된 것부터 닫힙니다.
+- iOS는 앱 창 맨 위(react-native-screens `FullWindowOverlay`)에 그려 열린 [BottomSheet](./BottomSheet)·formSheet 라우트 위에도 뜹니다.
+- Android는 앱 화면 안에 그려, 시트가 열려 있으면 시트의 어두운 막 아래에 놓입니다. 시트보다 위인 창(`Modal`)은 떠 있는 동안 화면 터치·포커스를 모두 가져가 스낵바에 쓰지 않습니다.
 
-`OverlayProvider`의 `customSnackbar`에 `CustomSnackbarProps`(`snackType`, `snackMessage`)를 받는 컴포넌트를 넘기면 기본 Snackbar를 대체합니다. 예제는 [OverlayProvider의 커스텀 스낵바](../Provider/OverlayProvider#커스텀-스낵바)를 참고하세요.
+## 접근성
 
-### Snackbar 닫기
+- 뜰 때 스크린 리더(VoiceOver·TalkBack)가 문구를 읽습니다.
+- 문구 부분은 버튼이고, 힌트로 `ThemeProvider accessibilityLabels.closeMessage`(기본 'Close message')를 읽습니다. 스크린 리더 사용자는 밀지 않고 문구를 눌러 닫습니다. 동작 버튼은 따로 포커스됩니다.
+- 상태 아이콘은 읽지 않습니다 — 문구가 상태를 말하게 씁니다.
+- 동작이 있는 스낵바는 시간이 지나도 닫히지 않아, 스크린 리더 사용자가 동작까지 갈 시간을 줍니다.
 
-```tsx
-import { useOverlay } from '@0610studio/zs-ui';
+## 관련 문서
 
-function MyComponent() {
-  const { hideOverlay } = useOverlay();
-
-  // 모든 Snackbar 닫기
-  const closeAll = () => {
-    hideOverlay('snack');
-  };
-
-  return <Button title="모두 닫기" onPress={closeAll} />;
-}
-```
-
-### 최대 개수 제한
-
-동시에 표시할 수 있는 Snackbar 수는 `OverlayProvider`의 `maxSnackbarCount`(기본값 `3`)로 정합니다. 개수를 넘으면 가장 오래된 Snackbar부터 닫힙니다. 설정 예제는 [OverlayProvider의 최대 스낵바 개수 설정](../Provider/OverlayProvider#최대-스낵바-개수-설정)을 참고하세요.
+- [ZSBanner](../UiComponent/ZSBanner) — 사라지지 않고 화면 안에 남는 상태 메시지
+- [GlobalOverlay](./start#globaloverlay) — React 밖에서 `showSnackbar`

@@ -1,0 +1,79 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      true: ${STEP == 'setup'}
+    commands:
+      - launchApp:
+          clearState: false
+      - setOrientation: PORTRAIT
+      - extendedWaitUntil:
+          visible: 'ZS-UI'
+          timeout: 120000
+      - runFlow: ../common/open-lab.yaml
+      - scrollUntilVisible:
+          element:
+            id: 'lab-tabs-stack-card'
+          direction: DOWN
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn:
+                id: 'lab-tabs-stack-card'
+            - assertVisible:
+                id: 'tabs-stack-feed-title'
+      - tapOn:
+          id: 'tabs-stack-feed-plus'
+      - tapOn:
+          id: 'tabs-stack-feed-plus'
+      - tapOn:
+          id: 'tabs-stack-feed-plus'
+      - tapOn:
+          id: 'tabs-stack-feed-open'
+      - assertVisible:
+          id: 'tabs-stack-feed-detail'
+          text: '피드 상세 1'
+      - runFlow:
+          file: ../common/tap-tab.yaml
+          env:
+            TAB: '프로필'
+      - tapOn:
+          id: 'tabs-stack-profile-plus'
+      - assertVisible:
+          id: 'tabs-stack-profile-count'
+          text: '1'
+      - runFlow:
+          file: ../common/tap-tab.yaml
+          env:
+            TAB: '피드'
+      - assertVisible:
+          id: 'tabs-stack-feed-detail'
+          text: '피드 상세 1'
+
+- runFlow:
+    when:
+      true: ${STEP == 'verify'}
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: "${POSTURE == 'folded' ? 'zs-tab-navigator-bar' : 'zs-tab-navigator-rail'}"
+          timeout: 10000
+      - assertVisible:
+          id: 'tabs-stack-feed-detail'
+          text: '피드 상세 1'
+      - waitForAnimationToEnd
+      - takeScreenshot: f01-after-${POSTURE}
+      - runFlow:
+          file: ../common/tap-tab.yaml
+          env:
+            TAB: '프로필'
+      - assertVisible:
+          id: 'tabs-stack-profile-count'
+          text: '1'
+      - runFlow:
+          file: ../common/tap-tab.yaml
+          env:
+            TAB: '피드'
+      - assertVisible:
+          id: 'tabs-stack-feed-detail'
+          text: '피드 상세 1'

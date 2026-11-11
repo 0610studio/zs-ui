@@ -1,37 +1,8 @@
-import { extractStyle, Z_INDEX_VALUE, OVERLAY_FOLDABLE_SINGLE_WIDTH } from "../../model/utils";
+import { Z_INDEX_VALUE } from '../../model/utils';
 
-describe("extractStyle", () => {
-  it("배열 스타일에서 지정 속성을 추출한다", () => {
-    const style = [{ color: "red" }, { fontSize: 16 }];
-    expect(extractStyle(style, "fontSize")).toBe(16);
-    expect(extractStyle(style, "color")).toBe("red");
-  });
-
-  it("객체 스타일에서 지정 속성을 추출한다", () => {
-    const style = { lineHeight: 22 } as const;
-    expect(extractStyle(style, "lineHeight")).toBe(22);
-  });
-
-  it("해당 속성이 없으면 undefined를 반환한다", () => {
-    const style = [{ color: "red" }];
-    expect(extractStyle(style, "fontWeight")).toBeUndefined();
-  });
-
-  it("스타일이 비어 있으면 undefined를 반환한다", () => {
-    expect(extractStyle(undefined, "fontSize")).toBeUndefined();
+describe('Z_INDEX_VALUE', () => {
+  it('키보드 위 포털 < 스낵바 < 진행 표시 순으로 쌓는다', () => {
+    expect(Z_INDEX_VALUE.ABOVE_KEYBOARD).toBeLessThan(Z_INDEX_VALUE.SNACKBAR);
+    expect(Z_INDEX_VALUE.SNACKBAR).toBeLessThan(Z_INDEX_VALUE.LOADING);
   });
 });
-
-describe("constants", () => {
-  it("Z_INDEX_VALUE가 기대값을 가진다", () => {
-    expect(Z_INDEX_VALUE.DEFAULT).toBe(8000);
-    expect(Z_INDEX_VALUE.ALERT).toBe(8700);
-    expect(Z_INDEX_VALUE.LOADING).toBe(8999);
-  });
-
-  it("OVERLAY_FOLDABLE_SINGLE_WIDTH가 정의된다", () => {
-    expect(OVERLAY_FOLDABLE_SINGLE_WIDTH).toBeGreaterThan(0);
-  });
-});
-
-

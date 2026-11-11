@@ -1,7 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect, useId } from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { Z_INDEX_VALUE } from '../../model/utils';
+import { SPACE } from '../../theme/spacing';
+import { enterTransition, exitTransition } from '../transitions';
+
+const PORTAL_ENTERING = enterTransition({ translateY: -SPACE.lg });
+const PORTAL_EXITING = exitTransition({ translateY: SPACE.lg });
 
 interface PortalContextType {
   registerPortal: (id: string, element: ReactNode) => void;
@@ -48,7 +53,7 @@ export const PortalProvider: React.FC<PortalProviderProps> = ({ children }) => {
     <PortalContext.Provider value={contextValue}>
       {children}
       {Array.from(portals.entries()).map(([id, element]) => (
-        <Animated.View entering={FadeInDown} exiting={FadeOutDown} key={id} style={styles.portalLayer}>
+        <Animated.View entering={PORTAL_ENTERING} exiting={PORTAL_EXITING} key={id} style={styles.portalLayer}>
           {element}
         </Animated.View>
       ))}
@@ -68,14 +73,14 @@ const styles = StyleSheet.create({
   },
 });
 
-interface PortalProps {
+export interface ZSPortalProps {
   children: ReactNode;
   isFocused?: boolean;
 }
 
-export const ZSPortal: React.FC<PortalProps> = ({ children, isFocused = true }) => {
+export const ZSPortal: React.FC<ZSPortalProps> = ({ children, isFocused = true }) => {
   const context = useContext(PortalContext);
-  const [portalId] = useState(() => `portal_${Date.now()}_${Math.random()}`);
+  const portalId = useId();
 
   useEffect(() => {
     if (!context) return;

@@ -1,0 +1,13 @@
+appId: kr.co.studio0610.zsui.example
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: 'BackButton'
