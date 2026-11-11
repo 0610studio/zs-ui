@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'package.json'
+  # 배포 단계가 실패한 뒤 package.json을 건드리지 않은 수정만 올렸을 때 같은 버전을 다시 배포한다.
+  workflow_dispatch:
 
 permissions:
   id-token: write
