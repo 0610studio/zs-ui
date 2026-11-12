@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { matchFont, useFonts, type DataModule, type SkFont, type SkTypefaceFontProvider } from '@shopify/react-native-skia';
+import { matchFont, useFonts, type DataModule, type SkFont, type SkTypefaceFontProvider } from 'react-native-skia';
 import type { ThemeFontAssets } from '../../../theme/typeScale';
 
 export interface CalendarFonts {

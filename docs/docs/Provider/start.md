@@ -1,14 +1,14 @@
 # 시작하기
 
-Expo SDK 58·React Native 0.88 프로젝트에 zs-ui 2.0.0을 설치합니다. iOS·Android를 지원합니다.
+Expo SDK 58·React Native 0.88 프로젝트에 zs-ui 2.1.0을 설치합니다. iOS·Android를 지원합니다.
 
 ## 1. 설치
 
 zs-ui와 peer 의존성을 함께 설치합니다. `npx expo install`이 Expo SDK 58에 맞는 버전을 고릅니다.
 
 ```bash
-npx expo install @0610studio/zs-ui@2.0.0 @expo/ui expo-router expo-navigation-bar \
-  @react-native-async-storage/async-storage @shopify/react-native-skia \
+npx expo install @0610studio/zs-ui@2.1.0 @expo/ui expo-router expo-navigation-bar \
+  @react-native-async-storage/async-storage react-native-skia \
   react-native-reanimated react-native-worklets react-native-gesture-handler \
   react-native-safe-area-context react-native-screens react-native-svg expo-blur expo-status-bar
 ```
@@ -22,7 +22,7 @@ npx expo install @0610studio/zs-ui@2.0.0 @expo/ui expo-router expo-navigation-ba
 | `expo-router` | `>=58.0.26` | 탭·Stack |
 | `expo-navigation-bar` | `>=58.0.0` | Android 시스템 바 아이콘 색 |
 | `@react-native-async-storage/async-storage` | `*` | 다크 모드 선택 저장 |
-| `@shopify/react-native-skia` | `>=2.11.0` | `ZSCalendar`·`ZSSkeleton`·`ZSBorderBeam` |
+| `react-native-skia` | `>=3.0.0` | `ZSCalendar`·`ZSSkeleton`·`ZSBorderBeam`. Skia v3(Graphite)라 Android `minSdkVersion` 26 이상·Vulkan 1.1, iOS 15.1 이상이 필요합니다 |
 | `react-native-reanimated` | `>=4.7.0 <5.0.0` | |
 | `react-native-worklets` | `>=0.13.0 <0.14.0` | |
 | `react-native-gesture-handler` | `>=3.2.0 <4.0.0` | |

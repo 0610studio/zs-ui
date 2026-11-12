@@ -1,4 +1,4 @@
-import type * as SkiaModule from '@shopify/react-native-skia';
+import type * as SkiaModule from 'react-native-skia';
 import type * as FontsModule from '../../../ui/ZSCalendar/skia/fonts';
 
 describe('ZSCalendar skia/fonts — 시스템 폰트 family', () => {
@@ -6,7 +6,7 @@ describe('ZSCalendar skia/fonts — 시스템 폰트 family', () => {
     jest.resetModules();
     jest.doMock('react-native', () => ({ Platform: { OS: os } }));
     /* eslint-disable @typescript-eslint/no-var-requires */
-    const skia = require('@shopify/react-native-skia') as typeof SkiaModule;
+    const skia = require('react-native-skia') as typeof SkiaModule;
     const fonts = require('../../../ui/ZSCalendar/skia/fonts') as typeof FontsModule;
     /* eslint-enable @typescript-eslint/no-var-requires */
     return { fonts, matchFont: jest.spyOn(skia, 'matchFont') };

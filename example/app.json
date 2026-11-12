@@ -2,7 +2,7 @@
   "expo": {
     "name": "zs-ui-example",
     "slug": "zs-ui-example",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -46,7 +46,8 @@
             "deploymentTarget": "16.4"
           },
           "android": {
-            "usesCleartextTraffic": true
+            "usesCleartextTraffic": true,
+            "minSdkVersion": 26
           }
         }
       ],

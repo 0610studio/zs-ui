@@ -1,4 +1,4 @@
-import { createPicture, matchFont } from '@shopify/react-native-skia';
+import { createPicture, matchFont } from 'react-native-skia';
 import { drawCalls, paragraphStyles } from '../../__mocks__/react-native-skia';
 import { createThemeColors, DEFAULT_COLORS } from '../../../theme/color';
 import { RADIUS } from '../../../theme/radius';
@@ -12,7 +12,7 @@ import {
 import { nth } from '../../utils/hostQueries';
 import { contrastRatio } from '../../utils/contrast';
 
-jest.mock('@shopify/react-native-skia', () => {
+jest.mock('react-native-skia', () => {
   const actual = jest.requireActual('../../__mocks__/react-native-skia');
   const recordingPaint = () => {
     const state = { style: 0, strokeWidth: 0, color: undefined as unknown, alpha: 1, maskFilter: undefined as unknown };

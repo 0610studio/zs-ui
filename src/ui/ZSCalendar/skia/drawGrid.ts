@@ -7,7 +7,7 @@ import {
   type SkPaint,
   type SkParagraph,
   type SkRect,
-} from '@shopify/react-native-skia';
+} from 'react-native-skia';
 import { RADIUS } from '../../../theme/radius';
 import type {
   DateString,

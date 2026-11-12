@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Platform, StyleSheet, View, type LayoutChangeEvent } from "react-native";
-import { Canvas, Group, LinearGradient, Rect, Skia, vec } from "@shopify/react-native-skia";
+import { Canvas, Group, LinearGradient, Rect, Skia, vec } from "react-native-skia";
 import {
   Easing,
   ReduceMotion,

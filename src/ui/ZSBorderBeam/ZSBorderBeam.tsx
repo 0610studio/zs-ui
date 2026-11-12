@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Platform, StyleSheet, View, type LayoutChangeEvent, type ViewProps } from "react-native";
-import { Blur, Canvas, Group, Path, RoundedRect, SweepGradient, vec, type AnimatedProp } from "@shopify/react-native-skia";
+import { Blur, Canvas, Group, Path, RoundedRect, SweepGradient, vec, type AnimatedProp } from "react-native-skia";
 import {
   Easing,
   cancelAnimation,

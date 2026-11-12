@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { Skia, createPicture, type SkPicture } from '@shopify/react-native-skia';
+import { Skia, createPicture, type SkPicture } from 'react-native-skia';
 import {
   addDays,
   addMonths,

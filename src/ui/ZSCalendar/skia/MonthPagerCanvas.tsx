@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Canvas, Group, Paint, Picture, Skia } from '@shopify/react-native-skia';
+import { Canvas, Group, Paint, Picture, Skia } from 'react-native-skia';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,

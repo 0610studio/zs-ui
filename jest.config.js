@@ -59,7 +59,7 @@ module.exports = {
     'react-native-gesture-handler': '<rootDir>/src/__tests__/__mocks__/react-native-gesture-handler.ts',
     'react-native-reanimated': '<rootDir>/src/__tests__/__mocks__/react-native-reanimated.js',
     'react-native-worklets': '<rootDir>/src/__tests__/__mocks__/react-native-worklets.ts',
-    '^@shopify/react-native-skia$': '<rootDir>/src/__tests__/__mocks__/react-native-skia.tsx',
+    '^react-native-skia$': '<rootDir>/src/__tests__/__mocks__/react-native-skia.tsx',
     '^@expo/ui$': '<rootDir>/src/__tests__/__mocks__/expo-ui.tsx',
     '^@expo/ui/swift-ui$': '<rootDir>/src/__tests__/__mocks__/expo-ui-swift-ui.ts',
     '^@expo/ui/swift-ui/modifiers$': '<rootDir>/src/__tests__/__mocks__/expo-ui-swift-ui-modifiers.ts',
