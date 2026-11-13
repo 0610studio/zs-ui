@@ -19,6 +19,7 @@ export const StyleSheet = {
 export const View = React.forwardRef((props: any, ref: any) =>
   React.createElement('View', { ...props, ref }, props.children)
 );
+export const KeyboardAvoidingView = View;
 export const Text = (props: any) => React.createElement('Text', props, props.children);
 export const processColor = (color: unknown) => color;
 export const Image = Object.assign((props: any) => React.createElement('Image', props), {

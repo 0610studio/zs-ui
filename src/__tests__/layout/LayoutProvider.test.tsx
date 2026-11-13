@@ -231,14 +231,14 @@ describe('LayoutProvider barAxis', () => {
     return <Text>{`axis-${barAxis}`}</Text>;
   }
 
-  it("기본은 'vertical' 이고 iOS 세로 바를 건드리지 않는다", async () => {
+  it("기본은 'horizontal' 이고 iOS 세로 바를 끈다", async () => {
     const { getByText } = await render(
       <LayoutProvider>
         <Axis />
       </LayoutProvider>,
     );
-    expect(getByText('axis-vertical')).toBeTruthy();
-    expect(setBehavior).not.toHaveBeenCalled();
+    expect(getByText('axis-horizontal')).toBeTruthy();
+    expect(setBehavior).toHaveBeenLastCalledWith('disabled');
   });
 
   it("iOS 'horizontal' 은 세로 바를 끄고, 'vertical' 로 바꾸거나 언마운트하면 되돌린다", async () => {

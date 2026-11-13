@@ -13,7 +13,7 @@
 
 `SafeAreaProvider` 안쪽, `ThemeProvider` 바깥쪽에 둡니다. 루트 레이아웃 코드는 [시작하기](../Provider/start)에 있습니다.
 
-[`ZSScreen`](../UiComponent/ZSScreen)·[`ZSKeyboardStickyView`](../UiComponent/ZSKeyboardStickyView)(가독 폭), [`ZSPaneLayout`](./ZSPaneLayout)(분할·접힘선), [`ZSTabNavigator`](../Navigation/ZSTabNavigator)(Android 바 ↔ 레일)가 이 값을 읽습니다. 시트·메뉴의 넓은 창 배치와 접힘선 회피는 시스템이 맡습니다. Alert는 zs-ui가 창 가운데에 그립니다.
+[`ZSScreen`](../UiComponent/ZSScreen)·[`ZSKeyboardStickyView`](../UiComponent/ZSKeyboardStickyView)(가독 폭), [`ZSPaneLayout`](./ZSPaneLayout)(분할·접힘선), [`ZSTabNavigator`](../Navigation/ZSTabNavigator)(Android 바 ↔ 레일)가 이 값을 읽습니다. 네이티브 시트·메뉴의 넓은 창 배치와 접힘선 회피는 시스템이 맡습니다. Duo 가로 배치의 바텀시트는 앱 창의 전체 폭에 맞추고, Alert는 zs-ui가 창 가운데에 그립니다.
 
 `LayoutProvider` 밖에서 `useWindowLayout`·`useDisplayFeatures`·`useDevicePosture`·`useBarAxis`나 이 값을 쓰는 컴포넌트를 쓰면 에러(`… must be used within a LayoutProvider`)를 던집니다.
 
@@ -22,7 +22,7 @@
 | Prop | Type | Default | 설명 |
 |------|------|---------|------|
 | `readableMaxWidth` | `ReadableMaxWidth` | `'system'` | 가독 폭(`'system' \| number`). 화면이 `maxContentWidth="readable"`을 고를 때만 씁니다 — 기본은 전폭이라 쓰지 않습니다 |
-| `barAxis` | `BarAxis` | `'vertical'` | 바 배치(`'vertical' \| 'horizontal'`). 아래 [바 배치](#바-배치--baraxis)를 보세요 |
+| `barAxis` | `BarAxis` | `'horizontal'` | 바 배치(`'vertical' \| 'horizontal'`). 아래 [바 배치](#바-배치--baraxis)를 보세요 |
 | `children` | `ReactNode` | Required | 앱 |
 
 | `readableMaxWidth` | iOS | Android |
@@ -36,7 +36,7 @@ compact 창에는 적용하지 않습니다. 넓은 창 폭 규칙은 [ZSScreen]
 
 ## 바 배치 — `barAxis`
 
-상태바·내비게이션 바·탭 바를 세로 바에 둘지, 위아래 가로 바에 둘지 정합니다. 앱 단위로 한 번 정합니다.
+상태바·내비게이션 바·탭 바를 세로 바에 둘지, 위아래 가로 바에 둘지 정합니다. 기본은 `'horizontal'`이며 앱 단위로 한 번 정합니다. 시스템의 세로 배치를 사용하려면 `barAxis="vertical"`을 지정합니다.
 
 ```tsx
 <LayoutProvider barAxis="horizontal">{children}</LayoutProvider>
@@ -50,6 +50,7 @@ compact 창에는 적용하지 않습니다. 넓은 창 폭 규칙은 [ZSScreen]
 - iOS는 `expo-status-bar`의 `StatusBar.setVerticalBarBehaviorIOS`로 적용합니다. 화면에 `<StatusBar verticalBarBehaviorIOS="…" />`를 따로 두면 그 값이 앞섭니다.
 - iOS 세로 바는 iOS 27.1 이상에서 iOS 27.1 SDK(Xcode 27.1)로 빌드한 앱에만 있습니다. 세로 바가 없는 기기에서는 두 값이 같습니다. 세로 바가 놓이는 쪽(시작·끝)은 `expo-status-bar`의 `useVerticalBarEdgeIOS()`로 읽습니다.
 - 바뀌면 시스템이 애니메이션으로 다시 배치하고, 화면은 safe area를 따라 다시 그려집니다.
+- Duo에서 가로 배치를 선택하면 바텀시트는 앱 창 안에 표시합니다. UIKit 시스템 시트가 상태 표시줄을 세로로 전환하면서 우측 공간을 만드는 문제를 피하고, 접기·펴기 중에도 시트 내용과 입력 상태를 유지합니다. 일반 iPhone과 세로 배치는 네이티브 시트를 사용합니다.
 
 ### 실행 중에 바꾸기 — `useBarAxis`
 

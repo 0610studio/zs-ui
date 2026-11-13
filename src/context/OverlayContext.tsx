@@ -10,6 +10,7 @@ import type { OverlayContextProps, ShowAlertProps, ShowBottomSheetProps, ShowLoa
 import { PortalProvider } from '../overlay/ZSPortal';
 import AlertDialog from '../overlay/AlertDialog';
 import AndroidBottomSheet from '../overlay/AndroidBottomSheet';
+import IOSBottomSheet from '../overlay/IOSBottomSheet';
 import { SheetBottom } from '../overlay/SheetBottom';
 import { SheetContent } from '../overlay/SheetContent';
 import { SheetHeader } from '../overlay/SheetHeader';
@@ -157,7 +158,12 @@ export function OverlayProvider({ children, snackbarPosition = 'top' }: OverlayP
               {sheetContent}
             </AndroidBottomSheet>
           ) : null}
-          {activeSheet && Platform.OS !== 'android' ? (
+          {activeSheet && Platform.OS === 'ios' ? (
+            <IOSBottomSheet key={activeSheet.id} open={sheetOpen} snapPoints={snapPoints} dismissible={sheetDismissible} onClose={() => handleSheetClose(activeSheet.id)}>
+              {sheetContent}
+            </IOSBottomSheet>
+          ) : null}
+          {activeSheet && Platform.OS !== 'android' && Platform.OS !== 'ios' ? (
             <BottomSheet key={activeSheet.id} index={sheetOpen ? 0 : -1} snapPoints={snapPoints} enablePanDownToClose={sheetDismissible} onClose={() => handleSheetClose(activeSheet.id)}>
               {sheetContent}
             </BottomSheet>

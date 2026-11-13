@@ -16,7 +16,7 @@ export interface LayoutProviderProps {
 
 const OS = Platform.OS === 'ios' ? 'ios' : 'android';
 
-export function LayoutProvider({ children, readableMaxWidth = 'system', barAxis = 'vertical' }: LayoutProviderProps) {
+export function LayoutProvider({ children, readableMaxWidth = 'system', barAxis = 'horizontal' }: LayoutProviderProps) {
   const lastRef = useRef<{ observation: WindowObservation; measured: boolean }>({
     observation: Dimensions.get('window'),
     measured: false,
