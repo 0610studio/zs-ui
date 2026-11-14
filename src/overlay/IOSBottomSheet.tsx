@@ -3,6 +3,7 @@ import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useVerticalBarEdgeIOS } from 'expo-status-bar';
 import { LayoutContext, createValueStore } from '../layout/LayoutContext';
 import type { BarAxis } from '../layout/types';
+import { PresentationAnchor } from './PresentationAnchor';
 import WindowBottomSheet from './WindowBottomSheet';
 
 const defaultBarAxis = createValueStore<BarAxis>('horizontal', Object.is);
@@ -27,8 +28,10 @@ export default function IOSBottomSheet({ open, snapPoints, dismissible, onClose,
     return <WindowBottomSheet open={open} snapPoints={snapPoints} dismissible={dismissible} onClose={onClose}>{children}</WindowBottomSheet>;
   }
   return (
-    <BottomSheet index={open ? 0 : -1} snapPoints={snapPoints} enablePanDownToClose={dismissible} onClose={onClose}>
-      {children}
-    </BottomSheet>
+    <PresentationAnchor onDetach={onClose}>
+      <BottomSheet index={open ? 0 : -1} snapPoints={snapPoints} enablePanDownToClose={dismissible} onClose={onClose}>
+        {children}
+      </BottomSheet>
+    </PresentationAnchor>
   );
 }

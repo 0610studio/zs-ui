@@ -77,6 +77,7 @@ function ThemedStack() {
           name="FormSheetDemo"
           options={{ presentation: 'formSheet', sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true, headerShown: false }}
         />
+        <Stack.Screen name="ModalSheetDemo" options={{ presentation: 'modal', headerShown: false }} />
         <Stack.Screen name="friends/breed" options={{ presentation: 'modal' }} />
         <Stack.Screen name="diary/guide" options={{ presentation: 'modal' }} />
         <Stack.Screen name="diary/search" options={{ presentation: 'modal' }} />

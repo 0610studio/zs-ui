@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert, BackHandler, Keyboard, StyleSheet, Text } from 'react-native';
+import { Alert, BackHandler, Keyboard, StyleSheet, Text, TextInput } from 'react-native';
 import { OverlayProvider } from '../../context/OverlayContext';
 import { useScreenCovered } from '../../context/ScreenCoverContext';
 import { GlobalOverlay } from '../../model/globalOverlay';
@@ -241,27 +241,117 @@ describe('OverlayProvider (iOS)', () => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('열린 시트를 새 시트로 바꾸면 이전 시트의 onClose 를 부르고 새 시트를 보인다', async () => {
-      const first = jest.fn();
-      const second = jest.fn();
-      await renderProvider();
-      await act(() => overlay.showBottomSheet({ component: <Text>첫 시트</Text>, options: { onClose: first } }));
-      await act(() => overlay.showBottomSheet({ component: <Text>둘째 시트</Text>, options: { onClose: second } }));
-      expect(first).toHaveBeenCalledTimes(1);
-      expect(second).not.toHaveBeenCalled();
-      expect(screen.queryByText('첫 시트')).toBeNull();
-      expect(screen.getByText('둘째 시트')).toBeTruthy();
-      await act(() => sheet().props.onClose());
-      expect(second).toHaveBeenCalledTimes(1);
-      expect(first).toHaveBeenCalledTimes(1);
+    describe('겹치기 — 시트가 열린 채 다시 부르면 위에 띄운다', () => {
+      function Draft() {
+        const [value, setValue] = useState('');
+        return <TextInput testID="draft" value={value} onChangeText={setValue} />;
+      }
+      const indexes = () => sheets().map((node) => node.props.index);
+
+      it('새 시트를 위에 띄우고 아래 시트와 그 입력은 남긴다 — 위 시트가 닫히면 아래 시트로 돌아온다', async () => {
+        const first = jest.fn();
+        const second = jest.fn();
+        await renderProvider();
+        await act(() => overlay.showBottomSheet({ component: <Draft />, options: { snapPoints: ['full'], onClose: first } }));
+        await fireEvent.changeText(screen.getByTestId('draft'), '산책 기록');
+        await act(() => overlay.showBottomSheet({ component: <Text>날짜</Text>, options: { onClose: second } }));
+        expect(indexes()).toEqual([0, 0]);
+        expect(screen.getByText('날짜')).toBeTruthy();
+        expect(first).not.toHaveBeenCalled();
+        await act(() => sheets()[1]!.props.onClose());
+        expect(second).toHaveBeenCalledTimes(1);
+        expect(first).not.toHaveBeenCalled();
+        expect(sheets()).toHaveLength(1);
+        expect(screen.getByTestId('draft').props.value).toBe('산책 기록');
+        expect(covered).toBe(true);
+      });
+
+      it('hideBottomSheet 는 맨 위 시트만 닫는다', async () => {
+        await renderProvider();
+        await act(() => overlay.showBottomSheet({ component: <Text>검색</Text> }));
+        await act(() => overlay.showBottomSheet({ component: <Text>날짜</Text> }));
+        await act(() => overlay.hideBottomSheet());
+        expect(indexes()).toEqual([0, -1]);
+        await act(() => sheets()[1]!.props.onClose());
+        expect(indexes()).toEqual([0]);
+        await act(() => overlay.hideBottomSheet());
+        expect(indexes()).toEqual([-1]);
+      });
+
+      it('바꾸려면 hideBottomSheet 다음 showBottomSheet — 앞 시트가 다 닫힌 뒤 새 시트가 뜬다', async () => {
+        const first = jest.fn();
+        await renderProvider();
+        await act(() => overlay.showBottomSheet({ component: <Text>첫 시트</Text>, options: { onClose: first } }));
+        await act(() => {
+          overlay.hideBottomSheet();
+          overlay.showBottomSheet({ component: <Text>다음 시트</Text> });
+        });
+        expect(indexes()).toEqual([-1]);
+        expect(screen.queryByText('다음 시트')).toBeNull();
+        expect(covered).toBe(true);
+        await act(() => sheet().props.onClose());
+        expect(first).toHaveBeenCalledTimes(1);
+        expect(indexes()).toEqual([0]);
+        expect(screen.getByText('다음 시트')).toBeTruthy();
+      });
+
+      it('기다리던 시트를 hideBottomSheet 로 거두면 띄우지 않고 onClose 를 한 번 부른다', async () => {
+        const waiting = jest.fn();
+        await renderProvider();
+        await act(() => overlay.showBottomSheet({ component: <Text>첫 시트</Text> }));
+        await act(() => {
+          overlay.hideBottomSheet();
+          overlay.showBottomSheet({ component: <Text>다음 시트</Text>, options: { onClose: waiting } });
+          overlay.hideBottomSheet();
+        });
+        expect(waiting).toHaveBeenCalledTimes(1);
+        await act(() => sheet().props.onClose());
+        expect(sheets()).toHaveLength(0);
+        expect(waiting).toHaveBeenCalledTimes(1);
+        expect(covered).toBe(false);
+      });
+
+      it('아래 시트가 먼저 닫히면 위 시트도 함께 거두고 onClose 를 위에서부터 부른다', async () => {
+        const order: string[] = [];
+        await renderProvider();
+        await act(() => overlay.showBottomSheet({ component: <Text>검색</Text>, options: { onClose: () => order.push('검색') } }));
+        await act(() => overlay.showBottomSheet({ component: <Text>날짜</Text>, options: { onClose: () => order.push('날짜') } }));
+        const lowerClose = sheets()[0]!.props.onClose;
+        const upperClose = sheets()[1]!.props.onClose;
+        await act(() => lowerClose());
+        expect(sheets()).toHaveLength(0);
+        expect(order).toEqual(['날짜', '검색']);
+        await act(() => upperClose());
+        expect(order).toEqual(['날짜', '검색']);
+      });
+
+      it('시트를 띄운 화면(모달·formSheet)이 닫혀 시트가 떨어지면(onDetach) 그 시트를 거두고 onClose 를 부른다', async () => {
+        const onClose = jest.fn();
+        await renderProvider();
+        await act(() => overlay.showBottomSheet({ component: <Text>시트</Text>, options: { onClose } }));
+        await act(() => getByHostType('ZSPresentationAnchorView').props.onDetach());
+        expect(sheets()).toHaveLength(0);
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(covered).toBe(false);
+      });
     });
 
-    it('교체된 시트의 늦은 닫힘 이벤트가 새 시트를 닫지 않는다', async () => {
+    it('시스템 시트는 맨 위 화면에 붙이는 ZSPresentationAnchorView 안에 둔다', async () => {
+      await renderProvider();
+      await act(() => overlay.showBottomSheet({ component: <Text>시트</Text> }));
+      const anchor = getByHostType('ZSPresentationAnchorView');
+      expect(StyleSheet.flatten(anchor.props.style)).toEqual({ position: 'absolute', width: 0, height: 0 });
+      expect(anchor.props.pointerEvents).toBeUndefined();
+      expect(sheet().parent).toBe(anchor);
+    });
+
+    it('닫힌 시트의 늦은 닫힘 이벤트가 새 시트를 닫지 않는다', async () => {
       const first = jest.fn();
       const second = jest.fn();
       await renderProvider();
       await act(() => overlay.showBottomSheet({ component: <Text>첫 시트</Text>, options: { onClose: first } }));
       const staleClose = sheet().props.onClose;
+      await act(() => staleClose());
       await act(() => overlay.showBottomSheet({ component: <Text>둘째 시트</Text>, options: { onClose: second } }));
       await act(() => staleClose());
       expect(sheet().props.index).toBe(0);
@@ -275,6 +365,7 @@ describe('OverlayProvider (iOS)', () => {
       await renderProvider();
       await act(() => overlay.showBottomSheet(props));
       const staleClose = sheet().props.onClose;
+      await act(() => staleClose());
       await act(() => overlay.showBottomSheet(props));
       await act(() => staleClose());
       expect(sheet().props.index).toBe(0);

@@ -1,0 +1,175 @@
+appId: kr.co.studio0610.zsui.example
+# 시트 겹치기 — 전체 높이 시트 위 날짜 시트, formSheet·modal 라우트 위 날짜 시트.
+# 위 시트를 닫으면 아래 시트·라우트와 그 입력이 그대로 남는지 본다.
+---
+- launchApp:
+    clearState: false
+- setOrientation: PORTRAIT
+- extendedWaitUntil:
+    visible: 'ZS-UI'
+    timeout: 120000
+- scrollUntilVisible:
+    element: 'Overlay:.*'
+    direction: DOWN
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: 'Overlay:.*'
+      - assertVisible:
+          id: 'overlay-sheet-fit'
+
+# 1. 전체 높이 시트 위 날짜 시트
+- scrollUntilVisible:
+    element:
+      id: 'overlay-sheet-stack'
+    direction: DOWN
+- tapOn:
+    id: 'overlay-sheet-stack'
+- extendedWaitUntil:
+    visible:
+      id: 'overlay-sheet-stack-query'
+    timeout: 10000
+- tapOn:
+    id: 'overlay-sheet-stack-query'
+- inputText: 'walk'
+# iOS 는 날짜 칸을 누르면 showBottomSheet 가 키보드를 내린다
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- tapOn:
+    id: 'overlay-sheet-stack-period-start'
+- extendedWaitUntil:
+    visible:
+      id: 'date-picker-sheet'
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: s01-full-sheet-date-on-top
+- tapOn: '입력'
+- tapOn:
+    id: 'date-picker-input'
+- eraseText: 8
+- inputText: '20261120'
+- tapOn:
+    id: 'date-picker-confirm'
+- extendedWaitUntil:
+    notVisible:
+      id: 'date-picker-sheet'
+    timeout: 5000
+- assertVisible: '2026-11-20'
+- assertVisible: 'walk'
+- takeScreenshot: s02-back-to-full-sheet
+# 바깥 탭·뒤로가기는 맨 위 시트만 닫는다
+- tapOn:
+    id: 'overlay-sheet-stack-period-end'
+- extendedWaitUntil:
+    visible:
+      id: 'date-picker-sheet'
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          point: 50%, 8%
+- extendedWaitUntil:
+    notVisible:
+      id: 'date-picker-sheet'
+    timeout: 5000
+- assertVisible: 'walk'
+- assertVisible: '2026-11-20'
+- takeScreenshot: s03-dismissed-top-only
+- tapOn:
+    id: 'overlay-sheet-stack-submit'
+- extendedWaitUntil:
+    notVisible:
+      id: 'overlay-sheet-stack-query'
+    timeout: 5000
+
+# 2. formSheet 라우트 위 날짜 시트
+- scrollUntilVisible:
+    element:
+      id: 'open-form-sheet'
+    direction: DOWN
+- tapOn:
+    id: 'open-form-sheet'
+- extendedWaitUntil:
+    visible:
+      id: 'form-sheet-title'
+    timeout: 10000
+- tapOn:
+    id: 'form-sheet-title'
+- inputText: 'memo'
+# iOS 는 날짜 칸을 누르면 showBottomSheet 가 키보드를 내린다
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- tapOn:
+    id: 'form-sheet-period-start'
+- extendedWaitUntil:
+    visible:
+      id: 'date-picker-sheet'
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: s04-form-sheet-date-on-top
+- tapOn: '입력'
+- tapOn:
+    id: 'date-picker-input'
+- eraseText: 8
+- inputText: '20261121'
+- tapOn:
+    id: 'date-picker-confirm'
+- extendedWaitUntil:
+    notVisible:
+      id: 'date-picker-sheet'
+    timeout: 5000
+- assertVisible: 'memo'
+- assertVisible: '2026-11-21'
+- takeScreenshot: s05-back-to-form-sheet
+- tapOn:
+    id: 'form-sheet-save'
+- extendedWaitUntil:
+    visible:
+      id: 'open-form-sheet'
+    timeout: 5000
+
+# 3. modal 라우트 위 날짜 시트
+- tapOn:
+    id: 'open-modal-sheet'
+- extendedWaitUntil:
+    visible:
+      id: 'form-sheet-title'
+    timeout: 10000
+- tapOn:
+    id: 'form-sheet-period-end'
+- extendedWaitUntil:
+    visible:
+      id: 'date-picker-sheet'
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: s06-modal-date-on-top
+- tapOn:
+    id: 'date-picker-confirm'
+- extendedWaitUntil:
+    notVisible:
+      id: 'date-picker-sheet'
+    timeout: 5000
+- assertVisible:
+    id: 'form-sheet-title'
+- assertVisible: '2026-11-14'
+- takeScreenshot: s07-back-to-modal
+- tapOn:
+    id: 'form-sheet-save'
+- extendedWaitUntil:
+    visible:
+      id: 'open-modal-sheet'
+    timeout: 5000

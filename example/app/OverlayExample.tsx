@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { ZSButton, ZSScreen, ZSText, ZSTextField, useOverlay } from '@0610studio/zs-ui';
 import MyBottomSheet from '../src/ui/MyBottomSheet';
+import PeriodFields from '../src/ui/overlay/PeriodFields';
 import Section from '../src/ui/kit/Section';
 import DemoRow from '../src/ui/kit/DemoRow';
 import { GAP, PAGE_CONTENT } from '../src/ui/kit/layout';
@@ -162,8 +164,22 @@ export default function OverlayExample() {
           />
         </Section>
 
-        <Section label="네이티브 Stack 시트" surface="list">
-          <DemoRow title="presentation: formSheet" caption="라우터로 여는 입력 폼 · 시스템 뒤로 가기" testID="open-form-sheet" onPress={() => router.push('/FormSheetDemo')} />
+        <Section label="시트 겹치기 · 라우트 위 시트" surface="list">
+          <DemoRow
+            title="전체 높이 시트 위 날짜 시트"
+            caption="snapPoints ['full'] · 시작일을 누르면 날짜 시트가 위에 뜨고, 닫으면 입력이 남은 채 돌아온다"
+            testID="overlay-sheet-stack"
+            onPress={() =>
+              showBottomSheet({
+                options: { snapPoints: ['full'] },
+                header: '기록 검색',
+                component: <StackedSearchForm />,
+                bottomComponent: <ZSButton title="검색" fullWidth onPress={hideBottomSheet} testID="overlay-sheet-stack-submit" />,
+              })
+            }
+          />
+          <DemoRow title="presentation: formSheet" caption="라우터로 여는 입력 폼 · 날짜 칸은 시트를 위에 띄운다" testID="open-form-sheet" onPress={() => router.push('/FormSheetDemo')} />
+          <DemoRow title="presentation: modal" caption="모달 라우트 위 날짜 시트 · 모달은 그대로 남는다" testID="open-modal-sheet" onPress={() => router.push('/ModalSheetDemo')} />
         </Section>
 
         <Section label="Loader · 작업 진행 상태" surface="list">
@@ -174,8 +190,20 @@ export default function OverlayExample() {
   );
 }
 
+/** 전체 높이 시트 본문 — 검색어는 이 시트에 남고, 날짜 칸은 날짜 시트를 위에 겹친다 */
+function StackedSearchForm() {
+  const [query, setQuery] = useState('');
+  return (
+    <View style={styles.stackForm}>
+      <ZSTextField label="검색어" value={query} onChangeText={setQuery} testID="overlay-sheet-stack-query" />
+      <PeriodFields testID="overlay-sheet-stack-period" />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: PAGE_CONTENT,
+  stackForm: { gap: GAP.lg, paddingBottom: GAP.lg },
   row: { flexDirection: 'row', gap: GAP.md },
   rowButton: { flex: 1 },
 });

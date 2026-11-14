@@ -1,16 +1,23 @@
 import type { OverlayContextProps } from './types';
 
-let globalOverlayRef: OverlayContextProps | null = null;
+// Provider 를 겹쳐 두어도(모달 화면 안에 하나 더 등) 안쪽이 언마운트되면 바깥 Provider 로 돌아간다.
+const registered: { current: OverlayContextProps }[] = [];
 
-export const setGlobalOverlayRef = (ref: OverlayContextProps | null) => {
-  globalOverlayRef = ref;
+/** 마운트한 OverlayProvider 를 맨 위에 올리고, 돌려준 함수로 내린다. */
+export const registerGlobalOverlay = (slot: { current: OverlayContextProps }) => {
+  registered.push(slot);
+  return () => {
+    const index = registered.lastIndexOf(slot);
+    if (index >= 0) registered.splice(index, 1);
+  };
 };
 
 const requireRef = (): OverlayContextProps => {
-  if (!globalOverlayRef) {
+  const slot = registered[registered.length - 1];
+  if (!slot) {
     throw new Error('Overlay functions are not available. Please make sure OverlayProvider is properly set up in your app root.');
   }
-  return globalOverlayRef;
+  return slot.current;
 };
 
 export const GlobalOverlay: OverlayContextProps = {

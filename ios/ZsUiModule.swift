@@ -31,6 +31,10 @@ public class ZsUiModule: Module {
 
     View(ZSSheetContentView.self) {}
 
+    View(ZSPresentationAnchorView.self) {
+      Events("onDetach")
+    }
+
     View(ZSSelectMenuView.self) {
       Events("onSelectOption")
 

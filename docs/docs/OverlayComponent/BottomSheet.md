@@ -1,6 +1,6 @@
 # BottomSheet
 
-화면을 떠나지 않고 짧은 선택·입력을 받을 때 시스템 시트에 React Native 콘텐츠를 띄웁니다. 입력이 여러 개인 화면 단위 작성·편집은 [formSheet 라우트](./start#화면-단위-모달--formsheet-라우트)를 씁니다.
+화면을 떠나지 않고 짧은 선택·입력을 받을 때 시스템 시트에 React Native 콘텐츠를 띄웁니다. 입력이 여러 개인 화면 단위 작성·편집은 [formSheet 라우트](./start#화면-단위-모달--formsheet-라우트)를 쓰고, 그 라우트 안의 날짜·항목 고르기는 이 시트로 [라우트 위에](#formsheet--모달-라우트-위) 띄웁니다. 시트 안에서 다른 시트를 [겹쳐](#겹치기--시트-위-시트) 열 수도 있습니다.
 
 | 플랫폼 | 구현 |
 |--------|------|
@@ -61,8 +61,8 @@ function SortButton() {
 
 | 옵션 | Type | Default | 설명 |
 |------|------|---------|------|
-| `dismissible` | `boolean` | `true` | 손잡이 끌기·바깥 탭·뒤로가기로 닫기. `false`여도 `hideBottomSheet()`로는 닫힙니다. Android는 `false`면 시트 끌기가 모두 꺼져 단계 사이로도 옮길 수 없습니다 |
-| `onClose` | `() => void` | `undefined` | 어떤 경로로 닫히든 1회 호출됩니다. 닫힘 전환이 끝난 뒤라 여기서 다른 오버레이를 띄워도 됩니다 |
+| `dismissible` | `boolean` | `true` | 손잡이 끌기·바깥 탭·뒤로가기로 닫기(시트가 겹쳐 있으면 맨 위 시트만). `false`여도 `hideBottomSheet()`로는 닫힙니다. Android는 `false`면 시트 끌기가 모두 꺼져 단계 사이로도 옮길 수 없습니다 |
+| `onClose` | `() => void` | `undefined` | 어떤 경로로 닫히든 1회 호출됩니다. 아래 시트·라우트와 함께 닫혀도 불립니다. 닫힘 전환이 끝난 뒤라 여기서 다른 오버레이를 띄워도 됩니다 |
 | `snapPoints` | ``Array<'half' \| 'full' \| `${number}%`>`` | `undefined` | 멈출 높이 — [높이](#높이--snappoints). 생략하면 콘텐츠 높이에 맞춥니다 |
 | `contentPadding` | `number` | iOS `20` · Android `16` | 콘텐츠 좌우 여백. `0`이면 가장자리까지 채웁니다 |
 
@@ -145,8 +145,73 @@ showBottomSheet({
 ```
 
 - `dismissible: false`면 끌기·바깥 탭·Android 뒤로가기로 닫히지 않습니다(뒤로가기는 소비만 합니다). 콘텐츠 안 버튼에서 `hideBottomSheet()`를 부르세요.
-- 시트가 열린 채 `showBottomSheet`를 다시 부르면 이전 시트의 `onClose`가 1회 불리고 새 시트로 바뀝니다.
+- `hideBottomSheet()`는 맨 위 시트를 닫습니다. 시트가 열린 채 `showBottomSheet`를 다시 부르면 [위에 겹쳐](#겹치기--시트-위-시트) 뜹니다.
 - 닫힘이 끝나면 시트 본문을 언마운트합니다. 본문의 구독·타이머는 effect 정리 함수에서 해제합니다.
+
+## 겹치기 — 시트 위 시트
+
+시트가 열린 채 `showBottomSheet`를 부르면 새 시트가 그 위에 뜨고 아래 시트는 그대로 남습니다. 위 시트를 닫으면 아래 시트로 돌아오며, 아래 시트의 입력·스크롤 위치가 유지됩니다.
+
+```tsx
+function SearchSheet() {
+  const { showBottomSheet, hideBottomSheet } = useOverlay();
+  const [query, setQuery] = useState('');
+  const [start, setStart] = useState(todayDateString());
+
+  const pickStart = () =>
+    showBottomSheet({
+      header: '시작일',
+      component: (
+        <DatePicker
+          value={start}
+          onConfirm={(date) => {
+            setStart(date);
+            hideBottomSheet(); // 날짜 시트만 닫고 검색 시트로 돌아온다
+          }}
+        />
+      ),
+    });
+
+  return (
+    <View style={{ gap: 12 }}>
+      <ZSTextField label="검색어" value={query} onChangeText={setQuery} />
+      <ZSButton title={`시작일 ${start}`} variant="outlined" onPress={pickStart} />
+    </View>
+  );
+}
+
+showBottomSheet({ options: { snapPoints: ['full'] }, header: '기록 검색', component: <SearchSheet /> });
+```
+
+| 동작 | 결과 |
+|------|------|
+| `hideBottomSheet()` | 맨 위 시트만 닫습니다 |
+| 바깥 탭 · 손잡이 끌기 · Android 뒤로가기 | 맨 위 시트만 닫습니다(그 시트의 `dismissible`을 따릅니다) |
+| 아래 시트나 라우트가 먼저 닫힘 | 그 위 시트도 함께 닫히고, 위 시트부터 차례로 `onClose`가 불립니다 |
+
+시트를 바꾸려면 `hideBottomSheet()` 뒤에 `showBottomSheet()`를 부릅니다. 앞 시트가 다 닫힌 뒤 새 시트가 뜹니다.
+
+```tsx
+hideBottomSheet();
+showBottomSheet({ component: <NextStep /> });
+```
+
+## formSheet · 모달 라우트 위
+
+expo-router Stack의 `presentation: 'formSheet'`·`'modal'` 화면 안에서 띄운 시트는 그 라우트 위에 뜹니다. 시트를 닫으면 라우트와 그 입력이 그대로 남습니다. 라우트마다 `OverlayProvider`를 따로 두지 않습니다.
+
+```tsx
+// app/_layout.tsx
+<Stack.Screen name="search" options={{ presentation: 'formSheet', sheetAllowedDetents: [1], sheetGrabberVisible: true }} />
+
+// app/search.tsx
+function Search() {
+  const { showBottomSheet, hideBottomSheet } = useOverlay();
+  // 시작일을 누르면 날짜 시트가 검색 라우트 위에 뜬다
+}
+```
+
+시트가 떠 있는 채 `router.back()` 등으로 라우트가 닫히면 시트도 함께 닫히고 `onClose`가 불립니다.
 
 ## 접근성
 
@@ -154,6 +219,6 @@ showBottomSheet({
 
 ## 관련 문서
 
-- [오버레이 개요](./start) — formSheet 라우트
+- [오버레이 개요](./start) — formSheet·모달 라우트
 - [Alert](./Alert)
 - [ZSMenu](../UiComponent/ZSMenu) — 동작 목록은 메뉴로

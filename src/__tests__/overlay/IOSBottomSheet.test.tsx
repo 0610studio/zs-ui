@@ -32,6 +32,15 @@ describe('iOS sheet presentation', () => {
     expect(screen.queryByTestId('zs-bottom-sheet-window')).toBeNull();
   });
 
+  it('presents the native sheet from the topmost screen and closes when that screen takes it down', async () => {
+    const onClose = jest.fn();
+    await render(<Sheet onClose={onClose} />);
+    const anchor = getByHostType('ZSPresentationAnchorView');
+    expect(getByHostType('BottomSheet').parent).toBe(anchor);
+    await act(() => anchor.props.onDetach());
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps native sheets when Duo explicitly uses vertical bars', async () => {
     edge.mockReturnValue('trailing');
     await render(<Sheet axis="vertical" />);
@@ -43,6 +52,7 @@ describe('iOS sheet presentation', () => {
     await render(<Sheet />);
     expect(screen.getByTestId('zs-bottom-sheet-window')).toBeTruthy();
     expect(queryAllByHostType('BottomSheet')).toHaveLength(0);
+    expect(queryAllByHostType('ZSPresentationAnchorView')).toHaveLength(0);
   });
 
   it('also works without LayoutProvider and retains draft state through folding', async () => {

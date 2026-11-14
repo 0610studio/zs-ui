@@ -92,20 +92,42 @@ describe('OverlayProvider (Android)', () => {
     const sheets = () => queryAllByHostType('ModalBottomSheet');
     const settle = () => act(async () => {});
 
-    it('교체된 시트의 dismiss 이벤트가 새 시트를 닫지 않는다', async () => {
+    it('시트가 열린 채 다시 부르면 새 시트를 위에 겹치고, back 은 맨 위 시트만 닫는다', async () => {
       const first = jest.fn();
       const second = jest.fn();
       await renderProvider();
-      await act(() => overlay.showBottomSheet({ component: <Text>첫 시트</Text>, options: { onClose: first } }));
-      const staleDismiss = sheet().props.onDismissRequest;
-      await act(() => overlay.showBottomSheet({ component: <Text>둘째 시트</Text>, options: { onClose: second } }));
-      await act(() => staleDismiss());
-      expect(screen.getByText('둘째 시트')).toBeTruthy();
+      await act(() => overlay.showBottomSheet({ component: <Text>검색</Text>, options: { snapPoints: ['full'], onClose: first } }));
+      await act(() => overlay.showBottomSheet({ component: <Text>날짜</Text>, options: { onClose: second } }));
+      expect(sheets()).toHaveLength(2);
+      expect(screen.getByText('검색')).toBeTruthy();
+      expect(screen.getByText('날짜')).toBeTruthy();
+      mockSheetHide.mockClear();
+      await act(() => {
+        expect(pressBack()).toBe(true);
+      });
+      expect(mockSheetHide).toHaveBeenCalledTimes(1);
+      await settle();
       expect(sheets()).toHaveLength(1);
-      expect(first).toHaveBeenCalledTimes(1);
-      expect(second).not.toHaveBeenCalled();
-      await act(() => sheet().props.onDismissRequest());
+      expect(screen.getByText('검색')).toBeTruthy();
       expect(second).toHaveBeenCalledTimes(1);
+      expect(first).not.toHaveBeenCalled();
+    });
+
+    it('위 시트의 바깥 탭(onDismissRequest)은 그 시트만 닫고, 닫힌 시트의 늦은 이벤트는 무시한다', async () => {
+      const first = jest.fn();
+      const second = jest.fn();
+      await renderProvider();
+      await act(() => overlay.showBottomSheet({ component: <Text>검색</Text>, options: { onClose: first } }));
+      await act(() => overlay.showBottomSheet({ component: <Text>날짜</Text>, options: { onClose: second } }));
+      const upperDismiss = sheets()[1]!.props.onDismissRequest;
+      await act(() => upperDismiss());
+      await act(() => upperDismiss());
+      expect(sheets()).toHaveLength(1);
+      expect(second).toHaveBeenCalledTimes(1);
+      expect(first).not.toHaveBeenCalled();
+      await act(() => sheet().props.onDismissRequest());
+      expect(first).toHaveBeenCalledTimes(1);
+      expect(sheets()).toHaveLength(0);
     });
 
     it('커뮤니티 시트 대신 surface2 ModalBottomSheet 에 M3 콘텐츠 여백(16)을 둔다', async () => {

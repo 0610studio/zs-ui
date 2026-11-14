@@ -16,7 +16,7 @@ export interface ShowAlertProps {
 
 export interface BottomSheetOptions {
   dismissible?: boolean;
-  /** 닫힘·교체 시 한 번 호출합니다. */
+  /** 닫힐 때 한 번 호출합니다 — 아래 시트·라우트와 함께 닫혀도 불립니다. */
   onClose?: () => void;
   /** Android는 값 대신 개수로 절반·전체 단계를 정합니다. */
   snapPoints?: ('half' | 'full' | `${number}%`)[];
@@ -47,7 +47,9 @@ export interface ShowLoaderProps {
 
 export interface OverlayContextProps {
   showAlert: (props: ShowAlertProps) => void;
+  /** 시트를 띄운다. 열린 시트가 있으면 그 위에 겹친다. */
   showBottomSheet: (props: ShowBottomSheetProps) => void;
+  /** 맨 위 시트를 닫는다. */
   hideBottomSheet: () => void;
   showSnackbar: (props: ShowSnackbarProps) => boolean;
   showLoader: (props?: ShowLoaderProps) => void;
