@@ -1,21 +1,35 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, View, VirtualizedList, useWindowDimensions } from 'react-native';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { I18nManager, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, View, VirtualizedList, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { GestureDetector, GestureHandlerRootView, usePanGesture } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FullWindowOverlay } from 'react-native-screens';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useTheme } from '../context/ThemeContext';
+import { NO_DISPLAY_FEATURES } from '../layout/displayFeatures';
+import { createValueStore, LayoutContext } from '../layout/LayoutContext';
 import { springConfig, timingConfig } from '../theme/motion';
 import { RADIUS } from '../theme/radius';
 import type { IOSBottomSheetProps } from './IOSBottomSheet';
 import { Veil } from './veil';
+import { resolveWindowSheetPane } from './windowSheetPane';
 
 const VirtualizedListContext = VirtualizedList.contextType;
+const defaultDisplayFeatures = createValueStore(NO_DISPLAY_FEATURES, Object.is);
 
 /** A sheet in the existing UIWindow, without a UIKit modal changing the bar axis. */
 export default function WindowBottomSheet({ open, snapPoints, dismissible, onClose, children }: IOSBottomSheetProps) {
-  const { height } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  const features = useContext(LayoutContext)?.displayFeatures ?? defaultDisplayFeatures;
+  const { fold } = useSyncExternalStore(features.subscribe, features.get, features.get);
+  const pane = resolveWindowSheetPane(width, fold);
+  // Change only the frame, preserving header/body/footer state as the device folds or unfolds.
+  // Logical margins avoid Fabric's RTL swapping of physical left/right margins.
+  const paneStyle = pane ? {
+    width: pane.width,
+    marginStart: I18nManager.isRTL ? width - pane.left - pane.width : pane.left,
+    marginEnd: I18nManager.isRTL ? pane.left : width - pane.left - pane.width,
+  } : undefined;
   const { top, bottom } = useSafeAreaInsets();
   const { colors } = useTheme();
   const maxHeight = Math.max(1, height - top);
@@ -87,7 +101,7 @@ export default function WindowBottomSheet({ open, snapPoints, dismissible, onClo
               accessibilityViewIsModal
               onAccessibilityEscape={escape}
               onLayout={event => setMeasuredHeight(event.nativeEvent.layout.height)}
-              style={[styles.sheet, { maxHeight, height: targetHeight, paddingBottom: bottom, backgroundColor: colors.surface2 }, motion]}
+              style={[styles.sheet, { maxHeight, height: targetHeight, paddingBottom: bottom, backgroundColor: colors.surface2 }, paneStyle, motion]}
             >
               <View testID="zs-bottom-sheet-handle" style={styles.handleArea}>
                 <View style={[styles.handle, { backgroundColor: colors.surface5 }]} />

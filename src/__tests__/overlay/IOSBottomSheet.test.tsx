@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Dimensions, StyleSheet, Text, TextInput } from 'react-native';
+import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
+import { Dimensions, I18nManager, StyleSheet, Text, TextInput } from 'react-native';
 import { useVerticalBarEdgeIOS } from 'expo-status-bar';
 import * as GestureHandler from 'react-native-gesture-handler';
 import IOSBottomSheet from '../../overlay/IOSBottomSheet';
@@ -9,8 +9,13 @@ import type { WindowObserverProps } from '../../layout/WindowObserver.types';
 import type { MockGesture } from '../__mocks__/react-native-gesture-handler';
 import { getByHostType, queryAllByHostType } from '../utils/hostQueries';
 
+let observe: WindowObserverProps['onObserve'] = () => {};
+
 jest.mock('../../context/ThemeContext', () => require('../utils/theme').mockThemeModule());
-jest.mock('../../layout/WindowObserver', () => ({ __esModule: true, default: ({ children }: WindowObserverProps) => children }));
+jest.mock('../../layout/WindowObserver', () => ({
+  __esModule: true,
+  default: ({ children, onObserve }: WindowObserverProps) => { observe = onObserve; return children; },
+}));
 
 const edge = jest.mocked(useVerticalBarEdgeIOS);
 const pan = jest.spyOn(GestureHandler, 'usePanGesture');
@@ -70,6 +75,66 @@ describe('iOS sheet presentation', () => {
       expect(screen.getByTestId('draft').props.value).toBe('작성 중인 기록');
       expect(StyleSheet.flatten(screen.getByTestId('zs-bottom-sheet-window').props.style)).toMatchObject({ width: '100%' });
     } finally { get.mockRestore(); }
+  });
+
+  it.each([false, true])('keeps the whole sheet outside an occluding hinge and retains its draft when unfolded (RTL %s)', async (rtl) => {
+    edge.mockReturnValue('trailing');
+    const get = jest.spyOn(Dimensions, 'get');
+    get.mockReturnValue({ width: 951, height: 669, scale: 3, fontScale: 1 });
+    const previousRTL = I18nManager.isRTL;
+    I18nManager.isRTL = rtl;
+    const onClose = jest.fn();
+    function Draft() { const [value, setValue] = useState(''); return <TextInput testID="draft" value={value} onChangeText={setValue} />; }
+    const ui = () => <LayoutProvider><IOSBottomSheet open dismissible onClose={onClose}><Text>제목</Text><Draft /><Text>확인</Text></IOSBottomSheet></LayoutProvider>;
+    const observation = {
+      width: 951, height: 669,
+      displayFeatures: [{ type: 'fold', x: 455.5, y: 0, width: 40, height: 669, orientation: 'vertical', active: true, state: 'halfOpened' }],
+    } as const;
+    try {
+      await render(ui());
+      await act(() => observe(observation as any));
+      const sheet = screen.getByTestId('zs-bottom-sheet-window');
+      const frame = StyleSheet.flatten(sheet.props.style);
+      expect(frame).toMatchObject({ width: 455.5, marginStart: rtl ? 495.5 : 0, marginEnd: rtl ? 0 : 495.5 });
+      expect(rtl ? frame.marginEnd : frame.marginStart).toBe(0);
+      expect(within(sheet).getByTestId('zs-bottom-sheet-handle')).toBeTruthy();
+      expect(within(sheet).getByTestId('draft')).toBeTruthy();
+      expect(within(sheet).getByText('제목')).toBeTruthy();
+      expect(within(sheet).getByText('확인')).toBeTruthy();
+      await fireEvent.changeText(screen.getByTestId('draft'), '2021-03-15');
+
+      await act(() => observe({ ...observation, displayFeatures: [] }));
+      edge.mockReturnValue(null);
+      await screen.rerender(ui());
+      expect(StyleSheet.flatten(screen.getByTestId('zs-bottom-sheet-window').props.style)).toMatchObject({ width: '100%' });
+      expect(screen.getByTestId('draft').props.value).toBe('2021-03-15');
+      expect(onClose).not.toHaveBeenCalled();
+
+      await act(() => lastPan().__config.onDeactivate({ translationY: 200, velocityY: 1500 }));
+      await act(() => jest.runOnlyPendingTimers());
+      expect(onClose).toHaveBeenCalledTimes(1);
+    } finally { get.mockRestore(); I18nManager.isRTL = previousRTL; }
+  });
+
+  it.each([false, true])('keeps an asymmetric right pane at the same physical position (RTL %s)', async (rtl) => {
+    edge.mockReturnValue('trailing');
+    const get = jest.spyOn(Dimensions, 'get');
+    get.mockReturnValue({ width: 1000, height: 669, scale: 3, fontScale: 1 });
+    const previousRTL = I18nManager.isRTL;
+    I18nManager.isRTL = rtl;
+    try {
+      await render(<Sheet />);
+      await act(() => observe({
+        width: 1000, height: 669,
+        displayFeatures: [{ type: 'fold', x: 350, y: 0, width: 40, height: 669, orientation: 'vertical', active: true, state: 'halfOpened' }],
+      }));
+      const frame = StyleSheet.flatten(screen.getByTestId('zs-bottom-sheet-window').props.style);
+      const physicalLeft = rtl ? frame.marginEnd : frame.marginStart;
+      expect(physicalLeft).toBe(390);
+      expect(physicalLeft + frame.width).toBe(1000);
+      expect(frame.marginLeft).toBeUndefined();
+      expect(frame.marginRight).toBeUndefined();
+    } finally { get.mockRestore(); I18nManager.isRTL = previousRTL; }
   });
 
   it('closes only after the animation and calls onClose once', async () => {

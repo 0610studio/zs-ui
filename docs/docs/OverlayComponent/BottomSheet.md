@@ -7,6 +7,8 @@
 | iOS | SwiftUI sheet(detent) — 시스템 재질(Liquid Glass), 그래버, 넓은 창에서 시스템 폭 |
 | Android | Compose Material 3 `ModalBottomSheet` — 배경 `surface2`, 막 `backdrop` 32%, 넓은 창에서 최대 640dp 가운데, predictive back |
 
+iPhone Duo 가로 바에서는 막대 방향을 유지하려고 앱 창 안에 시트를 그립니다. 활성 세로 접힘선에 폭이 있으면 손잡이·헤더·본문·하단 영역을 더 넓은 쪽 화면 안에 함께 놓고, 두 쪽 폭이 같으면 왼쪽을 씁니다. 펼치면 원래 전체 폭으로 돌아가며 시트 안 입력은 유지됩니다. 폭이 0인 접힘선과 Android 시스템 시트의 배치는 이 규칙으로 바꾸지 않습니다.
+
 콘텐츠 위에서 누른 채 움직이거나 스크롤해도 시트는 늘어나거나 끌려 내려가지 않습니다. 시트를 끄는 곳은 맨 위 손잡이와 그 아래 [헤더 줄](#헤더--header--headerright)입니다.
 
 | 플랫폼 | 콘텐츠 위 끌기 |
