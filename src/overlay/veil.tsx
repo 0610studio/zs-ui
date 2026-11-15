@@ -32,6 +32,8 @@ const IOS_FULL_BLUR_RADIUS = 30;
 const DIMEZIS_SCALE_FACTOR = 4;
 const RENDER_EFFECT_SIGMA_PER_RADIUS = 0.57735;
 const RENDER_EFFECT_SIGMA_OFFSET = 0.5;
+/** 진행값으로 흐림을 움직일 때의 최소 세기. 0이면 안드로이드 RenderEffect가 null을 돌려 줘 그리기에서 죽는다 */
+const MIN_ANIMATED_INTENSITY = 1;
 
 export interface VeilBlur {
   intensity: number;
@@ -154,7 +156,11 @@ export function Veil({ kind = 'veil', blurTarget, radius = 'none', edge, floatin
   const lifted = floating ?? kind !== 'scrim';
 
   const fadeStyle = useAnimatedStyle(() => ({ opacity: progress ? progress.value : 1 }));
-  const blurProps = useAnimatedProps(() => ({ intensity: progress ? intensity * progress.value : intensity }));
+  // 안드로이드(dimezis RenderEffect)는 흐림 반지름 0을 만들지 못해(RenderEffect.createBlurEffect → 'nativePtr is null') 앱이 죽는다.
+  // 열고 닫는 동안 progress가 0을 지나므로 세기를 1 아래로 내리지 않는다(2026-11-15 갤럭시 S20+ 안드로이드 13에서 확인).
+  const blurProps = useAnimatedProps(() => ({
+    intensity: progress ? Math.max(MIN_ANIMATED_INTENSITY, intensity * progress.value) : intensity,
+  }));
   const fade = progress ? fadeStyle : null;
 
   return (
