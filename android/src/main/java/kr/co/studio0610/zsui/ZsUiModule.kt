@@ -61,6 +61,7 @@ class ZsUiModule : Module() {
       Prop("dark") { view: ZSTabBarView, value: Boolean? -> view.dark = value ?: false }
       Prop("maxFontScale") { view: ZSTabBarView, value: Double? -> view.maxFontScale = value?.toFloat() }
       Prop("floating") { view: ZSTabBarView, value: Boolean? -> view.floating = value ?: false }
+      Prop("containerWidth") { view: ZSTabBarView, value: Double? -> view.containerWidth = value?.toFloat() }
 
       OnViewDidUpdateProps { view: ZSTabBarView -> view.applyProps() }
     }

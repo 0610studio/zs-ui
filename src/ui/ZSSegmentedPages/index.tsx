@@ -40,6 +40,8 @@ function ZSSegmentedPages<T extends string | number = string>({
   const [visited, setVisited] = useState<ReadonlySet<T>>(() => new Set([value]));
   const offset = useSharedValue(0);
   const start = useSharedValue(0);
+  const layoutGeneration = useSharedValue(0);
+  const gestureGeneration = useSharedValue(0);
   const placed = useRef(false);
   // 스와이프가 끝날 때마다 올린다 — 부모가 값을 바꾸지 않으면 지금 페이지 자리로 되돌아간다
   const [settled, setSettled] = useState(0);
@@ -62,6 +64,7 @@ function ZSSegmentedPages<T extends string | number = string>({
   const handleLayout = (event: LayoutChangeEvent) => {
     const next = Math.round(event.nativeEvent.layout.width);
     if (next === width) return;
+    layoutGeneration.value += 1;
     placed.current = false;
     setWidth(next);
   };
@@ -79,9 +82,11 @@ function ZSSegmentedPages<T extends string | number = string>({
     onActivate: () => {
       'worklet';
       start.value = offset.value;
+      gestureGeneration.value = layoutGeneration.value;
     },
     onUpdate: (event) => {
       'worklet';
+      if (gestureGeneration.value !== layoutGeneration.value) return;
       const raw = start.value + event.translationX;
       const min = sign < 0 ? -(count - 1) * width : 0;
       const max = sign < 0 ? 0 : (count - 1) * width;
@@ -90,6 +95,7 @@ function ZSSegmentedPages<T extends string | number = string>({
     },
     onDeactivate: (event) => {
       'worklet';
+      if (gestureGeneration.value !== layoutGeneration.value) return;
       // 마지막 onUpdate 가 손 뗀 위치까지 못 따라온 경우가 있어 끝 이벤트의 이동량으로 판정한다
       const dragged = (start.value + event.translationX - sign * index * width) * sign;
       const flung = Math.abs(event.velocityX) > FLING_VELOCITY;

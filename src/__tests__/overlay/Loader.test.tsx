@@ -36,7 +36,7 @@ describe('Loader', () => {
     expect(styleOf(loader)).toMatchObject({ zIndex: 8999, alignItems: 'center' });
     expect(styleOf(loader).opacity).toBeUndefined();
     expect(fillOf(scrimOf())).toMatchObject({ backgroundColor: withOpacity(colors.backdrop, 0.32), opacity: 0 });
-    expect(queryAllByHostType('BlurView').map((node) => node.props.intensity)).toEqual([0, 0]);
+    expect(queryAllByHostType('BlurView').map((node) => node.props.intensity)).toEqual([1, 1]);
   });
 
   it('iOS 는 창에 직접 붙는 FullWindowOverlay 에 그린다 — 열린 SwiftUI 시트까지 막는다', async () => {

@@ -4,8 +4,10 @@ package kr.co.studio0610.zsui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import androidx.compose.foundation.background
@@ -99,6 +101,7 @@ class ZSTabBarView(context: Context, appContext: AppContext) : ExpoView(context,
   var maxFontScale: Float? = null
 
   var floating: Boolean = false
+  var containerWidth: Float? = null
 
   private var snapshot by mutableStateOf(TabBarState())
   private var imeVisible by mutableStateOf(false)
@@ -106,6 +109,14 @@ class ZSTabBarView(context: Context, appContext: AppContext) : ExpoView(context,
   private val requestedIcons = mutableMapOf<String, String?>()
   private var reportedSize = -1
   private var reportedWidth = -1
+  private var reportedDensity = 0f
+
+  // Yoga에는 알약의 실측 크기가 고정값으로 보고된다. 창만 줄면 알약 자체의
+  // measure spec은 그대로일 수 있으므로, 창의 layout이 끝난 뒤 다시 잰다.
+  private var observedRoot: View? = null
+  private val rootLayoutListener = View.OnLayoutChangeListener { _, l, t, r, b, oldL, oldT, oldR, oldB ->
+    if (r - l != oldR - oldL || b - t != oldB - oldT) requestLayout()
+  }
 
   private val insetsDispatcher = PositionedInsetsDispatcher(this)
 
@@ -403,7 +414,23 @@ class ZSTabBarView(context: Context, appContext: AppContext) : ExpoView(context,
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
+    observedRoot = rootView.also { it.addOnLayoutChangeListener(rootLayoutListener) }
     reportedSize = -1
+    reportedWidth = -1
+    requestLayout()
+  }
+
+  override fun onDetachedFromWindow() {
+    observedRoot?.removeOnLayoutChangeListener(rootLayoutListener)
+    observedRoot = null
+    super.onDetachedFromWindow()
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration?) {
+    super.onConfigurationChanged(newConfig)
+    // 화면 확대·글자 크기가 바뀌어도 같은 px 크기를 새 dp 값으로 보고해야 한다.
+    reportedSize = -1
+    reportedWidth = -1
     requestLayout()
   }
 
@@ -428,8 +455,13 @@ class ZSTabBarView(context: Context, appContext: AppContext) : ExpoView(context,
     if (snapshot.floating && snapshot.mode != MODE_RAIL) {
       val rootWidth = rootView.width.takeIf { it > 0 } ?: resources.displayMetrics.widthPixels
       val rootHeight = rootView.height.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels
-      val margin = (FLOATING_SCREEN_MARGIN.value * resources.displayMetrics.density).toInt()
-      composeView.measure(atMost((rootWidth - 2 * margin).coerceAtLeast(0)), atMost(rootHeight))
+      val density = resources.displayMetrics.density
+      // React Native가 잰 내비게이터 폭을 사용한다. 창보다 좁은 컨테이너나,
+      // 창의 layout보다 먼저 도착한 props도 root 폭으로 한 번 더 제한한다.
+      val containerWidthPx = containerWidth?.takeIf { it.isFinite() && it > 0f }?.let { (it * density).toInt() } ?: rootWidth
+      val availableWidth = minOf(rootWidth, containerWidthPx)
+      val margin = (FLOATING_SCREEN_MARGIN.value * density).toInt()
+      composeView.measure(atMost((availableWidth - 2 * margin).coerceAtLeast(0)), atMost(rootHeight))
       val naturalWidth = composeView.measuredWidth
       val naturalHeight = composeView.measuredHeight
       if (width > 0 && height > 0) composeView.measure(exactly(width), exactly(height))
@@ -453,17 +485,20 @@ class ZSTabBarView(context: Context, appContext: AppContext) : ExpoView(context,
   }
 
   private fun reportFloatingSize(widthPx: Int, heightPx: Int) {
-    if (widthPx == reportedWidth && heightPx == reportedSize) return
+    val density = resources.displayMetrics.density
+    if (widthPx == reportedWidth && heightPx == reportedSize && density == reportedDensity) return
     reportedWidth = widthPx
     reportedSize = heightPx
-    val density = resources.displayMetrics.density.toDouble()
-    shadowNodeProxy.setStyleSize(widthPx / density, heightPx / density)
+    reportedDensity = density
+    shadowNodeProxy.setStyleSize(widthPx / density.toDouble(), heightPx / density.toDouble())
   }
 
   private fun reportSize(px: Int) {
-    if (px == reportedSize) return
+    val density = resources.displayMetrics.density
+    if (px == reportedSize && density == reportedDensity) return
     reportedSize = px
-    val dp = px / resources.displayMetrics.density.toDouble()
+    reportedDensity = density
+    val dp = px / density.toDouble()
     if (snapshot.mode == MODE_RAIL) shadowNodeProxy.setStyleSize(dp, null) else shadowNodeProxy.setStyleSize(null, dp)
   }
 

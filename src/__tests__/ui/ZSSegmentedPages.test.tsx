@@ -68,6 +68,20 @@ describe('ZSSegmentedPages', () => {
     }
   });
 
+  it('접기·펼치기로 폭이 바뀌어도 고른 페이지와 이미 연 페이지 상태를 유지한다', async () => {
+    await render(pages('day'));
+    await act(layout);
+    await screen.rerender(pages('month'));
+    for (const width of [700, 320, 300]) {
+      await fireEvent(screen.getByTestId('pages'), 'layout', { nativeEvent: { layout: { x: 0, y: 0, width, height: 500 } } });
+      await screen.rerender(pages('month'));
+      expect(trackX()).toBe(-2 * width);
+      expect(StyleSheet.flatten(page('month').props.style).width).toBe(width);
+      expect(text('page:day')).toBeTruthy();
+      expect(text('page:month')).toBeTruthy();
+    }
+  });
+
   describe('swipeEnabled', () => {
     let pan: jest.SpyInstance;
     const lastPan = () => (pan.mock.results.at(-1)?.value as MockGesture).__config;
@@ -138,6 +152,35 @@ describe('ZSSegmentedPages', () => {
         config.onDeactivate({ translationX: -WIDTH, velocityX: -900 });
       });
       expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('끌던 도중 접고 펴면 옛 손짓을 버린다 — 원래 폭으로 돌아와도 마지막 이벤트는 무시한다', async () => {
+      const onValueChange = jest.fn();
+      const props = { swipeEnabled: true, onValueChange };
+      await render(pages('week', props));
+      await act(layout);
+      const stale = lastPan();
+      await act(() => {
+        stale.onActivate();
+        stale.onUpdate({ translationX: -100 });
+      });
+      for (const width of [700, WIDTH]) {
+        await fireEvent(screen.getByTestId('pages'), 'layout', { nativeEvent: { layout: { x: 0, y: 0, width, height: 500 } } });
+        await screen.rerender(pages('week', props));
+      }
+      await act(() => {
+        stale.onUpdate({ translationX: -250 });
+        stale.onDeactivate({ translationX: -250, velocityX: -900 });
+      });
+      await screen.rerender(pages('week', props));
+      expect(trackX()).toBe(-WIDTH);
+      expect(onValueChange).not.toHaveBeenCalled();
+      const current = lastPan();
+      await act(() => {
+        current.onActivate();
+        current.onDeactivate({ translationX: -150, velocityX: 0 });
+      });
+      expect(onValueChange).toHaveBeenLastCalledWith('month', 2);
     });
   });
 });

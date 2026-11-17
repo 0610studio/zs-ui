@@ -155,9 +155,9 @@ describe('투명 헤더 상단 여백·바탕 (Android)', () => {
         expect(scrimStyle()).toMatchObject({ position: 'absolute', top: 0, height: 80 });
       });
 
-      it('스크롤 전에는 흐림 intensity·막이 0 이고 스크롤되면 짙어진다 — 뷰 투명도는 쓰지 않는다', async () => {
+      it('스크롤 전에는 흐림 intensity는 안전 하한 1·막은 0 이고 스크롤되면 짙어진다 — 뷰 투명도는 쓰지 않는다', async () => {
         await renderScrim({ blurTarget: target });
-        expect(getByHostType('BlurView').props.intensity).toBe(0);
+        expect(getByHostType('BlurView').props.intensity).toBe(1);
         expect(veilFill()?.opacity).toBe(0);
         expect(scrimStyle().opacity).toBeUndefined();
         await settle({ blurTarget: target, scrolled: true });

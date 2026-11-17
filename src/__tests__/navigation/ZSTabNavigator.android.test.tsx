@@ -60,11 +60,12 @@ jest.mock('react-native', () => {
 });
 
 let mockWidthClass = 'compact';
+let mockWindowWidth = 390;
 let mockHeightClass = 'medium';
 let mockPosture = 'unknown';
 let mockBarAxis = 'vertical';
 jest.mock('../../layout/LayoutContext', () => ({
-  useWindowLayout: () => ({ widthClass: mockWidthClass, heightClass: mockHeightClass }),
+  useWindowLayout: () => ({ width: mockWindowWidth, widthClass: mockWidthClass, heightClass: mockHeightClass }),
   useDevicePosture: () => ({ posture: mockPosture }),
   useBarAxis: () => [mockBarAxis, jest.fn()],
 }));
@@ -130,6 +131,7 @@ describe('ZSTabNavigator Android', () => {
     platform.OS = 'android';
     setTestTheme({ fonts: FONTS, platform: 'android' });
     mockWidthClass = 'compact';
+    mockWindowWidth = 390;
     mockHeightClass = 'medium';
     mockPosture = 'unknown';
     mockBarAxis = 'vertical';
@@ -188,6 +190,32 @@ describe('ZSTabNavigator Android', () => {
     expect(pill.children.map((child: any) => child.type)).toEqual(['View', 'View', 'View', 'ZSTabBarView']);
     await act(() => tabBar().props.onLayout({ nativeEvent: { layout: { x: 0, y: 0, width: 0, height: 0 } } }));
     expect(pill.children.map((child: any) => child.type)).toEqual(['ZSTabBarView']);
+  });
+
+  it('알약 폭은 창 등급과 별도로 실제 탭 컨테이너 폭을 따른다 — 접기·분할창에서도 장면을 유지한다', async () => {
+    mockWindowWidth = 750;
+    mockWidthClass = 'medium';
+    mockBarAxis = 'horizontal';
+    let mounts = 0;
+    function Scene() {
+      React.useEffect(() => { mounts += 1; }, []);
+      return <Text>selected profile</Text>;
+    }
+    const { container, tabBar } = await setup({
+      index: 1,
+      descriptors: { profile: { options: { title: '프로필' }, render: () => <Scene /> } },
+    });
+    const nativeBar = tabBar();
+    const root = nth(queryAllByHostType('View', container), 0);
+    expect(nativeBar.props.containerWidth).toBe(750);
+    const mounted = mounts;
+    for (const width of [700, 320, 650]) {
+      await fireEvent(root, 'layout', { nativeEvent: { layout: { x: 0, y: 0, width, height: 832 } } });
+      expect(tabBar().props).toMatchObject({ mode: 'bar', selectedKey: 'profile', containerWidth: width });
+      expect(tabBar()).toBe(nativeBar);
+      expect(mounts).toBe(mounted);
+      expect(getByHostType('Screen', container).props.activityState).toBe(2);
+    }
   });
 
   describe('알약 바탕 — 막(veil): 블러 + 막 + 얇은 테두리 + 떠 있는 그림자', () => {

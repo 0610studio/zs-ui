@@ -8,6 +8,7 @@ import {
   View,
   type HostInstance,
   type ImageSourcePropType,
+  type LayoutChangeEvent,
   type NativeSyntheticEvent,
   type ViewProps,
 } from 'react-native';
@@ -53,6 +54,7 @@ interface NativeTabBarProps extends ViewProps {
   dark?: boolean;
   maxFontScale?: number;
   floating?: boolean;
+  containerWidth?: number;
   onTabPress: (event: NativeSyntheticEvent<{ key: string }>) => void;
 }
 
@@ -159,7 +161,7 @@ function useIconSources(icons: (ZSTabIcon | undefined)[]) {
 function ZSTabsContent({ state, descriptors, actions, emitter, android, unselectedIconColor, unselectedLabelColor }: TabsContentProps) {
   unstable_useReconcileTabHistory();
   const { colors: roles, fonts, mode: colorMode, maxFontSizeMultiplier } = useTheme();
-  const { widthClass, heightClass } = useWindowLayout();
+  const { width: windowWidth, widthClass, heightClass } = useWindowLayout();
   const { posture } = useDevicePosture();
   const [barAxis] = useBarAxis();
   const mode = resolveNavigationMode(android?.navigationMode, widthClass, heightClass, posture, barAxis);
@@ -173,7 +175,10 @@ function ZSTabsContent({ state, descriptors, actions, emitter, android, unselect
   const headerHeight = useHeaderInset();
   const rootRef = useRef<HostInstance>(null);
   const [rootTop, setRootTop] = useState<number | null>(null);
-  const handleRootLayout = useCallback(() => {
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  const handleRootLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextWidth = event.nativeEvent.layout.width;
+    setContainerWidth((prev) => prev === nextWidth ? prev : nextWidth);
     rootRef.current?.measureInWindow?.((_x: number, y: number) => setRootTop((prev) => (prev === y ? prev : y)));
   }, []);
   const railOffset = mode === 'rail' && headerHeight > 0 && (rootTop === null || rootTop < 1) ? headerHeight : 0;
@@ -257,6 +262,7 @@ function ZSTabsContent({ state, descriptors, actions, emitter, android, unselect
       dark={colorMode === 'dark'}
       maxFontScale={maxFontSizeMultiplier}
       floating={floating}
+      containerWidth={containerWidth ?? windowWidth}
       onLayout={(event) => {
         const { width, height } = event.nativeEvent.layout;
         setRailWidth(mode === 'rail' ? width : 0);

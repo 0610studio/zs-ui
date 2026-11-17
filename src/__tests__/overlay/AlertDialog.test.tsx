@@ -102,9 +102,9 @@ describe('AlertDialog', () => {
   });
 
   describe('뒤 막(scrim) — 흐림 10 + 검정 32%(다크 52%)', () => {
-    it('iOS 는 뒤를 흐리고 검정 32% 를 깐다 — 들어올 때 흐림·막이 투명도 0 에서 함께 짙어진다(뷰 투명도는 쓰지 않는다)', async () => {
+    it('iOS 는 뒤를 흐리고 검정 32% 를 깐다 — 흐림은 안전 하한 1·막은 투명도 0 에서 짙어진다(뷰 투명도는 쓰지 않는다)', async () => {
       await renderAlert();
-      expect(getByHostType('BlurView').props.intensity).toBe(0);
+      expect(getByHostType('BlurView').props.intensity).toBe(1);
       expect(scrimFill()).toMatchObject({ backgroundColor: withOpacity(colors.backdrop, 0.32), opacity: 0 });
       expect(styleOf(scrim()).opacity).toBeUndefined();
     });

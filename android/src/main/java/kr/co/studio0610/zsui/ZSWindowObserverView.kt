@@ -65,7 +65,10 @@ class ZSWindowObserverView(context: Context, appContext: AppContext) : ExpoView(
     setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec))
   }
 
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) = Unit
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    // 폭이 같아도 루트 위치가 바뀌면 접힘선의 로컬 좌표가 달라진다.
+    if (changed) emitIfChanged()
+  }
 
   private fun emitIfChanged() {
     val activity = appContext.currentActivity ?: return
