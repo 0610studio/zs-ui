@@ -52,6 +52,8 @@ jest.mock('react-native-safe-area-context', () => {
 });
 
 const mockScrollTo = jest.fn();
+// 테스트마다 ScrollView ref 에 getNativeScrollRef·getInnerViewRef 를 덧붙일 때 쓴다(기본은 없음 → onScroll 값으로 대신한다)
+let mockScrollRefs: Record<string, unknown> = {};
 
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
@@ -62,7 +64,7 @@ jest.mock('react-native', () => {
       get: jest.fn(() => ({ height: 800, width: 400 })),
     },
     ScrollView: React.forwardRef((props: any, ref: any) => {
-      React.useImperativeHandle(ref, () => ({ scrollTo: mockScrollTo }));
+      React.useImperativeHandle(ref, () => ({ scrollTo: mockScrollTo, ...mockScrollRefs }));
       return React.createElement('ScrollView', props, props.children);
     }),
   };
@@ -358,7 +360,7 @@ describe('ZSScreen', () => {
       mockKeyboardHeight = 300;
       const tree = await render(<ZSScreen><Text>Body</Text></ZSScreen>);
       await layoutScrollView(tree);
-      expect(contentStyleOf(tree)).toMatchObject({ paddingBottom: 300, minHeight: 666 });
+      expect(contentStyleOf(tree)).toMatchObject({ paddingBottom: 300 + 30, minHeight: 666 });
     });
 
     it('당겨서 새로고침은 그대로 — 튕김을 켜고 alwaysBounceVertical 은 건드리지 않는다(ScrollView 기본 true)', async () => {
@@ -424,10 +426,13 @@ describe('ZSScreen', () => {
   });
 
   describe('키보드 하단 여백', () => {
-    it('스크롤 콘텐츠 하단에 useKeyboard 가 알려준 키보드 높이만큼 여백을 둔다', async () => {
+    it('스크롤 콘텐츠 하단에 키보드 높이 + 포커스 여유(keyboardScrollExtraOffset)만큼 여백을 둔다 — 가린 만큼 올려도 끝을 넘지 않는다', async () => {
       mockKeyboardHeight = 300;
       const tree = await render(<ZSScreen><Text>Body</Text></ZSScreen>);
-      expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingBottom).toBe(300);
+      expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingBottom).toBe(300 + 30);
+      await tree.unmount();
+      const extra = await render(<ZSScreen keyboardScrollExtraOffset={120}><Text>Body</Text></ZSScreen>);
+      expect(StyleSheet.flatten(getByHostType('ScrollView', extra.container).props.contentContainerStyle).paddingBottom).toBe(300 + 120);
     });
 
     it('키보드가 없으면 여백이 없다', async () => {
@@ -593,11 +598,48 @@ describe('ZSScreen', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       mockScrollTo.mockClear();
+      mockScrollRefs = {};
     });
 
     afterEach(() => {
       jest.useRealTimers();
       jest.restoreAllMocks();
+    });
+
+    it('iOS 자동 인셋 아래(정지 offset 이 -인셋)서도 지금 offset 에 가린 만큼만 더한다 — 목표가 음수여도 그대로 넘긴다', async () => {
+      const tree = await render(<ZSScreen keyboardScrollExtraOffset={20}><Text>Body</Text></ZSScreen>);
+      await fireEvent.scroll(getByHostType('ScrollView', tree.container), { nativeEvent: { contentOffset: { x: 0, y: -116 } } });
+      focusInput({ y: 500, height: 40 });
+      await showKeyboard(520);
+      expect(mockScrollTo).toHaveBeenCalledWith({ y: -116 + 40, animated: true });
+    });
+
+    it('지금 offset 은 스크롤 뷰 윗변과 콘텐츠 윗변의 차이로 잰다 — onScroll 을 한 번도 받지 않았어도 맞다', async () => {
+      mockScrollRefs = {
+        getNativeScrollRef: () => ({ measureInWindow: (cb: (...args: number[]) => void) => cb(0, 100, 400, 700) }),
+        getInnerViewRef: () => ({ measureInWindow: (cb: (...args: number[]) => void) => cb(0, 216, 400, 2000) }),
+      };
+      await render(<ZSScreen keyboardScrollExtraOffset={20}><Text>Body</Text></ZSScreen>);
+      focusInput({ y: 500, height: 40 });
+      await showKeyboard(520);
+      expect(mockScrollTo).toHaveBeenCalledWith({ y: (100 - 216) + 40, animated: true });
+    });
+
+    it('scrollToOverflowEnabled 는 iOS 자동 인셋(edges 생략)에서만 켠다 — 네이티브 scrollTo 의 0 하한을 풀어 -인셋 ~ 0 목표를 허용한다', async () => {
+      const platform = Platform as { OS: string };
+      const auto = await render(<ZSScreen><Text>Body</Text></ZSScreen>);
+      expect(getByHostType('ScrollView', auto.container).props.scrollToOverflowEnabled).toBe(true);
+      await auto.unmount();
+      const manual = await render(<ZSScreen edges={['top']}><Text>Body</Text></ZSScreen>);
+      expect(getByHostType('ScrollView', manual.container).props.scrollToOverflowEnabled).toBeUndefined();
+      await manual.unmount();
+      platform.OS = 'android';
+      try {
+        const android = await render(<ZSScreen><Text>Body</Text></ZSScreen>);
+        expect(getByHostType('ScrollView', android.container).props.scrollToOverflowEnabled).toBeUndefined();
+      } finally {
+        platform.OS = 'ios';
+      }
     });
 
     it('가려진 입력은 가려진 만큼(+여유)만 올린다', async () => {
@@ -855,10 +897,10 @@ describe('ZSScreen 떠 있는 탭 바 아래 (Android 탭 기본)', () => {
     expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingBottom).toBe(32 + 84);
   });
 
-  it('키보드가 열리면 키보드 높이가 대신한다 — 키보드가 탭 바를 덮는다', async () => {
+  it('키보드가 열리면 키보드 높이(+포커스 여유)가 대신한다 — 키보드가 탭 바를 덮는다', async () => {
     mockKeyboardHeight = 300;
     const tree = await renderInTab(<ZSScreen><Text>Test</Text></ZSScreen>);
-    expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingBottom).toBe(300);
+    expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingBottom).toBe(300 + 30);
   });
 
   it('고정 본문은 루트가 아래 inset 을 받고 탭 바만큼 더 비킨다', async () => {

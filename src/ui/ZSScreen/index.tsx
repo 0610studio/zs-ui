@@ -142,18 +142,38 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
 
   useImperativeHandle(forwardedRef, () => scrollViewRef.current as ScrollViewInstance, [scrollEnabled]);
 
+  // 지금 contentOffset 을 화면 좌표로 잰다(스크롤 뷰 윗변 - 콘텐츠 윗변). iOS 가 헤더·safe area 를 자동 인셋으로 넣으면
+  // 정지 offset 이 0 이 아니라 -인셋이라, onScroll 로 받아 둔 값은 확인용으로만 쓴다
+  const measureScrollOffset = useCallback((done: (offset: number) => void) => {
+    const scrollView = scrollViewRef.current;
+    const outer = scrollView?.getNativeScrollRef?.();
+    const inner = scrollView?.getInnerViewRef?.();
+    if (!outer?.measureInWindow || !inner?.measureInWindow) {
+      done(positionRef.current);
+      return;
+    }
+    outer.measureInWindow((_x, outerY) => {
+      inner.measureInWindow((_innerX, innerY) => done(outerY - innerY));
+    });
+  }, []);
+
   const scrollFocusedInputIntoView = useCallback((keyboardTop: number) => {
     const input = TextInput.State.currentlyFocusedInput();
     const content = scrollContentRef.current;
     if (!input || !content) return;
+    // 이 컨테이너 밖(시트·모달) 입력이면 measureLayout 이 실패한다
     input.measureLayout(content, () => {
       input.measureInWindow((_x, y, _width, height) => {
         const overlap = y + height + keyboardScrollExtraOffset - keyboardTop;
         if (overlap <= 0) return;
-        scrollViewRef.current?.scrollTo({ y: positionRef.current + overlap, animated: true });
+        // 목표는 '지금 offset + 가린 만큼'. 본문 아래 여백이 키보드 높이 + 여유라 끝을 넘지 않고,
+        // iOS 자동 인셋 아래서는 목표가 음수(-인셋 ~ 0)일 수 있어 scrollToOverflowEnabled 로 네이티브 0 하한을 푼다
+        measureScrollOffset((offset) => {
+          scrollViewRef.current?.scrollTo({ y: offset + overlap, animated: true });
+        });
       });
     }, () => {});
-  }, [keyboardScrollExtraOffset]);
+  }, [keyboardScrollExtraOffset, measureScrollOffset]);
 
   const keyboardTopRef = useRef<number | null>(null);
 
@@ -222,10 +242,12 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
     setScrollViewHeight((prev) => (prev === height ? prev : height));
   }, []);
 
+  // 키보드가 떠 있는 동안은 키보드 높이에 포커스 여유까지 더해, 가린 만큼 올려도 스크롤 끝을 넘지 않게 한다
+  const keyboardPadding = keyboardHeight > 0 ? keyboardHeight + keyboardScrollExtraOffset : 0;
   const scrollContentStyle = useMemo(() => [
     styles.scrollContainerStyle,
-    { paddingBottom: keyboardHeight + bottomInset },
-  ], [keyboardHeight, bottomInset]);
+    { paddingBottom: keyboardPadding + bottomInset },
+  ], [keyboardPadding, bottomInset]);
 
   const columnStyle = useMemo(() => (
     contentMaxWidth === undefined ? undefined : { width: '100%' as const, maxWidth: contentMaxWidth, alignSelf: 'center' as const }
@@ -297,6 +319,8 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
         ref={scrollViewRef}
         style={styles.w100}
         contentInsetAdjustmentBehavior={isIOSAutoInset ? 'automatic' : 'never'}
+        // 자동 인셋 아래서 정지 offset 은 -인셋. 네이티브 scrollTo 는 contentInset(0) 기준 0 아래를 막으므로 푼다
+        scrollToOverflowEnabled={isIOSAutoInset || undefined}
         onLayout={isIOSAutoInset ? handleScrollViewLayout : undefined}
         showsVerticalScrollIndicator={showsVerticalScrollIndicator}
         contentContainerStyle={[

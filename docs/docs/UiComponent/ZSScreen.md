@@ -104,6 +104,8 @@ function EditScreen() {
 
 `scrollToFocusedInput`(기본 켬)이면 포커스한 입력이 키보드에 가릴 때만 가린 만큼 스크롤합니다. 탭·다음 키·`ref.focus()` 모두 같은 규칙입니다. Android에서 키보드가 떠 있는 동안 포커스를 옮길 때는 [ZSTextField](./ZSTextField)만 따라 스크롤합니다. 이 컨테이너 안의 입력만 대상이고, 시트·모달 위 입력은 스크롤하지 않습니다.
 
+얼마나 올릴지는 화면 좌표로 잽니다 — 지금 스크롤 위치(스크롤 뷰 윗변과 콘텐츠 윗변의 차이)에 가린 만큼을 더합니다. iOS 네이티브 헤더 아래(`edges` 생략)에서는 UIKit 자동 인셋 때문에 맨 위 정지 위치가 `0`이 아니라 `-인셋`이라, 목표가 `-인셋`과 `0` 사이일 수 있습니다. React Native의 `scrollTo`는 이 범위를 `0`으로 잘라 헤더·상태 표시줄 높이만큼 더 올려 버리므로, 이 경우에만 `scrollToOverflowEnabled`를 켭니다. 키보드가 떠 있는 동안 본문 아래 여백은 키보드 높이에 `keyboardScrollExtraOffset`을 더한 값이라, 가린 만큼 올려도 스크롤 끝을 넘지 않습니다.
+
 ```tsx
 <ZSScreen keyboardScrollExtraOffset={50}>
   <ZSTextField label="이름" value={name} onChangeText={setName} />
