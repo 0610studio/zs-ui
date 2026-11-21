@@ -43,6 +43,7 @@ beforeEach(() => {
 });
 
 let mockInsetTop = 0;
+let mockFrameY = 0;
 let mockInsetBottom = 0;
 let mockInsetRight = 0;
 
@@ -52,6 +53,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaView: ({ children, ...props }: any) => React.createElement('SafeAreaView', props, children),
     SafeAreaProvider: ({ children, ...props }: any) => React.createElement('SafeAreaProvider', props, children),
     useSafeAreaInsets: () => ({ top: mockInsetTop, bottom: mockInsetBottom, left: 0, right: mockInsetRight }),
+    useSafeAreaFrame: () => ({ x: 0, y: mockFrameY, width: 750, height: 832 }),
   };
 });
 
@@ -347,6 +349,7 @@ describe('투명 헤더 아래 (Android, useStackTheme 기본)', () => {
   afterEach(() => {
     platform.OS = 'ios';
     mockInsetTop = 0;
+    mockFrameY = 0;
   });
 
   it('고정 pane 은 위 inset 대신 헤더 높이(상태바 포함)만큼 비킨다', async () => {
@@ -464,6 +467,7 @@ describe('투명 헤더 아래 (Android, useStackTheme 기본)', () => {
   });
 
   it('불투명 헤더면(레이아웃이 헤더 아래에서 시작해 상단 inset 0) 그대로 위 inset 을 받는다', async () => {
+    mockFrameY = 80;
     mockInsetTop = 0;
     const tree = await renderUnderHeader(<ZSPaneLayout {...PANES} />, ANDROID_OPEN);
     expect(paneOf(tree, 'zs-pane-primary').props.edges).toContain('top');

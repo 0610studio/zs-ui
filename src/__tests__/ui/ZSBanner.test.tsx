@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { StyleSheet, Text } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 import ZSBanner from '../../ui/ZSBanner';
 import { getPaletteColors } from '../../theme/color';
 import { getTestTheme, setTestTheme } from '../utils/theme';
@@ -63,6 +63,34 @@ describe('ZSBanner', () => {
     expect(StyleSheet.flatten(iconSlot.props.style)).toMatchObject({ justifyContent: 'center', minHeight: 40 });
     await layout([{ height: 40 }]);
     expect(barStyle().alignItems).toBe('center');
+  });
+
+  it('fits Android message height to the rendered lines after text and font size changes', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    const tree = await render(<ZSBanner message="Short" />);
+    const measure = (text: string, heights: number[]) =>
+      fireEvent(screen.getByText(text), 'textLayout', { nativeEvent: { lines: heights.map(height => ({ height })) } });
+    const maxHeight = (text: string) => StyleSheet.flatten(screen.getByText(text).props.style).maxHeight;
+
+    expect(maxHeight('Short')).toBeUndefined();
+    await measure('Short', [21.5]);
+    expect(maxHeight('Short')).toBe(22);
+    await tree.rerender(<ZSBanner message="A longer message that wraps" />);
+    await measure('A longer message that wraps', [21.5, 23]);
+    expect(maxHeight('A longer message that wraps')).toBe(45);
+    await measure('A longer message that wraps', [30, 31, 32]);
+    expect(maxHeight('A longer message that wraps')).toBe(93);
+    await measure('A longer message that wraps', [30, 31]);
+    expect(maxHeight('A longer message that wraps')).toBe(61);
+  });
+
+  it.each(['android', 'ios'] as const)('measures the title separately from the message on %s', async (platform) => {
+    jest.replaceProperty(Platform, 'OS', platform);
+    await render(<ZSBanner title="Title" message="Several lines of detail" />);
+    const title = screen.getByText('Title');
+    await fireEvent(title, 'textLayout', { nativeEvent: { lines: [{ height: 20 }] } });
+    expect(StyleSheet.flatten(title.props.style).maxHeight).toBe(platform === 'android' ? 20 : undefined);
+    expect(StyleSheet.flatten(screen.getByText('Several lines of detail').props.style).maxHeight).toBeUndefined();
   });
 
   it.each(['info', 'success', 'warning', 'error'] as const)('tonal %s 는 상태 색 container 에 onContainer 글자, 아이콘은 상태 main 색 면에 기호를 container 색으로 오려 낸다', async (status) => {

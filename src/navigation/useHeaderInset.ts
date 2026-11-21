@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderHeightContext } from 'expo-router/react-navigation';
 
 export function useHeaderInset(): number {
@@ -11,5 +11,9 @@ export function useHeaderInset(): number {
 export function useHeaderOverlap(enabled = true): number {
   const headerHeight = useHeaderInset();
   const { top } = useSafeAreaInsets();
-  return enabled && headerHeight > 0 && top > 0 ? headerHeight : 0;
+  const { y } = useSafeAreaFrame();
+  // In split screen the status bar inset can be zero. An overlaid screen still starts
+  // at the window top, while an opaque header has already moved its container down.
+  const overlapsHeader = top > 0 || y < 1;
+  return enabled && headerHeight > 0 && overlapsHeader ? headerHeight : 0;
 }

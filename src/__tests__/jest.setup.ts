@@ -9,6 +9,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaProvider: ({ children }: { children?: ReactNode }) => children,
     SafeAreaView: ({ children }: { children?: ReactNode }) => children,
     useSafeAreaInsets: () => inset,
+    useSafeAreaFrame: () => ({ x: 0, y: 0, width: 400, height: 800 }),
     initialWindowMetrics: { frame: { x: 0, y: 0, width: 0, height: 0 }, insets: inset },
   };
 });

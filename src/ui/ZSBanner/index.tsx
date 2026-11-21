@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, type StyleProp, type TextLayoutEvent, type ViewStyle } from 'react-native';
+import { Platform, StyleSheet, View, type StyleProp, type TextLayoutEvent, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTheme } from '../../context/ThemeContext';
 import { enterTransition, exitTransition, layoutTransition } from '../../overlay/transitions';
@@ -73,14 +73,20 @@ function ZSBanner({
     if (visible) setInternalVisible(true);
   }, [visible]);
 
-  const [firstLine, setFirstLine] = useState<{ height: number; multiline: boolean } | null>(null);
+  const [firstLine, setFirstLine] = useState<{ height: number; multiline: boolean; maxHeight?: number } | null>(null);
   const handleFirstTextLayout = useCallback((event: TextLayoutEvent) => {
     const { lines } = event.nativeEvent;
     const height = lines[0]?.height;
     if (!height) return;
     const multiline = lines.length > 1;
-    setFirstLine((prev) => (prev && Math.abs(prev.height - height) < 0.5 && prev.multiline === multiline ? prev : { height, multiline }));
+    // Android can reserve an extra line when text exactly fits the available width.
+    const maxHeight = Platform.OS === 'android' ? Math.ceil(lines.reduce((sum, line) => sum + line.height, 0)) : undefined;
+    setFirstLine((prev) => {
+      if (prev && Math.abs(prev.height - height) < 0.5 && prev.multiline === multiline && prev.maxHeight === maxHeight) return prev;
+      return { height, multiline, maxHeight };
+    });
   }, []);
+  const measuredTextStyle = firstLine?.maxHeight === undefined ? undefined : { maxHeight: firstLine.maxHeight };
 
   const tone =
     status === 'neutral'
@@ -122,11 +128,17 @@ function ZSBanner({
 
         <View style={[styles.content, fullWidth && styles.contentFill]}>
           {title != null ? (
-            <ZSText variant="body2" emphasized color={ink} onTextLayout={handleFirstTextLayout}>
+            <ZSText variant="body2" emphasized color={ink} onTextLayout={handleFirstTextLayout} style={measuredTextStyle}>
               {title}
             </ZSText>
           ) : null}
-          <ZSText variant="body2" emphasized={title == null} color={ink} onTextLayout={title != null ? undefined : handleFirstTextLayout}>
+          <ZSText
+            variant="body2"
+            emphasized={title == null}
+            color={ink}
+            onTextLayout={title == null ? handleFirstTextLayout : undefined}
+            style={title == null ? measuredTextStyle : undefined}
+          >
             {message}
           </ZSText>
           {action ? (

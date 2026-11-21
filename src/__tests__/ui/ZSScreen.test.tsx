@@ -40,6 +40,7 @@ jest.mock('../../model/useKeyboard', () => ({
 }));
 
 let mockInsetTop = 0;
+let mockFrameY = 0;
 let mockInsetBottom = 0;
 
 jest.mock('react-native-safe-area-context', () => {
@@ -48,6 +49,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaView: ({ children, ...props }: any) => React.createElement('SafeAreaView', props, children),
     SafeAreaProvider: ({ children, ...props }: any) => React.createElement('SafeAreaProvider', props, children),
     useSafeAreaInsets: () => ({ top: mockInsetTop, bottom: mockInsetBottom, left: 0, right: 0 }),
+    useSafeAreaFrame: () => ({ x: 0, y: mockFrameY, width: 400, height: 800 }),
   };
 });
 
@@ -724,6 +726,7 @@ describe('ZSScreen', () => {
     afterEach(() => {
       platform.OS = 'ios';
       mockInsetTop = 0;
+      mockFrameY = 0;
     });
 
     it('iOS: topComponent 는 safe area(내비게이션 바 포함)만큼 비킨다 — 고정 영역은 UIKit 스크롤 자동 조정을 받지 못한다', async () => {
@@ -755,6 +758,11 @@ describe('ZSScreen', () => {
         mockInsetTop = 24;
         const tree = await renderUnderHeader(<ZSScreen><Text>Test</Text></ZSScreen>);
         expect(rootOf(tree).props.edges).toEqual(['left', 'right', 'bottom']);
+        expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingTop).toBe(80);
+      });
+
+      it('reserves the transparent header when a split-screen window has no status bar inset', async () => {
+        const tree = await renderUnderHeader(<ZSScreen><Text>Split screen</Text></ZSScreen>);
         expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingTop).toBe(80);
       });
 
@@ -802,10 +810,17 @@ describe('ZSScreen', () => {
       });
 
       it('불투명 헤더면(컨테이너가 헤더 아래에서 시작해 상단 inset 0) 아무것도 더하지 않는다', async () => {
+        mockFrameY = 79.5;
         const tree = await renderUnderHeader(<ZSScreen><Text>Test</Text></ZSScreen>);
         expect(rootOf(tree).props.edges).toEqual(['left', 'right', 'top', 'bottom']);
         expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingTop).toBeUndefined();
         expect(scrimOf(tree)).toBeUndefined();
+      });
+
+      it('avoids double padding when the reported header height still includes the old status bar inset', async () => {
+        mockFrameY = 56;
+        const tree = await renderUnderHeader(<ZSScreen><Text>Split screen</Text></ZSScreen>);
+        expect(StyleSheet.flatten(getByHostType('ScrollView', tree.container).props.contentContainerStyle).paddingTop).toBeUndefined();
       });
 
       it('Stack 화면 밖이면 상태바 inset 만 받는다', async () => {
@@ -855,11 +870,13 @@ describe('ZSScreen', () => {
         });
 
         it('불투명 헤더거나 topComponent 가 비키면 내리지 않는다', async () => {
+          mockFrameY = 80;
           const control = <RefreshControl refreshing={false} />;
           const opaque = await renderUnderHeader(<ZSScreen refreshControl={control}><Text>Test</Text></ZSScreen>);
           expect(refreshControlOf(opaque)).toBe(control);
           await opaque.unmount();
 
+          mockFrameY = 0;
           mockInsetTop = 24;
           const withTop = await renderUnderHeader(<ZSScreen refreshControl={control} topComponent={<Text>Top</Text>}><Text>Test</Text></ZSScreen>);
           expect(refreshControlOf(withTop)).toBe(control);
