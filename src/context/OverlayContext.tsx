@@ -21,6 +21,8 @@ import { VeilScreen, VeilTargetContext } from '../overlay/veil';
 export interface OverlayProviderProps {
   children: ReactNode;
   snackbarPosition?: SnackbarPosition;
+  /** 바텀시트 최대 폭(pt·dp). 창이 더 넓으면 이 폭으로 가운데에 띄운다. 생략하면 플랫폼 기본 폭 */
+  bottomSheetMaxWidth?: number;
 }
 
 const SHEET_PADDING = Platform.OS === 'android' ? 16 : 20;
@@ -57,7 +59,7 @@ const topSheetOf = (sheets: SheetEntry[]) => {
 // 닫히는 시트가 없으면 기다리던 시트를 띄운다
 const settle = (sheets: SheetEntry[]) => (sheets.some((sheet) => sheet.state === 'closing') ? sheets : sheets.map((sheet) => (sheet.state === 'pending' ? { ...sheet, state: 'open' as const } : sheet)));
 
-export function OverlayProvider({ children, snackbarPosition = 'top' }: OverlayProviderProps) {
+export function OverlayProvider({ children, snackbarPosition = 'top', bottomSheetMaxWidth }: OverlayProviderProps) {
   const { accessibilityLabels } = useTheme();
   const screenTarget = useRef<HostInstance>(null);
   const [alertQueue, setAlertQueue] = useState<QueuedAlert[]>([]);
@@ -156,7 +158,7 @@ export function OverlayProvider({ children, snackbarPosition = 'top' }: OverlayP
               <BottomBarStoreContext.Provider value={bottomBar}>{children}</BottomBarStoreContext.Provider>
             </ScreenCoverContext.Provider>
           </VeilScreen>
-          {sheets.map((sheet) => (sheet.state === 'pending' ? null : <SheetLayer key={sheet.id} sheet={sheet} onClose={handleSheetClose} />))}
+          {sheets.map((sheet) => (sheet.state === 'pending' ? null : <SheetLayer key={sheet.id} sheet={sheet} maxWidth={bottomSheetMaxWidth} onClose={handleSheetClose} />))}
           {currentAlert ? <AlertDialog key={currentAlert.id} alert={currentAlert.props} onClose={closeAlert} /> : null}
           <SnackbarHost items={snackbars} onHide={hideSnackbar} position={snackbarPosition} bottomBar={bottomBar} />
           <Loader visible={loader !== null} accessibilityLabel={loader?.accessibilityLabel ?? accessibilityLabels.loading} />
@@ -167,7 +169,7 @@ export function OverlayProvider({ children, snackbarPosition = 'top' }: OverlayP
 }
 
 /** 시트 하나 — 쌓인 순서대로 그려 뒤에 그린 시트가 위에 뜬다 */
-function SheetLayer({ sheet: { id, props: sheet, state }, onClose }: { sheet: SheetEntry; onClose: (id: number) => void }) {
+function SheetLayer({ sheet: { id, props: sheet, state }, maxWidth, onClose }: { sheet: SheetEntry; maxWidth?: number; onClose: (id: number) => void }) {
   const { colors } = useTheme();
   const open = state === 'open';
   const dismissible = sheet.options?.dismissible ?? true;
@@ -201,14 +203,14 @@ function SheetLayer({ sheet: { id, props: sheet, state }, onClose }: { sheet: Sh
 
   if (Platform.OS === 'android') {
     return (
-      <AndroidBottomSheet open={open} snapPoints={snapPoints} dismissible={dismissible} containerColor={colors.surface2} onClose={close}>
+      <AndroidBottomSheet open={open} snapPoints={snapPoints} dismissible={dismissible} containerColor={colors.surface2} maxWidth={maxWidth} onClose={close}>
         {content}
       </AndroidBottomSheet>
     );
   }
   if (Platform.OS === 'ios') {
     return (
-      <IOSBottomSheet open={open} snapPoints={snapPoints} dismissible={dismissible} onClose={close}>
+      <IOSBottomSheet open={open} snapPoints={snapPoints} dismissible={dismissible} maxWidth={maxWidth} onClose={close}>
         {content}
       </IOSBottomSheet>
     );

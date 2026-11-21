@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { ZSButton, ZSMenu, ZSText, ZSTextField, useDisplayFeatures, useOverlay, useWindowLayout } from '@0610studio/zs-ui';
+import { ZSButton, ZSMenu, ZSSegmentedControl, ZSText, ZSTextField, useDisplayFeatures, useOverlay, useWindowLayout } from '@0610studio/zs-ui';
+import { useSheetWidthSetting } from '../../src/model/SheetWidthSetting';
 import Section from '../../src/ui/kit/Section';
 import LabValueRow from '../../src/ui/lab/LabValueRow';
 import { EndMarker, LabPage, labStyles } from '../../src/ui/lab/FoldableLab';
 
 export default function LabOverlayPlacement() {
-  const { widthClass, readableMaxWidth } = useWindowLayout();
+  const { width, widthClass, readableMaxWidth } = useWindowLayout();
+  const { sheetMaxWidth, setSheetMaxWidth } = useSheetWidthSetting();
   const { fold } = useDisplayFeatures();
   const { showAlert, showSnackbar, showBottomSheet, hideBottomSheet } = useOverlay();
   const [closed, setClosed] = useState(0);
@@ -20,12 +22,22 @@ export default function LabOverlayPlacement() {
   return (
     <LabPage title="시트와 알림">
       <Section label="useWindowLayout() · useDisplayFeatures()" gap={0}>
+        <LabValueRow label="width" value={String(Math.round(width))} testID="lab-overlay-width" />
         <LabValueRow label="widthClass" value={widthClass} testID="lab-overlay-width-class" />
         <LabValueRow label="readableMaxWidth" value={String(Math.round(readableMaxWidth))} testID="lab-overlay-readable" />
         <LabValueRow label="fold" value={fold ? `${fold.orientation} x ${Math.round(fold.rect.x * 10) / 10} · ${fold.active ? 'active' : 'flat'}` : 'none'} testID="lab-overlay-fold" isLast />
       </Section>
       <ZSText variant="body2" color="textSecondary">시트를 띄운 채로 접기·펴기·회전을 반복하세요. 입력값이 유지되고 닫힘 횟수는 실제로 닫을 때 한 번만 증가해야 합니다.</ZSText>
       <ZSText variant="subtitle2" testID="lab-overlay-close-count">{`시트 닫힘 ${closed}회`}</ZSText>
+      <Section label="OverlayProvider bottomSheetMaxWidth" gap={12}>
+        <ZSSegmentedControl
+          options={[{ label: '기본', value: 0 }, { label: '500', value: 500 }]}
+          value={sheetMaxWidth ?? 0}
+          onValueChange={(value) => setSheetMaxWidth(value === 0 ? undefined : value)}
+          accessibilityLabel="시트 최대 폭"
+          testID="lab-overlay-sheet-max-width"
+        />
+      </Section>
       <Section label="시스템 오버레이" gap={12}>
         <ZSButton title="Alert" fullWidth testID="lab-overlay-alert" onPress={() => showAlert({ title: '접힘선 확인', message: '폴더블에서도 화면 가운데에 뜬다.', confirm: { label: '닫기' } })} />
         <ZSButton title="BottomSheet" variant="tonal" fullWidth testID="lab-overlay-sheet" onPress={() => openSheet(false)} />

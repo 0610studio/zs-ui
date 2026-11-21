@@ -40,6 +40,16 @@ describe('OverlayProvider (Android)', () => {
     (Platform as { OS: string }).OS = 'ios';
   });
 
+  it('bottomSheetMaxWidth 를 시트 폭으로 넘긴다', async () => {
+    await render(
+      <OverlayProvider bottomSheetMaxWidth={500}>
+        <Capture />
+      </OverlayProvider>,
+    );
+    await act(() => overlay.showBottomSheet({ component: <Text>시트</Text> }));
+    expect(sheet().props.modifiers).toEqual([{ $type: 'width', args: [500] }]);
+  });
+
   it('아무것도 없을 때는 back 을 가로채지 않는다', async () => {
     await renderProvider();
     expect(dialogs()).toHaveLength(0);

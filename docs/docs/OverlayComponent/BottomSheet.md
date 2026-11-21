@@ -4,8 +4,10 @@
 
 | 플랫폼 | 구현 |
 |--------|------|
-| iOS | SwiftUI sheet(detent) — 시스템 재질(Liquid Glass), 그래버, 넓은 창에서 시스템 폭 |
-| Android | Compose Material 3 `ModalBottomSheet` — 배경 `surface2`, 막 `backdrop` 32%, 넓은 창에서 최대 640dp 가운데, predictive back |
+| iOS | SwiftUI sheet(detent) — 시스템 재질(Liquid Glass), 그래버, 넓은 창에서 가운데 폼 시트(기본은 시스템 폭) |
+| Android | Compose Material 3 `ModalBottomSheet` — 배경 `surface2`, 막 `backdrop` 32%, 넓은 창에서 가운데(기본 최대 640dp), predictive back |
+
+넓은 창의 시트 폭은 [`bottomSheetMaxWidth`](#폭--bottomsheetmaxwidth)로 정합니다.
 
 iPhone Duo 가로 바에서는 막대 방향을 유지하려고 앱 창 안에 시트를 그립니다. 활성 세로 접힘선에 폭이 있으면 손잡이·헤더·본문·하단 영역을 더 넓은 쪽 화면 안에 함께 놓고, 두 쪽 폭이 같으면 왼쪽을 씁니다. 펼치면 원래 전체 폭으로 돌아가며 시트 안 입력은 유지됩니다. 폭이 0인 접힘선과 Android 시스템 시트의 배치는 이 규칙으로 바꾸지 않습니다.
 
@@ -102,6 +104,26 @@ showBottomSheet({
 |--------|------|
 | iOS | 준 값마다 detent가 생기고 첫 번째 값으로 열립니다. 사용자가 끌어 단계를 옮깁니다 |
 | Android | M3 시트는 절반·전체 두 단계뿐이라 값은 쓰지 않고 개수만 봅니다. 두 개 이상이면 절반으로 열려 전체까지 끌 수 있고, 하나면 전체 높이로 엽니다. 전체 높이는 상태 표시줄 아래에서 멈춥니다 |
+
+## 폭 — `bottomSheetMaxWidth`
+
+태블릿·펼친 폴더블처럼 넓은 창의 시트 폭을 [`OverlayProvider`](./start#overlayprovider)에서 앱 전체에 한 번 정합니다.
+
+```tsx
+<OverlayProvider bottomSheetMaxWidth={500}>
+  {children}
+</OverlayProvider>
+```
+
+| 플랫폼 | 창이 이 폭보다 넓을 때 | 좁을 때 |
+|--------|----------------------|--------|
+| iOS | 이 폭의 폼 시트를 창 가운데에 띄웁니다(iPad·펼친 iPhone Duo) | 시스템 폭 그대로입니다 |
+| Android | 이 폭으로 화면 아래 가운데에 띄웁니다 | 창 폭 그대로입니다 |
+| iPhone Duo 가로 바 | 이 폭으로 화면 아래 가운데에 띄웁니다. 활성 세로 접힘선이 있으면 더 넓은 쪽 화면 안 가운데에 놓습니다 | 창(또는 그 쪽 화면) 폭입니다 |
+
+- 생략하면 iOS는 시스템 폭(iPad 폼 시트 약 580pt), Android는 Material 3 기본(최대 640dp)입니다.
+- iOS 시트 폭은 `presentationSizing`(iOS 18 이상)으로 맞춥니다. 그보다 낮은 iOS에서는 시트 폭은 시스템이 정하고 콘텐츠만 이 폭 안에 둡니다.
+- 시트를 띄운 채 창 폭이 바뀌면(Android 접기·펴기, Duo 가로 바) 시트는 그대로 남고 폭만 바뀝니다.
 
 ## 하단 고정 — `bottomComponent`
 

@@ -34,6 +34,7 @@ function NotifyButton() {
 |------|------|---------|------|
 | `children` | `ReactNode` | Required | 앱 화면 |
 | `snackbarPosition` | `'top' \| 'bottom'` | `'top'` | 스낵바 자리 — `top`은 기기 상태바 바로 아래(상단 바를 덮는다), `bottom`은 M3 자리(아래 고정 영역·탭 바·키보드 위). [자리와 개수](./Snackbar#자리와-개수) |
+| `bottomSheetMaxWidth` | `number` | `undefined` | 바텀시트 최대 폭(iOS pt · Android dp). 창이 더 넓으면 이 폭으로 가운데에 띄웁니다. 생략하면 플랫폼 기본 폭입니다. [폭](./BottomSheet#폭--bottomsheetmaxwidth) |
 
 - `OverlayProvider` 밖에서 `useOverlay()`를 부르면 `useOverlay must be used within an OverlayProvider` 에러를 던집니다.
 - Alert는 한 번에 하나씩 보이고, 이어서 부른 Alert는 [차례로](./Alert) 뜹니다. 시트가 열린 채 `showBottomSheet`를 다시 부르면 [새 시트가 위에 겹쳐 뜹니다](./BottomSheet#겹치기--시트-위-시트). 스낵바는 [최대 3개까지 쌓입니다](./Snackbar#자리와-개수).

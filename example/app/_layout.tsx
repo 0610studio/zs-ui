@@ -3,6 +3,7 @@ import { LayoutProvider, ThemeProvider, OverlayProvider, useNavigationTheme, use
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { BarAxisSettingProvider, useBarAxisSetting } from '../src/model/BarAxisSetting';
+import { SheetWidthSettingProvider, useSheetWidthSetting } from '../src/model/SheetWidthSetting';
 import { StatusBarSlotProvider } from '../src/model/StatusBarSlot';
 
 const fonts = {
@@ -39,7 +40,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <BarAxisSettingProvider>
-        <AppProviders />
+        <SheetWidthSettingProvider>
+          <AppProviders />
+        </SheetWidthSettingProvider>
       </BarAxisSettingProvider>
     </SafeAreaProvider>
   );
@@ -47,11 +50,12 @@ export default function RootLayout() {
 
 function AppProviders() {
   const { barAxis } = useBarAxisSetting();
+  const { sheetMaxWidth } = useSheetWidthSetting();
 
   return (
     <LayoutProvider barAxis={barAxis}>
       <ThemeProvider colors={{ primary: '#ffa20d', secondary: '#0f766e' }} fonts={fonts} fontAssets={fontAssets} accessibilityLabels={accessibilityLabels}>
-        <OverlayProvider>
+        <OverlayProvider bottomSheetMaxWidth={sheetMaxWidth}>
           <StatusBarSlotProvider>
             <ThemedStack />
           </StatusBarSlotProvider>

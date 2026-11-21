@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, VirtualizedList, useWindowDimensions } from 'react-native';
 import { ModalBottomSheet, RNHostView, type ModalBottomSheetRef } from '@expo/ui/jetpack-compose';
+import { width as widthModifier } from '@expo/ui/jetpack-compose/modifiers';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeHost } from '../native/NativeHost';
 import { useComposeColors } from '../native/composeColors';
@@ -11,6 +12,8 @@ export interface AndroidBottomSheetProps {
   snapPoints?: (string | number)[];
   dismissible: boolean;
   containerColor?: string;
+  /** dp. M3 centers the sheet; a narrower window keeps the window width */
+  maxWidth?: number;
   onClose: () => void;
   children: ReactNode;
 }
@@ -25,7 +28,7 @@ function ScrollContextReset({ children }: { children: ReactNode }) {
   );
 }
 
-export default function AndroidBottomSheet({ open, snapPoints, dismissible, containerColor, onClose, children }: AndroidBottomSheetProps) {
+export default function AndroidBottomSheet({ open, snapPoints, dismissible, containerColor, maxWidth, onClose, children }: AndroidBottomSheetProps) {
   const { width, height } = useWindowDimensions();
   const { top, bottom } = useSafeAreaInsets();
   const composeColors = useComposeColors();
@@ -75,6 +78,8 @@ export default function AndroidBottomSheet({ open, snapPoints, dismissible, cont
   const multipleSnapPoints = (snapPoints?.length ?? 0) > 1;
   const fitToContents = !snapPoints || snapPoints.length === 0;
   const sheetGeneration = generation;
+  // Applied before M3's own widthIn(max = 640.dp): the preferred width still yields to a narrower window
+  const modifiers = maxWidth !== undefined && Number.isFinite(maxWidth) && maxWidth > 0 ? [widthModifier(maxWidth)] : undefined;
 
   return (
     <NativeHost style={[styles.anchor, { width }]} pointerEvents="none">
@@ -86,6 +91,7 @@ export default function AndroidBottomSheet({ open, snapPoints, dismissible, cont
         sheetGesturesEnabled={dismissible}
         showDragHandle={false}
         containerColor={containerColor}
+        modifiers={modifiers}
         contentColor={composeColors.bottomSheet.contentColor}
         scrimColor={composeColors.bottomSheet.scrimColor}
         properties={{ shouldDismissOnBackPress: dismissible, shouldDismissOnClickOutside: dismissible }}

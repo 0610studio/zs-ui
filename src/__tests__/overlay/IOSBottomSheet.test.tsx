@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useState } from 'react';
 import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
 import { Dimensions, I18nManager, StyleSheet, Text, TextInput } from 'react-native';
@@ -44,6 +45,76 @@ describe('iOS sheet presentation', () => {
     expect(getByHostType('BottomSheet').parent).toBe(anchor);
     await act(() => anchor.props.onDetach());
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  describe('bottomSheetMaxWidth on the system sheet', () => {
+    const sized = (props: Partial<React.ComponentProps<typeof IOSBottomSheet>> = {}) => (
+      <IOSBottomSheet open dismissible maxWidth={500} onClose={jest.fn()} {...props}><Text>내용</Text></IOSBottomSheet>
+    );
+    const modifierTypes = () => getByHostType('Group').props.modifiers.map((m: { $type: string }) => m.$type);
+
+    it('gives the SwiftUI sheet an ideal width that presentationSizing fits horizontally', async () => {
+      await render(sized());
+      const sheet = getByHostType('BottomSheet');
+      expect(sheet.props).toMatchObject({ isPresented: true, fitToContents: true });
+      expect(sheet.parent).toBe(getByHostType('Host'));
+      expect(getByHostType('Host').parent).toBe(getByHostType('ZSPresentationAnchorView'));
+      expect(getByHostType('Group').props.modifiers).toEqual(expect.arrayContaining([
+        { $type: 'frame', args: [{ idealWidth: 500, maxWidth: 500 }] },
+        { $type: 'presentationSizing', args: ['automatic', { fitted: { horizontal: true, vertical: true } }] },
+        { $type: 'interactiveDismissDisabled', args: [false] },
+      ]));
+      expect(modifierTypes()).not.toContain('presentationDetents');
+      expect(getByHostType('RNHostView').props).toMatchObject({ matchContents: { vertical: true }, boundedByHost: true });
+      expect(screen.getByText('내용')).toBeTruthy();
+    });
+
+    it('starts RN layout at the smaller of the max width and the window', async () => {
+      await render(sized({ maxWidth: 2000 }));
+      expect(StyleSheet.flatten(getByHostType('Host').props.style)).toMatchObject({ position: 'absolute', width: 390 });
+    });
+
+    it('keeps snap points as detents and fits only the width', async () => {
+      await render(sized({ snapPoints: ['50%', '100%'], dismissible: false }));
+      expect(getByHostType('BottomSheet').props.fitToContents).toBe(false);
+      expect(getByHostType('Group').props.modifiers).toEqual(expect.arrayContaining([
+        { $type: 'presentationSizing', args: ['automatic', { fitted: { horizontal: true, vertical: false } }] },
+        { $type: 'presentationDetents', args: [[{ fraction: 0.5 }, { fraction: 1 }]] },
+        { $type: 'interactiveDismissDisabled', args: [true] },
+      ]));
+      expect(getByHostType('RNHostView').props).toMatchObject({ matchContents: false, boundedByHost: false });
+    });
+
+    it('closes after the native dismissal, once', async () => {
+      const onClose = jest.fn();
+      await render(sized({ onClose }));
+      await screen.rerender(sized({ onClose, open: false }));
+      expect(getByHostType('BottomSheet').props.isPresented).toBe(false);
+      expect(onClose).not.toHaveBeenCalled();
+      await act(() => getByHostType('BottomSheet').props.onDismiss());
+      await act(() => getByHostType('BottomSheet').props.onDismiss());
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('reports a swipe-down as closed and can be opened again', async () => {
+      const onClose = jest.fn();
+      await render(sized({ onClose }));
+      await act(() => getByHostType('BottomSheet').props.onIsPresentedChange(false));
+      expect(getByHostType('BottomSheet').props.isPresented).toBe(false);
+      await act(() => getByHostType('BottomSheet').props.onDismiss());
+      expect(onClose).toHaveBeenCalledTimes(1);
+      await screen.rerender(sized({ onClose, open: false }));
+      await screen.rerender(sized({ onClose }));
+      expect(getByHostType('BottomSheet').props.isPresented).toBe(true);
+      await act(() => getByHostType('BottomSheet').props.onDismiss());
+      expect(onClose).toHaveBeenCalledTimes(2);
+    });
+
+    it.each([0, -1, Number.NaN])('keeps the community sheet for maxWidth %s', async (maxWidth) => {
+      await render(sized({ maxWidth }));
+      expect(getByHostType('BottomSheet').props.index).toBe(0);
+      expect(queryAllByHostType('Group')).toHaveLength(0);
+    });
   });
 
   it('keeps native sheets when Duo explicitly uses vertical bars', async () => {
@@ -135,6 +206,28 @@ describe('iOS sheet presentation', () => {
       expect(frame.marginLeft).toBeUndefined();
       expect(frame.marginRight).toBeUndefined();
     } finally { get.mockRestore(); I18nManager.isRTL = previousRTL; }
+  });
+
+  it.each([false, true])('narrows the window sheet to maxWidth and centers it (RTL %s)', async (rtl) => {
+    edge.mockReturnValue('trailing');
+    const get = jest.spyOn(Dimensions, 'get');
+    get.mockReturnValue({ width: 951, height: 669, scale: 3, fontScale: 1 });
+    const previousRTL = I18nManager.isRTL;
+    I18nManager.isRTL = rtl;
+    try {
+      await render(<IOSBottomSheet open dismissible maxWidth={500} onClose={jest.fn()}><Text>내용</Text></IOSBottomSheet>);
+      expect(StyleSheet.flatten(screen.getByTestId('zs-bottom-sheet-window').props.style)).toMatchObject({ width: 500, marginStart: 225.5, marginEnd: 225.5 });
+    } finally { get.mockRestore(); I18nManager.isRTL = previousRTL; }
+  });
+
+  it('keeps the full window width when the window is not wider than maxWidth', async () => {
+    edge.mockReturnValue('trailing');
+    const get = jest.spyOn(Dimensions, 'get');
+    get.mockReturnValue({ width: 466, height: 678, scale: 3, fontScale: 1 });
+    try {
+      await render(<IOSBottomSheet open dismissible maxWidth={500} onClose={jest.fn()}><Text>내용</Text></IOSBottomSheet>);
+      expect(StyleSheet.flatten(screen.getByTestId('zs-bottom-sheet-window').props.style)).toMatchObject({ width: '100%' });
+    } finally { get.mockRestore(); }
   });
 
   it('closes only after the animation and calls onClose once', async () => {

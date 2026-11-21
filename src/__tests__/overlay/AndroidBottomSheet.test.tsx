@@ -55,6 +55,16 @@ describe('AndroidBottomSheet (M3 ModalBottomSheet)', () => {
     expect(screen.getByText('내용')).toBeTruthy();
   });
 
+  it('maxWidth 를 주면 시트에 그 폭을 준다 — M3 가 가운데 놓고, 더 좁은 창에서는 창 폭이 된다', async () => {
+    await renderSheet({ maxWidth: 500 });
+    expect(sheet().props.modifiers).toEqual([{ $type: 'width', args: [500] }]);
+  });
+
+  it.each([undefined, 0, -1, Number.NaN])('maxWidth %s 면 폭 수정자 없이 M3 기본 폭이다', async (maxWidth) => {
+    await renderSheet({ maxWidth });
+    expect(sheet().props.modifiers).toBeUndefined();
+  });
+
   it('dismissible=false 면 끌기·뒤로가기·바깥 탭으로 닫히지 않는다', async () => {
     await renderSheet({ dismissible: false });
     expect(sheet().props).toMatchObject({

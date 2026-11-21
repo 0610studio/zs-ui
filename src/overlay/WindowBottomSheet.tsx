@@ -12,17 +12,17 @@ import { springConfig, timingConfig } from '../theme/motion';
 import { RADIUS } from '../theme/radius';
 import type { IOSBottomSheetProps } from './IOSBottomSheet';
 import { Veil } from './veil';
-import { resolveWindowSheetPane } from './windowSheetPane';
+import { resolveWindowSheetFrame } from './windowSheetPane';
 
 const VirtualizedListContext = VirtualizedList.contextType;
 const defaultDisplayFeatures = createValueStore(NO_DISPLAY_FEATURES, Object.is);
 
 /** A sheet in the existing UIWindow, without a UIKit modal changing the bar axis. */
-export default function WindowBottomSheet({ open, snapPoints, dismissible, onClose, children }: IOSBottomSheetProps) {
+export default function WindowBottomSheet({ open, snapPoints, dismissible, maxWidth, onClose, children }: IOSBottomSheetProps) {
   const { width, height } = useWindowDimensions();
   const features = useContext(LayoutContext)?.displayFeatures ?? defaultDisplayFeatures;
   const { fold } = useSyncExternalStore(features.subscribe, features.get, features.get);
-  const pane = resolveWindowSheetPane(width, fold);
+  const pane = resolveWindowSheetFrame(width, fold, maxWidth);
   // Change only the frame, preserving header/body/footer state as the device folds or unfolds.
   // Logical margins avoid Fabric's RTL swapping of physical left/right margins.
   const paneStyle = pane ? {

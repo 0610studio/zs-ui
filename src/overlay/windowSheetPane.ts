@@ -14,3 +14,14 @@ export function resolveWindowSheetPane(width: number, fold: DisplayFeature | nul
   if (before <= 0 && after <= 0) return null;
   return before >= after ? { left: 0, width: before } : { left: end, width: after };
 }
+
+/**
+ * Horizontal frame of a window sheet: the larger pane beside an occluding fold, narrowed to `maxWidth`
+ * and centered in it. Null keeps the full window width.
+ */
+export function resolveWindowSheetFrame(width: number, fold: DisplayFeature | null, maxWidth?: number): { left: number; width: number } | null {
+  const pane = resolveWindowSheetPane(width, fold);
+  const region = pane ?? (Number.isFinite(width) && width > 0 ? { left: 0, width } : null);
+  if (!region || maxWidth === undefined || !Number.isFinite(maxWidth) || maxWidth <= 0 || maxWidth >= region.width) return pane;
+  return { left: region.left + (region.width - maxWidth) / 2, width: maxWidth };
+}
