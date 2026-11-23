@@ -108,6 +108,7 @@ function ZSPaneLayout({
         tabletop={tabletop}
         surfaceColor={surfaceColor}
         windowClass={layout.widthClass}
+        largeScreen={layout.largeScreen}
         windowHeightClass={layout.heightClass}
         fold={toLocalFold(fold, frame)}
         width={containerWidth}
@@ -132,6 +133,7 @@ type PaneRowProps = Pick<ZSPaneLayoutProps, 'primary' | 'secondary' | 'divider' 
   surfaceColor: string;
   windowClass: WindowSizeClassName;
   windowHeightClass: WindowSizeClassName;
+  largeScreen: boolean;
   fold: LocalFold | null;
   width: number;
   height: number;
@@ -154,6 +156,7 @@ function PaneRow({
   surfaceColor,
   windowClass,
   windowHeightClass,
+  largeScreen,
   fold,
   width,
   height,
@@ -176,6 +179,7 @@ function PaneRow({
     height: measuredHeight,
     tabletop,
     insets: { start: rtl ? insets.right : insets.left, end: rtl ? insets.left : insets.right },
+    largeScreen,
   });
   const separator = renderSeparator(arrangement, divider, dividerColor);
 

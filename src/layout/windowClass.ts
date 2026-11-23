@@ -4,6 +4,35 @@ export const WIDTH_BREAKPOINTS = { medium: 600, expanded: 840 } as const;
 export const HEIGHT_BREAKPOINTS = { medium: 480, expanded: 900 } as const;
 export const MATERIAL_READABLE_MAX_WIDTH = 640;
 
+/** Android 큰 화면 — 창의 짧은 변이 이 dp 이상(Android sw600dp 기준, Jetpack WindowSizeClass medium 하한) */
+export const LARGE_SCREEN_MIN_DP = 600;
+/** 이 비율(긴 변/짧은 변) 이상이면 바형 폰 모양 — 19.5:9 ≈ 2.17. 태블릿 16:10 = 1.6, 16:9 = 1.78 */
+export const PHONE_MIN_ASPECT = 1.9;
+/** 접힘선이 있고 이 비율 이하면 책처럼 펼친 폴더블(Fold 약 1.1, Pixel Fold 1.2). 위아래로 여는 Flip(약 2.3)은 아님 */
+export const BOOK_FOLDABLE_MAX_ASPECT = 1.6;
+
+const aspectOf = (width: number, height: number) => Math.max(width, height) / Math.max(1, Math.min(width, height));
+
+/**
+ * 큰 화면 창인지. 밀도(화면 확대)·글자 크기와 상관없이 기기 모양으로 정한다.
+ * - iOS: 가로 크기 등급 regular(iPad 전체 화면·펼친 iPhone Duo). iPhone 세로는 compact.
+ * - Android: 기기 고유 밀도로 잰 창의 짧은 변 ≥ 600dp(네이티브가 stableWidth/Height 를 줄 때).
+ *   주지 않는 이전 네이티브에서는 ① 현재 짧은 변 ≥ 600dp 이고 폰 비율이 아님(태블릿) ② 접힘선이 있고 책 비율(펼친 폴더블).
+ */
+export function resolveLargeScreen(observation: WindowObservation, os: 'ios' | 'android'): boolean {
+  const { width, height } = observation;
+  if (os === 'ios') {
+    return observation.horizontalSizeClass ? observation.horizontalSizeClass === 'regular' : classify(width, WIDTH_BREAKPOINTS) !== 'compact';
+  }
+  if (observation.stableWidth && observation.stableHeight) {
+    return Math.min(observation.stableWidth, observation.stableHeight) >= LARGE_SCREEN_MIN_DP;
+  }
+  const aspect = aspectOf(width, height);
+  const tablet = Math.min(width, height) >= LARGE_SCREEN_MIN_DP && aspect < PHONE_MIN_ASPECT;
+  const bookFoldable = (observation.displayFeatures ?? []).some((feature) => feature.type === 'fold') && aspect <= BOOK_FOLDABLE_MAX_ASPECT;
+  return tablet || bookFoldable;
+}
+
 export function resolveReadableMaxWidth(config: ReadableMaxWidth, observation: WindowObservation): number {
   if (typeof config === 'number') return config;
   return observation.readableWidth && observation.readableWidth > 0 ? observation.readableWidth : MATERIAL_READABLE_MAX_WIDTH;
@@ -55,6 +84,7 @@ export function resolveWindowLayout(
     orientation: width > height ? 'landscape' : 'portrait',
     measured,
     readableMaxWidth: resolveReadableMaxWidth(readable, observation),
+    largeScreen: resolveLargeScreen(observation, os),
   };
 
   if (os === 'ios' && horizontalSizeClass && verticalSizeClass) {
@@ -94,6 +124,7 @@ export function isSameWindowLayout(a: WindowLayout, b: WindowLayout): boolean {
     a.heightClass === b.heightClass &&
     a.measured === b.measured &&
     a.readableMaxWidth === b.readableMaxWidth &&
+    a.largeScreen === b.largeScreen &&
     JSON.stringify(a.platform) === JSON.stringify(b.platform)
   );
 }

@@ -1,4 +1,4 @@
-import { classifyHeight, classifyWidth, isSameWindowLayout, narrowerClass, resolveContentMaxWidth, resolveWindowLayout } from '../../layout/windowClass';
+import { classifyHeight, classifyWidth, isSameWindowLayout, narrowerClass, resolveContentMaxWidth, resolveLargeScreen, resolveWindowLayout } from '../../layout/windowClass';
 
 describe('resolveWindowLayout', () => {
   describe('iOS — compact 경계는 size class trait', () => {
@@ -156,5 +156,53 @@ describe('classifyHeight', () => {
     expect(classifyHeight(480)).toBe('medium');
     expect(classifyHeight(899)).toBe('medium');
     expect(classifyHeight(900)).toBe('expanded');
+  });
+});
+
+describe('resolveLargeScreen — 큰 화면 창(밀도·글자 크기와 무관)', () => {
+  const fold = (orientation: 'vertical' | 'horizontal', x: number, y: number, width: number, height: number) =>
+    ({ type: 'fold' as const, x, y, width, height, orientation, state: 'flat' as const, active: false });
+
+  it('iOS 는 가로 크기 등급 regular 만 큰 화면 — iPad·펼친 Duo 는 true, iPhone 은 false', () => {
+    expect(resolveLargeScreen({ width: 834, height: 1194, horizontalSizeClass: 'regular', verticalSizeClass: 'regular' }, 'ios')).toBe(true);
+    expect(resolveLargeScreen({ width: 951, height: 760, horizontalSizeClass: 'regular', verticalSizeClass: 'regular' }, 'ios')).toBe(true);
+    expect(resolveLargeScreen({ width: 440, height: 956, horizontalSizeClass: 'compact', verticalSizeClass: 'regular' }, 'ios')).toBe(false);
+  });
+
+  it('Android 네이티브가 기기 고유 밀도 크기를 주면 그 짧은 변 600dp 로만 정한다', () => {
+    // 화면 확대한 Fold7(현재 599dp, 고유 밀도 420 기준 749.7dp) — 큰 화면
+    expect(resolveLargeScreen({ width: 598.6, height: 664, stableWidth: 749.7, stableHeight: 832 }, 'android')).toBe(true);
+    // 화면을 극단적으로 축소한 바형 폰(현재 664dp 이지만 고유 밀도 기준 411dp) — 큰 화면 아님
+    expect(resolveLargeScreen({ width: 664, height: 1491, stableWidth: 411.4, stableHeight: 923.4 }, 'android')).toBe(false);
+    // 화면 확대한 8인치 태블릿(현재 560dp, 고유 기준 800dp)
+    expect(resolveLargeScreen({ width: 560, height: 896, stableWidth: 800, stableHeight: 1280 }, 'android')).toBe(true);
+    // 바형 폰 가로(고유 기준 짧은 변 411)
+    expect(resolveLargeScreen({ width: 914, height: 411, stableWidth: 914, stableHeight: 411 }, 'android')).toBe(false);
+  });
+
+  it('고유 밀도 크기가 없는 이전 네이티브: 책처럼 펼친 폴더블(접힘선 + 비율 ≤ 1.6)은 화면 확대해도 큰 화면', () => {
+    expect(resolveLargeScreen({ width: 598.6, height: 664, displayFeatures: [fold('vertical', 299.3, 0, 0, 664)] }, 'android')).toBe(true);
+    expect(resolveLargeScreen({ width: 749.7, height: 832, displayFeatures: [fold('vertical', 374.9, 0, 0, 832)] }, 'android')).toBe(true);
+    // 같은 폭이라도 접힘선이 없으면(바형 폰 분할 창 등) 아님
+    expect(resolveLargeScreen({ width: 598.6, height: 664 }, 'android')).toBe(false);
+    // 위아래로 여는 Flip(가로 접힘선, 비율 약 2.3)은 아님
+    expect(resolveLargeScreen({ width: 411.4, height: 960, displayFeatures: [fold('horizontal', 0, 480, 411.4, 0)] }, 'android')).toBe(false);
+  });
+
+  it('고유 밀도 크기가 없는 이전 네이티브: 태블릿(짧은 변 ≥ 600, 폰 비율 아님)은 큰 화면, 바형 폰은 어떤 밀도에서도 아님', () => {
+    expect(resolveLargeScreen({ width: 800, height: 1280 }, 'android')).toBe(true);
+    expect(resolveLargeScreen({ width: 600, height: 1067 }, 'android')).toBe(true);
+    expect(resolveLargeScreen({ width: 1280, height: 800 }, 'android')).toBe(true);
+    // 극단적으로 축소한 바형 폰(짧은 변 664, 비율 2.24)·바형 폰 가로
+    expect(resolveLargeScreen({ width: 664, height: 1491 }, 'android')).toBe(false);
+    expect(resolveLargeScreen({ width: 914, height: 411 }, 'android')).toBe(false);
+  });
+
+  it('resolveWindowLayout 이 largeScreen 을 채우고 같은지 비교에 넣는다', () => {
+    const fold7 = resolveWindowLayout({ width: 598.6, height: 664, widthClass: 'compact', heightClass: 'medium', displayFeatures: [fold('vertical', 299.3, 0, 0, 664)] }, 'android', true);
+    expect(fold7).toMatchObject({ widthClass: 'compact', largeScreen: true });
+    const phone = resolveWindowLayout({ width: 598.6, height: 664, widthClass: 'compact', heightClass: 'medium' }, 'android', true);
+    expect(phone.largeScreen).toBe(false);
+    expect(isSameWindowLayout(fold7, phone)).toBe(false);
   });
 });

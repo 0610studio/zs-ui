@@ -64,15 +64,25 @@ describe('resolvePaneArrangement', () => {
     expect(resolvePaneArrangement({ widthClass: 'medium', width: 660, primaryFraction: 0.5, dividerWidth: 0, insets: { start: 44, end: 44 } })).toEqual({ mode: 'single' });
   });
 
-  it('화면 확대한 폴더블 내부 화면(Fold7 520dpi 약 605, 간격 24)도 medium 이면 두 칸이다 — 각 약 290', () => {
-    expect(resolvePaneArrangement({ widthClass: 'medium', width: 605, primaryFraction: 0.5, dividerWidth: 0, spacing: 24 })).toEqual({
+  it('큰 화면 창(largeScreen)은 폭 등급과 상관없이 나눈다 — 화면 확대한 Fold7(526dpi, w599dp)은 각 287', () => {
+    expect(resolvePaneArrangement({ widthClass: 'compact', width: 598, primaryFraction: 0.5, dividerWidth: 0, spacing: 24, largeScreen: true })).toEqual({
       mode: 'split',
       basis: 'fraction',
-      primaryWidth: 291,
-      secondaryWidth: 290,
+      primaryWidth: 287,
+      secondaryWidth: 287,
       gap: 24,
     });
-    expect(resolvePaneArrangement({ widthClass: 'medium', width: 599, primaryFraction: 0.5, dividerWidth: 0, spacing: 24 })).toEqual({ mode: 'single' });
+  });
+
+  it('큰 화면 창은 pane 을 300 까지 확보하고, 모자라면 240 까지 줄인 뒤 그보다 좁으면 1단', () => {
+    expect(resolvePaneArrangement({ widthClass: 'expanded', width: 1000, primaryFraction: 0.4, dividerWidth: 0, largeScreen: true })).toMatchObject({ primaryWidth: 400, secondaryWidth: 600 });
+    expect(resolvePaneArrangement({ widthClass: 'medium', width: 700, primaryFraction: 0.2, dividerWidth: 0, largeScreen: true })).toMatchObject({ primaryWidth: 300 });
+    expect(resolvePaneArrangement({ widthClass: 'compact', width: 504, primaryFraction: 0.5, dividerWidth: 0, spacing: 24, largeScreen: true })).toMatchObject({ mode: 'split', primaryWidth: 240, secondaryWidth: 240 });
+    expect(resolvePaneArrangement({ widthClass: 'compact', width: 503, primaryFraction: 0.5, dividerWidth: 0, spacing: 24, largeScreen: true })).toEqual({ mode: 'single' });
+  });
+
+  it('큰 화면 창이 아니면(바형 폰) 폭이 넓어도 1단 — 접힘선 경계 분할만 예외', () => {
+    expect(resolvePaneArrangement({ widthClass: 'expanded', width: 900, primaryFraction: 0.5, dividerWidth: 0, spacing: 24, largeScreen: false })).toEqual({ mode: 'single' });
   });
 
   it('접힘선 경계 분할은 inset 과 무관하게 화면 위치 그대로다', () => {

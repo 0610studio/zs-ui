@@ -3,6 +3,7 @@ package kr.co.studio0610.zsui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
+import android.util.DisplayMetrics
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -74,6 +75,8 @@ class ZSWindowObserverView(context: Context, appContext: AppContext) : ExpoView(
     val activity = appContext.currentActivity ?: return
     val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(activity)
     val sizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(metrics)
+    // 기기 고유 밀도 — 사용자가 화면 크기(확대)를 바꿔도 변하지 않는다. 큰 화면(태블릿·펼친 폴더블) 판단에 쓴다
+    val stableScale = DisplayMetrics.DENSITY_DEVICE_STABLE / DisplayMetrics.DENSITY_DEFAULT.toDouble()
 
     val payload = mapOf(
       "width" to metrics.widthDp.toDouble(),
@@ -82,6 +85,8 @@ class ZSWindowObserverView(context: Context, appContext: AppContext) : ExpoView(
       "heightClass" to heightClassName(sizeClass),
       "minWidthDp" to sizeClass.minWidthDp,
       "minHeightDp" to sizeClass.minHeightDp,
+      "stableWidth" to metrics.bounds.width() / stableScale,
+      "stableHeight" to metrics.bounds.height() / stableScale,
       "displayFeatures" to foldingFeatures.map { foldPayload(it, metrics.density) },
     )
     if (payload == lastPayload) return

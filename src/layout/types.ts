@@ -19,6 +19,11 @@ export interface WindowLayout {
   orientation: 'portrait' | 'landscape';
   measured: boolean;
   readableMaxWidth: number;
+  /**
+   * 큰 화면 창(태블릿·펼친 폴더블·iPad·펼친 iPhone Duo) — 화면 확대(밀도)·글자 크기와 상관없이 정해집니다.
+   * 바형 폰은 늘 false. ZSPaneLayout 이 두 칸으로 나눌지 이 값으로 정합니다.
+   */
+  largeScreen: boolean;
   platform: WindowPlatformInfo;
 }
 
@@ -32,6 +37,9 @@ export interface WindowObservation {
   heightClass?: WindowSizeClassName;
   minWidthDp?: number;
   minHeightDp?: number;
+  /** Android — 기기 고유 밀도(DisplayMetrics.DENSITY_DEVICE_STABLE)로 잰 창 폭·높이(dp). 화면 크기(확대) 설정과 무관 */
+  stableWidth?: number;
+  stableHeight?: number;
   displayFeatures?: DisplayFeatureObservation[];
 }
 

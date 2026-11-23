@@ -1,6 +1,8 @@
 import type { WindowSizeClassName } from './types';
 
-export const PANE_MIN_WIDTH = 288;
+export const PANE_MIN_WIDTH = 300;
+/** 큰 화면 창(largeScreen)에서 pane 하나의 최소 폭 — 화면 확대로 dp 가 줄어도 나누되, 이보다 좁으면 1단 */
+export const LARGE_SCREEN_PANE_MIN_WIDTH = 240;
 
 export const MATERIAL_PANE_SPACER = 24;
 
@@ -27,6 +29,11 @@ export interface PaneArrangementInput {
   height?: number;
   tabletop?: boolean;
   insets?: { start: number; end: number };
+  /**
+   * 큰 화면 창(WindowLayout.largeScreen). 주면 폭 등급 대신 이 값으로 나눌지 정하고, pane 최소 폭은 300 까지 확보하되
+   * 모자라면 LARGE_SCREEN_PANE_MIN_WIDTH 까지 줄인다. false 면 1단(접힘선 경계 분할은 그대로).
+   */
+  largeScreen?: boolean;
 }
 
 function resolveFoldSplit(width: number, fold: LocalFold, rtl: boolean): PaneArrangement | null {
@@ -57,6 +64,7 @@ export function resolvePaneArrangement({
   height,
   tabletop = false,
   insets = { start: 0, end: 0 },
+  largeScreen,
 }: PaneArrangementInput): PaneArrangement {
   if (fold && tabletop) {
     const stacked = resolveTabletop(height, fold);
@@ -67,13 +75,14 @@ export function resolvePaneArrangement({
     if (foldSplit) return foldSplit;
   }
 
-  if (widthClass === 'compact') return { mode: 'single' };
+  if (largeScreen === undefined ? widthClass === 'compact' : !largeScreen) return { mode: 'single' };
 
   const available = width - insets.start - insets.end - dividerWidth - spacing;
-  if (available < PANE_MIN_WIDTH * 2) return { mode: 'single' };
+  const minPane = largeScreen ? Math.max(LARGE_SCREEN_PANE_MIN_WIDTH, Math.min(PANE_MIN_WIDTH, Math.floor(available / 2))) : PANE_MIN_WIDTH;
+  if (available < minPane * 2) return { mode: 'single' };
 
   const fraction = Math.min(Math.max(primaryFraction, 0), 1);
-  const primaryContent = Math.round(Math.min(Math.max(available * fraction, PANE_MIN_WIDTH), available - PANE_MIN_WIDTH));
+  const primaryContent = Math.round(Math.min(Math.max(available * fraction, minPane), available - minPane));
   return {
     mode: 'split',
     basis: 'fraction',

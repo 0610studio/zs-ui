@@ -518,3 +518,15 @@ describe('떠 있는 탭 바 아래 (Android 탭 기본)', () => {
     expect(paneOf(tree, 'zs-pane-primary').props.edges).toContain('bottom');
   });
 });
+
+describe('큰 화면 창(largeScreen)을 따른 분할 — Android 판정은 resolveLargeScreen 단위 테스트', () => {
+  it('큰 화면 창이면 폭 600 이 안 돼도 2단이다(pane 을 240 까지 줄임)', async () => {
+    const tree = await render(<ZSPaneLayout {...PANES} />, { width: 520, height: 900, horizontalSizeClass: 'regular', verticalSizeClass: 'regular', readableWidth: 480 });
+    expect(tree.getByText('상세')).toBeTruthy();
+  });
+
+  it('큰 화면 창이 아니면 폭이 넓어도 1단이다', async () => {
+    const tree = await render(<ZSPaneLayout {...PANES} />, { width: 900, height: 420, horizontalSizeClass: 'compact', verticalSizeClass: 'compact', readableWidth: 600 });
+    expect(tree.queryByText('상세')).toBeNull();
+  });
+});
