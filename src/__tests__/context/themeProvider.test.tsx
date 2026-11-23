@@ -306,10 +306,11 @@ describe('ThemeProvider', () => {
       jest.mocked(NavigationBar.setStyle).mockClear();
       await renderProvider();
       expect(setBarStyle).toHaveBeenLastCalledWith('dark-content');
-      expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('light');
+      // 라이트 모드는 밝은 바 + 어두운 버튼(expo-navigation-bar 'dark')
+      expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('dark');
       await act(() => theme.toggleTheme());
       expect(setBarStyle).toHaveBeenLastCalledWith('light-content');
-      expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('dark');
+      expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('light');
     });
 
     it('iOS 는 시스템 바를 직접 칠하지 않는다', async () => {

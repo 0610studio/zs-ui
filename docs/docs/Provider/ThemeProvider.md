@@ -110,7 +110,7 @@ function AppearanceSetting() {
 
 켜져 있으면(기본) 선택한 모드를 `Appearance.setColorScheme`으로 네이티브에 알립니다(`'system'`이면 `'auto'`). 그래서 네이티브 헤더·키보드·시트가 앱 테마를 따릅니다.
 
-앱이 `Appearance`를 직접 제어해야 하면 `syncNativeAppearance={false}`로 끕니다. 끄면 네이티브 UI는 시스템 설정을 따르고 zs-ui 색만 바뀝니다. Android 상태 바·내비게이션 바 아이콘 색은 이 설정과 관계없이 앱 테마 모드에 맞춥니다(`expo-navigation-bar`). iOS Info.plist `UIViewControllerBasedStatusBarAppearance`가 `true`면 [`useStackTheme`](../Navigation/Stack)을 넣은 Stack 화면의 상태바도 이 설정과 관계없이 앱 테마 모드를 따릅니다.
+앱이 `Appearance`를 직접 제어해야 하면 `syncNativeAppearance={false}`로 끕니다. 끄면 네이티브 UI는 시스템 설정을 따르고 zs-ui 색만 바뀝니다. Android 상태 바·내비게이션 바 아이콘 색은 이 설정과 관계없이 앱 테마 모드에 맞춥니다(`expo-navigation-bar`). 라이트 모드는 어두운 아이콘, 다크 모드는 밝은 아이콘입니다. iOS Info.plist `UIViewControllerBasedStatusBarAppearance`가 `true`면 [`useStackTheme`](../Navigation/Stack)을 넣은 Stack 화면의 상태바도 이 설정과 관계없이 앱 테마 모드를 따릅니다.
 
 ## 대비 — `contrast`
 

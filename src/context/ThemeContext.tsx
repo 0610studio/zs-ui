@@ -194,7 +194,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
   useEffect(() => {
     if (Platform.OS !== 'android') return;
-    NavigationBar.setStyle(mode);
+    // expo-navigation-bar style names the button color, like StatusBar: 'dark' = dark buttons on a light bar.
+    NavigationBar.setStyle(mode === 'dark' ? 'light' : 'dark');
     StatusBar.setBarStyle(mode === 'dark' ? 'light-content' : 'dark-content');
   }, [mode]);
 
