@@ -5,6 +5,7 @@ import { ZSChip, ZSScreen, ZSText, useHeaderInset, useNavigationBarOnDark, useTh
 import ScreenHeader from '../../src/ui/ScreenHeader';
 
 const ROWS = Array.from({ length: 24 }, (_, index) => index + 1);
+const CAMERA_BLACK = '#000000';
 
 /**
  * Android 하단 내비게이션 바 — 앱 루트 ZSNavigationBarFade(바 뒤 화면 바탕색 페이드)와
@@ -21,21 +22,23 @@ export default function LabNavigationBar() {
   return (
     <>
       <ScreenHeader title="내비게이션 바" />
-      {/* 내용이 바 밑을 지나가야 페이드가 보인다 — 아래 safe area 를 빼고 화면 끝까지 깔고, 끝 줄 뒤에만 아래 inset 만큼 비운다 */}
-      <ZSScreen edges={['left', 'right']} backgroundColor={dark ? '#000000' : 'background'} style={[styles.content, { paddingTop: styles.content.padding + headerInset }]} testID="lab-navigation-bar-scroll">
+      {/* 내용이 바 밑을 지나가야 페이드가 보인다 — 아래 safe area 를 빼고 화면 끝까지 깔고, 끝 줄 뒤에만 아래 inset 만큼 비운다.
+          어두운 면은 머리글 아래 묶음에만 깔아 머리글·상태 표시줄은 테마 색 그대로 읽힌다 */}
+      <ZSScreen edges={['left', 'right']} backgroundColor="background" style={[styles.screen, { paddingTop: headerInset }]} testID="lab-navigation-bar-scroll">
         {dark ? <DarkSurface /> : null}
-        <ZSChip label="어두운 면(카메라)" selected={dark} onSelectedChange={() => setDark(!dark)} testID="lab-navigation-bar-dark" />
-        <ZSText variant="body2" style={{ color: ink }}>
-          {dark
-            ? 'useNavigationBarOnDark() — 이 화면이 보이는 동안 버튼·손잡이는 흰색이고 바 뒤 페이드를 끈다.'
-            : '바 뒤에 화면 바탕색 투명 → 80% 페이드(ZSNavigationBarFade). 아래 줄이 바 밑으로 지나가며 흐려진다.'}
-        </ZSText>
-        {ROWS.map((row) => (
-          <View key={row} style={[styles.row, { backgroundColor: dark ? '#222222' : colors.surface2 }]}>
-            <ZSText variant="subtitle2" style={{ color: ink }}>{`줄 ${row}`}</ZSText>
-          </View>
-        ))}
-        <View style={{ height: bottom }} />
+        <View style={[styles.content, { backgroundColor: dark ? CAMERA_BLACK : colors.background, paddingBottom: styles.content.padding + bottom }]} testID="lab-navigation-bar-surface">
+          <ZSChip label="어두운 면(카메라)" selected={dark} onSelectedChange={() => setDark(!dark)} testID="lab-navigation-bar-dark" />
+          <ZSText variant="body2" style={{ color: ink }}>
+            {dark
+              ? 'useNavigationBarOnDark() — 이 화면이 보이는 동안 버튼·손잡이는 흰색이고 바 뒤 페이드를 끈다.'
+              : '바 뒤에 화면 바탕색 투명 → 80% 페이드(ZSNavigationBarFade). 아래 줄이 바 밑으로 지나가며 흐려진다.'}
+          </ZSText>
+          {ROWS.map((row) => (
+            <View key={row} style={[styles.row, { backgroundColor: dark ? '#222222' : colors.surface2 }]}>
+              <ZSText variant="subtitle2" style={{ color: ink }}>{`줄 ${row}`}</ZSText>
+            </View>
+          ))}
+        </View>
       </ZSScreen>
     </>
   );
@@ -47,6 +50,7 @@ function DarkSurface() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 20, gap: 12 },
+  screen: { flexGrow: 1 },
+  content: { flexGrow: 1, padding: 20, gap: 12 },
   row: { height: 56, borderRadius: 16, justifyContent: 'center', paddingHorizontal: 16 },
 });

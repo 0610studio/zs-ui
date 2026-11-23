@@ -35,6 +35,16 @@ npx expo install @0610studio/zs-ui@2.2.0 @expo/ui expo-router expo-navigation-ba
 
 zs-ui는 Expo Modules 네이티브 코드를 포함하므로 Expo Go가 아니라 [개발 빌드](https://docs.expo.dev/develop/development-builds/introduction/)로 실행합니다. 설치 뒤 `npx expo prebuild`(또는 `npx expo run:ios`·`npx expo run:android`)로 네이티브 프로젝트를 다시 만듭니다.
 
+앱 설정의 `plugins`에 zs-ui 설정 플러그인을 넣습니다. Android 메인 액티비티가 폴더블 접기·펴기와 화면 크기·글자 크기 변경(`screenSize`·`smallestScreenSize`·`screenLayout`·`density`·`fontScale` 등)을 직접 받도록 `configChanges`를 더합니다. 빠지면 밀도가 다른 화면으로 접고 펼 때 액티비티가 다시 만들어져 화면 상태가 사라지고, 개발 모드에서 'linking을 여러 곳에 설정' 경고가 뜹니다.
+
+```json
+{
+  "expo": {
+    "plugins": ["@0610studio/zs-ui"]
+  }
+}
+```
+
 ## 2. Provider 설정
 
 expo-router 루트 레이아웃(`app/_layout.tsx`)에 Provider를 아래 순서로 둡니다.

@@ -26,6 +26,7 @@
       "predictiveBackGestureEnabled": true
     },
     "plugins": [
+      "@0610studio/zs-ui",
       "expo-router",
       "expo-system-ui",
       [
