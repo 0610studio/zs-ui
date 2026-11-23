@@ -1,10 +1,9 @@
 import { Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
-import { LayoutProvider, ThemeProvider, OverlayProvider, useNavigationTheme, useStackTheme } from '@0610studio/zs-ui';
+import { LayoutProvider, ThemeProvider, OverlayProvider, ZSNavigationBarFade, ZSTopBarSlotProvider, useNavigationTheme, useStackTheme } from '@0610studio/zs-ui';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { BarAxisSettingProvider, useBarAxisSetting } from '../src/model/BarAxisSetting';
 import { SheetWidthSettingProvider, useSheetWidthSetting } from '../src/model/SheetWidthSetting';
-import { StatusBarSlotProvider } from '../src/model/StatusBarSlot';
 
 const fonts = {
   400: 'Pretendard-Regular',
@@ -56,9 +55,10 @@ function AppProviders() {
     <LayoutProvider barAxis={barAxis}>
       <ThemeProvider colors={{ primary: '#ffa20d', secondary: '#0f766e' }} fonts={fonts} fontAssets={fontAssets} accessibilityLabels={accessibilityLabels}>
         <OverlayProvider bottomSheetMaxWidth={sheetMaxWidth}>
-          <StatusBarSlotProvider>
+          <ZSTopBarSlotProvider>
             <ThemedStack />
-          </StatusBarSlotProvider>
+            <ZSNavigationBarFade />
+          </ZSTopBarSlotProvider>
         </OverlayProvider>
       </ThemeProvider>
     </LayoutProvider>

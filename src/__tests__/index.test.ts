@@ -2,12 +2,13 @@ import * as zsUi from '../index';
 
 const EXPORTS = {
   provider: ['ThemeProvider', 'useTheme', 'OverlayProvider', 'useOverlay', 'GlobalOverlay', 'LayoutProvider'],
-  layout: ['useWindowLayout', 'useDisplayFeatures', 'useDevicePosture', 'usePaneLayout', 'useBarAxis'],
-  navigation: ['ZSTabNavigator', 'useStackTheme', 'useNavigationTheme', 'useHeaderInset', 'useTabBarInset', 'ZSHeaderBackground', 'useHeaderButtonColors'],
+  layout: ['useWindowLayout', 'useDisplayFeatures', 'useDevicePosture', 'usePaneLayout', 'useCanSplitPanes', 'useBarAxis'],
+  navigation: ['ZSTabNavigator', 'useStackTheme', 'useNavigationTheme', 'useHeaderInset', 'useTabBarInset', 'ZSHeaderBackground', 'useHeaderButtonColors', 'useNavigationBarOnDark'],
   tokens: [
     'createThemeColors', 'DEFAULT_COLORS', 'getPaletteColors', 'resolveColor', 'withOpacity',
     'TYPE_SCALE', 'TEXT_VARIANTS', 'createTypography', 'fontFamilyFor',
     'RADIUS', 'radiusStyle',
+    'SPACE',
     'ANDROID_SPRING', 'IOS_SPRING_DURATION', 'DURATION', 'springConfig', 'timingConfig',
     'OPACITY', 'MIN_TOUCH_TARGET',
     'SHADOW', 'createShadows', 'shadowFor',
@@ -15,7 +16,7 @@ const EXPORTS = {
   components: [
     'ZSText', 'ZSBox', 'ZSCard', 'ZSPressable', 'ZSButton', 'ZSTextField', 'ZSSelect', 'ZSSwitch', 'ZSCheckbox', 'ZSRadioGroup',
     'ZSSegmentedControl', 'ZSSegmentedPages', 'ZSChip', 'ZSMenu', 'ZSBanner', 'ZSTooltip', 'ZSSkeleton', 'ZSBorderBeam', 'ZSScreen', 'useScreenBottomInset',
-    'ZSPaneLayout', 'ZSTopBar', 'ZSKeyboardStickyView', 'ZSPortal',
+    'ZSPaneLayout', 'ZSTopBar', 'ZSTopBarSlotProvider', 'useTopBarSlot', 'ZSKeyboardStickyView', 'ZSNavigationBarFade', 'ZSPortal',
   ],
   calendar: [
     'ZSCalendar', 'useCalendarAgenda', 'CALENDAR_LOCALES', 'buildEventIndex', 'eventsInRange', 'getEventsOn',

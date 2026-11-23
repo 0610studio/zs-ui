@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Expo from 'expo';
 import { NavigationBar } from 'expo-navigation-bar';
 import { ThemeProvider, useTheme, type ThemeContextValue } from '../../context/ThemeContext';
+import { useNavigationBarOnDark } from '../../navigation/useNavigationBarOnDark';
 import { createThemeColors, DEFAULT_COLORS } from '../../theme/color';
 import { DEFAULT_ACCESSIBILITY_LABELS } from '../../theme/accessibilityLabels';
 import { nth } from '../utils/hostQueries';
@@ -311,6 +312,26 @@ describe('ThemeProvider', () => {
       await act(() => theme.toggleTheme());
       expect(setBarStyle).toHaveBeenLastCalledWith('light-content');
       expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('light');
+    });
+
+    it('어두운 면 화면(useNavigationBarOnDark)이 보이는 동안은 모드와 상관없이 흰 버튼, 벗어나면 모드 색으로 돌아간다', async () => {
+      platform.OS = 'android';
+      jest.mocked(NavigationBar.setStyle).mockClear();
+      function DarkScreen() {
+        useNavigationBarOnDark();
+        return null;
+      }
+      await render(
+        <ThemeProvider>
+          <Capture />
+          <DarkScreen />
+        </ThemeProvider>,
+      );
+      await act(async () => {});
+      expect(theme.mode).toBe('light');
+      expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('light');
+      await act(() => rerenderProvider());
+      expect(NavigationBar.setStyle).toHaveBeenLastCalledWith('dark');
     });
 
     it('iOS 는 시스템 바를 직접 칠하지 않는다', async () => {

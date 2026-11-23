@@ -8,6 +8,7 @@ import { createTypography, type ThemeFontAssets, type ThemeFonts, type Typograph
 import { createShadows, type ShadowStyles } from '../theme/shadow';
 import { DEFAULT_ACCESSIBILITY_LABELS, type AccessibilityLabels } from '../theme/accessibilityLabels';
 import { DEFAULT_MAX_FONT_SIZE_MULTIPLIER } from '../theme/fontScale';
+import { useNavigationBarOverDark } from '../navigation/navigationBarStore';
 
 export type ColorSchemePreference = 'system' | 'light' | 'dark';
 export type ContrastPreference = 'system' | 'standard' | 'high';
@@ -192,10 +193,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     [labelKey],
   );
 
+  // 보이는 화면이 내비게이션 바 아래에 어두운 면을 깔면(useNavigationBarOnDark) 모드와 상관없이 흰 버튼
+  const navigationBarOverDark = useNavigationBarOverDark();
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     // expo-navigation-bar style names the button color, like StatusBar: 'dark' = dark buttons on a light bar.
-    NavigationBar.setStyle(mode === 'dark' ? 'light' : 'dark');
+    NavigationBar.setStyle(mode === 'dark' || navigationBarOverDark ? 'light' : 'dark');
+  }, [mode, navigationBarOverDark]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
     StatusBar.setBarStyle(mode === 'dark' ? 'light-content' : 'dark-content');
   }, [mode]);
 

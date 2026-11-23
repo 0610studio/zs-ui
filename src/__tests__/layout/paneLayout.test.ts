@@ -1,4 +1,4 @@
-import { MATERIAL_PANE_SPACER, PANE_MIN_WIDTH, resolvePaneArrangement } from '../../layout/paneLayout';
+import { canSplitByFraction, MATERIAL_PANE_SPACER, PANE_MIN_WIDTH, resolvePaneArrangement } from '../../layout/paneLayout';
 
 describe('resolvePaneArrangement', () => {
   it('compact 창은 폭과 무관하게 1단', () => {
@@ -182,5 +182,23 @@ describe('resolvePaneArrangement 테이블탑', () => {
     expect(
       resolvePaneArrangement({ ...base, tabletop: true, fold: { orientation: 'vertical', start: 416, size: 0, active: true } }),
     ).toMatchObject({ mode: 'split', basis: 'fold' });
+  });
+});
+
+describe('canSplitByFraction', () => {
+  it('큰 화면 창은 가용 폭에 pane 240 두 개가 들어가면 두 칸 — resolvePaneArrangement 와 같은 경계', () => {
+    expect(canSplitByFraction({ widthClass: 'compact', largeScreen: true, available: 480 })).toBe(true);
+    expect(canSplitByFraction({ widthClass: 'compact', largeScreen: true, available: 479 })).toBe(false);
+    for (const available of [479, 480, 575, 726]) {
+      const split = resolvePaneArrangement({ widthClass: 'compact', largeScreen: true, width: available, primaryFraction: 0.5, dividerWidth: 0 }).mode === 'split';
+      expect(canSplitByFraction({ widthClass: 'compact', largeScreen: true, available })).toBe(split);
+    }
+  });
+
+  it('큰 화면 창이 아니면 폭과 상관없이 한 칸, largeScreen 을 모르면 폭 등급과 pane 300', () => {
+    expect(canSplitByFraction({ widthClass: 'expanded', largeScreen: false, available: 1200 })).toBe(false);
+    expect(canSplitByFraction({ widthClass: 'medium', available: PANE_MIN_WIDTH * 2 })).toBe(true);
+    expect(canSplitByFraction({ widthClass: 'medium', available: PANE_MIN_WIDTH * 2 - 1 })).toBe(false);
+    expect(canSplitByFraction({ widthClass: 'compact', available: 900 })).toBe(false);
   });
 });

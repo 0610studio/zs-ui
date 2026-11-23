@@ -12,6 +12,7 @@ import { useTabBarOverlap } from '../../navigation/useTabBarInset';
 import { ZSHeaderBackground } from '../../navigation/ZSHeaderBackground';
 import useKeyboard from '../../model/useKeyboard';
 import { useWindowLayout } from '../../layout/LayoutContext';
+import { useCanSplitPanes } from '../../layout/useCanSplitPanes';
 import { resolveContentMaxWidth } from '../../layout/windowClass';
 import type { ContentMaxWidth } from '../../layout/types';
 import { InputFocusContext } from './InputFocusContext';
@@ -127,8 +128,10 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
   const isIOS = Platform.OS === 'ios';
   const { widthClass, readableMaxWidth } = useWindowLayout();
   const contentMaxWidth = resolveContentMaxWidth(maxContentWidth, { widthClass, readableMaxWidth });
-  // 한쪽 CTA 는 넓은 창에서만 — compact 창은 한 열이라 전폭으로 둔다
-  const bottomSide = bottomComponent && bottomComponentPlacement !== 'full' && widthClass !== 'compact' ? bottomComponentPlacement : null;
+  // 한쪽 CTA 는 ZSPaneLayout 이 두 칸으로 나누는 창에서만 — 폭 등급이 아니라 같은 분할 규칙(큰 화면 창·pane 최소 폭)을 본다.
+  // 화면 확대로 compact 가 된 펼친 Fold 도 두 칸이라 한쪽에 두고, 한 칸이면 전폭으로 둔다
+  const canSplit = useCanSplitPanes();
+  const bottomSide = bottomComponent && bottomComponentPlacement !== 'full' && canSplit ? bottomComponentPlacement : null;
   const [bottomSideHeight, setBottomSideHeight] = useState(0);
   const handleBottomSideLayout = useCallback((event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;

@@ -9,6 +9,9 @@ export const SPACE = {
   '3xl': 32,
 } as const;
 
+/** `SPACE`의 키 */
+export type SpaceToken = keyof typeof SPACE;
+
 export const CONTENT_INSET = SPACE.lg;
 
 export const SCREEN_INSET = SPACE.xl;

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, View, type HostInstance } from 'react-native';
-import { ZSChip, ZSPaneLayout, ZSPressable, ZSText, ZSTextField, usePaneLayout, useTheme, useWindowLayout } from '@0610studio/zs-ui';
+import { ZSButton, ZSChip, ZSPaneLayout, ZSPressable, ZSScreen, ZSText, ZSTextField, useCanSplitPanes, usePaneLayout, useTheme, useWindowLayout } from '@0610studio/zs-ui';
 import ScreenHeader from '../../src/ui/ScreenHeader';
 import { EndMarker } from '../../src/ui/lab/FoldableLab';
 
@@ -9,7 +9,9 @@ const FRACTIONS = [0.4, 0.5];
 
 export default function LabPaneLayout() {
   const { colors } = useTheme();
-  const { widthClass } = useWindowLayout();
+  const { widthClass, largeScreen } = useWindowLayout();
+  const canSplit = useCanSplitPanes();
+  const [cta, setCta] = useState(false);
   const [selected, setSelected] = useState(1);
   const [memo, setMemo] = useState('');
   const [compactBehavior, setCompactBehavior] = useState<'hide' | 'stack'>('hide');
@@ -20,11 +22,12 @@ export default function LabPaneLayout() {
     <View style={styles.pane}>
       <PaneWidth label="primary" testID="lab-pane-primary-width" />
       <PaneHook testID="lab-pane-primary-hook" />
-      <ZSText variant="overline" color="textSecondary" style={styles.hook}>{`widthClass ${widthClass}`}</ZSText>
+      <ZSText variant="overline" color="textSecondary" style={styles.hook} testID="lab-pane-window">{`widthClass ${widthClass} · largeScreen ${largeScreen} · useCanSplitPanes ${canSplit}`}</ZSText>
       <View style={styles.chips}>
         <ZSChip label="hide" selected={compactBehavior === 'hide'} onSelectedChange={() => setCompactBehavior('hide')} testID="lab-pane-compact-hide" />
         <ZSChip label="stack" selected={compactBehavior === 'stack'} onSelectedChange={() => setCompactBehavior('stack')} testID="lab-pane-compact-stack" />
         <ZSChip label="tabletop" selected={tabletop} onSelectedChange={() => setTabletop(!tabletop)} testID="lab-pane-tabletop" />
+        <ZSChip label="시작 칸 버튼" selected={cta} onSelectedChange={() => setCta(!cta)} testID="lab-pane-cta-toggle" />
       </View>
       <View style={styles.chips}>
         {FRACTIONS.map((value) => (
@@ -72,18 +75,32 @@ export default function LabPaneLayout() {
     </View>
   );
 
+  const panes = (
+    <ZSPaneLayout
+      primary={primary}
+      secondary={secondary}
+      primaryFraction={fraction}
+      compactBehavior={compactBehavior}
+      tabletop={tabletop}
+      scroll
+      backgroundColor={colors.surface1}
+    />
+  );
+
   return (
     <>
       <ScreenHeader title="Pane Layout" />
-      <ZSPaneLayout
-        primary={primary}
-        secondary={secondary}
-        primaryFraction={fraction}
-        compactBehavior={compactBehavior}
-        tabletop={tabletop}
-        scroll
-        backgroundColor={colors.surface1}
-      />
+      {cta ? (
+        // ZSScreen bottomComponentPlacement — ZSPaneLayout 이 두 칸일 때(useCanSplitPanes)만 시작 칸 아래, 한 칸이면 전폭
+        <ZSScreen
+          scrollEnabled={false}
+          backgroundColor={colors.surface1}
+          bottomComponentPlacement="start"
+          bottomComponent={<View style={styles.cta}><ZSButton title="시작 칸 버튼" size="large" fullWidth onPress={() => setCta(false)} testID="lab-pane-cta" /></View>}
+        >
+          {panes}
+        </ZSScreen>
+      ) : panes}
     </>
   );
 }
@@ -118,6 +135,7 @@ function PaneHook({ testID }: { testID: string }) {
 }
 
 const styles = StyleSheet.create({
+  cta: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   hook: {
     paddingHorizontal: 20,
   },

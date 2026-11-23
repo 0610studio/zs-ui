@@ -18,6 +18,7 @@ const DIAGNOSTICS: Unit[] = [
   { id: 'safe-area', title: 'Safe Area', caption: 'ZSScreen 영역별 자동 inset', href: '/lab/safe-area' },
   { id: 'readable-content', title: 'Readable Content', caption: 'maxContentWidth · 가독 폭 가운데 열', href: '/lab/readable-content' },
   { id: 'bar-axis', title: '바 방향', caption: '세로·가로 배치 전환 · iOS 세로 바 · Android 바·레일', href: '/lab/bar-axis' },
+  { id: 'navigation-bar', title: '내비게이션 바', caption: 'Android 바 뒤 페이드 · 어두운 면 화면의 흰 버튼', href: '/lab/navigation-bar' },
   { id: 'top-bar', title: '상단 바', caption: 'ZSTopBar · 시계 옆 칸(iPhone Duo) · safeArea · 여백 색 표시', href: '/lab/top-bar' },
   { id: 'zs-tab-navigator', title: '탭 옵션과 아이콘', caption: '이미지·심볼 · 뱃지 · 검색 탭 · bottom accessory', href: '/lab/zs-tab-navigator' },
   { id: 'sidebar-tabs', title: 'iOS 사이드바 탭', caption: 'preferredPlacement · 사이드바 다시 열기', href: '/lab/sidebar-tabs' },

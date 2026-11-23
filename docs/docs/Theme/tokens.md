@@ -1,6 +1,30 @@
 # 토큰
 
-zs-ui 컴포넌트가 함께 쓰는 모서리·모션·상태·터치 영역·그림자 기준입니다. 커스텀 UI에도 같은 값을 쓰면 zs-ui 컴포넌트와 모양이 맞습니다.
+zs-ui 컴포넌트가 함께 쓰는 간격·모서리·모션·상태·터치 영역·그림자 기준입니다. 커스텀 UI에도 같은 값을 쓰면 zs-ui 컴포넌트와 모양이 맞습니다.
+
+## 간격 — `SPACE`
+
+4pt 격자 간격(pt·dp)입니다. zs-ui 컴포넌트의 안쪽 여백·사이 간격이 이 값을 씁니다.
+
+| 토큰 | 값 |
+|------|----|
+| `xxs` | 2 |
+| `xs` | 4 |
+| `sm` | 8 |
+| `md` | 12 |
+| `lg` | 16 |
+| `xl` | 20 |
+| `2xl` | 24 |
+| `3xl` | 32 |
+
+```tsx
+import { View } from 'react-native';
+import { SPACE } from '@0610studio/zs-ui';
+
+<View style={{ paddingHorizontal: SPACE.xl, gap: SPACE.sm }} />;
+```
+
+`SpaceToken` 타입(`SPACE`의 키)을 내보냅니다.
 
 ## 모서리 — `RADIUS` · `radiusStyle`
 

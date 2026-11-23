@@ -10,6 +10,8 @@ export { LayoutProvider } from './layout/LayoutProvider';
 export type { LayoutProviderProps } from './layout/LayoutProvider';
 export { useBarAxis, useDevicePosture, useDisplayFeatures, useWindowLayout } from './layout/LayoutContext';
 export { usePaneLayout } from './layout/PaneContext';
+export { useCanSplitPanes } from './layout/useCanSplitPanes';
+export type { CanSplitPanesOptions } from './layout/useCanSplitPanes';
 export type {
   WindowLayout,
   WindowSizeClassName,
@@ -48,6 +50,7 @@ export { useNavigationTheme } from './navigation/useNavigationTheme';
 export { useHeaderInset } from './navigation/useHeaderInset';
 export { useTabBarInset } from './navigation/useTabBarInset';
 export { ZSHeaderBackground } from './navigation/ZSHeaderBackground';
+export { useNavigationBarOnDark } from './navigation/useNavigationBarOnDark';
 export type { ZSHeaderBackgroundProps } from './navigation/ZSHeaderBackground';
 
 export { createThemeColors, DEFAULT_COLORS, getPaletteColors, resolveColor, withOpacity } from './theme/color';
@@ -56,6 +59,8 @@ export { TYPE_SCALE, TEXT_VARIANTS, createTypography, fontFamilyFor } from './th
 export type { TextVariant, FontWeight, TypeMetric, ThemeFonts, ThemeFontAssets, FontAsset, TypographyStyles } from './theme/typeScale';
 export { RADIUS, radiusStyle } from './theme/radius';
 export type { RadiusToken } from './theme/radius';
+export { SPACE } from './theme/spacing';
+export type { SpaceToken } from './theme/spacing';
 export { ANDROID_SPRING, IOS_SPRING_DURATION, DURATION, springConfig, timingConfig } from './theme/motion';
 export type { MotionKind, MotionSpeed } from './theme/motion';
 export { OPACITY, MIN_TOUCH_TARGET } from './theme/state';
@@ -105,8 +110,11 @@ export { useScreenBottomInset } from './ui/ZSScreen/BottomInsetContext';
 export { default as ZSPaneLayout } from './ui/ZSPaneLayout';
 export type { ZSPaneLayoutProps } from './ui/ZSPaneLayout';
 export { default as ZSTopBar } from './ui/ZSTopBar';
+export { ZSTopBarSlotProvider, useTopBarSlot } from './ui/ZSTopBar/TopBarSlot';
 export type { ZSTopBarProps, ZSTopBarRegion, ZSTopBarPlacement, ZSTopBarInsets, ZSTopBarRect } from './ui/ZSTopBar';
 export { default as ZSKeyboardStickyView } from './ui/ZSKeyboardStickyView';
+export { default as ZSNavigationBarFade } from './ui/ZSNavigationBarFade';
+export type { ZSNavigationBarFadeProps } from './ui/ZSNavigationBarFade';
 export type { ZSKeyboardStickyViewProps } from './ui/ZSKeyboardStickyView';
 export { ZSPortal } from './overlay/ZSPortal';
 export type { ZSPortalProps } from './overlay/ZSPortal';

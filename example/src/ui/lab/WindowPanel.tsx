@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 import ScreenScrollView from '../kit/ScreenScrollView';
-import { ZSText, useTheme, useWindowLayout } from '@0610studio/zs-ui';
+import { ZSText, useCanSplitPanes, useTheme, useWindowLayout } from '@0610studio/zs-ui';
 import Section from '../kit/Section';
 import LabValueRow from './LabValueRow';
 
@@ -9,6 +9,7 @@ export default function WindowPanel({ header }: { header: ReactNode }) {
   const { colors } = useTheme();
   const layout = useWindowLayout();
   const { platform } = layout;
+  const canSplit = useCanSplitPanes();
 
   return (
     <>
@@ -23,7 +24,9 @@ export default function WindowPanel({ header }: { header: ReactNode }) {
           <LabValueRow label="size" value={`${Math.round(layout.width)} × ${Math.round(layout.height)}`} testID="lab-window-layout-size" />
           <LabValueRow label="orientation" value={layout.orientation} testID="lab-window-layout-orientation" />
           <LabValueRow label="measured" value={String(layout.measured)} testID="lab-window-layout-measured" />
-          <LabValueRow label="readableMaxWidth" value={String(Math.round(layout.readableMaxWidth))} testID="lab-window-layout-readable" isLast />
+          <LabValueRow label="readableMaxWidth" value={String(Math.round(layout.readableMaxWidth))} testID="lab-window-layout-readable" />
+          <LabValueRow label="largeScreen" value={String(layout.largeScreen)} testID="lab-window-layout-large-screen" />
+          <LabValueRow label="useCanSplitPanes()" value={String(canSplit)} testID="lab-window-layout-can-split" isLast />
         </Section>
 
         <Section label="플랫폼" gap={0}>

@@ -6,6 +6,20 @@ export const LARGE_SCREEN_PANE_MIN_WIDTH = 240;
 
 export const MATERIAL_PANE_SPACER = 24;
 
+/** 비율 분할에서 pane 하나가 확보할 폭 — 큰 화면 창은 300, 화면 확대로 모자라면 240까지 줄인다 */
+export function paneMinWidth(largeScreen: boolean | undefined, available: number): number {
+  return largeScreen ? Math.max(LARGE_SCREEN_PANE_MIN_WIDTH, Math.min(PANE_MIN_WIDTH, Math.floor(available / 2))) : PANE_MIN_WIDTH;
+}
+
+/**
+ * 비율 분할(분할 규칙 3·4)로 두 칸이 되는지. `available`은 좌우 safe area·구분선·spacing 을 뺀 폭이다.
+ * largeScreen 을 모르는(옛 네이티브) 값이면 폭 등급으로 대신한다.
+ */
+export function canSplitByFraction({ widthClass, largeScreen, available }: { widthClass: WindowSizeClassName; largeScreen?: boolean; available: number }): boolean {
+  if (largeScreen === undefined ? widthClass === 'compact' : !largeScreen) return false;
+  return available >= paneMinWidth(largeScreen, available) * 2;
+}
+
 export type PaneArrangement =
   | { mode: 'single' }
   | { mode: 'split'; basis: 'fraction' | 'fold'; primaryWidth: number; secondaryWidth: number; gap: number }
@@ -75,11 +89,9 @@ export function resolvePaneArrangement({
     if (foldSplit) return foldSplit;
   }
 
-  if (largeScreen === undefined ? widthClass === 'compact' : !largeScreen) return { mode: 'single' };
-
   const available = width - insets.start - insets.end - dividerWidth - spacing;
-  const minPane = largeScreen ? Math.max(LARGE_SCREEN_PANE_MIN_WIDTH, Math.min(PANE_MIN_WIDTH, Math.floor(available / 2))) : PANE_MIN_WIDTH;
-  if (available < minPane * 2) return { mode: 'single' };
+  if (!canSplitByFraction({ widthClass, largeScreen, available })) return { mode: 'single' };
+  const minPane = paneMinWidth(largeScreen, available);
 
   const fraction = Math.min(Math.max(primaryFraction, 0), 1);
   const primaryContent = Math.round(Math.min(Math.max(available * fraction, minPane), available - minPane));

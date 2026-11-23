@@ -32,7 +32,7 @@ function EditScreen() {
 | `bounces` | `boolean` | `refreshControl`이 있으면 `true`, 없으면 `false` | 스크롤 끝에서 튕김(iOS). Android는 오버스크롤 효과(`overScrollMode`)를 같은 값으로 켜고 끕니다 |
 | `topComponent` | `ReactNode` | `undefined` | 스크롤 밖 상단에 고정하는 영역 |
 | `bottomComponent` | `ReactNode` | `undefined` | 스크롤 밖 하단에 고정하는 영역. 배경은 `backgroundColor`와 같게 둡니다 — [Safe area](#safe-area) |
-| `bottomComponentPlacement` | `'full' \| 'start' \| 'end'` | `'full'` | 넓은 창에서 `bottomComponent`를 놓을 자리 — 전폭, 시작 쪽 절반, 끝 쪽 절반. compact 창은 늘 전폭입니다 — [아래 영역 위치](#아래-영역-위치) |
+| `bottomComponentPlacement` | `'full' \| 'start' \| 'end'` | `'full'` | 두 칸 창에서 `bottomComponent`를 놓을 자리 — 전폭, 시작 쪽 절반, 끝 쪽 절반. 한 칸 창은 늘 전폭입니다 — [아래 영역 위치](#아래-영역-위치) |
 | `showsVerticalScrollIndicator` | `boolean` | `true` | 세로 스크롤 인디케이터 표시 |
 | `scrollToFocusedInput` | `boolean` | `true` | 키보드가 포커스 입력을 가리면 가린 만큼 스크롤 — [키보드 자동 스크롤](#키보드-자동-스크롤) |
 | `keyboardScrollExtraOffset` | `number` | `30` | 포커스 입력 하단과 키보드 상단 사이 여유(pt·dp). 키보드 위 CTA가 있으면 그 높이를 더합니다 |
@@ -91,7 +91,9 @@ function EditScreen() {
 </ZSScreen>
 ```
 
-| 값 | 넓은 창(`medium`·`expanded`) | compact 창 |
+두 칸 창은 [`useCanSplitPanes()`](../Layout/ZSPaneLayout#usecansplitpanes)가 `true`인 창 — 기본 설정의 `ZSPaneLayout`이 두 칸으로 나누는 창입니다. 폭 등급(`widthClass`)이 아니라 큰 화면 창·pane 최소 폭으로 정하므로, 화면 확대로 compact가 된 펼친 폴더블도 두 칸 창입니다.
+
+| 값 | 두 칸 창 | 한 칸 창 |
 |----|------|------|
 | `'full'` | 본문 아래 전폭 | 본문 아래 전폭 |
 | `'start'` | 본문 위 바닥, 시작 쪽 절반 폭(RTL이면 오른쪽) | 본문 아래 전폭 |

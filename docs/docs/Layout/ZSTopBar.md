@@ -30,6 +30,33 @@ function MapScreen() {
 - children 은 가로 줄(`flexDirection: 'row'`, `alignItems: 'center'`)에 놓입니다. 높이가 `height`보다 작은 컨트롤은 줄 가운데에 옵니다.
 - 화면 맨 위에 둡니다. 시계 옆 칸 판단은 컴포넌트 자기 좌표로 하므로, 상태바 아래에 두면 `belowStatusBar`가 됩니다.
 
+## 시계 옆 칸 알아내기 — `ZSTopBarSlotProvider` · `useTopBarSlot`
+
+시계 옆 칸이 있을 때만 헤더를 그 칸으로 올리는 화면처럼, 칸이 있는지·어디인지를 먼저 알아야 할 때 씁니다. 앱 루트(SafeAreaProvider 안, 화면 맨 위 좌표)에 `ZSTopBarSlotProvider`를 한 번 두면, 보이지 않는 `ZSTopBar` 하나로 재서 하위에 알려 줍니다. 화면마다 `ZSTopBar`를 그려서 재면 첫 프레임에 시스템 헤더가 보였다 사라집니다.
+
+```tsx
+import { ZSTopBar, ZSTopBarSlotProvider, useTopBarSlot } from '@0610studio/zs-ui';
+
+// app/_layout.tsx
+<SafeAreaProvider>
+  <ZSTopBarSlotProvider>
+    <Stack />
+  </ZSTopBarSlotProvider>
+</SafeAreaProvider>;
+
+function Header({ title }: { title: string }) {
+  const slot = useTopBarSlot();
+  if (!slot) return <StackHeader title={title} />;
+  return (
+    <ZSTopBar style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+      <Text>{title}</Text>
+    </ZSTopBar>
+  );
+}
+```
+
+`useTopBarSlot()`은 시계 옆 칸(`besideStatusBar`)일 때만 그 `ZSTopBarRegion`을, 아니거나 Provider 밖이면 `null`을 돌려줍니다.
+
 ## 사용 조건
 
 상태바 옆 배치는 iOS 27.1 이상과 iOS 27.1 SDK(Xcode 27.1) 빌드가 필요합니다. 나머지 환경에서는 safe area 아래에 배치합니다.

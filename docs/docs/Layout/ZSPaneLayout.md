@@ -83,6 +83,31 @@ function DetailHeader() {
 
 높이는 테이블탑처럼 pane이 창보다 낮을 때 씁니다. 예: 위 pane이 `compact`면 달력을 주간 한 줄로 둡니다([ZSCalendar](../UiComponent/ZSCalendar)).
 
+## useCanSplitPanes
+
+pane 밖(화면 컴포넌트·아래 버튼 자리 등)에서 "이 창이면 `ZSPaneLayout`이 두 칸으로 나누는가"를 알아야 할 때 씁니다. 위 분할 규칙 3·4와 같은 계산입니다.
+
+```tsx
+import { useCanSplitPanes } from '@0610studio/zs-ui';
+
+function MailScreen() {
+  // ZSPaneLayout 에 준 spacing·divider 와 같은 값을 넘긴다
+  const split = useCanSplitPanes({ spacing: 0 });
+  return split ? <ZSPaneLayout spacing={0} primary={<MailList />} secondary={<MailDetail />} /> : <MailList />;
+}
+```
+
+| 옵션 | Type | Default | 설명 |
+|------|------|---------|------|
+| `spacing` | `number` | iOS `0` · Android `24` | `ZSPaneLayout spacing`과 같은 값 |
+| `divider` | `boolean` | iOS `true` · Android `false` | `ZSPaneLayout divider`가 `true`(hairline)인지 |
+
+- 창 전체를 쓰는 `ZSPaneLayout` 기준입니다(창 폭 − 좌우 safe area − 구분선 − `spacing`). 창의 일부에 둔 `ZSPaneLayout`은 자기 폭으로 판단합니다.
+- 책 자세처럼 접힘선으로 나뉘는 경우(분할 규칙 2)는 포함하지 않습니다. 필요하면 [`useDisplayFeatures().fold`](./useDisplayFeatures)를 함께 봅니다.
+- [`ZSScreen bottomComponentPlacement`](../UiComponent/ZSScreen#아래-영역-위치)는 기본 옵션의 이 값으로 한쪽 배치를 정합니다.
+
+`CanSplitPanesOptions` 타입을 내보냅니다.
+
 ## 관련 문서
 
 - [useDisplayFeatures](./useDisplayFeatures) — 접힘선

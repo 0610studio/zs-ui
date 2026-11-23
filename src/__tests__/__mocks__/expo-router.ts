@@ -32,3 +32,7 @@ export function createStandardRouterNavigator(content: unknown, router: unknown,
 
 export const mockGoBack = jest.fn();
 export const useNavigation = () => ({ goBack: mockGoBack });
+// 화면 포커스 = 마운트로 본다
+export const useFocusEffect = (effect: React.EffectCallback) => {
+  React.useEffect(effect, [effect]);
+};
