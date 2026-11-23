@@ -1,6 +1,6 @@
 import type { WindowSizeClassName } from './types';
 
-export const PANE_MIN_WIDTH = 300;
+export const PANE_MIN_WIDTH = 288;
 
 export const MATERIAL_PANE_SPACER = 24;
 

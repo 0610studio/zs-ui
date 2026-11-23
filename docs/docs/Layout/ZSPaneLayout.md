@@ -28,7 +28,7 @@ export default function MailScreen() {
 | `secondary` | `ReactNode` | `undefined` | 보조 콘텐츠 |
 | `divider` | `boolean \| ReactNode` | iOS `true` · Android `false` | pane 사이 구분선. `true`는 `border` 색 hairline, ReactNode는 그대로 그립니다 |
 | `spacing` | `number` | iOS `0` · Android `24` | 비율 분할일 때 pane 사이 간격(Material 3 pane spacer) |
-| `primaryFraction` | `number` | `0.4` | 비율 분할에서 주 pane 비율(0–1). 각 pane은 최소 300입니다 |
+| `primaryFraction` | `number` | `0.4` | 비율 분할에서 주 pane 비율(0–1). 각 pane은 최소 288입니다 |
 | `compactBehavior` | `'hide' \| 'stack'` | `'hide'` | 1단일 때 secondary — 숨기거나 primary 아래에 쌓습니다 |
 | `scroll` | `boolean` | `false` | 각 pane을 ScrollView로 감쌉니다 |
 | `extendUnderTabBar` | `boolean` | `false` | 고정 pane을 Android 떠 있는 탭 바 뒤(화면 아래 끝)까지 깝니다. pane 안의 콘텐츠가 아래 inset·`useTabBarInset()`만큼 비킵니다 — [떠 있는 탭 바](../Navigation/ZSTabNavigator#하단-바-모양--barstyle) |
@@ -48,7 +48,7 @@ export default function MailScreen() {
 1. **`tabletop`을 켜고 화면을 가르는 가로 접힘선**이 있으면 primary를 위, secondary를 아래에 둡니다. 기본은 끕니다(Apple은 자세 기반 재배치를 권하지 않고, Android는 테이블탑 UX를 권하므로 필요한 앱만 켭니다).
 2. **화면을 가르는 세로 접힘선**(반쯤 접은 책 자세 — `active: true`)이 레이아웃 안에 있으면 그 경계로 나누고 접힘선 두께만큼 비웁니다. compact 창이어도 나눕니다(HIG: 힌지 위에 인터랙티브 요소를 두지 않습니다). 평평하게 펼친 접힘선(`active: false`)은 경계로 쓰지 않고 3·4를 따릅니다.
 3. **compact 창은 1단**입니다.
-4. 그 밖(`medium`·`expanded`)은 `primaryFraction` 비율로 나눕니다. 가용 폭(레이아웃 폭 − 좌우 safe area − 구분선 − `spacing`)에서 두 pane이 300씩 확보되지 않으면 1단입니다.
+4. 그 밖(`medium`·`expanded`)은 `primaryFraction` 비율로 나눕니다. 가용 폭(레이아웃 폭 − 좌우 safe area − 구분선 − `spacing`)에서 두 pane이 288씩 확보되지 않으면 1단입니다. Android 기본 `spacing`(24)이면 폭 600(medium 하한)부터 두 칸입니다.
 
 ### 배치 세부
 

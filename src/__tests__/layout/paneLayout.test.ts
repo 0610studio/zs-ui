@@ -61,7 +61,18 @@ describe('resolvePaneArrangement', () => {
       secondaryWidth: 951 - 84 - 434 + 84,
       gap: 0,
     });
-    expect(resolvePaneArrangement({ widthClass: 'medium', width: 680, primaryFraction: 0.5, dividerWidth: 0, insets: { start: 44, end: 44 } })).toEqual({ mode: 'single' });
+    expect(resolvePaneArrangement({ widthClass: 'medium', width: 660, primaryFraction: 0.5, dividerWidth: 0, insets: { start: 44, end: 44 } })).toEqual({ mode: 'single' });
+  });
+
+  it('화면 확대한 폴더블 내부 화면(Fold7 520dpi 약 605, 간격 24)도 medium 이면 두 칸이다 — 각 약 290', () => {
+    expect(resolvePaneArrangement({ widthClass: 'medium', width: 605, primaryFraction: 0.5, dividerWidth: 0, spacing: 24 })).toEqual({
+      mode: 'split',
+      basis: 'fraction',
+      primaryWidth: 291,
+      secondaryWidth: 290,
+      gap: 24,
+    });
+    expect(resolvePaneArrangement({ widthClass: 'medium', width: 599, primaryFraction: 0.5, dividerWidth: 0, spacing: 24 })).toEqual({ mode: 'single' });
   });
 
   it('접힘선 경계 분할은 inset 과 무관하게 화면 위치 그대로다', () => {
