@@ -504,4 +504,17 @@ describe('떠 있는 탭 바 아래 (Android 탭 기본)', () => {
     expect(paneOf(tree, 'zs-pane-primary').props.edges).toContain('bottom');
     expect(StyleSheet.flatten(paneOf(tree, 'zs-pane-primary').props.style).paddingBottom).toBe(84);
   });
+
+  it('extendUnderTabBar 고정 pane 은 탭 바 뒤(아래 끝)까지 깔린다 — 아래 inset·탭 바 여백을 콘텐츠에 맡긴다', async () => {
+    const tree = await renderInTab(<ZSPaneLayout {...PANES} extendUnderTabBar />, ANDROID_OPEN);
+    for (const testID of ['zs-pane-primary', 'zs-pane-secondary']) {
+      expect(paneOf(tree, testID).props.edges).not.toContain('bottom');
+      expect(StyleSheet.flatten(paneOf(tree, testID).props.style).paddingBottom).toBeUndefined();
+    }
+  });
+
+  it('extendUnderTabBar 는 떠 있는 탭 바가 없으면 고정 pane 을 그대로 둔다', async () => {
+    const tree = await render(<ZSPaneLayout {...PANES} extendUnderTabBar />, ANDROID_OPEN);
+    expect(paneOf(tree, 'zs-pane-primary').props.edges).toContain('bottom');
+  });
 });

@@ -22,6 +22,7 @@ export type ZSPaneLayoutProps = {
   primaryFraction?: number;
   compactBehavior?: 'hide' | 'stack';
   scroll?: boolean;
+  extendUnderTabBar?: boolean;
   tabletop?: boolean;
   backgroundColor?: ColorName | (string & {});
   style?: StyleProp<ViewStyle>;
@@ -58,6 +59,7 @@ function ZSPaneLayout({
   primaryFraction = 0.4,
   compactBehavior = 'hide',
   scroll = false,
+  extendUnderTabBar = false,
   tabletop = false,
   backgroundColor,
   style,
@@ -102,6 +104,7 @@ function ZSPaneLayout({
         primaryFraction={primaryFraction}
         compactBehavior={compactBehavior}
         scroll={scroll}
+        extendUnderTabBar={extendUnderTabBar}
         tabletop={tabletop}
         surfaceColor={surfaceColor}
         windowClass={layout.widthClass}
@@ -124,6 +127,7 @@ type PaneRowProps = Pick<ZSPaneLayoutProps, 'primary' | 'secondary' | 'divider' 
   primaryFraction: number;
   compactBehavior: 'hide' | 'stack';
   scroll: boolean;
+  extendUnderTabBar: boolean;
   tabletop: boolean;
   surfaceColor: string;
   windowClass: WindowSizeClassName;
@@ -145,6 +149,7 @@ function PaneRow({
   primaryFraction,
   compactBehavior,
   scroll,
+  extendUnderTabBar,
   tabletop,
   surfaceColor,
   windowClass,
@@ -176,7 +181,7 @@ function PaneRow({
 
   const leading: Edge = rtl ? 'right' : 'left';
   const trailing: Edge = rtl ? 'left' : 'right';
-  const paneProps = { scroll, surfaceColor, windowClass, windowHeightClass };
+  const paneProps = { scroll, extendUnderTabBar, surfaceColor, windowClass, windowHeightClass };
 
   return (
     <View
@@ -227,6 +232,7 @@ type PaneProps = {
   sides: Edge[];
   vertical?: Edge[];
   scroll: boolean;
+  extendUnderTabBar: boolean;
   surfaceColor: string;
   width?: number;
   height?: number;
@@ -243,6 +249,7 @@ function Pane({
   sides,
   vertical = ['top', 'bottom'],
   scroll,
+  extendUnderTabBar,
   surfaceColor,
   width,
   height,
@@ -288,8 +295,10 @@ function Pane({
 
   const baseEdges: Edge[] = scroll && isIOS ? sides : [...sides, ...vertical];
   const edges = baseEdges.filter(
-    (edge) => !(edge === 'top' && headerOverlap > 0) && !(edge === 'bottom' && tabBarOverlap > 0 && scroll),
+    (edge) => !(edge === 'top' && headerOverlap > 0) && !(edge === 'bottom' && tabBarOverlap > 0 && (scroll || extendUnderTabBar)),
   );
+  // extendUnderTabBar 인 고정 pane 은 탭 바 뒤까지 깔리고, 안의 콘텐츠가 아래 inset·탭 바만큼 직접 비킨다
+  const fixedTabBarPadding = extendUnderTabBar ? 0 : tabBarOverlap;
   const scrollView = scroll ? (
     <ScrollView
       style={blurHeader ? [styles.flex1, { backgroundColor: surfaceColor }] : styles.flex1}
@@ -316,7 +325,7 @@ function Pane({
         <View style={width !== undefined ? { width } : height !== undefined ? { height } : styles.flex1} testID={testID}>
           <SafeAreaView
             edges={edges}
-            style={!scroll && (headerOverlap > 0 || tabBarOverlap > 0) ? [styles.flex1, { paddingTop: headerOverlap, paddingBottom: tabBarOverlap }] : styles.flex1}
+            style={!scroll && (headerOverlap > 0 || fixedTabBarPadding > 0) ? [styles.flex1, { paddingTop: headerOverlap, paddingBottom: fixedTabBarPadding }] : styles.flex1}
           >
             {scroll ? (
               blurHeader ? (

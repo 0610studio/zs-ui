@@ -31,6 +31,7 @@ export default function MailScreen() {
 | `primaryFraction` | `number` | `0.4` | 비율 분할에서 주 pane 비율(0–1). 각 pane은 최소 300입니다 |
 | `compactBehavior` | `'hide' \| 'stack'` | `'hide'` | 1단일 때 secondary — 숨기거나 primary 아래에 쌓습니다 |
 | `scroll` | `boolean` | `false` | 각 pane을 ScrollView로 감쌉니다 |
+| `extendUnderTabBar` | `boolean` | `false` | 고정 pane을 Android 떠 있는 탭 바 뒤(화면 아래 끝)까지 깝니다. pane 안의 콘텐츠가 아래 inset·`useTabBarInset()`만큼 비킵니다 — [떠 있는 탭 바](../Navigation/ZSTabNavigator#하단-바-모양--barstyle) |
 | `tabletop` | `boolean` | `false` | 테이블탑 자세(화면을 가르는 가로 접힘선)에서 위·아래로 나눕니다 |
 | `backgroundColor` | `ColorName \| string` | `'background'` | 표면색 — 색 역할 이름 또는 직접 지정한 색 |
 | `style` | `StyleProp<ViewStyle>` | `undefined` | |

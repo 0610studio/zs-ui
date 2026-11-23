@@ -181,7 +181,7 @@ function UnreadAccessory({ unread, onReadAll }: { unread: number; onReadAll: () 
 |------|------|
 | [`ZSScreen`](../UiComponent/ZSScreen) 스크롤 | 스크롤 뷰는 떠 있는 바 뒤까지 깔고, 콘텐츠를 아래 inset·떠 있는 바 위 10dp에서 끝냅니다 |
 | `ZSScreen` `bottomComponent`·[`ZSKeyboardStickyView`](../UiComponent/ZSKeyboardStickyView) | 떠 있는 바 위에 놓입니다. 키보드가 열리면 키보드 위로 갑니다 |
-| `ZSScreen scrollEnabled={false}`·[`ZSPaneLayout`](../Layout/ZSPaneLayout) | 스크롤 pane은 `ZSScreen`과 같고, 고정 화면·pane은 떠 있는 바 위에서 끝납니다 |
+| `ZSScreen scrollEnabled={false}`·[`ZSPaneLayout`](../Layout/ZSPaneLayout) | 스크롤 pane은 `ZSScreen`과 같고, 고정 화면·pane은 떠 있는 바 위에서 끝납니다. `extendUnderTabBar`를 주면 고정 화면·pane도 떠 있는 바 뒤까지 깔고, 안의 목록이 아래 행처럼 직접 비킵니다 |
 | 직접 스크롤하는 목록(`FlatList` 등) | `contentContainerStyle.paddingBottom`에 아래 safe area와 `useTabBarInset()`을 더합니다 |
 
 ```tsx

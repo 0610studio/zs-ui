@@ -927,6 +927,23 @@ describe('ZSScreen 떠 있는 탭 바 아래 (Android 탭 기본)', () => {
     expect(body && within(body).getByText('Test')).toBeTruthy();
   });
 
+  it('extendUnderTabBar 고정 본문은 탭 바 뒤(아래 끝)까지 깔린다 — 루트 하단 inset·탭 바 여백을 안쪽 목록에 맡긴다', async () => {
+    const tree = await renderInTab(<ZSScreen scrollEnabled={false} extendUnderTabBar><Text>Test</Text></ZSScreen>);
+    expect(rootOf(tree).props.edges).toEqual(['left', 'right', 'top']);
+    expect(queryAllByHostType('View', tree.container).some((node: any) => StyleSheet.flatten(node.props.style)?.paddingBottom === 84)).toBe(false);
+  });
+
+  it('extendUnderTabBar 는 떠 있는 탭 바가 없으면(탭 화면 밖·iOS) 고정 본문을 그대로 둔다', async () => {
+    const outside = await render(<ZSScreen scrollEnabled={false} extendUnderTabBar><Text>Test</Text></ZSScreen>);
+    expect(rootOf(outside).props.edges).toEqual(['left', 'right', 'top', 'bottom']);
+    await outside.unmount();
+
+    platform.OS = 'ios';
+    mockInsetBottom = 34;
+    const ios = await renderInTab(<ZSScreen scrollEnabled={false} extendUnderTabBar><Text>Test</Text></ZSScreen>);
+    expect(nth(queryAllByHostType('SafeAreaView', ios.container), 1).props.edges).toEqual(['top', 'bottom']);
+  });
+
   it('bottomComponent 는 탭 바 위에 놓인다 — 본문·bottomComponent 열이 탭 바 높이만큼 위에서 끝난다', async () => {
     const tree = await renderInTab(<ZSScreen bottomComponent={<Text>CTA</Text>}><Text>Test</Text></ZSScreen>);
     const column = queryAllByHostType('View', tree.container).find((node: any) => StyleSheet.flatten(node.props.style)?.marginBottom === 84);

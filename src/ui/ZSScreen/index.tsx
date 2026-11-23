@@ -83,6 +83,7 @@ export type ZSScreenProps = ViewProps & {
   edges?: Edge[];
   maxContentWidth?: ContentMaxWidth;
   scrollEnabled?: boolean;
+  extendUnderTabBar?: boolean;
   refreshControl?: React.ReactElement<RefreshControlProps>;
   bounces?: boolean;
   topComponent?: ReactNode;
@@ -103,6 +104,7 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
     edges,
     maxContentWidth = 'none',
     scrollEnabled = true,
+    extendUnderTabBar = false,
     refreshControl,
     bounces,
     topComponent,
@@ -310,8 +312,10 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
           {children}
         </View>
       );
-      return underHeader > 0 || underTabBar > 0
-        ? <View style={[styles.flex1, { paddingTop: underHeader, paddingBottom: underTabBar }]}>{fixedBody}</View>
+      // extendUnderTabBar 면 본문이 탭 바 뒤까지 깔리고, 안의 목록이 아래 inset·탭 바만큼 직접 비킨다
+      const fixedTabBarPadding = extendUnderTabBar ? 0 : underTabBar;
+      return underHeader > 0 || fixedTabBarPadding > 0
+        ? <View style={[styles.flex1, { paddingTop: underHeader, paddingBottom: fixedTabBarPadding }]}>{fixedBody}</View>
         : fixedBody;
     }
     return (
@@ -356,7 +360,7 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
             const underTabBar = bottomComponent ? 0 : tabBarOverlap;
             const body = renderBody(underHeader, insets, underTabBar);
             const edgesForRoot = rootEdges.filter(
-              (edge) => !(edge === 'top' && headerOverlap > 0) && !(edge === 'bottom' && underTabBar > 0 && scrollEnabled),
+              (edge) => !(edge === 'top' && headerOverlap > 0) && !(edge === 'bottom' && underTabBar > 0 && (scrollEnabled || extendUnderTabBar)),
             );
             return (
               <SafeAreaView style={rootStyle} edges={edgesForRoot}>

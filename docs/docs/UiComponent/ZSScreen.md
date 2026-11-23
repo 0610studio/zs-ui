@@ -27,6 +27,7 @@ function EditScreen() {
 | `edges` | `Array<'top' \| 'right' \| 'bottom' \| 'left'>` | 영역별 자동 | 지정하면 그 방향만 safe area 패딩으로 처리합니다 — [Safe area](#safe-area) |
 | `maxContentWidth` | `'readable' \| number \| 'none'` | `'none'` | 넓은 창에서 콘텐츠·`topComponent`·`bottomComponent`의 최대 폭 — [넓은 창 폭](#넓은-창-폭) |
 | `scrollEnabled` | `boolean` | `true` | `false`면 `ScrollView` 없이 고정 `View`로 그립니다(키보드 자동 스크롤·`refreshControl`·`bounces`도 꺼짐) |
+| `extendUnderTabBar` | `boolean` | `false` | `scrollEnabled={false}` 본문을 Android 떠 있는 탭 바 뒤(화면 아래 끝)까지 깝니다. 안의 목록이 아래 inset·`useTabBarInset()`만큼 비킵니다 — [떠 있는 탭 바](../Navigation/ZSTabNavigator#하단-바-모양--barstyle) |
 | `refreshControl` | `ReactElement<RefreshControlProps>` | `undefined` | 당겨서 새로고침 — [아래](#당겨서-새로고침) |
 | `bounces` | `boolean` | `refreshControl`이 있으면 `true`, 없으면 `false` | 스크롤 끝에서 튕김(iOS). Android는 오버스크롤 효과(`overScrollMode`)를 같은 값으로 켜고 끕니다 |
 | `topComponent` | `ReactNode` | `undefined` | 스크롤 밖 상단에 고정하는 영역 |
