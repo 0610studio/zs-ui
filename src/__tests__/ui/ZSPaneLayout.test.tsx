@@ -4,6 +4,7 @@ import { Platform, ScrollView, StyleSheet, Text } from 'react-native';
 import { HeaderHeightContext } from 'expo-router/react-navigation';
 import { TabBarInsetContext } from '../../navigation/useTabBarInset';
 import ZSPaneLayout from '../../ui/ZSPaneLayout';
+import ZSScreen from '../../ui/ZSScreen';
 import { LayoutProvider } from '../../layout/LayoutProvider';
 import { usePaneLayout } from '../../layout/PaneContext';
 import type { WindowObserverProps } from '../../layout/WindowObserver.types';
@@ -528,5 +529,26 @@ describe('큰 화면 창(largeScreen)을 따른 분할 — Android 판정은 res
   it('큰 화면 창이 아니면 폭이 넓어도 1단이다', async () => {
     const tree = await render(<ZSPaneLayout {...PANES} />, { width: 900, height: 420, horizontalSizeClass: 'compact', verticalSizeClass: 'compact', readableWidth: 600 });
     expect(tree.queryByText('상세')).toBeNull();
+  });
+});
+
+describe('ZSScreen 한쪽 아래 영역 — 안의 ZSPaneLayout 실제 분할을 따른다', () => {
+  const REGULAR = (width: number) => ({ width, height: 700, horizontalSizeClass: 'regular', verticalSizeClass: 'regular', readableWidth: 640 } as const);
+  const sideOf = (tree: Awaited<ReturnType<typeof render>>) => tree.queryByTestId('zs-screen-bottom-side');
+  const screenWith = (pane: Partial<React.ComponentProps<typeof ZSPaneLayout>>) => (
+    <ZSScreen scrollEnabled={false} bottomComponent={<Text>CTA</Text>} bottomComponentPlacement="start">
+      <ZSPaneLayout {...PANES} {...pane} />
+    </ZSScreen>
+  );
+
+  it('pane 이 기본보다 좁은 간격으로 두 칸이 되면(기본값으론 한 칸) 그 분할을 따라 한쪽에 둔다', async () => {
+    // iOS 기본(hairline 구분선)은 480 에서 한 칸이지만 divider 없는 spacing 0 pane 은 240 두 개가 들어가 두 칸
+    const tree = await render(screenWith({ divider: false, spacing: 0, primaryFraction: 0.5 }), REGULAR(480));
+    expect(sideOf(tree)).not.toBeNull();
+  });
+
+  it('pane 이 넓은 간격 때문에 한 칸이면 기본값이 두 칸이어도 전폭으로 둔다', async () => {
+    const tree = await render(screenWith({ spacing: 24, primaryFraction: 0.5 }), REGULAR(490));
+    expect(sideOf(tree)).toBeNull();
   });
 });

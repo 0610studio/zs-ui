@@ -91,7 +91,7 @@ function EditScreen() {
 </ZSScreen>
 ```
 
-두 칸 창은 [`useCanSplitPanes()`](../Layout/ZSPaneLayout#usecansplitpanes)가 `true`인 창 — 기본 설정의 `ZSPaneLayout`이 두 칸으로 나누는 창입니다. 폭 등급(`widthClass`)이 아니라 큰 화면 창·pane 최소 폭으로 정하므로, 화면 확대로 compact가 된 펼친 폴더블도 두 칸 창입니다.
+두 칸 창은 안에 둔 `ZSPaneLayout`이 실제로 두 칸으로 나뉜 창입니다(`spacing`·`divider`를 바꿔도 그 결과를 따릅니다). 안에 `ZSPaneLayout`이 없으면 기본 설정의 분할 규칙 [`useCanSplitPanes()`](../Layout/ZSPaneLayout#usecansplitpanes)로 정합니다. 폭 등급(`widthClass`)이 아니라 큰 화면 창·pane 최소 폭으로 정하므로, 화면 확대로 compact가 된 펼친 폴더블도 두 칸 창입니다.
 
 | 값 | 두 칸 창 | 한 칸 창 |
 |----|------|------|

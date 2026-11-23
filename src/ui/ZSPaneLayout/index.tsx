@@ -11,6 +11,7 @@ import { resolveColor, type ColorName } from '../../theme/color';
 import { useDisplayFeatures, useWindowLayout } from '../../layout/LayoutContext';
 import { MATERIAL_PANE_SPACER, resolvePaneArrangement, type LocalFold, type PaneArrangement } from '../../layout/paneLayout';
 import { PaneContext } from '../../layout/PaneContext';
+import { PaneSplitReportContext } from '../ZSScreen/PaneSplitContext';
 import { classifyHeight, classifyWidth, narrowerClass } from '../../layout/windowClass';
 import type { DisplayFeature, PaneRole, WindowSizeClassName } from '../../layout/types';
 
@@ -182,6 +183,16 @@ function PaneRow({
     largeScreen,
   });
   const separator = renderSeparator(arrangement, divider, dividerColor);
+
+  // 감싼 ZSScreen 이 한쪽 아래 영역(bottomComponentPlacement)을 실제 분할에 맞추게 알린다
+  const reportSplit = useContext(PaneSplitReportContext);
+  const split = arrangement.mode === 'split';
+  useEffect(() => {
+    reportSplit?.(split);
+  }, [reportSplit, split]);
+  useEffect(() => () => {
+    reportSplit?.(null);
+  }, [reportSplit]);
 
   const leading: Edge = rtl ? 'right' : 'left';
   const trailing: Edge = rtl ? 'left' : 'right';

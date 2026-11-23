@@ -17,6 +17,7 @@ import { resolveContentMaxWidth } from '../../layout/windowClass';
 import type { ContentMaxWidth } from '../../layout/types';
 import { InputFocusContext } from './InputFocusContext';
 import { ScreenBottomInsetContext } from './BottomInsetContext';
+import { PaneSplitReportContext } from './PaneSplitContext';
 
 const KEYBOARD_ANIMATION_DELAY = 50;
 const SCROLL_VIEW_OPTIONS = {
@@ -128,10 +129,12 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
   const isIOS = Platform.OS === 'ios';
   const { widthClass, readableMaxWidth } = useWindowLayout();
   const contentMaxWidth = resolveContentMaxWidth(maxContentWidth, { widthClass, readableMaxWidth });
-  // 한쪽 CTA 는 ZSPaneLayout 이 두 칸으로 나누는 창에서만 — 폭 등급이 아니라 같은 분할 규칙(큰 화면 창·pane 최소 폭)을 본다.
-  // 화면 확대로 compact 가 된 펼친 Fold 도 두 칸이라 한쪽에 두고, 한 칸이면 전폭으로 둔다
+  // 한쪽 CTA 는 두 칸일 때만 — 안의 ZSPaneLayout 이 알려 준 실제 분할을 따르고(앱이 spacing·divider 를 바꿔도 같다),
+  // 알리는 pane 이 없으면 같은 분할 규칙의 기본값(useCanSplitPanes)으로 본다. 화면 확대로 compact 가 된 펼친 Fold 도 두 칸이다
   const canSplit = useCanSplitPanes();
-  const bottomSide = bottomComponent && bottomComponentPlacement !== 'full' && canSplit ? bottomComponentPlacement : null;
+  const [reportedSplit, setReportedSplit] = useState<boolean | null>(null);
+  const split = reportedSplit ?? canSplit;
+  const bottomSide = bottomComponent && bottomComponentPlacement !== 'full' && split ? bottomComponentPlacement : null;
   const [bottomSideHeight, setBottomSideHeight] = useState(0);
   const handleBottomSideLayout = useCallback((event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
@@ -353,6 +356,7 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
 
   return (
     <InputFocusContext.Provider value={notifyInputFocus}>
+      <PaneSplitReportContext.Provider value={setReportedSplit}>
       <ScreenBottomInsetContext.Provider value={bottomInset}>
       <BottomStickyContext.Provider value={bottomBar.active ? bottomBar.setSticky : null}>
       <SurfaceContext.Provider value={typeof surfaceColor === 'string' ? surfaceColor : null}>
@@ -414,6 +418,7 @@ const ZSScreen = forwardRef<ZSScreenRef, ZSScreenProps>(function ZSScreen(
       </SurfaceContext.Provider>
       </BottomStickyContext.Provider>
       </ScreenBottomInsetContext.Provider>
+      </PaneSplitReportContext.Provider>
     </InputFocusContext.Provider>
   );
 });

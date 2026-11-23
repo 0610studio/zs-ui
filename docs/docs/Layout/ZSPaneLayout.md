@@ -104,7 +104,7 @@ function MailScreen() {
 
 - 창 전체를 쓰는 `ZSPaneLayout` 기준입니다(창 폭 − 좌우 safe area − 구분선 − `spacing`). 창의 일부에 둔 `ZSPaneLayout`은 자기 폭으로 판단합니다.
 - 책 자세처럼 접힘선으로 나뉘는 경우(분할 규칙 2)는 포함하지 않습니다. 필요하면 [`useDisplayFeatures().fold`](./useDisplayFeatures)를 함께 봅니다.
-- [`ZSScreen bottomComponentPlacement`](../UiComponent/ZSScreen#아래-영역-위치)는 기본 옵션의 이 값으로 한쪽 배치를 정합니다.
+- [`ZSScreen bottomComponentPlacement`](../UiComponent/ZSScreen#아래-영역-위치)는 안의 `ZSPaneLayout`이 알려 주는 실제 분할을 따르고, 없을 때만 기본 옵션의 이 값을 씁니다.
 
 `CanSplitPanesOptions` 타입을 내보냅니다.
 
