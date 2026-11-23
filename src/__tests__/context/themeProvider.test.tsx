@@ -300,6 +300,65 @@ describe('ThemeProvider', () => {
     });
   });
 
+  describe('Android 앱 야간 모드 저장(다음 실행 스플래시)', () => {
+    let setApplicationNightMode: jest.Mock;
+
+    beforeEach(() => {
+      platform.OS = 'android';
+      setApplicationNightMode = jest.fn(() => true);
+      mockNativeModule({ setApplicationNightMode });
+    });
+
+    it('저장된 선택을 읽은 뒤에만 쓴다 — 다크로 저장된 앱을 읽기 전 기본값(system)으로 덮지 않는다', async () => {
+      await AsyncStorage.setItem(STORAGE_KEY, 'dark');
+      await renderProvider();
+      expect(setApplicationNightMode.mock.calls).toEqual([['dark']]);
+    });
+
+    it('저장값이 없으면 기기 모드를 따르고, 고르면 그 모드를 저장한다', async () => {
+      await renderProvider();
+      expect(setApplicationNightMode).toHaveBeenLastCalledWith('system');
+      await act(() => theme.setColorSchemePreference('light'));
+      expect(setApplicationNightMode).toHaveBeenLastCalledWith('light');
+    });
+
+    it('저장소를 읽지 못하면 남아 있는 값을 건드리지 않다가, 직접 고르면 쓴다', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+      jest.mocked(AsyncStorage.getItem).mockRejectedValueOnce(new Error('disk'));
+      await renderProvider();
+      expect(setApplicationNightMode).not.toHaveBeenCalled();
+      await act(() => theme.setColorSchemePreference('dark'));
+      expect(setApplicationNightMode.mock.calls).toEqual([['dark']]);
+    });
+
+    it('darkMode=false 면 라이트로 저장한다', async () => {
+      await AsyncStorage.setItem(STORAGE_KEY, 'dark');
+      await renderProvider({ darkMode: false });
+      expect(setApplicationNightMode.mock.calls).toEqual([['light']]);
+    });
+
+    it('저장값이라 언마운트해도 풀지 않는다', async () => {
+      const view = await renderProvider();
+      await act(() => theme.setColorSchemePreference('dark'));
+      setApplicationNightMode.mockClear();
+      await view.unmount();
+      expect(setApplicationNightMode).not.toHaveBeenCalled();
+    });
+
+    it('syncNativeAppearance=false 면 기기 모드를 따르게 되돌리고 선택은 저장하지 않는다', async () => {
+      await renderProvider({ syncNativeAppearance: false });
+      await act(() => theme.setColorSchemePreference('dark'));
+      expect(setApplicationNightMode.mock.calls).toEqual([['system']]);
+    });
+
+    it('iOS 는 시작 화면을 앱이 바꿀 수 없어 부르지 않는다', async () => {
+      platform.OS = 'ios';
+      await AsyncStorage.setItem(STORAGE_KEY, 'dark');
+      await renderProvider();
+      expect(setApplicationNightMode).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Android 시스템 바', () => {
     it('상태바·내비게이션 바 아이콘을 모드에 맞춘다', async () => {
       platform.OS = 'android';

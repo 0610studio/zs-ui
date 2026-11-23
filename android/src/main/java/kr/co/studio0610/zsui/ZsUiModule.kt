@@ -30,6 +30,21 @@ class ZsUiModule : Module() {
       uiModeManager()?.contrast
     }
 
+    // Persists the app's own night mode (Android 12+) so the system draws the next starting window
+    // (splash) in the app's chosen mode instead of the device mode. "system" follows the device again.
+    Function("setApplicationNightMode") { preference: String ->
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return@Function false
+      val manager = uiModeManager() ?: return@Function false
+      manager.setApplicationNightMode(
+        when (preference) {
+          "dark" -> UiModeManager.MODE_NIGHT_YES
+          "light" -> UiModeManager.MODE_NIGHT_NO
+          else -> UiModeManager.MODE_NIGHT_AUTO
+        },
+      )
+      true
+    }
+
     OnStartObserving {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return@OnStartObserving
       val manager = uiModeManager() ?: return@OnStartObserving

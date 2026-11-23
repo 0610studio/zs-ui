@@ -51,6 +51,8 @@ interface ZsUiNativeModule {
   getDynamicSeedColor?: () => string | null;
   getContrast?: () => number | null;
   addListener?: (event: 'onContrastChange', listener: (event: { contrast: number }) => void) => { remove: () => void };
+  /** Android 12+ 앱 전용 야간 모드를 시스템에 저장한다. 다음 실행의 시작 창(스플래시)이 이 모드로 그려진다 */
+  setApplicationNightMode?: (preference: ColorSchemePreference) => boolean;
 }
 
 const nativeModule = (): ZsUiNativeModule | null => requireOptionalNativeModule<ZsUiNativeModule>('ZsUi');
@@ -144,6 +146,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 }) => {
   const systemScheme = useColorScheme();
   const [preference, setPreference] = useState<ColorSchemePreference>(darkMode ? 'system' : 'light');
+  // 저장된 선택을 읽었거나 직접 골랐는지. 읽기 전 기본값('system')은 실제 선택이 아니다
+  const [preferenceKnown, setPreferenceKnown] = useState(false);
   const preferenceRevision = useRef(0);
   const restoreRevision = preferenceRevision.current;
 
@@ -155,10 +159,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     }
     if (revision !== preferenceRevision.current) return;
     setPreference('system');
+    setPreferenceKnown(false);
     let mounted = true;
     AsyncStorage.getItem(STORAGE_KEY)
       .then((stored) => {
-        if (mounted && revision === preferenceRevision.current && (stored === 'light' || stored === 'dark' || stored === 'system')) setPreference(stored);
+        if (!mounted) return;
+        if (revision === preferenceRevision.current && (stored === 'light' || stored === 'dark' || stored === 'system')) setPreference(stored);
+        setPreferenceKnown(true);
       })
       .catch((error) => console.error('[zs-ui] 테마 설정을 읽지 못했습니다', error));
     return () => {
@@ -224,11 +231,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     appliedAppearanceRef.current = false;
   }, []);
 
+  // Android 12+ 는 앱 전용 야간 모드를 시스템에 저장해 다음 실행의 시작 창(스플래시)도 앱 모드로 그린다.
+  // Appearance 는 실행 중에만 유지돼, 시스템이 라이트인데 앱을 다크로 둔 사람은 켤 때마다 흰 스플래시를 봤다.
+  // 저장된 선택을 읽기 전 기본값으로 쓰면 다크로 저장된 앱이 켤 때마다 밝아졌다 돌아오므로 선택을 안 뒤에만 쓴다.
+  // 저장값이라 언마운트로 풀지 않는다. 동기화를 끄면 기기 모드를 따르게 되돌린다(예전 실행이 남긴 값까지).
+  const nightModeKnown = !darkMode || preferenceKnown;
+  useEffect(() => {
+    if (Platform.OS !== 'android' || syncNativeAppearance) return;
+    nativeModule()?.setApplicationNightMode?.('system');
+  }, [syncNativeAppearance]);
+  useEffect(() => {
+    if (Platform.OS !== 'android' || !syncNativeAppearance || !nightModeKnown) return;
+    nativeModule()?.setApplicationNightMode?.(!darkMode ? 'light' : preference);
+  }, [syncNativeAppearance, nightModeKnown, darkMode, preference]);
+
   const setColorSchemePreference = useCallback(
     (next: ColorSchemePreference) => {
       if (!darkMode) return;
       preferenceRevision.current += 1;
       setPreference(next);
+      setPreferenceKnown(true);
       AsyncStorage.setItem(STORAGE_KEY, next).catch((error) => console.error('[zs-ui] 테마 설정을 저장하지 못했습니다', error));
     },
     [darkMode],

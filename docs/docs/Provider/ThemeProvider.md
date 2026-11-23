@@ -21,7 +21,7 @@
 | `darkMode` | `boolean` | `true` | `false`면 항상 라이트입니다. 저장된 선택도 무시합니다 |
 | `contrast` | `ContrastPreference` | `'system'` | `'system' \| 'standard' \| 'high'` — [대비](#대비--contrast) |
 | `dynamicColor` | `boolean` | `false` | Android 12 이상에서 배경화면 색을 primary 시드로 씁니다 — [dynamic color](#android-dynamic-color--dynamiccolor) |
-| `syncNativeAppearance` | `boolean` | `true` | 앱 테마 모드를 `Appearance.setColorScheme`으로 네이티브 UI에 반영합니다 — [네이티브 UI 동기화](#네이티브-ui-동기화--syncnativeappearance) |
+| `syncNativeAppearance` | `boolean` | `true` | 앱 테마 모드를 `Appearance.setColorScheme`으로 네이티브 UI에 반영하고, Android 12+ 는 다음 실행 스플래시 모드로도 저장합니다 — [네이티브 UI 동기화](#네이티브-ui-동기화--syncnativeappearance) |
 | `accessibilityLabels` | `Partial<AccessibilityLabels>` | 영어 | 컴포넌트가 스크린 리더에 읽히는 기본 문구 — [스크린 리더 문구](#스크린-리더-문구--accessibilitylabels) |
 | `maxFontSizeMultiplier` | `number` | `2` | 글자 확대 상한(시스템 글자 크기 배율). zs-ui 글자가 이 배율까지만 커집니다. `0`이면 제한하지 않습니다 — [적용 범위](../Theme/typography#앱-전체-상한--maxfontsizemultiplier) |
 | `children` | `ReactNode` | Required | 앱 |
@@ -109,6 +109,13 @@ function AppearanceSetting() {
 ### 네이티브 UI 동기화 — `syncNativeAppearance`
 
 켜져 있으면(기본) 선택한 모드를 `Appearance.setColorScheme`으로 네이티브에 알립니다(`'system'`이면 `'auto'`). 그래서 네이티브 헤더·키보드·시트가 앱 테마를 따릅니다.
+
+`Appearance`는 앱이 실행 중일 때만 유지됩니다. 그래서 Android 12 이상에서는 선택한 모드를 앱 전용 야간 모드(`UiModeManager.setApplicationNightMode`)로도 시스템에 저장합니다. 시스템이 라이트인데 앱을 다크로 둔 사람도 다음 실행의 스플래시(시작 창)를 다크로 봅니다. 스플래시 색은 앱의 `values-night` 리소스(예: `expo-splash-screen`의 `dark.backgroundColor`)를 따릅니다.
+
+- 저장된 선택을 읽은 뒤에, 또는 `setColorSchemePreference`로 직접 고른 뒤에만 저장합니다. 읽기 전 기본값(`'system'`)으로 덮으면, 다크로 저장된 앱이 켤 때마다 밝아졌다가 돌아옵니다.
+- 저장값이라 `ThemeProvider`를 언마운트해도 풀지 않습니다. `syncNativeAppearance={false}`로 끄면 기기 모드를 따르도록 되돌립니다. 이전 실행이 남긴 값도 함께 되돌립니다.
+- Android 11 이하와 iOS에는 이런 저장소가 없습니다. iOS 시작 화면(LaunchScreen)은 앱이 바꿀 수 없어 기기 모드를 따릅니다.
+- 네이티브 코드라 zs-ui 2.3.0 이상의 새 앱 바이너리가 있어야 동작합니다. 모듈이 없는 바이너리에서는 아무 일도 하지 않습니다.
 
 앱이 `Appearance`를 직접 제어해야 하면 `syncNativeAppearance={false}`로 끕니다. 끄면 네이티브 UI는 시스템 설정을 따르고 zs-ui 색만 바뀝니다. Android 상태 바·내비게이션 바 아이콘 색은 이 설정과 관계없이 앱 테마 모드에 맞춥니다(`expo-navigation-bar`). 라이트 모드는 어두운 아이콘, 다크 모드는 밝은 아이콘입니다 — [Android 내비게이션 바](#android-내비게이션-바). iOS Info.plist `UIViewControllerBasedStatusBarAppearance`가 `true`면 [`useStackTheme`](../Navigation/Stack)을 넣은 Stack 화면의 상태바도 이 설정과 관계없이 앱 테마 모드를 따릅니다.
 
