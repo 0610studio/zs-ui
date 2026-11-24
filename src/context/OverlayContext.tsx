@@ -161,7 +161,7 @@ export function OverlayProvider({ children, snackbarPosition = 'top', bottomShee
           {sheets.map((sheet) => (sheet.state === 'pending' ? null : <SheetLayer key={sheet.id} sheet={sheet} maxWidth={bottomSheetMaxWidth} onClose={handleSheetClose} />))}
           {currentAlert ? <AlertDialog key={currentAlert.id} alert={currentAlert.props} onClose={closeAlert} /> : null}
           <SnackbarHost items={snackbars} onHide={hideSnackbar} position={snackbarPosition} bottomBar={bottomBar} />
-          <Loader visible={loader !== null} accessibilityLabel={loader?.accessibilityLabel ?? accessibilityLabels.loading} />
+          <Loader visible={loader !== null} accessibilityLabel={loader?.accessibilityLabel ?? accessibilityLabels.loading} progress={loader?.progress} />
         </PortalProvider>
       </VeilTargetContext.Provider>
     </OverlayContext.Provider>

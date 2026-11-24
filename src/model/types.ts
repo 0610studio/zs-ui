@@ -43,6 +43,8 @@ export interface ShowSnackbarProps {
 
 export interface ShowLoaderProps {
   accessibilityLabel?: string;
+  /** 0~1. 주면 진행 표시 아래에 막대와 백분율을 보인다. 같은 작업 중에 다시 호출해 값을 바꾼다 */
+  progress?: number;
 }
 
 export interface OverlayContextProps {

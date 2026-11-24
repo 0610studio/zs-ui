@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react-native';
 import { Platform, StyleSheet } from 'react-native';
-import Loader, { LOADER_BOX_SIZE } from '../../overlay/Loader';
+import Loader, { LOADER_BOX_SIZE, LOADER_PROGRESS_WIDTH } from '../../overlay/Loader';
 import { withOpacity } from '../../theme/color';
 import { RADIUS } from '../../theme/radius';
 import { DURATION } from '../../theme/motion';
@@ -79,6 +79,45 @@ describe('Loader', () => {
     expect(styleOf(box)).toMatchObject({ width: 88, height: 88, borderRadius: RADIUS.lg });
     expect(fillOf(box as never)).toMatchObject({ backgroundColor: withOpacity(colors.surface1, 0.8) });
     expect(queryAllByHostType('ContainedLoadingIndicator')).toHaveLength(0);
+  });
+
+  it('progress 가 없으면 진행률을 그리지 않고 스크린 리더 값도 두지 않는다', async () => {
+    await render(<Loader visible accessibilityLabel="로딩" />);
+    expect(screen.queryByTestId('zs-loader-progress')).toBeNull();
+    expect(screen.queryByTestId('zs-loader-percent')).toBeNull();
+    expect(screen.getByTestId('zs-loader').props.accessibilityValue).toBeUndefined();
+  });
+
+  it.each(['ios', 'android'])('%s: progress 를 주면 진행 표시 아래 막(veil) 상자에 막대와 백분율을 그리고 스크린 리더 값으로 알린다', async (os) => {
+    platform.OS = os;
+    await render(<Loader visible accessibilityLabel="압축 중" progress={0.426} />);
+    expect(screen.getByTestId('zs-loader').props.accessibilityValue).toEqual({ min: 0, max: 100, now: 42 });
+    expect(screen.getByTestId('zs-loader-percent').props.children).toBe('42%');
+    expect(styleOf(screen.getByTestId('zs-loader-percent'))).toMatchObject({ color: colors.textSecondary, fontVariant: ['tabular-nums'] });
+    expect(styleOf(screen.getByTestId('zs-loader-progress'))).toMatchObject({ width: LOADER_PROGRESS_WIDTH, height: 4, backgroundColor: colors.surface4 });
+    expect(styleOf(screen.getByTestId('zs-loader-progress-fill'))).toMatchObject({ backgroundColor: colors.primary, width: '42.6%' });
+    const box = screen.getByTestId('zs-loader-progress').parent!.parent!;
+    expect(styleOf(box)).toMatchObject({ position: 'absolute', top: '100%', borderRadius: RADIUS.lg });
+  });
+
+  it.each([
+    [1.5, '100%'],
+    [-0.2, '0%'],
+    [Number.NaN, '0%'],
+    [0.999, '99%'],
+  ])('progress %p 는 0~1 로 자르고 내림해 %s 로 보인다', async (progress, text) => {
+    await render(<Loader visible accessibilityLabel="로딩" progress={progress} />);
+    expect(screen.getByTestId('zs-loader-percent').props.children).toBe(text);
+  });
+
+  it('visible 이 false 가 되면 사라지는 동안 마지막 진행률을 그대로 보인다', async () => {
+    jest.useFakeTimers();
+    const { rerender } = await render(<Loader visible accessibilityLabel="압축 중" progress={0.7} />);
+    await rerender(<Loader visible={false} accessibilityLabel="Loading" />);
+    expect(screen.getByTestId('zs-loader-percent').props.children).toBe('70%');
+    await act(() => jest.advanceTimersByTime(DURATION.fast));
+    expect(screen.queryByTestId('zs-loader')).toBeNull();
+    jest.useRealTimers();
   });
 
   it('Android 는 M3 Expressive ContainedLoadingIndicator 다 — Modal 창이라 뒤는 흐리지 않고 대체 scrim(48%)', async () => {

@@ -19,6 +19,15 @@ export default function OverlayExample() {
     setTimeout(hideLoader, 4000);
   };
 
+  const handleShowProgressLoader = () => {
+    const steps = 20;
+    showLoader({ accessibilityLabel: '압축하는 중', progress: 0 });
+    for (let step = 1; step <= steps; step += 1) {
+      setTimeout(() => showLoader({ accessibilityLabel: '압축하는 중', progress: step / steps }), step * 250);
+    }
+    setTimeout(hideLoader, steps * 250 + 600);
+  };
+
   return (
     <>
       <ScreenHeader title="Overlay" />
@@ -184,6 +193,7 @@ export default function OverlayExample() {
 
         <Section label="Loader · 작업 진행 상태" surface="list">
           <DemoRow title="showLoader" caption="4초 뒤 hideLoader · Android M3 LoadingIndicator" onPress={handleShowLoader} testID="overlay-loader" />
+          <DemoRow title="showLoader · progress" caption="5초 동안 0→100% 막대·백분율 뒤 hideLoader" onPress={handleShowProgressLoader} testID="overlay-loader-progress" />
         </Section>
       </ZSScreen>
     </>

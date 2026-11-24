@@ -34,13 +34,31 @@ function PayButton() {
 }
 ```
 
-`showLoader(props?)`는 진행 표시를 띄우고, 이미 떠 있으면 문구만 바꿉니다. `hideLoader()`로 닫습니다.
+`showLoader(props?)`는 진행 표시를 띄우고, 이미 떠 있으면 문구와 진행률만 바꿉니다. `hideLoader()`로 닫습니다.
+
+## 진행률 — `progress`
+
+얼마나 남았는지 알 수 있는 작업(파일 압축·올리기 등)은 `progress`(0~1)를 함께 넘깁니다. 진행 표시 아래 막(veil) 상자에 막대(120×4, 채움 `primary`·바탕 `surface4`)와 백분율(`label`, `textSecondary`)을 그립니다. 같은 작업 중에 `showLoader`를 다시 호출해 값을 바꾸면 막대가 짧게 이어서 늘어납니다.
+
+```tsx
+const { showLoader, hideLoader } = useOverlay();
+
+showLoader({ accessibilityLabel: '동영상 압축 중', progress: 0 });
+await compress(video, (value) => showLoader({ accessibilityLabel: '동영상 압축 중', progress: value }));
+hideLoader();
+```
+
+- 값은 0~1로 자르고 백분율은 내림합니다(`0.999` → `99%`). 숫자가 아닌 값은 `0%`입니다.
+- `progress`를 빼고 다시 호출하면 진행률만 거두고 진행 표시는 남습니다.
+- 진행률이 생기거나 사라져도 진행 표시는 화면 가운데에서 움직이지 않습니다.
+- 막대와 글자는 RN 뷰로 그려 iOS·Android 모양이 같습니다.
 
 ## Props — `ShowLoaderProps`
 
 | Prop | Type | Default | 설명 |
 |------|------|---------|------|
 | `accessibilityLabel` | `string` | `accessibilityLabels.loading`(`'Loading'`) | 스크린 리더가 읽는 문구. 앱 전체 기본값은 [ThemeProvider `accessibilityLabels`](../Provider/ThemeProvider#스크린-리더-문구--accessibilitylabels)로 바꿉니다 |
+| `progress` | `number` | `undefined` | 0~1 진행률. 주면 진행 표시 아래에 막대와 백분율을 보입니다 |
 
 `ShowLoaderProps` 타입을 내보냅니다.
 
@@ -52,7 +70,7 @@ function PayButton() {
 
 ## 접근성
 
-진행 표시는 `progressbar` 역할의 모달 요소입니다(`accessibilityViewIsModal`, `busy` 상태). 스크린 리더 포커스가 진행 표시로 옮겨지고 `accessibilityLabel`을 읽습니다.
+진행 표시는 `progressbar` 역할의 모달 요소입니다(`accessibilityViewIsModal`, `busy` 상태). 스크린 리더 포커스가 진행 표시로 옮겨지고 `accessibilityLabel`을 읽습니다. `progress`를 주면 `accessibilityValue`(`min` 0·`max` 100·`now` 백분율)로 진행률도 읽으므로, `accessibilityLabel`에는 백분율을 넣지 않습니다.
 
 ## 관련 문서
 

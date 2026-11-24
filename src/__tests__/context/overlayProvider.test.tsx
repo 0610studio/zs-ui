@@ -495,6 +495,18 @@ describe('OverlayProvider (iOS)', () => {
       expect(screen.getByTestId('zs-loader').props.accessibilityLabel).toBe('결제 중');
     });
 
+    it('progress 를 주면 진행률을 보이고, 다시 호출해 값을 바꾸거나 빼면 거둔다', async () => {
+      await renderProvider();
+      await act(() => overlay.showLoader());
+      expect(screen.queryByTestId('zs-loader-percent')).toBeNull();
+      await act(() => overlay.showLoader({ progress: 0.3 }));
+      expect(screen.getByTestId('zs-loader-percent').props.children).toBe('30%');
+      await act(() => overlay.showLoader({ progress: 0.8 }));
+      expect(screen.getByTestId('zs-loader-percent').props.children).toBe('80%');
+      await act(() => overlay.showLoader());
+      expect(screen.queryByTestId('zs-loader-percent')).toBeNull();
+    });
+
     it('기본 문구는 ThemeProvider accessibilityLabels.loading 을 따른다', async () => {
       setTestTheme({ accessibilityLabels: { loading: '불러오는 중' } });
       await renderProvider();
