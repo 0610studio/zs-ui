@@ -1,4 +1,4 @@
-# zs-ui 2.3.0
+# zs-ui 2.4.0
 
 `@0610studio/zs-ui`는 Expo SDK 58·React Native 0.88용 iOS·Android UI 라이브러리입니다.
 
