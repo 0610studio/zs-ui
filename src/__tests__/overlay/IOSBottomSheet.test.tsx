@@ -51,69 +51,41 @@ describe('iOS sheet presentation', () => {
     const sized = (props: Partial<React.ComponentProps<typeof IOSBottomSheet>> = {}) => (
       <IOSBottomSheet open dismissible maxWidth={500} onClose={jest.fn()} {...props}><Text>내용</Text></IOSBottomSheet>
     );
-    const modifierTypes = () => getByHostType('Group').props.modifiers.map((m: { $type: string }) => m.$type);
 
-    it('gives the SwiftUI sheet an ideal width that presentationSizing fits horizontally', async () => {
+    it('passes an ideal width that presentationSizing fits horizontally to the community sheet', async () => {
       await render(sized());
       const sheet = getByHostType('BottomSheet');
-      expect(sheet.props).toMatchObject({ isPresented: true, fitToContents: true });
-      expect(sheet.parent).toBe(getByHostType('Host'));
-      expect(getByHostType('Host').parent).toBe(getByHostType('ZSPresentationAnchorView'));
-      expect(getByHostType('Group').props.modifiers).toEqual(expect.arrayContaining([
+      expect(sheet.props).toMatchObject({ index: 0, enablePanDownToClose: true });
+      expect(sheet.parent).toBe(getByHostType('ZSPresentationAnchorView'));
+      expect(sheet.props.modifiers).toEqual([
         { $type: 'frame', args: [{ idealWidth: 500, maxWidth: 500 }] },
         { $type: 'presentationSizing', args: ['automatic', { fitted: { horizontal: true, vertical: true } }] },
-        { $type: 'interactiveDismissDisabled', args: [false] },
-      ]));
-      expect(modifierTypes()).not.toContain('presentationDetents');
-      expect(getByHostType('RNHostView').props).toMatchObject({ matchContents: { vertical: true }, boundedByHost: true });
+      ]);
       expect(screen.getByText('내용')).toBeTruthy();
     });
 
-    it('starts RN layout at the smaller of the max width and the window', async () => {
-      await render(sized({ maxWidth: 2000 }));
-      expect(StyleSheet.flatten(getByHostType('Host').props.style)).toMatchObject({ position: 'absolute', width: 390 });
-    });
-
-    it('keeps snap points as detents and fits only the width', async () => {
+    it('keeps snap points on the community sheet and fits only the width', async () => {
       await render(sized({ snapPoints: ['50%', '100%'], dismissible: false }));
-      expect(getByHostType('BottomSheet').props.fitToContents).toBe(false);
-      expect(getByHostType('Group').props.modifiers).toEqual(expect.arrayContaining([
+      const sheet = getByHostType('BottomSheet');
+      expect(sheet.props).toMatchObject({ snapPoints: ['50%', '100%'], enablePanDownToClose: false });
+      expect(sheet.props.modifiers).toEqual([
+        { $type: 'frame', args: [{ idealWidth: 500, maxWidth: 500 }] },
         { $type: 'presentationSizing', args: ['automatic', { fitted: { horizontal: true, vertical: false } }] },
-        { $type: 'presentationDetents', args: [[{ fraction: 0.5 }, { fraction: 1 }]] },
-        { $type: 'interactiveDismissDisabled', args: [true] },
-      ]));
-      expect(getByHostType('RNHostView').props).toMatchObject({ matchContents: false, boundedByHost: false });
+      ]);
     });
 
-    it('closes after the native dismissal, once', async () => {
+    it('closes through the community sheet', async () => {
       const onClose = jest.fn();
       await render(sized({ onClose }));
       await screen.rerender(sized({ onClose, open: false }));
-      expect(getByHostType('BottomSheet').props.isPresented).toBe(false);
-      expect(onClose).not.toHaveBeenCalled();
-      await act(() => getByHostType('BottomSheet').props.onDismiss());
-      await act(() => getByHostType('BottomSheet').props.onDismiss());
+      expect(getByHostType('BottomSheet').props.index).toBe(-1);
+      await act(() => getByHostType('BottomSheet').props.onClose());
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('reports a swipe-down as closed and can be opened again', async () => {
-      const onClose = jest.fn();
-      await render(sized({ onClose }));
-      await act(() => getByHostType('BottomSheet').props.onIsPresentedChange(false));
-      expect(getByHostType('BottomSheet').props.isPresented).toBe(false);
-      await act(() => getByHostType('BottomSheet').props.onDismiss());
-      expect(onClose).toHaveBeenCalledTimes(1);
-      await screen.rerender(sized({ onClose, open: false }));
-      await screen.rerender(sized({ onClose }));
-      expect(getByHostType('BottomSheet').props.isPresented).toBe(true);
-      await act(() => getByHostType('BottomSheet').props.onDismiss());
-      expect(onClose).toHaveBeenCalledTimes(2);
-    });
-
-    it.each([0, -1, Number.NaN])('keeps the community sheet for maxWidth %s', async (maxWidth) => {
+    it.each([undefined, 0, -1, Number.NaN])('passes no modifiers for maxWidth %s', async (maxWidth) => {
       await render(sized({ maxWidth }));
-      expect(getByHostType('BottomSheet').props.index).toBe(0);
-      expect(queryAllByHostType('Group')).toHaveLength(0);
+      expect(getByHostType('BottomSheet').props).toMatchObject({ index: 0, modifiers: undefined });
     });
   });
 
