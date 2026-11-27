@@ -1,6 +1,6 @@
 # 시작하기
 
-Expo SDK 58.0.26 이상·React Native 0.88 프로젝트에 zs-ui 2.4.0을 설치합니다. iOS·Android를 지원합니다.
+Expo SDK 58.1.0 이상·React Native 0.88 프로젝트에 zs-ui 2.4.0을 설치합니다. iOS·Android를 지원합니다.
 
 ## 1. 설치
 
@@ -15,14 +15,14 @@ npx expo install @0610studio/zs-ui@2.4.0 @expo/ui expo-router expo-navigation-ba
 
 | peer | 버전 | 비고 |
 |------|------|------|
-| `expo` | `>=58.0.0` | |
+| `expo` | `>=58.1.0` | |
 | `react` | `*` | |
 | `react-native` | `>=0.88.0` | |
-| `@expo/ui` | `>=58.0.22` | 시스템 컨트롤·메뉴·시트 |
-| `expo-router` | `>=58.0.26` | 탭·Stack |
+| `@expo/ui` | `>=58.0.30` | 시스템 컨트롤·메뉴·시트 |
+| `expo-router` | `>=58.0.33` | 탭·Stack |
 | `expo-navigation-bar` | `>=58.0.0` | Android 시스템 바 아이콘 색 |
 | `@react-native-async-storage/async-storage` | `*` | 다크 모드 선택 저장 |
-| `react-native-skia` | `>=3.0.0` | `ZSCalendar`·`ZSSkeleton`·`ZSBorderBeam`. Skia v3(Graphite)라 Android `minSdkVersion` 26 이상·Vulkan 1.1, iOS 15.1 이상이 필요합니다 |
+| `react-native-skia` | `>=3.10.1` | `ZSCalendar`·`ZSSkeleton`·`ZSBorderBeam`. Skia v3(Graphite)라 Android `minSdkVersion` 26 이상·Vulkan 1.1, iOS 15.1 이상이 필요합니다. 3.10.1부터 Android에서 접기·펴기나 화면 크기 설정으로 바뀐 화면 밀도를 따라갑니다(그 전 버전은 처음 밀도로 계속 그려 크기가 어긋납니다) |
 | `react-native-reanimated` | `>=4.7.0 <5.0.0` | |
 | `react-native-worklets` | `>=0.13.0 <0.14.0` | |
 | `react-native-gesture-handler` | `>=3.2.0 <4.0.0` | |
