@@ -1,13 +1,13 @@
 # 시작하기
 
-Expo SDK 58.1.0 이상·React Native 0.88 프로젝트에 zs-ui 2.4.0을 설치합니다. iOS·Android를 지원합니다.
+Expo SDK 58.1.0 이상·React Native 0.88 프로젝트에 zs-ui 2.4.1을 설치합니다. iOS·Android를 지원합니다.
 
 ## 1. 설치
 
 zs-ui와 peer 의존성을 함께 설치합니다. `npx expo install`이 Expo SDK 58에 맞는 버전을 고릅니다.
 
 ```bash
-npx expo install @0610studio/zs-ui@2.4.0 @expo/ui expo-router expo-navigation-bar \
+npx expo install @0610studio/zs-ui@2.4.1 @expo/ui expo-router expo-navigation-bar \
   @react-native-async-storage/async-storage react-native-skia \
   react-native-reanimated react-native-worklets react-native-gesture-handler \
   react-native-safe-area-context react-native-screens react-native-svg expo-blur expo-status-bar
