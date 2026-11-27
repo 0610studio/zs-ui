@@ -55,6 +55,19 @@ export function createComposeColors(colors: ThemeColors, mode: ColorMode = 'ligh
       disabledLeadingIconColor: disabledContent,
       disabledTrailingIconColor: disabledContent,
     },
+    // 고르지 않은 항목은 메뉴 면에 녹게 투명하게 둔다(Expressive 기본 면은 메뉴 면 위에서 칸처럼 보인다).
+    // 고른 항목은 넓은 채움 강조 — 선택된 ZSChip 처럼 primary 면에 onPrimary 글자·체크
+    selectableMenuItem: {
+      containerColor: TRANSPARENT,
+      disabledContainerColor: TRANSPARENT,
+      textColor: colors.text,
+      leadingIconColor: colors.textSecondary,
+      disabledTextColor: disabledContent,
+      disabledLeadingIconColor: disabledContent,
+      selectedContainerColor: colors.primary,
+      selectedTextColor: colors.onPrimary,
+      selectedLeadingIconColor: colors.onPrimary,
+    },
     bottomSheet: {
       contentColor: colors.text,
       scrimColor: withOpacity(colors.backdrop, mode === 'dark' ? DARK_SCRIM_OPACITY : OPACITY.backdrop),

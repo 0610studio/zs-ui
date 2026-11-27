@@ -6,6 +6,7 @@ import type { MockModifier } from '../__mocks__/expo-ui-jetpack-compose-modifier
 import { getByHostType, nth, queryAllByHostProps, queryAllByHostType } from '../utils/hostQueries';
 import { CHEVRON_PATHS } from '../../assets/SvgChevron';
 import { getTestTheme } from '../utils/theme';
+import { createComposeColors } from '../../native/composeColors';
 import { RADIUS } from '../../theme/radius';
 import { placeholderColor } from '../../ui/ZSTextField/placeholderColor';
 
@@ -144,7 +145,7 @@ describe('ZSSelect — Android Compose 메뉴', () => {
 
   const dropdown = () => getByHostType('DropdownMenu');
   const trigger = () => getByHostType('Pressable');
-  const items = () => queryAllByHostType('DropdownMenuItem');
+  const items = () => queryAllByHostType('SelectableDropdownMenuItem');
   const open = () => fireEvent.press(trigger());
 
   it('칸을 RNHostView(가로 채움) 안 Pressable 로 감싸고, 메뉴는 닫힌 채 칸과 같은 모서리·표면색이다', async () => {
@@ -162,7 +163,8 @@ describe('ZSSelect — Android Compose 메뉴', () => {
     });
   });
 
-  it('누르면 열리고 칸이 포커스처럼 보이며(화살표 위), 고른 항목에 체크를 단다', async () => {
+  it('누르면 열리고 칸이 포커스처럼 보이며(화살표 위), 항목은 M3 선택 항목이라 고른 항목만 selected 다', async () => {
+    const { colors } = getTestTheme();
     await render(<ZSSelectAndroid label="지역" options={OPTIONS} value="busan" />);
     await act(open);
     expect(dropdown().props.expanded).toBe(true);
@@ -170,8 +172,15 @@ describe('ZSSelect — Android Compose 메뉴', () => {
     expect(chevron('up')).toHaveLength(1);
     expect(chevron('down')).toHaveLength(0);
     expect(items()).toHaveLength(2);
-    expect(queryAllByHostType('DropdownMenuItem.TrailingIcon', nth(items(), 1))).toHaveLength(1);
-    expect(queryAllByHostType('DropdownMenuItem.TrailingIcon', nth(items(), 0))).toHaveLength(0);
+    expect(queryAllByHostType('DropdownMenuItem')).toHaveLength(0);
+    expect(items().map((item) => item.props.selected)).toEqual([false, true]);
+    expect(nth(items(), 0).props.colors).toEqual(createComposeColors(colors).selectableMenuItem);
+    // 체크는 선택 때만 보이는 앞 아이콘 자리 — 고른 항목을 Compose 가 바꿔 그린다
+    for (const item of items()) {
+      const [check] = queryAllByHostType('Icon', getByHostType('SelectableDropdownMenuItem.SelectedLeadingIcon', item));
+      expect(check?.props).toEqual({ source: { uri: 'zs_ui_check' }, size: 20 });
+    }
+    expect(screen.queryByText('✓')).toBeNull();
   });
 
   it('항목을 누르면 onValueChange 후 닫고, 바깥을 누르면(onDismissRequest) 닫는다', async () => {

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Pressable, type LayoutChangeEvent } from 'react-native';
-import { DropdownMenu, DropdownMenuItem, RNHostView, Text } from '@expo/ui/jetpack-compose';
+import { DropdownMenu, Icon, RNHostView, SelectableDropdownMenuItem, Text } from '@expo/ui/jetpack-compose';
 import { fillMaxWidth, width as widthModifier } from '@expo/ui/jetpack-compose/modifiers';
 import { useTheme } from '../../context/ThemeContext';
 import { PRESS_THROTTLE_INTERVAL, usePreventDoublePress } from '../../model/usePreventDoublePress';
 import { NativeHost } from '../../native/NativeHost';
 import { useComposeColors } from '../../native/composeColors';
+import { MENU_CHECK_ICON, MENU_CHECK_ICON_SIZE } from '../../native/menuIcons';
 import { resolveColor } from '../../theme/color';
 import { RADIUS } from '../../theme/radius';
 import { fontFamilyFor } from '../../theme/typeScale';
@@ -20,7 +21,8 @@ const MENU_CORNER = RADIUS.lg;
 
 /**
  * Android — ZSTextField 모양 칸을 누르면 칸 폭의 Compose 메뉴가 아래로 열린다.
- * 메뉴는 칸과 같은 모서리, 앱 글꼴, 고른 항목에 체크. 배경은 menuColor(기본 surface3).
+ * 메뉴는 칸과 같은 모서리, 앱 글꼴. 항목은 M3 Expressive 선택 항목이라 고른 항목에 강조 면과 앞 체크가 붙고,
+ * 선택 상태가 TalkBack 에 전달된다. 배경은 menuColor(기본 surface3).
  */
 function ZSSelect<T extends string | number = string>({
   label,
@@ -88,9 +90,10 @@ function ZSSelect<T extends string | number = string>({
         </DropdownMenu.Trigger>
         <DropdownMenu.Items>
           {options.map((option, index) => (
-            <DropdownMenuItem
+            <SelectableDropdownMenuItem
               key={`${index}-${option.value}`}
-              elementColors={composeColors.menuItem}
+              selected={index === selectedIndex}
+              colors={composeColors.selectableMenuItem}
               // 메뉴 폭을 칸 폭에 맞춘다(M3 exposed dropdown 과 같음)
               modifiers={fieldWidth > 0 ? [widthModifier(fieldWidth)] : undefined}
               onClick={() => {
@@ -98,17 +101,13 @@ function ZSSelect<T extends string | number = string>({
                 setExpanded(false);
               }}
             >
-              <DropdownMenuItem.Text>
+              <SelectableDropdownMenuItem.Text>
                 <Text style={itemStyle}>{option.label}</Text>
-              </DropdownMenuItem.Text>
-              {index === selectedIndex ? (
-                <DropdownMenuItem.TrailingIcon>
-                  <Text style={itemStyle} color={colors.text}>
-                    ✓
-                  </Text>
-                </DropdownMenuItem.TrailingIcon>
-              ) : null}
-            </DropdownMenuItem>
+              </SelectableDropdownMenuItem.Text>
+              <SelectableDropdownMenuItem.SelectedLeadingIcon>
+                <Icon source={MENU_CHECK_ICON} size={MENU_CHECK_ICON_SIZE} />
+              </SelectableDropdownMenuItem.SelectedLeadingIcon>
+            </SelectableDropdownMenuItem>
           ))}
         </DropdownMenu.Items>
       </DropdownMenu>

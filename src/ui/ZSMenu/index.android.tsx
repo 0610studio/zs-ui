@@ -1,13 +1,14 @@
 import React, { cloneElement, isValidElement, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { DropdownMenu, DropdownMenuItem, Icon, RNHostView, Text } from '@expo/ui/jetpack-compose';
+import { DropdownMenu, DropdownMenuItem, Icon, RNHostView, SelectableDropdownMenuItem, Text } from '@expo/ui/jetpack-compose';
 import { useTheme } from '../../context/ThemeContext';
 import { PRESS_THROTTLE_INTERVAL, usePreventDoublePress } from '../../model/usePreventDoublePress';
 import { NativeHost } from '../../native/NativeHost';
-import { useComposeColors } from '../../native/composeColors';
+import { useComposeColors, type ComposeColors } from '../../native/composeColors';
+import { MENU_CHECK_ICON, MENU_CHECK_ICON_SIZE } from '../../native/menuIcons';
 import ZSButton from '../ZSButton';
 import ZSPressable from '../ZSPressable';
-import type { ZSMenuProps } from './types';
+import type { ZSMenuItem, ZSMenuProps } from './types';
 
 export type { ZSMenuItem, ZSMenuProps } from './types';
 
@@ -62,34 +63,71 @@ function ZSMenu({ items, onSelect, children, openOnLongPress = false, style, tes
           </DropdownMenu.Trigger>
           <DropdownMenu.Items>
             {items.map((item) => (
-              <DropdownMenuItem
+              <MenuItem
                 key={item.key}
-                enabled={!item.disabled}
-                elementColors={item.destructive ? { ...composeColors.menuItem, textColor: colors.error, leadingIconColor: colors.error } : composeColors.menuItem}
+                item={item}
+                composeColors={composeColors}
+                errorColor={colors.error}
+                onErrorColor={colors.onError}
                 onClick={() => {
                   setExpanded(false);
                   onSelect(item.key);
                 }}
-              >
-                <DropdownMenuItem.Text>
-                  <Text>{item.label}</Text>
-                </DropdownMenuItem.Text>
-                {item.icon?.android ? (
-                  <DropdownMenuItem.LeadingIcon>
-                    <Icon source={item.icon.android} size={24} />
-                  </DropdownMenuItem.LeadingIcon>
-                ) : null}
-                {item.checked ? (
-                  <DropdownMenuItem.TrailingIcon>
-                    <Text color={item.disabled ? composeColors.disabledText : colors.text}>✓</Text>
-                  </DropdownMenuItem.TrailingIcon>
-                ) : null}
-              </DropdownMenuItem>
+              />
             ))}
           </DropdownMenu.Items>
         </DropdownMenu>
       </NativeHost>
     </View>
+  );
+}
+
+interface MenuItemProps {
+  item: ZSMenuItem;
+  composeColors: ComposeColors;
+  errorColor: string;
+  onErrorColor: string;
+  onClick: () => void;
+}
+
+/**
+ * `checked` 가 있는 항목은 고르는 항목 — M3 Expressive 선택 항목으로 그려 고른 항목에 강조 면과 앞 체크(아이콘 자리)를 두고,
+ * 선택 상태를 TalkBack 에 전달한다(Expo UI `MenuView` 의 `state` 와 같은 방식). 나머지는 일반 항목이다.
+ * 고른 파괴 항목은 primary 대신 error 면에 onError 글자·체크다.
+ */
+function MenuItem({ item, composeColors, errorColor, onErrorColor, onClick }: MenuItemProps) {
+  const icon = item.icon?.android ? <Icon source={item.icon.android} size={24} /> : null;
+  const label = <Text>{item.label}</Text>;
+  if (item.checked !== undefined) {
+    const colors = item.destructive
+      ? {
+          ...composeColors.selectableMenuItem,
+          textColor: errorColor,
+          leadingIconColor: errorColor,
+          selectedContainerColor: errorColor,
+          selectedTextColor: onErrorColor,
+          selectedLeadingIconColor: onErrorColor,
+        }
+      : composeColors.selectableMenuItem;
+    return (
+      <SelectableDropdownMenuItem selected={item.checked} enabled={!item.disabled} colors={colors} onClick={onClick}>
+        <SelectableDropdownMenuItem.Text>{label}</SelectableDropdownMenuItem.Text>
+        {icon ? <SelectableDropdownMenuItem.LeadingIcon>{icon}</SelectableDropdownMenuItem.LeadingIcon> : null}
+        <SelectableDropdownMenuItem.SelectedLeadingIcon>
+          <Icon source={MENU_CHECK_ICON} size={MENU_CHECK_ICON_SIZE} />
+        </SelectableDropdownMenuItem.SelectedLeadingIcon>
+      </SelectableDropdownMenuItem>
+    );
+  }
+  return (
+    <DropdownMenuItem
+      enabled={!item.disabled}
+      elementColors={item.destructive ? { ...composeColors.menuItem, textColor: errorColor, leadingIconColor: errorColor } : composeColors.menuItem}
+      onClick={onClick}
+    >
+      <DropdownMenuItem.Text>{label}</DropdownMenuItem.Text>
+      {icon ? <DropdownMenuItem.LeadingIcon>{icon}</DropdownMenuItem.LeadingIcon> : null}
+    </DropdownMenuItem>
   );
 }
 

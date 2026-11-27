@@ -87,7 +87,10 @@ describe('ZSMenu — Android M3 DropdownMenu', () => {
   });
 
   const dropdown = () => getByHostType('DropdownMenu');
-  const items = () => queryAllByHostType('DropdownMenuItem');
+  // 화면 순서대로 — 일반 항목(DropdownMenuItem)과 고르는 항목(SelectableDropdownMenuItem)을 함께
+  const items = () => queryAllByHostType('DropdownMenuItem').concat(queryAllByHostType('SelectableDropdownMenuItem'))
+    .sort((a, b) => ITEMS.findIndex((item) => item.label === labelOf(a)) - ITEMS.findIndex((item) => item.label === labelOf(b)));
+  const labelOf = (node: ReturnType<typeof getByHostType>) => getByHostType('Text', node).props.children;
 
   it('트리거를 RNHostView 로 감싸고 메뉴는 닫힌 채 시작한다(clipping 끔)', async () => {
     await render(
@@ -236,7 +239,7 @@ describe('ZSMenu — Android M3 DropdownMenu', () => {
     expect(dropdown().props.expanded).toBe(false);
   });
 
-  it('항목 아이콘·체크·파괴 색·비활성을 Compose 항목에 넘긴다', async () => {
+  it('항목 아이콘·파괴 색·비활성을 Compose 항목에 넘긴다 — checked 가 있는 항목만 M3 선택 항목이다', async () => {
     const { colors } = getTestTheme();
     await render(
       <ZSMenuAndroid items={ITEMS} onSelect={jest.fn()}>
@@ -244,27 +247,88 @@ describe('ZSMenu — Android M3 DropdownMenu', () => {
       </ZSMenuAndroid>,
     );
     expect(items().map((item) => item.props.enabled)).toEqual([true, true, false, true]);
+    expect(items().map((item) => item.type)).toEqual(['DropdownMenuItem', 'SelectableDropdownMenuItem', 'SelectableDropdownMenuItem', 'DropdownMenuItem']);
     const compose = createComposeColors(colors);
     expect(items()[3]?.props.elementColors).toEqual({ ...compose.menuItem, textColor: colors.error, leadingIconColor: colors.error });
     expect(items()[0]?.props.elementColors).toEqual(compose.menuItem);
     expect(getByHostType('DropdownMenu').props.color).toBe(colors.surface3);
-    expect(getByHostType('Icon').props).toEqual({ source: { uri: 'file:///edit.png' }, size: 24 });
+    expect(getByHostType('Icon', nth(items(), 0)).props).toEqual({ source: { uri: 'file:///edit.png' }, size: 24 });
     expect(queryAllByHostType('DropdownMenuItem.LeadingIcon')).toHaveLength(1);
-    expect(queryAllByHostType('DropdownMenuItem.TrailingIcon')).toHaveLength(1);
-    expect(screen.getByText('✓')).toBeTruthy();
+    expect(queryAllByHostType('DropdownMenuItem.TrailingIcon')).toHaveLength(0);
+    expect(screen.queryByText('✓')).toBeNull();
     expect(screen.getByText('삭제')).toBeTruthy();
   });
 
-  it('체크는 얇은 선택 표시라 먹(text) — 꼬리 아이콘 보조색·호박을 쓰지 않고, 비활성 항목은 비활성 글자색', async () => {
+  it('checked 항목은 selected 로 넘기고, 체크 아이콘은 선택 때만 보이는 앞 아이콘 자리에 둔다', async () => {
     const { colors } = getTestTheme();
     const compose = createComposeColors(colors);
     await render(
-      <ZSMenuAndroid items={[{ key: 'pin', label: '고정', checked: true }, { key: 'mute', label: '알림 끄기', checked: true, disabled: true }]} onSelect={jest.fn()}>
+      <ZSMenuAndroid items={[{ key: 'pin', label: '고정', checked: true }, { key: 'mute', label: '알림 끄기', checked: false, disabled: true }]} onSelect={jest.fn()}>
         <Text>열기</Text>
       </ZSMenuAndroid>,
     );
-    const marks = screen.getAllByText('✓');
-    expect(marks.map((mark) => mark.props.color)).toEqual([colors.text, compose.disabledText]);
-    expect(marks[0]?.props.color).not.toBe(colors.primary);
+    const selectable = queryAllByHostType('SelectableDropdownMenuItem');
+    expect(selectable.map((item) => [item.props.selected, item.props.enabled])).toEqual([[true, true], [false, false]]);
+    expect(selectable.map((item) => item.props.colors)).toEqual([compose.selectableMenuItem, compose.selectableMenuItem]);
+    for (const item of selectable) {
+      const check = getByHostType('Icon', getByHostType('SelectableDropdownMenuItem.SelectedLeadingIcon', item));
+      expect(check.props).toEqual({ source: { uri: 'zs_ui_check' }, size: 20 });
+    }
+  });
+
+  it('고르는 항목의 앞 아이콘은 LeadingIcon 자리 — 선택되면 체크가 그 자리를 대신한다', async () => {
+    await render(
+      <ZSMenuAndroid items={[{ key: 'grid', label: '격자', checked: true, icon: { android: { uri: 'file:///grid.png' } } }]} onSelect={jest.fn()}>
+        <Text>열기</Text>
+      </ZSMenuAndroid>,
+    );
+    const item = getByHostType('SelectableDropdownMenuItem');
+    expect(getByHostType('Icon', getByHostType('SelectableDropdownMenuItem.LeadingIcon', item)).props.source).toEqual({ uri: 'file:///grid.png' });
+  });
+
+  it('고른 항목은 primary 면에 onPrimary 글자·체크다(선택된 ZSChip 과 같은 넓은 채움 강조)', async () => {
+    const { colors } = getTestTheme();
+    await render(
+      <ZSMenuAndroid items={[{ key: 'pin', label: '고정', checked: true }]} onSelect={jest.fn()}>
+        <Text>열기</Text>
+      </ZSMenuAndroid>,
+    );
+    expect(getByHostType('SelectableDropdownMenuItem').props.colors).toMatchObject({
+      containerColor: '#00000000',
+      selectedContainerColor: colors.primary,
+      selectedTextColor: colors.onPrimary,
+      selectedLeadingIconColor: colors.onPrimary,
+    });
+  });
+
+  it('고른 파괴 항목은 error 면에 onError 글자·체크, 고르지 않으면 error 글자다', async () => {
+    const { colors } = getTestTheme();
+    const compose = createComposeColors(colors);
+    await render(
+      <ZSMenuAndroid items={[{ key: 'block', label: '차단', checked: true, destructive: true }]} onSelect={jest.fn()}>
+        <Text>열기</Text>
+      </ZSMenuAndroid>,
+    );
+    expect(getByHostType('SelectableDropdownMenuItem').props.colors).toEqual({
+      ...compose.selectableMenuItem,
+      textColor: colors.error,
+      leadingIconColor: colors.error,
+      selectedContainerColor: colors.error,
+      selectedTextColor: colors.onError,
+      selectedLeadingIconColor: colors.onError,
+    });
+  });
+
+  it('고르는 항목을 눌러도 닫고 key 를 알린다', async () => {
+    const onSelect = jest.fn();
+    await render(
+      <ZSMenuAndroid items={ITEMS} onSelect={onSelect}>
+        <Text>열기</Text>
+      </ZSMenuAndroid>,
+    );
+    await fireEvent.press(screen.getByText('열기'));
+    await act(() => nth(items(), 1).props.onClick());
+    expect(onSelect).toHaveBeenCalledWith('pin');
+    expect(dropdown().props.expanded).toBe(false);
   });
 });

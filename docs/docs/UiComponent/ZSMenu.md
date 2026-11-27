@@ -50,7 +50,7 @@ function MoreButton() {
 | `icon` | `{ sf?: string; android?: ImageSourcePropType }` | iOS SF Symbol 이름, Android 이미지 소스 |
 | `destructive` | `boolean` | 파괴 동작 — 빨간색(iOS 시스템 destructive, Android `error` 색) |
 | `disabled` | `boolean` | 고를 수 없음 |
-| `checked` | `boolean` | 켬·끔 상태 항목. iOS는 시스템 체크, Android는 끝에 `text` 색 ✓(비활성 항목은 비활성 색) |
+| `checked` | `boolean` | 켬·끔 상태 항목. iOS는 시스템 체크, Android는 Material 3 Expressive 선택 항목 — 켜면 `primary` 면에 `onPrimary` 글자·앞 체크가 붙고(앞 아이콘 자리를 체크가 대신합니다. 파괴 항목은 `error` 면에 `onError`) TalkBack에 선택 상태를 알립니다 |
 
 `ZSMenuProps`·`ZSMenuItem` 타입을 내보냅니다.
 

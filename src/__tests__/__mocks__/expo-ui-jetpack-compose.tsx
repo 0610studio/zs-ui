@@ -20,6 +20,7 @@ export const OutlinedTextField = Object.assign(
 
 export const DropdownMenu = compound('DropdownMenu', ['Trigger', 'Items'] as const);
 export const DropdownMenuItem = compound('DropdownMenuItem', ['Text', 'LeadingIcon', 'TrailingIcon'] as const);
+export const SelectableDropdownMenuItem = compound('SelectableDropdownMenuItem', ['Text', 'LeadingIcon', 'SelectedLeadingIcon', 'TrailingContent', 'SupportingText'] as const);
 export const SegmentedButton = compound('SegmentedButton', ['Label'] as const);
 export const Text = host('Text');
 export const ContainedLoadingIndicator = host('ContainedLoadingIndicator');

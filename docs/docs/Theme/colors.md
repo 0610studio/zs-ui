@@ -38,8 +38,8 @@ const { colors } = useTheme();
 
 | 쓰임 | 색 | zs-ui 컴포넌트 |
 |------|----|---------------|
-| 넓은 채움 강조 | `primary` 면 + `onPrimary` 글자·아이콘 | `ZSButton` `filled`, 선택된 `ZSChip`, `ZSSwitch` 켬, 스낵바 동작 버튼. `ZSCheckbox` 켬·고른 `ZSRadioGroup` 라디오도 `primary` 면이지만 체크·점은 흰색(플랫폼 기본 컨트롤처럼) |
-| 얇은 선택 표시(3:1 필요) | `text` | `ZSTextField` 포커스 테두리·라벨·커서, Android `ZSMenu` 체크 |
+| 넓은 채움 강조 | `primary` 면 + `onPrimary` 글자·아이콘 | `ZSButton` `filled`, 선택된 `ZSChip`, Android `ZSSelect`·`ZSMenu`의 고른 항목, `ZSSwitch` 켬, 스낵바 동작 버튼. `ZSCheckbox` 켬·고른 `ZSRadioGroup` 라디오도 `primary` 면이지만 체크·점은 흰색(플랫폼 기본 컨트롤처럼) |
+| 얇은 선택 표시(3:1 필요) | `text` | `ZSTextField` 포커스 테두리·라벨·커서 |
 | 글자 버튼·링크 | `text` | `ZSButton` `text`·`outlined`(`color="primary"`), 헤더 버튼·뒤로가기 |
 | 주색 표시(아이콘·선택 라벨, 3:1) | `primaryMark` | `ZSTabNavigator` 선택 아이콘·라벨, `ZSCalendar` 선택 카드 위 숫자 |
 | 브랜드 색조 글자(4.5:1) | `onPrimaryContainer` | `useStackTheme({ tint: 'primary' })`(밝은 시드일 때) |
