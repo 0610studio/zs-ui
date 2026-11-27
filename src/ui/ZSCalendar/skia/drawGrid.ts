@@ -16,7 +16,7 @@ import type {
   GridLayoutMetrics,
   ResolvedCalendarTheme,
 } from '../core';
-import { chipRect, dayCenter, dotCenter, dotColorsOn, dotRegionWidth, labelChipsOn, readableChipTextColor, weekdayColor } from '../core';
+import { chipRect, dayCenter, dotCenter, dotColorsOn, dotRegionWidth, labelChipsOn, MAX_DOT_ROWS, readableChipTextColor, weekdayColor } from '../core';
 import type { CalendarFonts } from './fonts';
 
 export interface MonthPaneParams {
@@ -253,10 +253,10 @@ export function drawWeekRow(canvas: SkCanvas, params: WeekRowParams, paints: Pan
     if (dots.length === 0) continue;
 
     const { dotRadius, dotGap, dotsPerRow } = metrics;
-    const rowCount = Math.ceil(dots.length / dotsPerRow);
     const dotOrigin = dotCenter(metrics, row, column);
     const rowPitch = dotRadius * 2 + dotGap;
-    const firstRowY = dotOrigin.y - ((rowCount - 1) * rowPitch) / 2;
+    // 점 줄은 두 줄 자리의 위에서부터 채운다(상단 정렬) — 한 줄이어도 두 줄일 때의 첫 줄 높이라 숫자에 붙어 보인다
+    const firstRowY = dotOrigin.y - ((MAX_DOT_ROWS - 1) * rowPitch) / 2;
 
     for (let i = 0; i < dots.length; i += 1) {
       const rowIndex = Math.floor(i / dotsPerRow);

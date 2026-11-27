@@ -168,6 +168,17 @@ describe('ZSCalendar skia/drawGrid — 선택 카드·오늘 원', () => {
     expect(metrics.maxDots).toBe(metrics.dotsPerRow * 2);
   });
 
+  it('dot 줄은 상단 정렬 — 한 줄이어도 두 줄일 때의 첫 줄 높이에 그린다', () => {
+    const away = { selectedDate: '2026-10-01', today: '2026-10-01' };
+    const one = recordArgs(params({ ...away, index: buildEventIndex([{ id: 'a', date: '2026-09-15' }]) })).circles;
+    const many = Array.from({ length: metrics.dotsPerRow + 1 }, (_, i) => ({ id: `e${i}`, date: '2026-09-15', color: `#${String(i).padStart(2, '0')}0000` }));
+    const two = recordArgs(params({ ...away, index: buildEventIndex(many) })).circles;
+    const rowYs = [...new Set(two.map((c) => c.y))].sort((a, b) => a - b);
+    expect(rowYs).toHaveLength(2);
+    expect(nth(one, 0).y).toBe(rowYs[0]);
+    expect(nth(one, 0).y).toBeLessThan(metrics.dotCenterOffsetY);
+  });
+
   it('dot 은 채움(fill) 칠로 그린다 — 링 칠을 쓰지 않는다', () => {
     const events = buildEventIndex([{ id: 'a', date: '2026-09-15', color: '#ff0000' }]);
     const { circles } = recordArgs(params({ index: events, selectedDate: '2026-10-01', today: '2026-10-01' }));
